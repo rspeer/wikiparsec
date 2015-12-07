@@ -302,7 +302,7 @@ LinkState.
 >   namespace :: String,
 >   page :: String,
 >   section :: String
-> } deriving (Show)
+> } deriving (Show, Eq)
 
 The {\tt makeLink} constructor allows creating a WikiLink where the
 values default to the empty string.
