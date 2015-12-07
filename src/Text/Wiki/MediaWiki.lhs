@@ -1,20 +1,20 @@
 \section{Setup}
 
-> module WikiText where
-
 To parse the mess that is Wiktionary, we make use of Parsec, perhaps the
 best-regarded parser-combinator library I've ever encountered.
 
 Parsec is explicitly designed around the way Haskell works. I wouldn't
 normally be using Haskell, but it does seem like the right tool for the job.
 
+> module Text.Wiki.MediaWiki where
 > import Text.Parsec hiding (parse, parseTest)
 > import Text.Parsec.Char
 > import Control.Monad.Identity
 
-Generally useful functions that are in other source files:
+Pull in some string-manipulating utilities that are defined elsewhere in
+this package:
 
-> import StringSplit
+> import Text.SplitUtils
 
 We're going to need to make use of Haskell's functional mapping type,
 Data.Map, to represent the contents of templates.
@@ -170,7 +170,7 @@ and ``do'' return their last argument.
 
 Internal links have many possible components. In general, they take the form:
 
->--   [[site:page#section|label]]
+>--   [[namespace:page#section|label]]
 
 The only part that has to be present is the page name. If the label is not
 given, then the label is the same as the page.
@@ -182,32 +182,42 @@ details of the link are added to the LinkState.
 
      In: [[word]]
     Out: "word"
-  State: {page=Just "word"} added to LinkState
+  State: [makeLink {page="word"}]
 
      In: [[word|this word]]
     Out: "this word"
-  State: {page=Just "word"} added to LinkState
+  State: [makeLink {page="word"}]
 
      In: [[word#English]]
     Out: "word"
-  State: {page=Just "word", section=Just "English"} added to LinkState
+  State: [makeLink {page="word", section="English"}]
 
      In: [[w:en:Word]]
     Out: "word"
-  State: {site=Just "w:en", page=Just "word"} added to LinkState
+  State: [makeLink {namespace="w:en", page="word"}]
+
+     In: [[Category:English nouns]]
+    Out: ""
+  State: [makeLink {namespace="Category", page="English nouns"}]
 
 \end{verbatim}
 
 > internalLink :: Parser String
 > internalLink = between (symbol "[[") (symbol "]]") internalLinkContents
 > internalLinkContents = do
->   site <- option "" (try sitePrefix)
 >   target <- linkTarget
->   text <- optionMaybe alternateText
->   updateState (addLink (parseLink target))
->   case text of
->     Just text' -> return text'
->     Nothing -> return target
+>   maybeText <- optionMaybe alternateText
+>   let link = (parseLink target) in do
+>     updateState (addLink link)
+>     case (namespace link) of
+>       -- Certain namespaces have special links that make their text disappear
+>       "Image"    -> return ""
+>       "Category" -> return ""
+>       "File"     -> return ""
+>       -- If the text didn't disappear, find the text that labels the link
+>       _          -> case maybeText of
+>         Just text  -> return text
+>         Nothing    -> return target
 >
 > linkTarget :: Parser String
 > linkTarget = many1 (noneOf "[]{}|<>\n")
@@ -216,12 +226,10 @@ details of the link are added to the LinkState.
 >
 > parseLink :: String -> WikiLink
 > parseLink target =
->   WikiLink {site=site, page=page, section=section}
+>   WikiLink {namespace=namespace, page=page, section=section}
 >   where
->     (site, local) = splitLast ':' target
+>     (namespace, local) = splitLast ':' target
 >     (page, section) = splitFirst '#' local
-
-
 
 \subsection{Templates}
 
@@ -283,7 +291,7 @@ But first, we need to recognize the syntax of templates.
 > textArg = many1 (noneOf "[]{}<>|")
 
 
-\section{Parser state}
+\section{Keeping track of links}
 
 As our parser runs, it will be collecting links in a value that we call a
 LinkState.
@@ -291,22 +299,34 @@ LinkState.
 > type LinkState = [WikiLink]
 >
 > data WikiLink = WikiLink {
->   site :: Maybe String,
->   page :: Maybe String,
->   section :: Maybe String
+>   namespace :: String,
+>   page :: String,
+>   section :: String
 > } deriving (Show)
->
+
+The {\tt makeLink} constructor allows creating a WikiLink where the
+values default to the empty string.
+
+> makeLink = WikiLink {namespace="", page="", section=""}
+
+Here are some functions that apply to LinkStates:
+
 > newState :: LinkState
 > newState = []
 >
 > resetState :: LinkState -> LinkState
 > resetState ps = []
-
+>
 > addLink :: WikiLink -> LinkState -> LinkState
 > addLink = (:)
 
-In some cases we'll modify a LinkState by adding new information to all
-of its WikiLink items at once. (TODO)
+And here's a variant of the wikiText parser combinator that returns the list
+of WikiLinks that it accumulates:
+
+> wikiTextLinks :: Parser LinkState
+> wikiTextLinks = do
+>   text <- wikiText
+>   getState
 
 
 \section{Entry points}

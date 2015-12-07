@@ -1,5 +1,5 @@
 import Test.HUnit
-import StringSplit
+import Text.SplitUtils
 
 splitTests = test [
     -- Test the case where the delimiter doesn't appear

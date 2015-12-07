@@ -1,6 +1,7 @@
-Some string-splitting functions that help us parse links without backtracking:
+Some string-splitting functions that help us parse Wikitext without
+backtracking:
 
-> module StringSplit (splitFirst, splitLast) where
+> module Text.SplitUtils (splitFirst, splitLast) where
 
 {\tt splitFirst} finds the first occurrence of a separator character, and
 splits the string at that point, returning the text before and after the
