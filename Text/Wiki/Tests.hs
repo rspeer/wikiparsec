@@ -3,28 +3,21 @@ import Text.Wiki.MediaWiki
 import Text.Parsec.Error
 import Data.Map (fromList)
 
--- I don't know why we need to re-define this here.
--- I just copied this out of the Text.Parsec.Error source.
-instance Eq ParseError where
-    l == r
-        = errorPos l == errorPos r && messageStrs l == messageStrs r
-        where
-          messageStrs = map messageString . errorMessages
-
 testParser parser input output =
   parse parser "(test)" input ~?= Right output
 
 testLinks = testParser wikiTextLinks
 
 linkTests = [
-    testParser wikiText "this [[word]]" "this word",
-    testParser wikiText "[[word|this word]]" "this word",
+    testParser wikiText "''this'' [[word]]" "this word",
+    testParser wikiText "[[word|''this'' word]]" "this word",
+    testParser wikiText "[[word|here's a word]]" "here's a word",
     testParser wikiText "this [[word#English]]" "this word",
     testParser wikiText "these [[w:en:word]]s" "these words",
     testParser wikiText "[[Category:English nouns]]" "",
 
     testLinks "this [[word]]" [makeLink {page="word"}],
-    testLinks "[[word|this word]]" [makeLink {page="word"}],
+    testLinks "[[word|''this'' word]]" [makeLink {page="word"}],
     testLinks "this [[word#English]]" [makeLink {page="word", section="English"}],
     testLinks "this [[w:en:word]]" [makeLink {namespace="w:en", page="word"}],
     testLinks "[[Category:English nouns]]" [makeLink {namespace="Category", page="English nouns"}]

@@ -22,6 +22,10 @@ this package:
 
 > import Text.SplitUtils
 
+And some more utilities from the MissingH package:
+
+> import Data.String.Utils
+
 
 \section{Data types}
 
@@ -120,10 +124,27 @@ away.
 >   manyTill anyChar (char '>')
 
 Our most reusable expression for miscellaneous text, {\tt basicText}, matches
-characters that aren't involved in any kind of Wiki syntax.
+characters that aren't involved in any interesting Wiki syntax.
+
+But wait, what about the *uninteresting* Wiki syntax? Any span of Wikitext can
+have double or triple apostrophes in it to indicate bold and italic text.
+Single apostrophes are, of course, just apostrophes.
+
+We could modify every parse rule that handles basic text to also have a case
+for bold and italic spans and an exception for individual apostrophes, but
+instead, we could take advantage of the fact that these spans are at the lowest
+level of syntax and we want to ignore them anyway.
+
+We'll just post-process the parse result to remove the sequences of
+apostrophes, by chaining it through the {\tt ignoreSpans} function.
 
 > basicText :: Parser String
-> basicText = many1 (noneOf "[]{}|<>:=\n")
+> basicText = many1 (noneOf "[]{}|<>:=\n") >>= ignoreSpans
+>
+> ignoreSpans = return . discardSpans
+>
+> discardSpans :: String -> String
+> discardSpans = (replace "''" "") . (replace "'''" "")
 
 However, there's a quirk: things that would cause syntax errors just get output
 as themselves. So sometimes, some of the above characters are going to appear
@@ -151,7 +172,7 @@ ignoredTemplate} rule.
 > wikiTextLine :: Parser String
 > wikiTextLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine]
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, eol]
-> textLine = many1 (noneOf "[]{}<>\n")
+> textLine = many1 (noneOf "[]{}<>\n") >>= ignoreSpans
 > eol = string "\n"
 
 
@@ -183,7 +204,7 @@ and ``do'' return their last argument.
 > schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
 > urlPath = many1 (noneOf "[]{}<>| ")
 > linkTitle = textChoices [ignored, linkText]
-> linkText = many1 (noneOf "[]{}|<>")
+> linkText = many1 (noneOf "[]{}|<>") >>= ignoreSpans
 
 Internal links have many possible components. In general, they take the form:
 
@@ -305,7 +326,7 @@ But first, we need to recognize the syntax of templates.
 > endOfTemplate = symbol "}}" >> return Map.empty
 >
 > wikiTextArg = textChoices [ignored, internalLink, externalLink, looseBracket, textArg]
-> textArg = many1 (noneOf "[]{}<>|")
+> textArg = many1 (noneOf "[]{}<>|") >>= ignoreSpans
 
 
 \section{Keeping track of state}
