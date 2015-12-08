@@ -90,6 +90,26 @@ and concatenates together their results.
 >   parts <- many combinator
 >   return (concat parts)
 
+\subsection{The ``and-then'' operator}
+
+I'm going to define a new operator that's going to be pretty useful in a lot of
+these expressions. Often I have a function that's in some monad, like {\tt
+Parser String}, and I want to apply a transformation to its output, like {\tt
+String -> String}.
+
+The {\tt liftM} function almost does this: it converts {\tt String -> String}
+to {\tt Parser String -> Parser String}, for example. But it's just a function,
+and you apply functions on the left... so the last thing you do has to be the
+first thing you write. This is confusing because the rest of the parser
+expression is usually written in sequential order, especially when it's using
+{\tt do} syntax.
+
+So this operator, the ``and-then'' operator, lets me write the thing that needs
+to happen to the output at the end. I could just define it as (flip liftM), but
+that would be pointless. (Functional programming puns! Hooray!)
+
+> (&>) :: Monad m => m a -> (a -> b) -> m b
+> (&>) result f = liftM f result
 
 \section{Spans of text}
 
@@ -136,20 +156,19 @@ instead, we could take advantage of the fact that these spans are at the lowest
 level of syntax and we want to ignore them anyway.
 
 We'll just post-process the parse result to remove the sequences of
-apostrophes, by chaining it through the {\tt ignoreSpans} function.
+apostrophes, by chaining it through the {\tt discardSpans} function.
 
 > basicText :: Parser String
-> basicText = many1 (noneOf "[]{}|<>:=\n") >>= ignoreSpans
->
-> ignoreSpans = return . discardSpans
+> basicText = many1 (noneOf "[]{}|<>:=\n") &> discardSpans
 >
 > discardSpans :: String -> String
 > discardSpans = (replace "''" "") . (replace "'''" "")
 
-However, there's a quirk: things that would cause syntax errors just get output
-as themselves. So sometimes, some of the above characters are going to appear
-as plain text, even in contexts where they would have a meaning -- such as
-a single closing bracket when two closing brackets would end a link.
+There's a quirk in Wiki syntax: things that would cause syntax errors just get
+output as themselves. So sometimes, some of the characters excluded by {\tt
+basicText} are going to appear as plain text, even in contexts where they would
+have a meaning -- such as a single closing bracket when two closing brackets
+would end a link.
 
 It would be excessive to actually try to simulate MediaWiki's error handling,
 but we can write this expression that allows ``loose brackets'' to be matched
@@ -172,11 +191,13 @@ ignoredTemplate} rule.
 > wikiTextLine :: Parser String
 > wikiTextLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine]
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, eol]
-> textLine = many1 (noneOf "[]{}<>\n") >>= ignoreSpans
+> textLine = many1 (noneOf "[]{}<>\n") &> discardSpans
 > eol = string "\n"
 
 
 \section{Wiki syntax items}
+
+\subsection{Links}
 
 External links appear in single brackets. They contain a URL, a space, and
 the text that labels the link, such as:
@@ -204,7 +225,7 @@ and ``do'' return their last argument.
 > schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
 > urlPath = many1 (noneOf "[]{}<>| ")
 > linkTitle = textChoices [ignored, linkText]
-> linkText = many1 (noneOf "[]{}|<>") >>= ignoreSpans
+> linkText = many1 (noneOf "[]{}|<>") &> discardSpans
 
 Internal links have many possible components. In general, they take the form:
 
@@ -269,6 +290,68 @@ details of the link are added to the LinkState.
 >     (namespace, local) = splitLast ':' target
 >     (page, section) = splitFirst '#' local
 
+\subsection{Headings}
+
+When parsing an entire Wiki article, you'll need to identify where the
+headings are. This is especially true on Wiktionary, where the
+domain-specific parsing rules will change based on the heading.
+
+The {\tt heading} parser looks for a heading of a particular level (for
+example, a level-2 heading is one delimited by {\tt ==}), and returns its
+title.
+
+> heading :: Int -> Parser String
+> heading level =
+>   let delimiter = (replicate level '=') in do
+>     symbol delimiter
+>     optional sameLineSpaces
+>     text <- headingText
+>     optional sameLineSpaces
+>     symbol delimiter
+>     optional sameLineSpaces
+>     eol
+>     return text
+>
+> headingText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, basicText]
+
+\subsection{Lists}
+
+> data ListItem = Item String | ListHeading String | BulletList [ListItem] | OrderedList [ListItem] | IndentedList [ListItem]
+>
+> listItems :: String -> Parser [ListItem]
+> listItems marker = do
+>   lookAhead (string marker)
+>   many1 (listItem marker)
+>
+> listItem :: String -> Parser ListItem
+> listItem marker = subList marker <|> singleListItem marker
+> 
+> subList :: String -> Parser ListItem
+> subList marker =   bulletList (marker ++ "*")
+>                <|> orderedList (marker ++ "#")
+>                <|> indentedList (marker ++ ":")
+>                <|> listHeading (marker ++ ";")
+>
+> anyList :: Parser ListItem
+> anyList = subList ""
+>
+> listHeading :: String -> Parser ListItem
+> listHeading marker = listItemContent marker &> ListHeading
+>
+> singleListItem :: String -> Parser ListItem
+> singleListItem marker = listItemContent marker &> Item
+>
+> listItemContent :: String -> Parser String
+> listItemContent marker = do
+>   symbol marker
+>   line <- wikiTextLine
+>   eol
+>   return line
+>
+> bulletList marker   = listItems marker &> BulletList
+> orderedList marker  = listItems marker &> OrderedList
+> indentedList marker = listItems marker &> IndentedList
+
 \subsection{Templates}
 
 A simple template looks like this:
@@ -285,9 +368,12 @@ And very complex templates can have both positional and named arguments:
 
 Some templates are more detailed versions of internal links. Some are metadata
 that we can simply ignore. The ultimate semantics of a template can depend both
-on its contents and the section in which it appears.
+on its contents and the section in which it appears, so these semantics need to
+be defined in the parsing rules for a specific wiki such as the English
+Wiktionary.
 
-But first, we need to recognize the syntax of templates.
+Here, we define the basic syntax of templates, and return their contents in a
+standardized form as a mapping from argument names to values.
 
 > template :: Parser TemplateData
 > template = symbol "{{" >> (templateArgs 0)
@@ -295,7 +381,7 @@ But first, we need to recognize the syntax of templates.
 > ignoredTemplate :: Parser String
 > ignoredTemplate = template >> return ""
 
-> templateArgs :: Integer -> Parser TemplateData
+> templateArgs :: Int -> Parser TemplateData
 > templateArgs offset = do
 >   nameMaybe <- optionMaybe (try templateArgName)
 >   case nameMaybe of
@@ -308,26 +394,34 @@ But first, we need to recognize the syntax of templates.
 >   string "="
 >   return name
 >
-> namedArg :: String -> Integer -> Parser TemplateData
+> namedArg :: String -> Int -> Parser TemplateData
 > namedArg name offset = do
 >   value <- wikiTextArg
 >   rest <- templateRest offset
 >   return (Map.insert name value rest)
 >
-> positionalArg :: Integer -> Parser TemplateData
+> positionalArg :: Int -> Parser TemplateData
 > positionalArg offset = do
 >   value <- wikiTextArg
 >   rest <- templateRest (offset + 1)
 >   return (Map.insert (show offset) value rest)
 >
-> templateRest :: Integer -> Parser TemplateData
+> templateRest :: Int -> Parser TemplateData
 > templateRest offset = endOfTemplate <|> (string "|" >> templateArgs offset)
 >
 > endOfTemplate = symbol "}}" >> return Map.empty
 >
 > wikiTextArg = textChoices [ignored, internalLink, externalLink, looseBracket, textArg]
-> textArg = many1 (noneOf "[]{}<>|") >>= ignoreSpans
+> textArg = many1 (noneOf "[]{}<>|") &> discardSpans
 
+We can simplify some of this parsing in the case where we are looking for a
+{\em particular} template.
+
+> knownTemplate :: String -> Parser TemplateData
+> knownTemplate name = do
+>   symbol ("{{" ++ name)
+>   parsed <- templateArgs 1
+>   return (Map.insert "0" name parsed)
 
 \section{Keeping track of state}
 
