@@ -11,30 +11,47 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import Text.Parsec.Char
 > import Control.Monad.Identity
 
-Pull in some string-manipulating utilities that are defined elsewhere in
-this package:
-
-> import Text.SplitUtils
-
 We're going to need to make use of Haskell's functional mapping type,
 Data.Map, to represent the contents of templates.
 
 > import Data.Map (Map)
 > import qualified Data.Map as Map
+
+Pull in some string-manipulating utilities that are defined elsewhere in
+this package:
+
+> import Text.SplitUtils
+
+
+\section{Data types}
+
+An internal link is represented as a record of a type we'll define here,
+called ``WikiLink''.
+
+> data WikiLink = WikiLink {
+>   namespace :: String,
+>   page :: String,
+>   section :: String
+> } deriving (Show, Eq)
+
+An invocation of a template is represented as a Map from parameter names to
+values.  Both the names and the values are strings.
+
 > type TemplateData = Map String String
 
 We'll also define a type expression called Parser. The type expression Parsec
 takes three arguments: the input type, the state type, and the output type.
 
 For most expressions in this file, the input type will be String and the state
-type will be LinkState, a relatively short-lived state that keeps track of
-links that have appeared in the text. Let's gloss over LinkState for now
-and define it at the end of the module.
-
-All we have left to specify is the output type, which can vary, so we won't
-fill in that argument.
+type will be LinkState, a short-lived state that keeps track of links that have
+appeared in the text. All we have left to specify is the output type, which can
+vary, so we won't fill in that argument.
 
 > type Parser = Parsec String LinkState
+
+The definition of LinkState will be straightforward -- it's just a list of
+WikiLinks -- but let's save defining it for later, because we're also going to
+define some functions for working with it.
 
 
 \section{Parser-making expressions}
@@ -217,7 +234,7 @@ details of the link are added to the LinkState.
 >       -- If the text didn't disappear, find the text that labels the link
 >       _          -> case maybeText of
 >         Just text  -> return text
->         Nothing    -> return target
+>         Nothing    -> return (page link)
 >
 > linkTarget :: Parser String
 > linkTarget = many1 (noneOf "[]{}|<>\n")
@@ -291,18 +308,12 @@ But first, we need to recognize the syntax of templates.
 > textArg = many1 (noneOf "[]{}<>|")
 
 
-\section{Keeping track of links}
+\section{Keeping track of state}
 
 As our parser runs, it will be collecting links in a value that we call a
 LinkState.
 
 > type LinkState = [WikiLink]
->
-> data WikiLink = WikiLink {
->   namespace :: String,
->   page :: String,
->   section :: String
-> } deriving (Show, Eq)
 
 The {\tt makeLink} constructor allows creating a WikiLink where the
 values default to the empty string.
