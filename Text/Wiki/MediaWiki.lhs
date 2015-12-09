@@ -190,9 +190,12 @@ ignoredTemplate} rule.
 
 > wikiTextLine :: Parser String
 > wikiTextLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine]
-> wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, eol]
+> wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
 > textLine = many1 (noneOf "[]{}<>\n") &> discardSpans
-> eol = string "\n"
+> newLine = string "\n"
+
+> eol :: Parser ()
+> eol = (newLine >> return ()) <|> eof
 
 
 \section{Wiki syntax items}
@@ -309,14 +312,19 @@ title.
 >     optional sameLineSpaces
 >     symbol delimiter
 >     optional sameLineSpaces
->     eol
+>     newLine
 >     return text
 >
 > headingText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, basicText]
 
 \subsection{Lists}
 
-> data ListItem = Item String | ListHeading String | BulletList [ListItem] | OrderedList [ListItem] | IndentedList [ListItem]
+> data ListItem = Item String
+>               | ListHeading String
+>               | BulletList [ListItem]
+>               | OrderedList [ListItem]
+>               | IndentedList [ListItem]
+>               deriving (Show, Eq)
 >
 > listItems :: String -> Parser [ListItem]
 > listItems marker = do
@@ -327,10 +335,10 @@ title.
 > listItem marker = subList marker <|> singleListItem marker
 > 
 > subList :: String -> Parser ListItem
-> subList marker =   bulletList (marker ++ "*")
->                <|> orderedList (marker ++ "#")
->                <|> indentedList (marker ++ ":")
->                <|> listHeading (marker ++ ";")
+> subList marker =   try (bulletList (marker ++ "*"))
+>                <|> try (orderedList (marker ++ "#"))
+>                <|> try (indentedList (marker ++ ":"))
+>                <|> try (listHeading (marker ++ ";"))
 >
 > anyList :: Parser ListItem
 > anyList = subList ""
@@ -344,6 +352,7 @@ title.
 > listItemContent :: String -> Parser String
 > listItemContent marker = do
 >   symbol marker
+>   optional sameLineSpaces
 >   line <- wikiTextLine
 >   eol
 >   return line

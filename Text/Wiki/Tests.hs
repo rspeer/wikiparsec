@@ -33,5 +33,11 @@ templateTests = [
     testLinks "{{t|ja|例え|tr=[[たとえ]], tatoe}}" [makeLink {page="たとえ"}]
     ]
 
-tests = test (linkTests ++ templateTests)
+listTests = [
+    testParser anyList "* item 1\n* item 2" $ BulletList [Item "item 1", Item "item 2"],
+    testParser anyList "# item 1\n# item 2\n" $ OrderedList [Item "item 1", Item "item 2"],
+    testParser anyList "# item 1\n#* item 2a\n#* item 2b\n# item 3" $ OrderedList [Item "item 1", BulletList [Item "item 2a", Item "item 2b"], Item "item 3"]
+    ]
+
+tests = test (linkTests ++ templateTests ++ listTests)
 main = runTestTT tests
