@@ -87,7 +87,7 @@ and concatenates together their results.
 >
 > concatMany :: Parser String -> Parser String
 > concatMany combinator = do
->   parts <- many combinator
+>   parts <- many1 combinator
 >   return (concat parts)
 
 \subsection{The ``and-then'' operator}
@@ -111,6 +111,7 @@ that would be pointless. (Functional programming puns! Hooray!)
 > (&>) :: Monad m => m a -> (a -> b) -> m b
 > (&>) result f = liftM f result
 
+
 \section{Spans of text}
 
 I forget exactly why, but I think we're going to need an expression that
@@ -123,25 +124,33 @@ Wikitext is whitespace-sensitive. (FIXME describe more)
 > sameLineSpaces :: Parser ()
 > sameLineSpaces = skipMany (oneOf " \t")
 
-The ``ignored'' expression matches HTML tags and comments and throws them
-away.
+The ``ignored'' expression matches HTML tags and comments and throws them away.
+We also throw away the contents between the open and close of certain tags,
+such as {\tt ref}.
 
 > ignored :: Parser String
 > ignored = do
 >   skipMany1 ignoredItem
 >   return ""
 >
-> ignoredItem = try htmlComment <|> try htmlTag
+> ignoredItem = htmlComment <|> htmlTag
 >
 > htmlComment :: Parser String
 > htmlComment = do
->   string "<!--"
+>   symbol "<!--"
 >   manyTill anyChar (symbol "-->")
 >
 > htmlTag :: Parser String
 > htmlTag = do
 >   char '<'
->   manyTill anyChar (char '>')
+>   try htmlSkippedSpan <|> manyTill anyChar (char '>')
+>
+> htmlSkippedSpan = do
+>   tagName <- symbol "ref" <|> symbol "gallery" <|> symbol "hiero" <|> symbol "timeline"
+>   restOfTag <- manyTill anyChar (char '>')
+>   if (endswith "/" (rstrip restOfTag))
+>   then return ""
+>   else manyTill anyChar (symbol ("</" ++ tagName ++ ">"))
 
 Our most reusable expression for miscellaneous text, {\tt basicText}, matches
 characters that aren't involved in any interesting Wiki syntax.
@@ -190,8 +199,14 @@ ignoredTemplate} rule.
 
 > wikiTextLine :: Parser String
 > wikiTextLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine]
+>
+> wikiNonHeadingLine :: Parser String
+> wikiNonHeadingLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine]
+>
+> wikiText :: Parser String
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
 > textLine = many1 (noneOf "[]{}<>\n") &> discardSpans
+> nonHeadingLine = notFollowedBy (string "=") >> textLine
 > newLine = string "\n"
 
 > eol :: Parser ()
@@ -228,7 +243,7 @@ and ``do'' return their last argument.
 > schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
 > urlPath = many1 (noneOf "[]{}<>| ")
 > linkTitle = textChoices [ignored, linkText]
-> linkText = many1 (noneOf "[]{}|<>") &> discardSpans
+> linkText = many1 (noneOf "[]{}<>") &> discardSpans
 
 Internal links have many possible components. In general, they take the form:
 
@@ -309,15 +324,17 @@ title.
 >     symbol delimiter
 >     optional sameLineSpaces
 >     text <- headingText
->     optional sameLineSpaces
 >     symbol delimiter
 >     optional sameLineSpaces
 >     newLine
->     return text
+>     return (rstrip text)
 >
 > headingText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, basicText]
 
 \subsection{Lists}
+
+Here's a hierarchical data type for describing the contents of lists, which
+semantically can contain other lists.
 
 > data ListItem = Item String
 >               | ListHeading String
@@ -325,7 +342,21 @@ title.
 >               | OrderedList [ListItem]
 >               | IndentedList [ListItem]
 >               deriving (Show, Eq)
+
+Sometimes we just want the text that the list contains. {\tt extractText}
+returns the text of the list items (whatever kind of items they are) separated
+by line breaks.
+
+> extractText :: ListItem -> String
+> extractText (Item s) = s
+> extractText (ListHeading s) = s
+> extractText (BulletList items) = extractTextFromList items
+> extractText (OrderedList items) = extractTextFromList items
+> extractText (IndentedList items) = extractTextFromList items
 >
+> extractTextFromList :: [ListItem] -> String
+> extractTextFromList items = unlines (map extractText items)
+
 > listItems :: String -> Parser [ListItem]
 > listItems marker = do
 >   lookAhead (string marker)
@@ -342,6 +373,9 @@ title.
 >
 > anyList :: Parser ListItem
 > anyList = subList ""
+>
+> anyListText :: Parser String
+> anyListText = anyList &> extractText
 >
 > listHeading :: String -> Parser ListItem
 > listHeading marker = listItemContent marker &> ListHeading
@@ -424,13 +458,35 @@ standardized form as a mapping from argument names to values.
 > textArg = many1 (noneOf "[]{}<>|") &> discardSpans
 
 We can simplify some of this parsing in the case where we are looking for a
-{\em particular} template.
+{\em particular} template. We start by expecting two left braces and the name
+of the template, then parse the rest of the template as usual.
+
+We set the template name as arg 0, as it would be if we were using the more
+general rule for parsing template expressions.
 
 > specificTemplate :: String -> Parser TemplateData
 > specificTemplate name = do
 >   symbol ("{{" ++ name)
 >   parsed <- templateRest 1
 >   return (Map.insert "0" name parsed)
+
+\subsection{Tables}
+
+Tables have complex formatting, and thus far we're just going to be skipping them.
+
+TODO
+
+
+\section{Parsing sections at a time}
+
+> sectionText :: Int -> Parser String
+> sectionText level = do
+>   theHeading <- heading level
+>   theContent <- sectionContent level
+>   return (unlines [theHeading, "", theContent, ""])
+>
+> sectionContent level = textChoices [sectionText (level + 1) &> rstrip, anyListText, wikiNonHeadingLine, newLine]
+
 
 \section{Keeping track of state}
 
