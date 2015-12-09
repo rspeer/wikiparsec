@@ -20,7 +20,7 @@ Data.Map, to represent the contents of templates.
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
-> import Text.SplitUtils
+> import Text.Wiki.SplitUtils
 
 And some more utilities from the MissingH package:
 
@@ -333,7 +333,7 @@ title.
 >
 > listItem :: String -> Parser ListItem
 > listItem marker = subList marker <|> singleListItem marker
-> 
+>
 > subList :: String -> Parser ListItem
 > subList marker =   try (bulletList (marker ++ "*"))
 >                <|> try (orderedList (marker ++ "#"))
@@ -426,10 +426,10 @@ standardized form as a mapping from argument names to values.
 We can simplify some of this parsing in the case where we are looking for a
 {\em particular} template.
 
-> knownTemplate :: String -> Parser TemplateData
-> knownTemplate name = do
+> specificTemplate :: String -> Parser TemplateData
+> specificTemplate name = do
 >   symbol ("{{" ++ name)
->   parsed <- templateArgs 1
+>   parsed <- templateRest 1
 >   return (Map.insert "0" name parsed)
 
 \section{Keeping track of state}
