@@ -3,7 +3,7 @@ backtracking:
 
 > module Text.Wiki.SplitUtils (splitFirst, splitLast) where
 
-{\tt splitFirst} finds the first occurrence of a separator character, and
+`splitFirst` finds the first occurrence of a separator character, and
 splits the string at that point, returning the text before and after the
 separator. If the separator never appears, the suffix will be the empty string.
 
@@ -15,9 +15,9 @@ separator. If the separator never appears, the suffix will be the empty string.
 >   else let (before, after) = splitFirst char rest
 >         in (next:before, after)
 
-{\tt splitLast} finds the {\em last} occurrence of a separator character
+`splitLast` finds the *last* occurrence of a separator character
 and splits the string at that point. This is easiest to define as a reversal
-of {\tt splitFirst}.
+of `splitFirst`.
 
 > splitLast :: (Eq a) => a -> [a] -> ([a], [a])
 > splitLast char str =
