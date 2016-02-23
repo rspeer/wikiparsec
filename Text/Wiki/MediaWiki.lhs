@@ -161,7 +161,7 @@ such as `ref`.
 Our most reusable expression for miscellaneous text, `basicText`, matches
 characters that aren't involved in any interesting Wiki syntax.
 
-But wait, what about the *uninteresting* Wiki syntax? Any span of Wikitext can
+But what about the *uninteresting* Wiki syntax? Any span of Wikitext can
 have double or triple apostrophes in it to indicate bold and italic text.
 Single apostrophes are, of course, just apostrophes.
 
@@ -200,8 +200,8 @@ as text:
 
 Wikitext in general is made of HTML, links, templates, and miscellaneous text.
 We'll parse templates for their meaning below, but in situations where we don't
-care about templates, we simply discard their contents using the {\tt
-ignoredTemplate} rule.
+care about templates, we simply discard their contents using the
+`ignoredTemplate` rule.
 
 > wikiTextLine :: Parser String
 > wikiTextLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine]
@@ -237,7 +237,7 @@ link that is just a bare URL in the text. Its effect on the text is exactly
 the same as if it weren't a link, so we can disregard that case.
 
 The following rules extract the text of an external link, as both `between`
-and `do` return their last argument.
+and `do` return what their last argument matches.
 
 > externalLink :: Parser String
 > externalLink = between (string "[") (string "]") externalLinkContents
@@ -261,24 +261,24 @@ given, then the label is the same as the page.
 When parsing internal links, we return just their label. However, other
 details of the link are added to the LinkState.
 
-         In: [[word]]
-        Out: "word"
+      In:    [[word]]
+      Out:   "word"
       State: [makeLink {page="word"}]
 
-         In: [[word|this word]]
-        Out: "this word"
+      In:    [[word|this word]]
+      Out:   "this word"
       State: [makeLink {page="word"}]
 
-         In: [[word#English]]
-        Out: "word"
+      In:    [[word#English]]
+      Out:   "word"
       State: [makeLink {page="word", section="English"}]
 
-         In: [[w:en:Word]]
-        Out: "word"
+      In:    [[w:en:Word]]
+      Out:   "word"
       State: [makeLink {namespace="w:en", page="word"}]
 
-         In: [[Category:English nouns]]
-        Out: ""
+      In:    [[Category:English nouns]]
+      Out:   ""
       State: [makeLink {namespace="Category", page="English nouns"}]
 
 
@@ -297,6 +297,7 @@ details of the link are added to the LinkState.
 >       -- If the text didn't disappear, find the text that labels the link
 >       _          -> case maybeText of
 >         Just text  -> return text
+>         -- With no alternate text, the text is the name of the target page
 >         Nothing    -> return (page link)
 >
 > linkTarget :: Parser String
@@ -310,6 +311,7 @@ details of the link are added to the LinkState.
 >   where
 >     (namespace, local) = splitLast ':' target
 >     (page, section) = splitFirst '#' local
+
 
 Headings
 --------
