@@ -63,7 +63,11 @@ articleSection = unlines [
     "Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous [[Grand Duchy of Finland|grand duchy]] within the [[Russian Empire]] having earlier been under Swedish control for many centuries.<ref name= grove3>{{cite web|last= Hepokoski|first= James|title= 1865–89: early years|url= http://www.oxfordmusiconline.com/subscriber/article/grove/music/43725?q=Sibelius&search=quick&pos=1&_start=1|publisher= Grove Music Online|accessdate= 2 August 2013}} {{subscription}}</ref> The country remained divided between a culturally dominant Swedish-speaking minority, to which the Sibelius family belonged, and a more nationalistically-minded Finnish-speaking, or \"[[Fennoman movement|Fennoman]]\" majority.<ref>Rickards, p. 22</ref> In about 1889 Sibelius met his future wife, [[Aino Sibelius|Aino Järnefelt]], who came from a staunch Fennoman family.<ref name= Vesa5>{{cite web|last= Sirén|first= Vesa; Hartikainen, Markku; Kilpeläinen, Kari|title= Studies in Helsinki 1885–1888 |url= http://www.sibelius.fi/english/elamankaari/sib_opinnot_helsinki.htm|publisher= \"Sibelius\" website: Sibelius the Man|accessdate= 2 August 2013|display-authors=etal}}</ref> Sibelius's association with the Järnefelts helped to awaken and develop his own nationalism; in 1892, the year of his marriage to Aino, he completed his first overtly nationalistic work, the symphonic suite ''[[Kullervo (Sibelius)|Kullervo]]''.<ref>Rickards, pp. 50–51</ref> Through the 1890s, as Russian control over the duchy grew increasingly oppressive, Sibelius produced a series of works reflecting Finnish resistance to foreign rule, culminating in the tone poem ''[[Finlandia]]''.<ref>Rickards, pp. 68–69</ref>",
     "",
     "===Subsection===",
-    "This subsection wasn't actually in the article."
+    "This subsection wasn't actually in the article.",
+    "{|",
+    "| This is a table",
+    "| This is still a table",
+    "|}"
     ]
 
 articleSectionText = unlines [
@@ -89,5 +93,12 @@ sectionTests = [
     ]
 
 
-tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests)
+tableTests = [
+   testParser wikiTable "{|\npointless table\n|}" "pointless table",
+   testParser wikiTable "{|\n|incomplete table" "|incomplete table",
+   testParser wikiTable "\n|incomplete table\n|}" ""
+   ]
+
+
+tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests ++ tableTests)
 main = runTestTT tests

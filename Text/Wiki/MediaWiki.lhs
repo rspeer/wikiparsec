@@ -93,6 +93,18 @@ and concatenates together their results.
 >   parts <- many1 combinator
 >   return (concat parts)
 
+Sometimes a token starts some special environment that will consume everything
+until an ending token. An example would be HTML comments, which consume
+everything between `<!--` and `-->`.
+
+We need to output something besides an error in the case where the ending token
+never appears, though. What we choose to do is to consume everything up to the
+end of the input, and return what we consumed.
+
+> delimitedSpan :: String -> String -> Parser String
+> delimitedSpan open close = do
+>   symbol open
+>   manyTill anyChar (symbol close <|> (eof >> return ""))
 
 The "and-then" operator
 -----------------------
@@ -132,19 +144,17 @@ Wikitext is whitespace-sensitive. (FIXME describe more)
 
 The "ignored" expression matches HTML tags and comments and throws them away.
 We also throw away the contents between the open and close of certain tags,
-such as `ref`.
+such as `ref`, and all table syntax (defined in its own section).
 
 > ignored :: Parser String
 > ignored = do
 >   skipMany1 ignoredItem
 >   return ""
 >
-> ignoredItem = htmlComment <|> htmlTag
+> ignoredItem = htmlComment <|> htmlTag <|> wikiTable
 >
 > htmlComment :: Parser String
-> htmlComment = do
->   symbol "<!--"
->   manyTill anyChar (symbol "-->")
+> htmlComment = delimitedSpan "<!--" "-->"
 >
 > htmlTag :: Parser String
 > htmlTag = do
@@ -213,8 +223,10 @@ care about templates, we simply discard their contents using the
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
 > textLine = many1 (noneOf "[]{}<>\n") &> discardSpans
 > nonHeadingLine = notFollowedBy (string "=") >> textLine
+>
+> newLine :: Parser String
 > newLine = string "\n"
-
+>
 > eol :: Parser ()
 > eol = (newLine >> return ()) <|> eof
 
@@ -484,9 +496,32 @@ general rule for parsing template expressions.
 Tables
 ------
 
-Tables have complex formatting, and thus far we're just going to be skipping them.
+Tables have complex formatting, and thus far we're just going to be skipping
+them as if they were comments. For the purpose of testing and possibly doing
+something useful with tables in the future, tables return the wikitext they
+contain.
 
-TODO
+> wikiTable :: Parser String
+> wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> return ""))
+>
+> wikiTableComplete :: Parser String
+> wikiTableComplete = delimitedSpan "{|" "|}" &> strip
+
+MediaWiki templates can be used in horrifying ways, and one way that they're
+sometimes used (particularly on Wikipedia) is to start a table that is then
+ended outside the template.
+
+We don't know which templates leave tables hanging open, but when we skip over
+such a template, we'll see a bunch of lines starting with |. Lines intended as
+text don't normally start with vertical bars. So we can clean up incomplete
+tables by skipping over all such lines.
+
+> wikiTableDetritus :: Parser ()
+> wikiTableDetritus = do
+>   newLine
+>   string "|"
+>   many (noneOf "\n")
+>   try wikiTableDetritus <|> eol
 
 
 Parsing sections at a time
@@ -498,7 +533,9 @@ Parsing sections at a time
 >   theContent <- sectionContent level
 >   return (unlines [theHeading, "", theContent, ""])
 >
-> sectionContent level = textChoices [sectionText (level + 1) &> rstrip, anyListText, wikiNonHeadingLine, newLine]
+> sectionContent level = textChoices [
+>     sectionText (level + 1) &> rstrip,
+>     anyListText, wikiNonHeadingLine, newLine]
 
 
 Keeping track of state
