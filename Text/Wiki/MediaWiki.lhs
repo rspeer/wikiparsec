@@ -527,6 +527,9 @@ tables by skipping over all such lines.
 Parsing sections at a time
 --------------------------
 
+These functions are designed to take in entire sections of wikitext,
+or an entire page, and return the plain text that they contain.
+
 > sectionText :: Int -> Parser String
 > sectionText level = do
 >   theHeading <- heading level
@@ -536,6 +539,15 @@ Parsing sections at a time
 > sectionContent level = textChoices [
 >     sectionText (level + 1) &> rstrip,
 >     anyListText, wikiNonHeadingLine, newLine]
+
+A page usually acts like the content of a level-1 section, without a heading
+(because the heading is actually the page title). However, a Wiki page can
+also contain level-1 headings, though it's discouraged. If we encounter a
+level-1 heading, then the level-1 section we're parsing will end, but at
+that point we can begin parsing a new level-1 section including the heading.
+
+> pageText :: Parser String
+> pageText = textChoices [sectionContent 1, sectionText 1]
 
 
 Keeping track of state
