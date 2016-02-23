@@ -1,4 +1,5 @@
-## Setup
+Setup
+=====
 
 To parse the mess that is Wiktionary, we make use of Parsec, perhaps the
 best-regarded parser-combinator library I've ever encountered.
@@ -27,7 +28,8 @@ And some more utilities from the MissingH package:
 > import Data.String.Utils
 
 
-## Data types
+Data types
+==========
 
 An internal link is represented as a record of a type we'll define here,
 called `WikiLink`.
@@ -58,7 +60,8 @@ WikiLinks -- but let's save defining it for later, because we're also going to
 define some functions for working with it.
 
 
-## Parser-making expressions
+Parser-making expressions
+-------------------------
 
 The awkward thing about LL parsing is that you can consume part of a string,
 fail to match the rest of it, and be unable to backtrack. When we match a
@@ -90,7 +93,9 @@ and concatenates together their results.
 >   parts <- many1 combinator
 >   return (concat parts)
 
-### The "and-then" operator
+
+The "and-then" operator
+-----------------------
 
 I'm going to define a new operator that's going to be pretty useful in a lot of
 these expressions. Often I have a function that's in some monad, like
@@ -112,7 +117,8 @@ that would be pointless. (Functional programming puns! Hooray!)
 > (&>) result f = liftM f result
 
 
-## Spans of text
+Spans of text
+=============
 
 I forget exactly why, but I think we're going to need an expression that
 allows whitespace as long as it stays on the same line. (FIXME check this)
@@ -149,8 +155,8 @@ such as `ref`.
 >   tagName <- symbol "ref" <|> symbol "gallery" <|> symbol "hiero" <|> symbol "timeline"
 >   restOfTag <- manyTill anyChar (char '>')
 >   if (endswith "/" (rstrip restOfTag))
->   then return ""
->   else manyTill anyChar (symbol ("</" ++ tagName ++ ">"))
+>     then return ""
+>     else manyTill anyChar (symbol ("</" ++ tagName ++ ">"))
 
 Our most reusable expression for miscellaneous text, `basicText`, matches
 characters that aren't involved in any interesting Wiki syntax.
@@ -213,9 +219,11 @@ ignoredTemplate} rule.
 > eol = (newLine >> return ()) <|> eof
 
 
-## Wiki syntax items
+Wiki syntax items
+=================
 
-### Links
+Links
+-----
 
 External links appear in single brackets. They contain a URL, a space, and
 the text that labels the link, such as:
@@ -303,7 +311,8 @@ details of the link are added to the LinkState.
 >     (namespace, local) = splitLast ':' target
 >     (page, section) = splitFirst '#' local
 
-### Headings
+Headings
+--------
 
 When parsing an entire Wiki article, you'll need to identify where the
 headings are. This is especially true on Wiktionary, where the
@@ -326,7 +335,9 @@ title.
 >
 > headingText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, basicText]
 
-### Lists
+
+Lists
+-----
 
 Here's a hierarchical data type for describing the contents of lists, which
 semantically can contain other lists.
@@ -390,7 +401,9 @@ by line breaks.
 > orderedList marker  = listItems marker &> OrderedList
 > indentedList marker = listItems marker &> IndentedList
 
-### Templates
+
+Templates
+---------
 
 A simple template looks like this:
 
@@ -465,14 +478,17 @@ general rule for parsing template expressions.
 >   parsed <- templateRest 1
 >   return (Map.insert "0" name parsed)
 
-### Tables
+
+Tables
+------
 
 Tables have complex formatting, and thus far we're just going to be skipping them.
 
 TODO
 
 
-## Parsing sections at a time
+Parsing sections at a time
+--------------------------
 
 > sectionText :: Int -> Parser String
 > sectionText level = do
@@ -483,7 +499,8 @@ TODO
 > sectionContent level = textChoices [sectionText (level + 1) &> rstrip, anyListText, wikiNonHeadingLine, newLine]
 
 
-## Keeping track of state
+Keeping track of state
+----------------------
 
 As our parser runs, it will be collecting links in a value that we call a
 LinkState.
@@ -515,7 +532,8 @@ of WikiLinks that it accumulates:
 >   getState
 
 
-## Entry points
+Entry points
+------------
 
 Parsec defines useful helpers such as parseTest, but they require the parser
 to have no modifiable state. We care a lot about the modifiable state, so
