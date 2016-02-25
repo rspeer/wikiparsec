@@ -49,9 +49,9 @@ We'll also define a type expression called Parser. The type expression Parsec
 takes three arguments: the input type, the state type, and the output type.
 
 For most expressions in this file, the input type will be String and the state
-type will be LinkState, a short-lived state that keeps track of links that have
-appeared in the text. All we have left to specify is the output type, which can
-vary, so we won't fill in that argument.
+type will be LinkState, a state that keeps track of links that have appeared in
+the text. All we have left to specify is the output type, which can vary, so we
+won't fill in that argument.
 
 > type Parser = Parsec String LinkState
 
@@ -132,12 +132,8 @@ that would be pointless. (Functional programming puns! Hooray!)
 Spans of text
 =============
 
-I forget exactly why, but I think we're going to need an expression that
-allows whitespace as long as it stays on the same line. (FIXME check this)
-If we allowed linebreaks, we could just use `spaces` from
-Text.Parsec.Char.
-
-Wikitext is whitespace-sensitive. (FIXME describe more)
+Some formatting allows whitespace as long as it stays on the same line --
+for example, the whitespace around headings and after list bullets.
 
 > sameLineSpaces :: Parser ()
 > sameLineSpaces = skipMany (oneOf " \t")
@@ -190,8 +186,8 @@ apostrophes, by chaining it through the `discardSpans` function.
 > discardSpans = (replace "''" "") . (replace "'''" "")
 
 There's a quirk in Wiki syntax: things that would cause syntax errors just get
-output as themselves. So sometimes, some of the characters excluded by {\tt
-basicText} are going to appear as plain text, even in contexts where they would
+output as themselves. So sometimes, some of the characters excluded by
+`basicText` are going to appear as plain text, even in contexts where they would
 have a meaning -- such as a single closing bracket when two closing brackets
 would end a link.
 
@@ -223,6 +219,7 @@ care about templates, we simply discard their contents using the
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
 > textLine = many1 (noneOf "[]{}<>\n") &> discardSpans
 > nonHeadingLine = notFollowedBy (string "=") >> textLine
+> basicLine = notFollowedBy (choice [heading, anyList]) >> wikiTextLine
 >
 > newLine :: Parser String
 > newLine = string "\n"
@@ -349,6 +346,18 @@ title.
 >
 > headingText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, basicText]
 
+Some parse rules expect to find a heading that matches a particular rule:
+
+> specificHeading level titleRule =
+>   let delimiter = (replicate level '=') in do
+>     symbol delimiter
+>     optional sameLineSpaces
+>     title <- titleRule
+>     optional sameLineSpaces
+>     symbol delimiter
+>     optional sameLineSpaces
+>     newLine
+>     return title
 
 Lists
 -----
@@ -414,6 +423,10 @@ by line breaks.
 > bulletList marker   = listItems marker &> BulletList
 > orderedList marker  = listItems marker &> OrderedList
 > indentedList marker = listItems marker &> IndentedList
+>
+> isPlainItem :: ListItem -> Bool
+> isPlainItem (Item s) = true
+> isPlainItem _ = false
 
 
 Templates
@@ -497,9 +510,8 @@ Tables
 ------
 
 Tables have complex formatting, and thus far we're just going to be skipping
-them as if they were comments. For the purpose of testing and possibly doing
-something useful with tables in the future, tables return the wikitext they
-contain.
+them. For the purpose of testing and possibly doing something useful with
+tables in the future, tables return the wikitext they contain.
 
 > wikiTable :: Parser String
 > wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> return ""))
@@ -577,10 +589,15 @@ Here are some functions that apply to LinkStates:
 And here's a variant of the wikiText parser combinator that returns the list
 of WikiLinks that it accumulates:
 
+> returnStateFrom :: Parser a -> Parser LinkState
+> returnStateFrom parser = do
+>   parser
+>   state <- getState
+>   modifyState resetState
+>   return state
+
 > wikiTextLinks :: Parser LinkState
-> wikiTextLinks = do
->   text <- wikiText
->   getState
+> wikiTextLinks = returnStateFrom wikiText
 
 
 Entry points
