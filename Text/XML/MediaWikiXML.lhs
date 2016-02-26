@@ -48,11 +48,14 @@ tuples. Here, in particular, we're mapping strings to strings.
 Top level
 =========
 
- parseMediaWikiDump :: String -> IO ()
- parseMediaWikiDump filename = do
-   content <- fmap BZip.decompress (ByteString.readFile filename)
-   map print (parseMediaWikiXML filename (UTF8.toString content))
-
+> parseMediaWikiDump :: String -> IO ()
+> parseMediaWikiDump filename = do
+>   content <- fmap BZip.decompress (ByteString.readFile filename)
+>   case (parseMediaWikiXML filename (UTF8.toString content)) of
+>     Just pages -> map print pages
+>
+> parseMediaWikiXML :: String -> String -> [WikiPage]
+> parseMediaWikiXML filename content = parse mediaWikiTag 
 
 Lexer rules
 ===========
