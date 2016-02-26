@@ -14,6 +14,9 @@ Text.Wiki.MediaWiki.
 > import Text.Parsec
 > import Text.Parsec.Char
 > import Text.HTML.TagSoup.Entity
+> import qualified Data.ByteString.UTF8 as UTF8
+> import qualified Data.ByteString.Lazy as ByteString
+> import qualified Codec.Compression.BZip as BZip
 > import Data.List
 > import Data.Maybe
 
@@ -42,6 +45,15 @@ tuples. Here, in particular, we're mapping strings to strings.
 > type AList = [(String,String)]
 
 
+Top level
+=========
+
+ parseMediaWikiDump :: String -> IO ()
+ parseMediaWikiDump filename = do
+   content <- fmap BZip.decompress (ByteString.readFile filename)
+   map print (parseMediaWikiXML filename (UTF8.toString content))
+
+
 Lexer rules
 ===========
 
@@ -54,7 +66,7 @@ actually simpler to define it again than to import it.
 
 Define some classes of characters:
 
-> safeChar = noneOf "&;<>\"\'= "
+> nameChar = noneOf "&;<>\"\'=/ "
 > attrChar = noneOf "&\"<>"
 > obligatorySpaces = many1 space
 
@@ -63,7 +75,7 @@ Use Text.HTML.TagSoup to convert entities to the characters they represent.
 > entity :: Parser Char
 > entity = do
 >   char '&'
->   entityName <- many1 safeChar
+>   entityName <- many1 nameChar
 >   char ';'
 >   case lookupEntity entityName of
 >     Just (char:[]) -> return char
@@ -75,16 +87,17 @@ Getting text from tags
 
 > attribute :: Parser (String,String)
 > attribute = do
->   obligatorySpaces
->   attrName <- many1 safeChar
+>   attrName <- try spacesAndAttrName
 >   char '='
 >   char '"'
 >   attrValue <- many (entity <|> attrChar)
 >   char '"'
 >   return (attrName, attrValue)
 >
+> spacesAndAttrName = obligatorySpaces >> many1 nameChar
+>
 > selfClose = do
->   spaces
+>   optional spaces
 >   symbol "/>"
 >   return ""
 >
@@ -97,7 +110,7 @@ anyTag matches a tag that may or may not contain other tags.
 > anyTag :: Parser AList
 > anyTag = do
 >   try (char '<' >> notFollowedBy (char '/'))
->   tagName <- many1 safeChar
+>   tagName <- many1 nameChar
 >   many attribute
 >   tagValue <- selfClose <|> restOfTag tagName
 >   spaces
@@ -106,7 +119,7 @@ anyTag matches a tag that may or may not contain other tags.
 > openTag :: Parser String
 > openTag = do
 >   try (char '<' >> notFollowedBy (char '/'))
->   tagName <- many1 safeChar
+>   tagName <- many1 nameChar
 >   many attribute
 >   char '>'
 >   spaces
