@@ -4,15 +4,20 @@ The purpose of this module is to extract Wikitext data from a MediaWiki XML
 dump. This module won't parse the Wikitext itself; that's a job for
 Text.Wiki.MediaWiki.
 
-> module Main where
+> module Text.XML.MediaWikiXMLConduit where
 > import qualified Data.ByteString.UTF8 as UTF8
 > import qualified Data.ByteString.Lazy as ByteString
+
+Decompression:
+
+> import Data.Conduit.BZlib (bunzip2)
 
 Imports for parsing XML in a stream:
 
 > import Data.Conduit
 > import qualified Data.Conduit.List as CL
-> import Data.Text (Text, unpack)
+> import qualified Data.Conduit.Binary as Binary
+> import Data.Text (Text, unpack, pack)
 > import Data.XML.Types
 > import Text.XML.Stream.Parse
 
@@ -38,27 +43,39 @@ tuples. Here, in particular, we're mapping strings to strings.
 
 > type AList = [(String,String)]
 
+> type ConduitStream t u = ConduitM Event t (ResourceT IO) u
 
 Top level
 =========
 
 This is based on http://haddock.stackage.org/lts-5.4/xml-conduit-1.3.3.1/Text-XML-Stream-Parse.html.
 
+> wiktSource = Binary.sourceFile "/wobbly/data/wiktionary/enwiktionary-20151201-pages-articles.xml.bz2"
+> outputSink = CL.mapM_ (lift . print)
+>
 > main :: IO ()
-> main = do
->   stdin <- ByteString.getContents
->   runResourceT $
->     parseLBS def stdin $$ parseMediaWiki =$ outputSink
->       where outputSink = CL.mapM_ (lift . print)
-
+> main = runResourceT $ wiktSource $= bunzip2 $$ parseBytes def =$ parseMediaWiki =$ outputSink
 
 Parsing some XML
 ================
 
-> parseMediaWiki = void (tagIgnoreAttrs "mediawiki" parsePages)
+> ns :: Text -> Name
+> ns name = Name { nameLocalName=name, nameNamespace=Just "http://www.mediawiki.org/xml/export-0.10/", namePrefix=Nothing }
+>
+> parseMediaWiki :: ConduitStream WikiPage ()
+> parseMediaWiki = void (tagIgnoreAttrs (ns "mediawiki") parsePages)
 > parsePages = manyYield' parsePage
-> parsePage = tagNoAttr "page" findTitle
+> parsePage = tagNoAttr (ns "page") findTitle
+>
+> findTitle :: ConduitStream WikiPage WikiPage
 > findTitle = do
->   many (ignoreAnyTreeName ["revision", "ns", "id", "redirect", "restrictions"])
->   tagNoAttr "title" content
+>   titles <- manyIgnore (tagNoAttr (ns "title") extractName) (ignoreAnyTreeName (map ns ["revision", "ns", "id", "redirect", "restrictions"]))
+>   return (head titles)
 
+   many (ignoreAnyTreeName (map ns ["revision", "ns", "id", "redirect", "restrictions"]))
+   tagNoAttr (ns "title") extractName
+   many (ignoreAnyTreeName (map ns ["revision", "ns", "id", "redirect", "restrictions"]))
+
+> extractName = do
+>   name <- content
+>   return (WikiPage {namespace="0", text="", title=(unpack name), redirect=Nothing})
