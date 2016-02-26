@@ -1,187 +1,109 @@
+> {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
+
 The purpose of this module is to extract Wikitext data from a MediaWiki XML
-dump, using an extremely minimal XML parser that extracts only the needed
-tags. 
-
-A full-featured XML parser would probably not be able to efficiently
-take in a large streaming file. A SAX-like XML parser would, but this
-module is doing basically the same thing that a SAX-like parser would,
-with a specific use case.
-
-This module won't parse the Wikitext itself; that's a job for
+dump. This module won't parse the Wikitext itself; that's a job for
 Text.Wiki.MediaWiki.
 
 > module Text.XML.MediaWikiXML where
-> import Text.Parsec
-> import Text.Parsec.Char
-> import Text.HTML.TagSoup.Entity
 > import qualified Data.ByteString.UTF8 as UTF8
 > import qualified Data.ByteString.Lazy as ByteString
-> import qualified Codec.Compression.BZip as BZip
-> import Data.List
-> import Data.Maybe
 
+Decompression:
+
+> import Data.Conduit.BZlib (bunzip2)
+
+Imports for parsing XML in a stream:
+
+> import Data.Conduit
+> import qualified Data.Conduit.List as CL
+> import qualified Data.Conduit.Binary as Binary
+> import Data.Text (Text, unpack, pack)
+> import Data.XML.Types
+> import Data.Maybe
+> import Text.XML.Stream.Parse
+
+Some exceedingly general monad bullshit that the documentation uses:
+
+> import Control.Monad.Trans.Resource
+> import Control.Monad.Trans.Class (lift)
+> import Control.Monad (void)
 
 Data types
 ==========
 
 > data WikiPage = WikiPage {
->   namespace :: String,
->   title :: String,
->   text :: String,
->   redirect :: Maybe String
+>   namespace :: Text,
+>   title :: Text,
+>   text :: Text
 > } deriving (Show, Eq)
-
-
-We'll also define a type expression called Parser. The type expression Parsec
-takes three arguments: the input type, the state type, and the output type.
-We don't need any state here, so the state type is ().
-
-> type Parser = Parsec String ()
+>
+> type WikiConduit u = ConduitM Event WikiPage (ResourceT IO) u
 
 An AList is an association list, that type that shows up in functional
 languages, where you map x to y by just putting together a bunch of (x,y)
-tuples. Here, in particular, we're mapping strings to strings.
+tuples. Here, in particular, we're mapping text names to text values.
 
-> type AList = [(String,String)]
-
+> type AItem = (Text,Text)
+> type AList = [AItem]
+>
+> justLookup :: Text -> AList -> Text
+> justLookup key aList = fromJust (lookup key aList)
 
 Top level
 =========
 
-> parseMediaWikiDump :: String -> IO ()
-> parseMediaWikiDump filename = do
->   content <- fmap BZip.decompress (ByteString.readFile filename)
->   case (parseMediaWikiXML filename (UTF8.toString content)) of
->     Just pages -> map print pages
+This is based on http://haddock.stackage.org/lts-5.4/xml-conduit-1.3.3.1/Text-XML-Stream-Parse.html.
+
+> -- Take the function that does useful work, and hit it with a monad hammer until it fits into stdout
+> outputify processor = CL.mapM_ (lift . print . processor)
 >
-> parseMediaWikiXML :: String -> String -> [WikiPage]
-> parseMediaWikiXML filename content = parse mediaWikiTag 
-
-Lexer rules
-===========
-
-`symbol` is a very simple expression that allows us to match a multi-character
-string and backtrack if it doesn't actually match. It's defined again in
-Text.Wiki.MediaWiki, where it's more fully described, it's just that it's
-actually simpler to define it again than to import it.
-
-> symbol = try . string
-
-Define some classes of characters:
-
-> nameChar = noneOf "&;<>\"\'=/ "
-> attrChar = noneOf "&\"<>"
-> obligatorySpaces = many1 space
-
-Use Text.HTML.TagSoup to convert entities to the characters they represent.
-
-> entity :: Parser Char
-> entity = do
->   char '&'
->   entityName <- many1 nameChar
->   char ';'
->   case lookupEntity entityName of
->     Just (char:[]) -> return char
->     _ -> fail ("Unknown entity " ++ entityName)
-
-
-Getting text from tags
-======================
-
-> attribute :: Parser (String,String)
-> attribute = do
->   attrName <- try spacesAndAttrName
->   char '='
->   char '"'
->   attrValue <- many (entity <|> attrChar)
->   char '"'
->   return (attrName, attrValue)
+> processMediaWikiDump :: (Show a) => String -> (WikiPage -> a) -> IO ()
+> processMediaWikiDump filename processor = runResourceT $
+>   Binary.sourceFile filename $= bunzip2 $$ parseBytes def =$ (void parseMediaWiki) =$ outputify processor
 >
-> spacesAndAttrName = obligatorySpaces >> many1 nameChar
->
-> selfClose = do
->   optional spaces
->   symbol "/>"
->   return ""
->
-> restOfTag name = do
->   char '>'
->   manyTill (entity <|> anyChar) (symbol ("</" ++ name ++ ">"))
+> main = processMediaWikiDump "/wobbly/data/wiktionary/enwiktionary-20151201-pages-articles.xml.bz2" id
 
-anyTag matches a tag that may or may not contain other tags.
+Parsing some XML
+================
 
-> anyTag :: Parser AList
-> anyTag = do
->   try (char '<' >> notFollowedBy (char '/'))
->   tagName <- many1 nameChar
->   many attribute
->   tagValue <- selfClose <|> restOfTag tagName
->   spaces
->   return [(tagName,tagValue)]
->
-> openTag :: Parser String
-> openTag = do
->   try (char '<' >> notFollowedBy (char '/'))
->   tagName <- many1 nameChar
->   many attribute
->   char '>'
->   spaces
->   return tagName
->
-> specificOpenTag :: String -> Parser ()
-> specificOpenTag name = do
->   symbol ("<" ++ name)
->   many attribute
->   char '>'
->   spaces
->   return ()
->
-> closeTag :: String -> Parser ()
-> closeTag name = do
->   symbol ("</" ++ name ++ ">")
->   spaces
->   return ()
+I really apologize for the relative lack of types. The xml-conduit API is bad
+(everyone on StackOverflow agrees with this, but there's no alternative), and
+the functions it works with are nearly impossible to write correct type
+signatures for. I tried for hours.
 
+> ns :: Text -> Name
+> ns name = Name { nameLocalName=name, nameNamespace=Just "http://www.mediawiki.org/xml/export-0.10/", namePrefix=Nothing }
 
-Handling for particular tags
-----------------------------
+> matchSingleChild name = do
+>   contents <- manyIgnore (tagIgnoreAttrs (ns name) content)
+>                          (ignoreTree (/= (ns name)))
+>   case contents of
+>     found:_ -> return found
+>     _       -> monadThrow (XmlException ("Couldn't find child tag: " ++ show name) Nothing)
+>
+> matchChild name = tagIgnoreAttrs (ns name) (itemize name)
+>
+> itemize name = do
+>   value <- content
+>   return (name,value)
+>
+> matchRevision = tagNoAttr (ns "revision") matchText
+> matchText = do
+>   text <- matchSingleChild "text"
+>   return ("text",text)
 
-> justLookup :: String -> AList -> String
-> justLookup key aList = fromJust (lookup key aList)
+> parseMediaWiki = tagIgnoreAttrs (ns "mediawiki") parsePages
+> parsePages = manyYield' parsePage
 >
-> redirectTag :: Parser AList
-> redirectTag = do
->   symbol "<redirect"
->   attrs <- many attribute
->   spaces
->   symbol "/>"
->   case (lookup "title" attrs) of
->     Just title -> return [("redirect",title)]
->     Nothing -> return []
+> parsePage = tagNoAttr (ns "page") parsePageContent
 >
-> revisionTag = do
->   specificOpenTag "revision"
->   subtags <- many anyTag
->   closeTag "revision"
->   return (concat subtags)
->
-> pageTag :: Parser [WikiPage]
-> pageTag = do
->   specificOpenTag "page"
->   spaces
->   subtags <- many (revisionTag <|> redirectTag <|> anyTag)
->   closeTag "page"
->   let subtagList = (concat subtags) in
->     return [WikiPage {
->       namespace=(justLookup "ns" subtagList),
->       title=(justLookup "title" subtagList),
->       text=(justLookup "text" subtagList),
->       redirect=(lookup "redirect" subtagList)
->     }]
->
-> mediaWikiTag = do
->   specificOpenTag "mediawiki"
->   pages <- many (pageTag <|> (anyTag >> return []))
->   return (concat pages)
->   closeTag "mediawiki"
+> parsePageContent :: WikiConduit WikiPage
+> parsePageContent =
+>   let parsers = (choose [matchRevision, matchChild "ns", matchChild "title"]) in do
+>     assoc <- manyIgnore parsers ignoreAllTrees
+>     return $ WikiPage {
+>       namespace=(justLookup "ns" assoc),
+>       title=(justLookup "title" assoc),
+>       text=(justLookup "text" assoc)
+>     }
 
