@@ -72,6 +72,10 @@ backtrack.
 
 > symbol = try . string
 
+TODO describe this:
+
+> textWithout chars = many1 (noneOf chars)
+
 This is similar to the `symbol` that's defined in Parsec's token-based
 parse rules, but we're not importing those because they don't coexist with
 significant whitespace.
@@ -180,7 +184,7 @@ We'll just post-process the parse result to remove the sequences of
 apostrophes, by chaining it through the `discardSpans` function.
 
 > basicText :: Parser String
-> basicText = many1 (noneOf "[]{}|<>:=\n") &> discardSpans
+> basicText = textWithout "[]{}|<>:=\n" &> discardSpans
 >
 > discardSpans :: String -> String
 > discardSpans = (replace "''" "") . (replace "'''" "")
@@ -217,9 +221,9 @@ care about templates, we simply discard their contents using the
 >
 > wikiText :: Parser String
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
-> textLine = many1 (noneOf "[]{}<>\n") &> discardSpans
-> nonHeadingLine = notFollowedBy (string "=") >> textLine
-> basicLine = notFollowedBy (choice [heading, anyList]) >> wikiTextLine
+> textLine = textWithout "[]{}<>\n" &> discardSpans
+> nonHeadingLine = notFollowedBy (char '=') >> textLine
+> basicLine = notFollowedBy (oneOf "=*#:;") >> wikiTextLine
 >
 > newLine :: Parser String
 > newLine = string "\n"
@@ -256,9 +260,9 @@ and `do` return what their last argument matches.
 >   spaces
 >   linkTitle
 > schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
-> urlPath = many1 (noneOf "[]{}<>| ")
+> urlPath = textWithout "[]{}<>| "
 > linkTitle = textChoices [ignored, linkText]
-> linkText = many1 (noneOf "[]{}<>") &> discardSpans
+> linkText = textWithout "[]{}<>" &> discardSpans
 
 Internal links have many possible components. In general, they take the form:
 
@@ -310,9 +314,9 @@ details of the link are added to the LinkState.
 >         Nothing    -> return (page link)
 >
 > linkTarget :: Parser String
-> linkTarget = many1 (noneOf "[]{}|<>\n")
+> linkTarget = textWithout "[]{}|<>\n"
 >
-> alternateText = string "|" >> linkText
+> alternateText = char '|' >> linkText
 >
 > parseLink :: String -> WikiLink
 > parseLink target =
@@ -425,8 +429,8 @@ by line breaks.
 > indentedList marker = listItems marker &> IndentedList
 >
 > isPlainItem :: ListItem -> Bool
-> isPlainItem (Item s) = true
-> isPlainItem _ = false
+> isPlainItem (Item s) = True
+> isPlainItem _ = False
 
 
 Templates
@@ -490,7 +494,7 @@ standardized form as a mapping from argument names to values.
 > endOfTemplate = symbol "}}" >> return Map.empty
 >
 > wikiTextArg = textChoices [ignored, internalLink, externalLink, looseBracket, textArg]
-> textArg = many1 (noneOf "[]{}<>|") &> discardSpans
+> textArg = textWithout "[]{}<>|" &> discardSpans
 
 We can simplify some of this parsing in the case where we are looking for a
 *particular* template. We start by expecting two left braces and the name
