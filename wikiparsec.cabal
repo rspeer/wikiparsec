@@ -18,8 +18,21 @@ cabal-version:       >=1.8
 Library
   exposed-modules:     Text.Wiki.SplitUtils, Text.Wiki.MediaWiki
   -- other-modules:
-  build-depends:       HUnit ==1.3.*, base ==4.6.*, bytestring ==0.10.*, utf8-string ==0.3.*, parsec ==3.1.9, mtl ==2.2.1, containers ==0.5.*, MissingH ==1.3.0.*, tagsoup ==0.13.*, bzlib ==0.5.*
+  build-depends:       HUnit ==1.3.*,
+                       base ==4.6.*, bytestring ==0.10.*, utf8-string ==0.3.*,
+                       parsec ==3.1.9, mtl ==2.2.1, containers ==0.5.*,
+                       MissingH ==1.3.0.*, tagsoup ==0.13.*, bzlib ==0.5.*,
+                       conduit ==1.2.6.*, conduit-extra ==1.1.10.*,
+                       xml-conduit ==1.3.3.*, xml-types ==0.3.*, text ==0.11.3.*,
+                       bzlib-conduit ==0.2.1.*,
+                       transformers ==0.5.2.*, resourcet ==1.1.7.*
 
 Executable wiki2text
   main-is:             cmd/Wiki2Text.lhs
-  build-depends:       base ==4.6.*, bytestring ==0.10.*, utf8-string ==0.3.*, parsec ==3.1.9, mtl ==2.2.1, containers ==0.5.*, MissingH ==1.3.0.*, tagsoup ==0.13.*, bzlib ==0.5.*
+  build-depends:       base ==4.6.*, bytestring ==0.10.*, utf8-string ==0.3.*,
+                       parsec ==3.1.9, mtl ==2.2.1, containers ==0.5.*,
+                       MissingH ==1.3.0.*, tagsoup ==0.13.*, bzlib ==0.5.*,
+                       conduit ==1.2.6.*, conduit-extra ==1.1.10.*,
+                       xml-conduit ==1.3.3.*, xml-types ==0.3.*, text ==0.11.3.*,
+                       bzlib-conduit ==0.2.1.*,
+                       transformers ==0.5.2.*, resourcet ==1.1.7.*
