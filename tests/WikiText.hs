@@ -6,10 +6,10 @@ import Data.Map (fromList)
 import Data.Either (rights)
 
 testParser parser input output =
-  parse parser "(test)" input ~?= Right output
+  input ~: parse parser "(test)" input ~?= Right output
 
 testParserFail parser input =
-  rights [parse parser "(test)" input] ~?= []
+  input ~: rights [parse parser "(test)" input] ~?= []
 
 testLinks = testParser wikiTextLinks
 
@@ -55,6 +55,13 @@ listTests = [
     testParserFail wikiTextLine ""
     ]
 
+miscTests = [
+    testParser looseBracket "}" "}",
+    testParser wikiText "<math>A =\\left ( \\frac{1329\\times10^{-H/5}}{D} \\right ) ^2</math>" "",
+    testParser wikiText "[[Image:Levellers declaration and standard.gif|thumb|200px|Woodcut from a [[Diggers]] document by [[William Everard (Digger)|William Everard]]]]" "",
+    testParser wikiText "{{template||arg1=1|arg2={{!}}|arg3=}}" ""
+    ]
+
 -- Test on a section from Wikipedia's featured article as I wrote this,
 -- which was "Symphony No. 8 (Sibelius)".
 articleSection = unlines [
@@ -79,6 +86,8 @@ articleSectionText = unlines [
     "Subsection",
     "",
     "This subsection wasn't actually in the article.",
+    "",
+    "",
     ""
     ]
 
@@ -100,5 +109,5 @@ tableTests = [
    ]
 
 
-tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests ++ tableTests)
+tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests ++ tableTests ++ miscTests)
 main = runTestTT tests

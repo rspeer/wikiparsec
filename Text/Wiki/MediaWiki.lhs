@@ -10,6 +10,8 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > module Text.Wiki.MediaWiki where
 > import Text.Parsec hiding (parse, parseTest)
 > import Text.Parsec.Char
+> import Text.Parsec.Error (ParseError, errorPos)
+> import Text.Parsec.Pos (sourceLine)
 > import Control.Monad.Identity
 
 We're going to need to make use of Haskell's functional mapping type,
@@ -26,6 +28,8 @@ this package:
 And some more utilities from the MissingH package:
 
 > import Data.String.Utils
+
+
 
 
 Data types
@@ -92,10 +96,20 @@ and concatenates together their results.
 > textChoices :: [Parser String] -> Parser String
 > textChoices options = concatMany (choice (map try options))
 >
+> textStrictChoices :: [Parser String] -> Parser String
+> textStrictChoices options = concatMany (choice options)
+>
 > concatMany :: Parser String -> Parser String
 > concatMany combinator = do
 >   parts <- many1 combinator
 >   return (concat parts)
+>
+> possiblyEmpty :: Parser String -> Parser String
+> possiblyEmpty combinator = do
+>   matched <- optionMaybe (try combinator)
+>   case matched of
+>     Just match -> return match
+>     Nothing    -> return ""
 
 Sometimes a token starts some special environment that will consume everything
 until an ending token. An example would be HTML comments, which consume
@@ -162,7 +176,7 @@ such as `ref`, and all table syntax (defined in its own section).
 >   try htmlSkippedSpan <|> manyTill anyChar (char '>')
 >
 > htmlSkippedSpan = do
->   tagName <- symbol "ref" <|> symbol "gallery" <|> symbol "hiero" <|> symbol "timeline"
+>   tagName <- symbol "math" <|> symbol "code" <|> symbol "ref" <|> symbol "gallery" <|> symbol "hiero" <|> symbol "timeline"
 >   restOfTag <- manyTill anyChar (char '>')
 >   if (endswith "/" (rstrip restOfTag))
 >     then return ""
@@ -201,9 +215,6 @@ as text:
 
 > looseBracket :: Parser String
 > looseBracket = do
->   notFollowedBy internalLink
->   notFollowedBy externalLink
->   notFollowedBy template
 >   bracket <- oneOf "[]{}"
 >   notFollowedBy (char bracket)
 >   return [bracket]
@@ -221,6 +232,7 @@ care about templates, we simply discard their contents using the
 >
 > wikiText :: Parser String
 > wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
+> cleanWikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, textLine, newLine]
 > textLine = textWithout "[]{}<>\n" &> discardSpans
 > nonHeadingLine = notFollowedBy (char '=') >> textLine
 > basicLine = notFollowedBy (oneOf "=*#:;") >> wikiTextLine
@@ -261,8 +273,7 @@ and `do` return what their last argument matches.
 >   linkTitle
 > schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
 > urlPath = textWithout "[]{}<>| "
-> linkTitle = textChoices [ignored, linkText]
-> linkText = textWithout "[]{}<>" &> discardSpans
+> linkTitle = textChoices [ignored, cleanWikiText]
 
 Internal links have many possible components. In general, they take the form:
 
@@ -316,7 +327,7 @@ details of the link are added to the LinkState.
 > linkTarget :: Parser String
 > linkTarget = textWithout "[]{}|<>\n"
 >
-> alternateText = char '|' >> linkText
+> alternateText = char '|' >> cleanWikiText
 >
 > parseLink :: String -> WikiLink
 > parseLink target =
@@ -340,21 +351,20 @@ title.
 > heading :: Int -> Parser String
 > heading level =
 >   let delimiter = (replicate level '=') in do
->     symbol delimiter
+>     try (string delimiter >> notFollowedBy (char '='))
 >     optional sameLineSpaces
->     text <- headingText
->     symbol delimiter
+>     text <- manyTill headingChar (symbol delimiter)
 >     optional sameLineSpaces
 >     newLine
 >     return (rstrip text)
 >
-> headingText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, basicText]
+> headingChar = noneOf "\n"
 
 Some parse rules expect to find a heading that matches a particular rule:
 
 > specificHeading level titleRule =
 >   let delimiter = (replicate level '=') in do
->     symbol delimiter
+>     try (string delimiter >> notFollowedBy (char '='))
 >     optional sameLineSpaces
 >     title <- titleRule
 >     optional sameLineSpaces
@@ -478,13 +488,13 @@ standardized form as a mapping from argument names to values.
 >
 > namedArg :: String -> Int -> Parser TemplateData
 > namedArg name offset = do
->   value <- wikiTextArg
+>   value <- possiblyEmpty wikiTextArg
 >   rest <- templateRest offset
 >   return (Map.insert name value rest)
 >
 > positionalArg :: Int -> Parser TemplateData
 > positionalArg offset = do
->   value <- wikiTextArg
+>   value <- possiblyEmpty wikiTextArg
 >   rest <- templateRest (offset + 1)
 >   return (Map.insert (show offset) value rest)
 >
@@ -493,7 +503,7 @@ standardized form as a mapping from argument names to values.
 >
 > endOfTemplate = symbol "}}" >> return Map.empty
 >
-> wikiTextArg = textChoices [ignored, internalLink, externalLink, looseBracket, textArg]
+> wikiTextArg = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textArg]
 > textArg = textWithout "[]{}<>|" &> discardSpans
 
 We can simplify some of this parsing in the case where we are looking for a
@@ -548,12 +558,12 @@ or an entire page, and return the plain text that they contain.
 
 > sectionText :: Int -> Parser String
 > sectionText level = do
->   theHeading <- heading level
+>   theHeading <- heading level <?> ("level-" ++ (show level) ++ " heading")
 >   theContent <- sectionContent level
->   return (unlines [theHeading, "", theContent, ""])
+>   return (unlines [theHeading, "", theContent])
 >
-> sectionContent level = textChoices [
->     sectionText (level + 1) &> rstrip,
+> sectionContent level = textStrictChoices [
+>     sectionText (level + 1),
 >     anyListText, wikiNonHeadingLine, newLine]
 
 A page usually acts like the content of a level-1 section, without a heading
@@ -563,7 +573,10 @@ level-1 heading, then the level-1 section we're parsing will end, but at
 that point we can begin parsing a new level-1 section including the heading.
 
 > pageText :: Parser String
-> pageText = textChoices [sectionContent 1, sectionText 1]
+> pageText = do
+>   content <- textChoices [sectionText 1, sectionContent 1]
+>   eof
+>   return content
 
 
 Keeping track of state
@@ -622,3 +635,30 @@ we'll write our own version.
 >
 > parse parser = runParser parser newState
 
+Here's a function to be run at the IO level, which takes in a string of Wikitext,
+outputs its plain text, and returns nothing.
+
+> outputPlainText :: String -> IO ()
+> outputPlainText input =
+>   let sourceName = "(input)" in
+>     case parse pageText sourceName input of
+>       Left err -> showError input err
+>       Right x -> putStrLn x
+
+Showing informative errors:
+
+> showError :: String -> ParseError -> IO ()
+> showError str err =
+>   let strLines  = lines str
+>       errorLine = sourceLine (errorPos err)
+>       errorCol  = sourceColumn (errorPos err)
+>   in do
+>     putStrLn "********"
+>     putStr "parse error at "
+>     print err
+>     putStrLn (strLines !! (errorLine - 1))
+>     putStr (replicate (errorCol - 1) ' ')
+>     putStrLn "^"
+>     putStrLn "\n"
+>     putStrLn str
+>     putStrLn "********"
