@@ -10,7 +10,7 @@ Text.Wiki.MediaWiki.
 
 XML and text decoding:
 
-> import Data.Text (Text, unpack, pack)
+> import Data.Text (Text)
 > import Data.XML.Types
 > import Data.Maybe
 > import Text.XML.Stream.Parse
@@ -27,6 +27,10 @@ Crazy streaming framework:
 > import Control.Monad.Trans.Resource
 > import Control.Monad.Trans.Class (lift)
 > import Control.Monad (void)
+
+The HTML processor that we'll run on the output:
+
+> import Text.Wiki.MediaWikiHTML (extractWikiTextFromHTML)
 
 Data types
 ==========
@@ -105,6 +109,6 @@ signatures for. I tried for hours.
 >     return $ WikiPage {
 >       pageNamespace=(justLookup "ns" assoc),
 >       pageTitle=(justLookup "title" assoc),
->       pageText=(justLookup "text" assoc)
+>       pageText=extractWikiTextFromHTML (justLookup "text" assoc)
 >     }
 

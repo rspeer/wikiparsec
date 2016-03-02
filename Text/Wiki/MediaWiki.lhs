@@ -12,7 +12,7 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import Text.Parsec.Char
 > import Text.Parsec.Error (ParseError, errorPos)
 > import Text.Parsec.Pos (sourceLine)
-> import Control.Monad.Identity
+> import Control.Monad.Identity (liftM)
 
 We're going to need to make use of Haskell's functional mapping type,
 Data.Map, to represent the contents of templates.
@@ -157,32 +157,6 @@ for example, the whitespace around headings and after list bullets.
 > sameLineSpaces :: Parser ()
 > sameLineSpaces = skipMany (oneOf " \t")
 
-The "ignored" expression matches HTML tags and comments and throws them away.
-We also throw away the contents between the open and close of certain tags,
-such as `ref`, and all table syntax (defined in its own section).
-
-> ignored :: Parser String
-> ignored = do
->   skipMany1 ignoredItem
->   return ""
->
-> ignoredItem = htmlComment <|> htmlTag <|> wikiTable
->
-> htmlComment :: Parser String
-> htmlComment = delimitedSpan "<!--" "-->"
->
-> htmlTag :: Parser String
-> htmlTag = do
->   char '<'
->   try htmlSkippedSpan <|> manyTill anyChar (char '>')
->
-> htmlSkippedSpan = do
->   tagName <- symbol "math" <|> symbol "code" <|> symbol "ref" <|> symbol "gallery" <|> symbol "hiero" <|> symbol "timeline"
->   restOfTag <- manyTill anyChar (char '>')
->   if (endswith "/" (rstrip restOfTag))
->     then return ""
->     else manyTill anyChar (symbol ("</" ++ tagName ++ ">"))
-
 Our most reusable expression for miscellaneous text, `basicText`, matches
 characters that aren't involved in any interesting Wiki syntax.
 
@@ -199,7 +173,7 @@ We'll just post-process the parse result to remove the sequences of
 apostrophes, by chaining it through the `discardSpans` function.
 
 > basicText :: Parser String
-> basicText = textWithout "[]{}|<>:=\n" &> discardSpans
+> basicText = textWithout "[]{}|:=\n" &> discardSpans
 >
 > discardSpans :: String -> String
 > discardSpans = (replace "''" "") . (replace "'''" "")
@@ -226,17 +200,16 @@ care about templates, we simply discard their contents using the
 `ignoredTemplate` rule.
 
 > wikiTextLine :: Parser String
-> wikiTextLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine]
+> wikiTextLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine]
 >
 > wikiNonHeadingLine :: Parser String
-> wikiNonHeadingLine = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine]
+> wikiNonHeadingLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine]
 >
 > wikiText :: Parser String
-> wikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textLine, newLine]
-> cleanWikiText = textChoices [ignored, internalLink, externalLink, ignoredTemplate, textLine, newLine]
-> textLine = textWithout "[]{}<>\n" &> discardSpans
+> wikiText = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine, newLine]
+> cleanWikiText = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, nonHeadingLine, newLine]
+> textLine = textWithout "[]{}\n" &> discardSpans
 > nonHeadingLine = notFollowedBy (char '=') >> textLine
-> basicLine = notFollowedBy (oneOf "=*#:;") >> wikiTextLine
 >
 > newLine :: Parser String
 > newLine = string "\n"
@@ -266,15 +239,14 @@ The following rules extract the text of an external link, as both `between`
 and `do` return what their last argument matches.
 
 > externalLink :: Parser String
-> externalLink = between (string "[") (string "]") externalLinkContents
+> externalLink = try (between (string "[") (string "]") externalLinkContents)
 > externalLinkContents = do
 >   schema
 >   urlPath
 >   spaces
->   linkTitle
-> schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
-> urlPath = textWithout "[]{}<>| "
-> linkTitle = textChoices [ignored, cleanWikiText]
+>   cleanWikiText
+> schema = choice (map symbol ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
+> urlPath = textWithout "[]{}| "
 
 Internal links have many possible components. In general, they take the form:
 
@@ -326,7 +298,7 @@ details of the link are added to the LinkState.
 >         Nothing    -> return (page link)
 >
 > linkTarget :: Parser String
-> linkTarget = textWithout "[]{}|<>\n"
+> linkTarget = textWithout "[]{}|\n"
 >
 > alternateText = char '|' >> cleanWikiText
 >
@@ -504,8 +476,8 @@ standardized form as a mapping from argument names to values.
 >
 > endOfTemplate = symbol "}}" >> return Map.empty
 >
-> wikiTextArg = textChoices [ignored, internalLink, externalLink, ignoredTemplate, looseBracket, textArg]
-> textArg = textWithout "[]{}<>|" &> discardSpans
+> wikiTextArg = textChoices [internalLink, externalLink, ignoredTemplate, looseBracket, textArg]
+> textArg = textWithout "[]{}|" &> discardSpans
 
 We can simplify some of this parsing in the case where we are looking for a
 *particular* template. We start by expecting two left braces and the name
@@ -525,14 +497,13 @@ Tables
 ------
 
 Tables have complex formatting, and thus far we're just going to be skipping
-them. For the purpose of testing and possibly doing something useful with
-tables in the future, tables return the wikitext they contain.
+them.
 
 > wikiTable :: Parser String
 > wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> return ""))
 >
 > wikiTableComplete :: Parser String
-> wikiTableComplete = delimitedSpan "{|" "|}" &> strip
+> wikiTableComplete = delimitedSpan "{|" "|}" >> return ""
 
 MediaWiki templates can be used in horrifying ways, and one way that they're
 sometimes used (particularly on Wikipedia) is to start a table that is then
@@ -561,7 +532,7 @@ or an entire page, and return the plain text that they contain.
 > sectionText level = do
 >   theHeading <- heading level <?> ("level-" ++ (show level) ++ " heading")
 >   theContent <- sectionContent level
->   return (unlines [theHeading, "", theContent])
+>   return (squishBlankLines (unlines [theHeading, "", theContent]))
 >
 > sectionContent level = textStrictChoices [
 >     sectionText (level + 1),
@@ -577,8 +548,13 @@ that point we can begin parsing a new level-1 section including the heading.
 > pageText = do
 >   content <- textChoices [sectionText 1, sectionContent 1]
 >   eof
->   return content
-
+>   return (squishBlankLines content)
+>
+> squishBlankLines :: String -> String
+> squishBlankLines s = unlines (filter isNonEmptyString (lines s))
+>
+> isNonEmptyString :: String -> Bool
+> isNonEmptyString s = (length s) > 0
 
 Keeping track of state
 ----------------------
