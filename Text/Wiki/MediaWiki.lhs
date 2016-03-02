@@ -1,8 +1,8 @@
 Setup
 =====
 
-To parse the mess that is Wiktionary, we make use of Parsec, perhaps the
-best-regarded parser-combinator library I've ever encountered.
+To parse the mess that is Wiktionary, we make use of Parsec, a well-regarded
+parser-combinator library for Haskell.
 
 Parsec is explicitly designed around the way Haskell works. I wouldn't
 normally be using Haskell, but it does seem like the right tool for the job.
@@ -28,8 +28,6 @@ this package:
 And some more utilities from the MissingH package:
 
 > import Data.String.Utils
-
-
 
 
 Data types
@@ -69,25 +67,28 @@ Parser-making expressions
 
 The awkward thing about LL parsing is that you can consume part of a string,
 fail to match the rest of it, and be unable to backtrack. When we match a
-string, we usually want it to be an all-or-nothing thing. At the cost of a bit
-of efficiency, we'll use the `symbol` expression for multi-character
-strings, which wraps the `string` combinator in `try` so it can
+multi-character string, we usually want it to be an all-or-nothing thing. At
+the cost of a bit of efficiency, we'll use the `symbol` expression for
+multi-character strings, which wraps the `string` parse rule in `try` so it can
 backtrack.
 
 > symbol = try . string
 
-TODO describe this:
+A lot of spans of Wikitext are mostly defined by what they're not. The
+`textWithout` rule matches and returns a sequence of 1 or more characters that
+are not in the given string.
 
+> textWithout :: String -> Parser String
 > textWithout chars = many1 (noneOf chars)
 
 This is similar to the `symbol` that's defined in Parsec's token-based
 parse rules, but we're not importing those because they don't coexist with
 significant whitespace.
 
-In various situations, we'll want to parse "some amount of arbitrary text
-without syntax in it". But what this means is, unfortunately, different in
-different situations. Sometimes line breaks are allowed. Sometimes unmatched
-brackets and braces are allowed. And so on.
+A more complex version of this is when there are many different kinds of
+strings that could appear in a given context, including different kinds of
+strings concatenated together. For example, in one context, we might accept
+plain text, links, and templates, but not line breaks.
 
 To make this easier, we'll define `textChoices`, which takes a list of
 expressions we're allowed to parse, tries all of them in that priority order,

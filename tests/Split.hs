@@ -1,5 +1,6 @@
 import Test.HUnit
 import Text.Wiki.SplitUtils
+import Control.Monad
 
 splitTests = test [
     -- Test the case where the delimiter doesn't appear
@@ -26,4 +27,4 @@ splitTests = test [
     splitLast '☃' "tëst☃øne☃tẃo" ~?= ("tëst☃øne", "tẃo")]
 
 tests = splitTests
-main = runTestTT tests
+main = void (runTestTT tests)

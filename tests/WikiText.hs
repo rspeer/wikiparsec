@@ -110,4 +110,6 @@ tableTests = [
 
 
 tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests ++ tableTests ++ miscTests)
-main = runTestTT tests
+
+main :: IO ()
+main = void (runTestTT tests)
