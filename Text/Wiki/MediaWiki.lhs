@@ -27,9 +27,9 @@ this package:
 
 Some common shorthand for defining parse rules:
 
-> import Text.Wiki.ParseTools ((&>), symbol, textWithout, textChoices,
+> import Text.Wiki.ParseTools (Parser, (&>), symbol, textWithout, textChoices,
 >                              textStrictChoices, concatMany, possiblyEmpty,
->                              delimitedSpan)
+>                              delimitedSpan, nop)
 
 And some more utilities from the MissingH package:
 
@@ -48,21 +48,35 @@ called `WikiLink`.
 >   section :: String
 > } deriving (Show, Eq)
 
+`makeLink` is a constant that can be used as a template for making WikiLinks.
+
+> makeLink :: WikiLink
+> makeLink = WikiLink {namespace="", page="", section=""}
+
+Wiki links can be put together into linked text, which has a rendered
+plain-text value and a list of links.
+
+> data LinkedText = LinkedText [WikiLink] String
+>
+> linkString :: WikiLink -> String -> LinkedText
+> linkString link s = LinkedText [link] s
+>
+> unlinkedString :: String -> LinkedText
+> unlinkedString s = LinkedText [] s
+>
+> concatLinkedText :: LinkedText -> LinkedText -> LinkedText
+> concatLinkedText (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (s1 ++ s2)
+>
+> discardLinks :: LinkedText -> String
+> discardLinks (LinkedText links s) = s
+>
+> noText :: Parser LinkedText
+> noText = return (unlinkedString "")
+
 An invocation of a template is represented as a Map from parameter names to
 values.  Both the names and the values are strings.
 
 > type TemplateData = Map String String
-
-We'll also define a type expression called Parser. The type expression Parsec
-takes three arguments: the input type, the state type, and the output type.
-
-For most expressions in this file, the input type will be String and the state
-type will be LinkState, a state that keeps track of links that have appeared in
-the text. All we have left to specify is the output type, which can vary, so we
-won't fill in that argument.
-
-> type Parser = Parsec String LinkState
-> type LinkState = [WikiLink]
 
 
 Spans of text
@@ -120,14 +134,14 @@ care about templates, we simply discard their contents using the
 `ignoredTemplate` rule.
 
 > wikiTextLine :: Parser String
-> wikiTextLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, textLine] <?> "line of wikitext"
+> wikiTextLine = textStrictChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, looseBracket, textLine] <?> "line of wikitext"
 >
 > wikiNonHeadingLine :: Parser String
-> wikiNonHeadingLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine] <?> "non-heading line of wikitext"
+> wikiNonHeadingLine = textStrictChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, looseBracket, nonHeadingLine] <?> "non-heading line of wikitext"
 >
 > wikiText :: Parser String
-> wikiText = textChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine, nonHeadingNewline] <?> "wikitext"
-> cleanWikiText = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, nonHeadingLine, nonHeadingNewline] <?> "well-formed wikitext"
+> wikiText = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, looseBracket, nonHeadingLine, nonHeadingNewline] <?> "wikitext"
+> cleanWikiText = textStrictChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, nonHeadingLine, nonHeadingNewline] <?> "well-formed wikitext"
 > textLine = textWithout "[]{}\n" &> discardSpans <?> "line of plain text"
 > nonHeadingLine = notFollowedBy (char '=') >> textLine <?> "non-heading line"
 > nonHeadingNewline = notFollowedBy (char '=') >> newLine <?> "non-heading newline"
@@ -159,8 +173,8 @@ the same as if it weren't a link, so we can disregard that case.
 The following rules extract the text of an external link, as both `between`
 and `do` return what their last argument matches.
 
-> externalLink :: Parser String
-> externalLink = try (between (string "[") (string "]") externalLinkContents)
+> externalLinkText :: Parser String
+> externalLinkText = try (between (string "[") (string "]") externalLinkContents)
 > externalLinkContents = do
 >   schema
 >   urlPath
@@ -168,6 +182,8 @@ and `do` return what their last argument matches.
 >   cleanWikiText
 > schema = choice (map symbol ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"])
 > urlPath = textWithout "[]{}| "
+
+FIXME: stop describing LinkState.
 
 Internal links have many possible components. In general, they take the form:
 
@@ -200,23 +216,25 @@ details of the link are added to the LinkState.
       State: [makeLink {namespace="Category", page="English nouns"}]
 
 
-> internalLink :: Parser String
+> internalLink :: Parser LinkedText
 > internalLink = between (symbol "[[") (symbol "]]") internalLinkContents
 > internalLinkContents = do
 >   target <- linkTarget
 >   maybeText <- optionMaybe alternateText
 >   let link = (parseLink target) in do
->     updateState (addLink link)
 >     case (namespace link) of
 >       -- Certain namespaces have special links that make their text disappear
->       "Image"    -> nop
->       "Category" -> nop
->       "File"     -> nop
+>       "Image"    -> noText
+>       "Category" -> noText
+>       "File"     -> noText
 >       -- If the text didn't disappear, find the text that labels the link
 >       _          -> case maybeText of
->         Just text  -> return text
+>         Just text  -> return (linkString link text)
 >         -- With no alternate text, the text is the name of the target page
->         Nothing    -> return (page link)
+>         Nothing    -> return (linkString link (page link))
+>
+> internalLinkText :: Parser String
+> internalLinkText = internalLink &> discardLinks
 >
 > linkTarget :: Parser String
 > linkTarget = textWithout "[]{}|\n"
@@ -397,7 +415,7 @@ standardized form as a mapping from argument names to values.
 >
 > endOfTemplate = symbol "}}" >> return Map.empty
 >
-> wikiTextArg = textChoices [internalLink, externalLink, ignoredTemplate, looseBracket, textArg]
+> wikiTextArg = textChoices [internalLinkText, externalLinkText, ignoredTemplate, looseBracket, textArg]
 > textArg = textWithout "[]{}|" &> discardSpans
 
 We can simplify some of this parsing in the case where we are looking for a
@@ -477,39 +495,6 @@ that point we can begin parsing a new level-1 section including the heading.
 > isNonEmptyString :: String -> Bool
 > isNonEmptyString s = (length s) > 0
 
-Keeping track of state
-----------------------
-
-As our parser runs, it will be collecting links in a value that we call a
-LinkState. The `makeLink` constructor allows creating a WikiLink where the
-values default to the empty string.
-
-> makeLink = WikiLink {namespace="", page="", section=""}
-
-Here are some functions that apply to LinkStates:
-
-> newState :: LinkState
-> newState = []
->
-> resetState :: LinkState -> LinkState
-> resetState ps = []
->
-> addLink :: WikiLink -> LinkState -> LinkState
-> addLink = (:)
-
-And here's a variant of the wikiText parser combinator that returns the list
-of WikiLinks that it accumulates:
-
-> returnStateFrom :: Parser a -> Parser LinkState
-> returnStateFrom parser = do
->   parser
->   state <- getState
->   modifyState resetState
->   return state
-
-> wikiTextLinks :: Parser LinkState
-> wikiTextLinks = returnStateFrom wikiText
-
 
 Entry points
 ------------
@@ -527,7 +512,7 @@ we'll write our own version.
 >       Right x -> do
 >         print x
 >
-> parse parser = runParser parser newState
+> parse parser = runParser parser ()
 
 Here's a function to be run at the IO level, which takes in a string of Wikitext,
 outputs its plain text, and returns nothing.

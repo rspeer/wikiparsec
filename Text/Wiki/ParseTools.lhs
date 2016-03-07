@@ -5,17 +5,26 @@
 > import Text.Parsec hiding (parse, parseTest)
 > import Text.Parsec.Char
 
+Data types
+==========
+
+We'll define a type expression called Parser. The type expression Parsec
+takes three arguments: the input type, the state type, and the output type.
+
+For most expressions in this file, the input type will be String and the state
+type will be (). All we have left to specify is the output type, which can
+vary, so we won't fill in that argument.
+
+> type Parser = Parsec String ()
+
+
 Parser-making expressions
--------------------------
+=========================
 
 As part of many expressions, we need a quick way to discard what we matched
 and use the empty string as its value:
 
 > nop = return ""
-
-Ugly type expression:
-
-> type GeneralizedParser = forall state. Parsec String state
 
 The awkward thing about LL parsing is that you can consume part of a string,
 fail to match the rest of it, and be unable to backtrack. When we match a
@@ -30,7 +39,7 @@ A lot of spans of Wikitext are mostly defined by what they're not. The
 `textWithout` rule matches and returns a sequence of 1 or more characters that
 are not in the given string.
 
-> textWithout :: String -> GeneralizedParser String
+> textWithout :: String -> Parser String
 > textWithout chars = many1 (noneOf chars)
 
 This is similar to the `symbol` that's defined in Parsec's token-based
@@ -47,13 +56,13 @@ expressions we're allowed to parse, tries all of them in that priority order
 (backtracking whenever one fails), and concatenates together their results.
 `textStrictChoices` is similar, but does not backtrack.
 
-> textChoices :: [GeneralizedParser String] -> GeneralizedParser String
+> textChoices :: [Parser String] -> Parser String
 > textChoices options = concatMany (choice (map try options))
 >
-> textStrictChoices :: [GeneralizedParser String] -> GeneralizedParser String
+> textStrictChoices :: [Parser String] -> Parser String
 > textStrictChoices options = concatMany (choice options)
 >
-> concatMany :: GeneralizedParser String -> GeneralizedParser String
+> concatMany :: Parser String -> Parser String
 > concatMany combinator = do
 >   parts <- many1 combinator
 >   return (concat parts)
@@ -63,7 +72,7 @@ us to repeat them without allowing repeated matches of the empty string.
 However, there are cases where the empty string is a valid value for a
 sub-expression. In those cases, we wrap the sub-expression in `possiblyEmpty`.
 
-> possiblyEmpty :: GeneralizedParser String -> GeneralizedParser String
+> possiblyEmpty :: Parser String -> Parser String
 > possiblyEmpty combinator = do
 >   matched <- optionMaybe (try combinator)
 >   case matched of
@@ -78,7 +87,7 @@ We need to output something besides an error in the case where the ending token
 never appears, though. What we choose to do is to consume everything up to the
 end of the input, and return what we consumed.
 
-> delimitedSpan :: String -> String -> GeneralizedParser String
+> delimitedSpan :: String -> String -> Parser String
 > delimitedSpan open close = do
 >   symbol open
 >   manyTill anyChar (symbol close <|> (eof >> nop))
