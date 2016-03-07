@@ -12,7 +12,6 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import Text.Parsec.Char
 > import Text.Parsec.Error (ParseError, errorPos)
 > import Text.Parsec.Pos (sourceLine)
-> import Control.Monad.Identity (liftM)
 > import Debug.Trace (trace)
 
 We're going to need to make use of Haskell's functional mapping type,
@@ -25,6 +24,12 @@ Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
 > import Text.Wiki.SplitUtils
+
+Some common shorthand for defining parse rules:
+
+> import Text.Wiki.ParseTools ((&>), symbol, textWithout, textChoices,
+>                              textStrictChoices, concatMany, possiblyEmpty,
+>                              delimitedSpan)
 
 And some more utilities from the MissingH package:
 
@@ -57,102 +62,7 @@ the text. All we have left to specify is the output type, which can vary, so we
 won't fill in that argument.
 
 > type Parser = Parsec String LinkState
-
-The definition of LinkState will be straightforward -- it's just a list of
-WikiLinks -- but let's save defining it for later, because we're also going to
-define some functions for working with it.
-
-
-Parser-making expressions
--------------------------
-
-As part of many expressions, we need a quick way to discard what we matched
-and use the empty string as its value:
-
-> nop = return ""
-
-The awkward thing about LL parsing is that you can consume part of a string,
-fail to match the rest of it, and be unable to backtrack. When we match a
-multi-character string, we usually want it to be an all-or-nothing thing. At
-the cost of a bit of efficiency, we'll use the `symbol` expression for
-multi-character strings, which wraps the `string` parse rule in `try` so it can
-backtrack.
-
-> symbol = try . string
-
-A lot of spans of Wikitext are mostly defined by what they're not. The
-`textWithout` rule matches and returns a sequence of 1 or more characters that
-are not in the given string.
-
-> textWithout :: String -> Parser String
-> textWithout chars = many1 (noneOf chars)
-
-This is similar to the `symbol` that's defined in Parsec's token-based
-parse rules, but we're not importing those because they don't coexist with
-significant whitespace.
-
-A more complex version of this is when there are many different kinds of
-strings that could appear in a given context, including different kinds of
-strings concatenated together. For example, in one context, we might accept
-plain text, links, and templates, but not line breaks.
-
-To make this easier, we'll define `textChoices`, which takes a list of
-expressions we're allowed to parse, tries all of them in that priority order,
-and concatenates together their results.
-
-> textChoices :: [Parser String] -> Parser String
-> textChoices options = concatMany (choice (map try options))
->
-> textStrictChoices :: [Parser String] -> Parser String
-> textStrictChoices options = concatMany (choice options)
->
-> concatMany :: Parser String -> Parser String
-> concatMany combinator = do
->   parts <- many1 combinator
->   return (concat parts)
->
-> possiblyEmpty :: Parser String -> Parser String
-> possiblyEmpty combinator = do
->   matched <- optionMaybe (try combinator)
->   case matched of
->     Just match -> return match
->     Nothing    -> nop
-
-Sometimes a token starts some special environment that will consume everything
-until an ending token. An example would be HTML comments, which consume
-everything between `<!--` and `-->`.
-
-We need to output something besides an error in the case where the ending token
-never appears, though. What we choose to do is to consume everything up to the
-end of the input, and return what we consumed.
-
-> delimitedSpan :: String -> String -> Parser String
-> delimitedSpan open close = do
->   symbol open
->   manyTill anyChar (symbol close <|> (eof >> nop))
-
-
-The "and-then" operator
------------------------
-
-I'm going to define a new operator that's going to be pretty useful in a lot of
-these expressions. Often I have a function that's in some monad, like
-`Parser String`, and I want to apply a transformation to its output, like
-`String -> String`.
-
-The `liftM` function almost does this: it converts `String -> String`
-to `Parser String -> Parser String`, for example. But it's just a function,
-and you apply functions on the left... so the last thing you do has to be the
-first thing you write. This is confusing because the rest of the parser
-expression is usually written in sequential order, especially when it's using
-`do` syntax.
-
-So this operator, the "and-then" operator, lets me write the thing that needs
-to happen to the output at the end. I could just define it as `(flip liftM)`, but
-that would be pointless. (Functional programming puns! Hooray!)
-
-> (&>) :: Monad m => m a -> (a -> b) -> m b
-> (&>) result f = liftM f result
+> type LinkState = [WikiLink]
 
 
 Spans of text
@@ -177,7 +87,8 @@ instead, we could take advantage of the fact that these spans are at the lowest
 level of syntax and we want to ignore them anyway.
 
 We'll just post-process the parse result to remove the sequences of
-apostrophes, by chaining it through the `discardSpans` function.
+apostrophes, by chaining it through the `discardSpans` function. (See
+`ParseTools.lhs` for the definition of the `&>` operator.)
 
 > basicText :: Parser String
 > basicText = textWithout "[]{}|:=\n" &> discardSpans
@@ -570,11 +481,7 @@ Keeping track of state
 ----------------------
 
 As our parser runs, it will be collecting links in a value that we call a
-LinkState.
-
-> type LinkState = [WikiLink]
-
-The `makeLink` constructor allows creating a WikiLink where the
+LinkState. The `makeLink` constructor allows creating a WikiLink where the
 values default to the empty string.
 
 > makeLink = WikiLink {namespace="", page="", section=""}
