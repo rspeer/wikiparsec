@@ -13,6 +13,7 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import Text.Parsec.Error (ParseError, errorPos)
 > import Text.Parsec.Pos (sourceLine)
 > import Control.Monad.Identity (liftM)
+> import Debug.Trace (trace)
 
 We're going to need to make use of Haskell's functional mapping type,
 Data.Map, to represent the contents of templates.
@@ -65,6 +66,11 @@ define some functions for working with it.
 Parser-making expressions
 -------------------------
 
+As part of many expressions, we need a quick way to discard what we matched
+and use the empty string as its value:
+
+> nop = return ""
+
 The awkward thing about LL parsing is that you can consume part of a string,
 fail to match the rest of it, and be unable to backtrack. When we match a
 multi-character string, we usually want it to be an all-or-nothing thing. At
@@ -110,7 +116,7 @@ and concatenates together their results.
 >   matched <- optionMaybe (try combinator)
 >   case matched of
 >     Just match -> return match
->     Nothing    -> return ""
+>     Nothing    -> nop
 
 Sometimes a token starts some special environment that will consume everything
 until an ending token. An example would be HTML comments, which consume
@@ -123,7 +129,8 @@ end of the input, and return what we consumed.
 > delimitedSpan :: String -> String -> Parser String
 > delimitedSpan open close = do
 >   symbol open
->   manyTill anyChar (symbol close <|> (eof >> return ""))
+>   manyTill anyChar (symbol close <|> (eof >> nop))
+
 
 The "and-then" operator
 -----------------------
@@ -189,10 +196,12 @@ but we can write this expression that allows "loose brackets" to be matched
 as text:
 
 > looseBracket :: Parser String
-> looseBracket = do
->   bracket <- oneOf "[]{}"
->   notFollowedBy (char bracket)
->   return [bracket]
+> looseBracket = (
+>   do
+>     bracket <- oneOf "[]{}"
+>     notFollowedBy (char bracket)
+>     return [bracket]
+>   ) <?> "unmatched bracket"
 
 Wikitext in general is made of HTML, links, templates, and miscellaneous text.
 We'll parse templates for their meaning below, but in situations where we don't
@@ -200,16 +209,17 @@ care about templates, we simply discard their contents using the
 `ignoredTemplate` rule.
 
 > wikiTextLine :: Parser String
-> wikiTextLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine]
+> wikiTextLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, textLine] <?> "line of wikitext"
 >
 > wikiNonHeadingLine :: Parser String
-> wikiNonHeadingLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine]
+> wikiNonHeadingLine = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine] <?> "non-heading line of wikitext"
 >
 > wikiText :: Parser String
-> wikiText = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine, newLine]
-> cleanWikiText = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, nonHeadingLine, newLine]
-> textLine = textWithout "[]{}\n" &> discardSpans
-> nonHeadingLine = notFollowedBy (char '=') >> textLine
+> wikiText = textChoices [wikiTable, internalLink, externalLink, ignoredTemplate, looseBracket, nonHeadingLine, nonHeadingNewline] <?> "wikitext"
+> cleanWikiText = textStrictChoices [wikiTable, internalLink, externalLink, ignoredTemplate, nonHeadingLine, nonHeadingNewline] <?> "well-formed wikitext"
+> textLine = textWithout "[]{}\n" &> discardSpans <?> "line of plain text"
+> nonHeadingLine = notFollowedBy (char '=') >> textLine <?> "non-heading line"
+> nonHeadingNewline = notFollowedBy (char '=') >> newLine <?> "non-heading newline"
 >
 > newLine :: Parser String
 > newLine = string "\n"
@@ -288,9 +298,9 @@ details of the link are added to the LinkState.
 >     updateState (addLink link)
 >     case (namespace link) of
 >       -- Certain namespaces have special links that make their text disappear
->       "Image"    -> return ""
->       "Category" -> return ""
->       "File"     -> return ""
+>       "Image"    -> nop
+>       "Category" -> nop
+>       "File"     -> nop
 >       -- If the text didn't disappear, find the text that labels the link
 >       _          -> case maybeText of
 >         Just text  -> return text
@@ -300,7 +310,7 @@ details of the link are added to the LinkState.
 > linkTarget :: Parser String
 > linkTarget = textWithout "[]{}|\n"
 >
-> alternateText = char '|' >> cleanWikiText
+> alternateText = char '|' >> wikiText
 >
 > parseLink :: String -> WikiLink
 > parseLink target =
@@ -391,7 +401,7 @@ by line breaks.
 > anyList = subList ""
 >
 > anyListText :: Parser String
-> anyListText = anyList &> extractText
+> anyListText = anyList &> extractText <?> "list"
 >
 > listHeading :: String -> Parser ListItem
 > listHeading marker = listItemContent marker &> ListHeading
@@ -444,7 +454,7 @@ standardized form as a mapping from argument names to values.
 > template = symbol "{{" >> (templateArgs 0)
 >
 > ignoredTemplate :: Parser String
-> ignoredTemplate = template >> return ""
+> ignoredTemplate = template >> nop
 
 > templateArgs :: Int -> Parser TemplateData
 > templateArgs offset = do
@@ -500,10 +510,10 @@ Tables have complex formatting, and thus far we're just going to be skipping
 them.
 
 > wikiTable :: Parser String
-> wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> return ""))
+> wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> nop))
 >
 > wikiTableComplete :: Parser String
-> wikiTableComplete = delimitedSpan "{|" "|}" >> return ""
+> wikiTableComplete = delimitedSpan "{|" "|}" >> nop
 
 MediaWiki templates can be used in horrifying ways, and one way that they're
 sometimes used (particularly on Wikipedia) is to start a table that is then
@@ -530,13 +540,13 @@ or an entire page, and return the plain text that they contain.
 
 > sectionText :: Int -> Parser String
 > sectionText level = do
->   theHeading <- heading level <?> ("level-" ++ (show level) ++ " heading")
->   theContent <- sectionContent level
+>   theHeading <- try (optional newLine >> heading level) <?> ("level-" ++ (show level) ++ " heading")
+>   theContent <- sectionContent level <?> "section content"
+>   newLine <|> (eof >> nop) <?> "end of line"
 >   return (squishBlankLines (unlines [theHeading, "", theContent]))
 >
-> sectionContent level = textStrictChoices [
->     sectionText (level + 1),
->     anyListText, wikiNonHeadingLine, newLine]
+> sectionContent level = textStrictChoices [sectionText (level + 1), sectionContent' level]
+> sectionContent' level = textChoices [anyListText, wikiNonHeadingLine, newLine] <?> ("level-" ++ (show level) ++ " section content")
 
 A page usually acts like the content of a level-1 section, without a heading
 (because the heading is actually the page title). However, a Wiki page can
