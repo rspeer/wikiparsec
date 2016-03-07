@@ -13,7 +13,7 @@ testParser parser input output =
 testParserFail parser input =
   input ~: rights [parse parser "(test)" input] ~?= []
 
-testLinks = testParser wikiTextLinks
+testLinks = testParser linkedWikiText
 
 linkTests = [
     testParser wikiText "''this'' [[word]]" "this word",
@@ -24,11 +24,11 @@ linkTests = [
     testParser wikiText "[[Category:English nouns]]" "",
     testParser wikiText "uphold[ing] the wages system" "uphold[ing] the wages system",
 
-    testLinks "this [[word]]" [makeLink {page="word"}],
-    testLinks "[[word|''this'' word]]" [makeLink {page="word"}],
-    testLinks "this [[word#English]]" [makeLink {page="word", section="English"}],
-    testLinks "this [[w:en:word]]" [makeLink {namespace="w:en", page="word"}],
-    testLinks "[[Category:English nouns]]" [makeLink {namespace="Category", page="English nouns"}]
+    testLinks "this [[word]]" $ LinkedText [makeLink {page="word"}] "this word",
+    testLinks "[[word|''this'' word]]" $ LinkedText [makeLink {page="word"}] "this word",
+    testLinks "this [[word#English]]" $ LinkedText [makeLink {page="word", section="English"}] "this word",
+    testLinks "this [[w:en:word]]" $ LinkedText [makeLink {namespace="w:en", page="word"}] "this word",
+    testLinks "[[Category:English nouns]]" $ LinkedText [makeLink {namespace="Category", page="English nouns"}] ""
     ]
 
 templateTests = [
@@ -39,8 +39,7 @@ templateTests = [
     testParser (specificTemplate "t+") "{{t+|fr|exemple|m}}" $ fromList
         [("0", "t+"), ("1", "fr"), ("2", "exemple"), ("3", "m")],
     testParser template "{{t|ja|例え|tr=[[たとえ]], tatoe}}" $ fromList
-        [("0", "t"), ("1", "ja"), ("2", "例え"), ("tr", "たとえ, tatoe")],
-    testLinks "{{t|ja|例え|tr=[[たとえ]], tatoe}}" [makeLink {page="たとえ"}]
+        [("0", "t"), ("1", "ja"), ("2", "例え"), ("tr", "たとえ, tatoe")]
     ]
 
 listTests = [

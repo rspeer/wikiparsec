@@ -56,22 +56,22 @@ called `WikiLink`.
 Wiki links can be put together into linked text, which has a rendered
 plain-text value and a list of links.
 
-> data LinkedText = LinkedText [WikiLink] String
+> data LinkedText = LinkedText [WikiLink] String deriving (Show, Eq)
 >
 > linkString :: WikiLink -> String -> LinkedText
 > linkString link s = LinkedText [link] s
 >
-> unlinkedString :: String -> LinkedText
-> unlinkedString s = LinkedText [] s
+> unlinked :: String -> LinkedText
+> unlinked s = LinkedText [] s
 >
-> concatLinkedText :: LinkedText -> LinkedText -> LinkedText
-> concatLinkedText (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (s1 ++ s2)
+> addLinkedText :: LinkedText -> LinkedText -> LinkedText
+> addLinkedText (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (s1 ++ s2)
+>
+> concatLinkedText :: [LinkedText] -> LinkedText
+> concatLinkedText = foldl addLinkedText (unlinked "") 
 >
 > discardLinks :: LinkedText -> String
 > discardLinks (LinkedText links s) = s
->
-> noText :: Parser LinkedText
-> noText = return (unlinkedString "")
 
 An invocation of a template is represented as a Map from parameter names to
 values.  Both the names and the values are strings.
@@ -224,9 +224,9 @@ details of the link are added to the LinkState.
 >   let link = (parseLink target) in do
 >     case (namespace link) of
 >       -- Certain namespaces have special links that make their text disappear
->       "Image"    -> noText
->       "Category" -> noText
->       "File"     -> noText
+>       "Image"    -> return (linkString link "")
+>       "Category" -> return (linkString link "")
+>       "File"     -> return (linkString link "")
 >       -- If the text didn't disappear, find the text that labels the link
 >       _          -> case maybeText of
 >         Just text  -> return (linkString link text)
@@ -247,7 +247,11 @@ details of the link are added to the LinkState.
 >   where
 >     (namespace, local) = splitLast ':' target
 >     (page, section) = splitFirst '#' local
-
+>
+> linkedWikiText :: Parser LinkedText
+> linkedWikiText = (many linkedWikiTextPiece) &> concatLinkedText
+> linkedWikiTextPiece = internalLink <|> unlinkedWikiText
+> unlinkedWikiText = textStrictChoices [externalLinkText, ignoredTemplate, nonHeadingLine, nonHeadingNewline] &> unlinked
 
 Headings
 --------
