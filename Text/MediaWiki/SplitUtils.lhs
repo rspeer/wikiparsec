@@ -1,7 +1,7 @@
 Some string-splitting functions that help us parse Wikitext without
 backtracking:
 
-> module Text.Wiki.SplitUtils (splitFirst, splitLast) where
+> module Text.MediaWiki.SplitUtils (splitFirst, splitLast) where
 
 `splitFirst` finds the first occurrence of a separator character, and
 splits the string at that point, returning the text before and after the

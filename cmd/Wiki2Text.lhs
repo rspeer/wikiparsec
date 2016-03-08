@@ -1,6 +1,6 @@
-> import Text.Wiki.MediaWikiXML (processMediaWikiDump, WikiPage,
+> import Text.MediaWiki.XML (processMediaWikiDump, WikiPage,
 >                                pageNamespace, pageTitle, pageText)
-> import Text.Wiki.MediaWiki (outputPlainText)
+> import Text.MediaWiki.WikiText (outputPlainText)
 > import Data.Text (unpack, pack)
 > import Control.Monad
 

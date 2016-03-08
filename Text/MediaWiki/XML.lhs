@@ -30,7 +30,7 @@ Crazy streaming framework:
 
 The HTML processor that we'll run on the output:
 
-> import Text.Wiki.MediaWikiHTML (extractWikiTextFromHTML)
+> import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 
 Data types
 ==========

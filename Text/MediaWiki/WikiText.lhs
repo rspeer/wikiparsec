@@ -23,13 +23,14 @@ Data.Map, to represent the contents of templates.
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
-> import Text.Wiki.SplitUtils
+> import Text.MediaWiki.SplitUtils
 
 Some common shorthand for defining parse rules:
 
-> import Text.Wiki.ParseTools (Parser, (&>), symbol, textWithout, textChoices,
->                              textStrictChoices, concatMany, possiblyEmpty,
->                              delimitedSpan, nop)
+> import Text.MediaWiki.ParseTools
+>   (Parser, (&>), symbol, textWithout, textChoices,
+>    textStrictChoices, concatMany, possiblyEmpty,
+>    delimitedSpan, nop)
 
 And some more utilities from the MissingH package:
 

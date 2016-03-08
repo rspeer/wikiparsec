@@ -1,11 +1,14 @@
 > {-# LANGUAGE OverloadedStrings #-}
 > 
 > module Text.MediaWiki.Sections where
-> import Data.Text as T
-> import Data.Text (Text)
+> import qualified Data.Text as T
+> import Text.Parsec.Pos
 > import Text.Parsec.Prim
 > import Text.Parsec.Combinator
-> import Control.Applicative
+> import Text.Parsec.Error
+> import Control.Applicative ((<$>))
+> import Data.Maybe (fromJust)
+
 
 Data structures
 ===============
@@ -17,6 +20,8 @@ about their entire stack of headings.
 
 Here we define the data structures representing the outputs of these various
 steps.
+
+> type Text = T.Text
 
 > data SingleSection = SingleSection {
 >   ssLevel :: Int,
@@ -34,6 +39,9 @@ steps.
 > isHeading :: TextLine -> Bool
 > isHeading (Heading _ _) = True
 > isHeading _             = False
+>
+> getText :: TextLine -> Text
+> getText (Plain text) = text
 
 
 Reading lines
@@ -43,7 +51,7 @@ This is a kind of lexer for the section parser. We sort the lines of the page
 into two types: headings and non-headings.
 
 > readLines :: Text -> [TextLine]
-> readLines text = map parseTextLine (lines text)
+> readLines text = map parseTextLine (T.lines text)
 >
 > parseTextLine :: Text -> TextLine
 > parseTextLine text =
@@ -52,9 +60,10 @@ into two types: headings and non-headings.
 >
 > headingWithLevel :: Text -> (Text, Int)
 > headingWithLevel text =
->   if (length text) > 1 && T.isPrefixOf "=" text && T.isSuffixOf "=" text
->     then let (innerText, innerLevel) = headingWithLevel text
->          in  (innerText, innerLevel + 1)
+>   if (T.length text) > 1 && T.isPrefixOf "=" text && T.isSuffixOf "=" text
+>     then let innerText = fromJust $ T.stripPrefix "=" $ fromJust $ T.stripSuffix "=" text
+>              (finalText, innerLevel) = headingWithLevel innerText
+>          in  (finalText, innerLevel + 1)
 >     else (text, 0)
 
 
@@ -65,32 +74,33 @@ A line-by-line parser
 
 Here's some boilerplate to help Parsec understand that our tokens are lines:
 
-> matchLine :: LineParser 
+> matchLine :: (TextLine -> Bool) -> LineParser TextLine
 > matchLine pred =
 >   let showLine = show
 >       testLine line = if pred line then Just line else Nothing
 >       nextPos pos x xs = updatePosLine pos x
 >   in  tokenPrim showLine nextPos testLine
 >
-> updatePosLine (SourcePos name line column) _ = SourcePos name (line+1) 1
+> updatePosLine :: SourcePos -> TextLine -> SourcePos
+> updatePosLine pos _ = incSourceLine pos 1
 
 Now we can use it to define two token-matching parsers:
 
-> pPlainLine :: Parser TextLine
-> pPlainLine = matchLine (not isHeading)
+> pPlainLine :: LineParser Text
+> pPlainLine = getText <$> matchLine (not . isHeading)
 >
-> pHeadingLine :: Parser TextLine
+> pHeadingLine :: LineParser TextLine
 > pHeadingLine = matchLine isHeading
 
 
 Parsing sections
 ================
 
-> pSection :: Parser SingleSection
+> pSection :: LineParser SingleSection
 > pSection = do
 >   Heading level name <- pHeadingLine
 >   textLines <- many pPlainLine
->   return (SingleSection { ssLevel = level, ssHeading = name, ssContent = unlines textLines })
+>   return (SingleSection { ssLevel = level, ssHeading = name, ssContent = T.unlines textLines })
 
 
 Converting sections
@@ -106,7 +116,7 @@ WikiSections.
 > processSectionHeadings headingStack [] = []
 > processSectionHeadings headingStack (sec:rest) =
 >   let sec' = (applyHeadings headingStack sec)
->       heds = (headings section)
+>       heds = (headings sec')
 >   in  (sec':(processSectionHeadings heds rest))
 >
 > applyHeadings :: [Text] -> SingleSection -> WikiSection
@@ -120,12 +130,12 @@ Parsing the whole page
 
 It's convenient for us if all text is in a section. The text that precedes any
 section headings is effectively in a level-1 section called "top". Let's just
-add the heading for it.
+add the heading for it before we scan its lines.
 
-> preparePage :: Text -> Text
-> preparePage text = "=top=\n" ++ text
+> preparePage :: Text -> [TextLine]
+> preparePage text = readLines (T.append "=top=\n" text)
 >
-> pPage :: Parser [WikiSection]
+> pPage :: LineParser [WikiSection]
 > pPage = convertSections <$> many pSection
 >
 > parsePageIntoSections :: Text -> Either ParseError [WikiSection]
