@@ -4,7 +4,7 @@ After parsing the XML of a MediaWiki entry, the result then needs to be
 decoded as (potentially very sloppy) HTML, the contents of which are Wikitext.
 This module is responsible for handling the HTML.
 
-> module Text.Wiki.MediaWikiHTML where
+> module Text.MediaWiki.HTML where
 > import Data.Text (Text)
 > import qualified Data.Text as T
 > import Text.HTML.TagSoup

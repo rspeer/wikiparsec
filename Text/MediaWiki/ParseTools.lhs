@@ -1,6 +1,6 @@
 > {-# LANGUAGE RankNTypes, NoMonomorphismRestriction #-}
 
-> module Text.Wiki.ParseTools where
+> module Text.MediaWiki.ParseTools where
 > import Control.Monad.Identity (liftM)
 > import Text.Parsec hiding (parse, parseTest)
 > import Text.Parsec.Char

@@ -7,7 +7,7 @@ parser-combinator library for Haskell.
 Parsec is explicitly designed around the way Haskell works. I wouldn't
 normally be using Haskell, but it does seem like the right tool for the job.
 
-> module Text.Wiki.MediaWiki where
+> module Text.MediaWiki.WikiText where
 > import Text.Parsec hiding (parse, parseTest)
 > import Text.Parsec.Char
 > import Text.Parsec.Error (ParseError, errorPos)
@@ -68,7 +68,7 @@ plain-text value and a list of links.
 > addLinkedText (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (s1 ++ s2)
 >
 > concatLinkedText :: [LinkedText] -> LinkedText
-> concatLinkedText = foldl addLinkedText (unlinked "") 
+> concatLinkedText = foldl addLinkedText (unlinked "")
 >
 > discardLinks :: LinkedText -> String
 > discardLinks (LinkedText links s) = s

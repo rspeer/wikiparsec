@@ -4,7 +4,7 @@ The purpose of this module is to extract Wikitext data from a MediaWiki XML
 dump. This module won't parse the Wikitext itself; that's a job for
 Text.Wiki.MediaWiki.
 
-> module Text.Wiki.MediaWikiXML where
+> module Text.MediaWiki.XML where
 > import qualified Data.ByteString.UTF8 as UTF8
 > import qualified Data.ByteString.Lazy as ByteString
 
