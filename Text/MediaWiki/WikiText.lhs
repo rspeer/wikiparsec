@@ -63,11 +63,11 @@ plain-text value and a list of links.
 > linkText :: WikiLink -> Text -> LinkedText
 > linkText link s = LinkedText [link] s
 >
-> unlinked :: Text -> LinkedText
-> unlinked s = LinkedText [] s
+> toLinked :: Text -> LinkedText
+> toLinked s = LinkedText [] s
 >
 > emptyLinkedText :: LinkedText
-> emptyLinkedText = unlinked ""
+> emptyLinkedText = toLinked ""
 >
 > addLinkedText :: LinkedText -> LinkedText -> LinkedText
 > addLinkedText (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (T.append s1 s2)
@@ -81,6 +81,9 @@ plain-text value and a list of links.
 > joinLinkedText :: Text -> [LinkedText] -> LinkedText
 > joinLinkedText sep [] = emptyLinkedText
 > joinLinkedText sep ts = foldl1 (addLinkedTextSep sep) ts
+>
+> unlinesLinkedText :: [LinkedText] -> LinkedText
+> unlinesLinkedText ts = addLinkedText (joinLinkedText "\n" ts) (toLinked "\n")
 >
 > discardLinks :: LinkedText -> Text
 > discardLinks (LinkedText links s) = s
@@ -287,7 +290,7 @@ links.
 > linkedWikiText :: Parser LinkedText
 > linkedWikiText      = linkedTextFrom linkedWikiTextPiece
 > linkedWikiTextPiece = internalLink <|> unlinkedWikiText
-> unlinkedWikiText    = unlinked <$> textChoices [externalLinkText, ignoredTemplate, messyTextLine]
+> unlinkedWikiText    = toLinked <$> textChoices [externalLinkText, ignoredTemplate, messyTextLine]
 
 
 Lists
@@ -307,15 +310,18 @@ Sometimes we just want the text that the list contains. `extractText`
 returns the text of the list items (whatever kind of items they are) separated
 by line breaks.
 
-> extractText :: ListItem -> LinkedText
-> extractText (Item t) = t
-> extractText (ListHeading t) = t
-> extractText (BulletList items) = extractTextFromList items
-> extractText (OrderedList items) = extractTextFromList items
-> extractText (IndentedList items) = extractTextFromList items
+> extractTextLines :: ListItem -> [LinkedText]
+> extractTextLines (Item t) = [t]
+> extractTextLines (ListHeading t) = [t]
+> extractTextLines (BulletList items) = extractTextLinesFromList items
+> extractTextLines (OrderedList items) = extractTextLinesFromList items
+> extractTextLines (IndentedList items) = extractTextLinesFromList items
 >
-> extractTextFromList :: [ListItem] -> LinkedText
-> extractTextFromList items = joinLinkedText "\n" (map extractText items)
+> extractTextLinesFromList :: [ListItem] -> [LinkedText]
+> extractTextLinesFromList items = concat (map extractTextLines items)
+>
+> extractText :: ListItem -> LinkedText
+> extractText = unlinesLinkedText . extractTextLines
 
 > listItems :: Text -> Parser [ListItem]
 > listItems marker = do
@@ -326,10 +332,10 @@ by line breaks.
 > listItem marker = subList marker <|> singleListItem marker
 
 > subList :: Text -> Parser ListItem
-> subList marker =   bulletList (T.snoc marker '*')
->                <|> orderedList (T.snoc marker '#')
->                <|> indentedList (T.snoc marker ':')
->                <|> listHeading (T.snoc marker ';')
+> subList marker =   try (bulletList (T.snoc marker '*'))
+>                <|> try (orderedList (T.snoc marker '#'))
+>                <|> try (indentedList (T.snoc marker ':'))
+>                <|> try (listHeading (T.snoc marker ';'))
 >
 > anyList :: Parser ListItem
 > anyList = subList ""
@@ -477,7 +483,7 @@ These functions are designed to take in entire sections of wikitext
 the plain text that they contain.
 
 > sectionLinkedText :: Parser LinkedText
-> sectionLinkedText = lTextChoices [anyListText, linkedWikiText, unlinked <$> newLine] <?> "section content"
+> sectionLinkedText = lTextChoices [anyListText, linkedWikiText, toLinked <$> newLine] <?> "section content"
 
 > sectionText :: Parser Text
 > sectionText = squishBlankLines <$> discardLinks <$> sectionLinkedText
