@@ -1,7 +1,8 @@
 > {-# LANGUAGE OverloadedStrings #-}
-> 
+>
 > module Text.MediaWiki.Sections where
 > import qualified Data.Text as T
+> import Data.Text (Text)
 > import Text.Parsec.Pos
 > import Text.Parsec.Prim
 > import Text.Parsec.Combinator
@@ -21,19 +22,6 @@ about their entire stack of headings.
 Here we define the data structures representing the outputs of these various
 steps.
 
-> type Text = T.Text
-
-> data SingleSection = SingleSection {
->   ssLevel :: Int,
->   ssHeading :: Text,
->   ssContent :: Text
-> } deriving (Eq, Show)
-
-> data WikiSection = WikiSection {
->   headings :: [Text],
->   content :: Text
-> } deriving (Eq, Show)
->
 > data TextLine = Heading Int Text | Plain Text deriving (Eq, Show)
 >
 > isHeading :: TextLine -> Bool
@@ -42,6 +30,17 @@ steps.
 >
 > getText :: TextLine -> Text
 > getText (Plain text) = text
+>
+> data SingleSection = SingleSection {
+>   ssLevel :: Int,
+>   ssHeading :: Text,
+>   ssContent :: Text
+> } deriving (Eq, Show)
+>
+> data WikiSection = WikiSection {
+>   headings :: [Text],
+>   content :: Text
+> } deriving (Eq, Show)
 
 
 Reading lines
@@ -61,10 +60,16 @@ into two types: headings and non-headings.
 > headingWithLevel :: Text -> (Text, Int)
 > headingWithLevel text =
 >   if (T.length text) > 1 && T.isPrefixOf "=" text && T.isSuffixOf "=" text
->     then let innerText = fromJust $ T.stripPrefix "=" $ fromJust $ T.stripSuffix "=" text
+>     then let innerText               = trim text
 >              (finalText, innerLevel) = headingWithLevel innerText
 >          in  (finalText, innerLevel + 1)
 >     else (text, 0)
+
+`trim` is a helper that takes in a text of length at least 2, and strips off
+its first and last character.
+
+> trim :: Text -> Text
+> trim = T.init . T.tail
 
 
 A line-by-line parser

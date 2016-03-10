@@ -1,5 +1,5 @@
 import Test.HUnit
-import Text.Wiki.SplitUtils
+import Text.MediaWiki.SplitUtils
 import Control.Monad
 
 splitTests = test [

@@ -1,46 +1,55 @@
-> {-# LANGUAGE RankNTypes, NoMonomorphismRestriction #-}
+> {-# LANGUAGE RankNTypes, NoMonomorphismRestriction, OverloadedStrings #-}
 
 > module Text.MediaWiki.ParseTools where
-> import Control.Monad.Identity (liftM)
-> import Text.Parsec hiding (parse, parseTest)
+> import qualified Data.Text as T
+> import Data.Text (Text)
+> import Text.Parsec
+> import Text.Parsec.Text
 > import Text.Parsec.Char
+> import Text.Parsec.Pos
+> import Control.Applicative ((<$>))
 
-Data types
-==========
+Parsing primitives for text
+===========================
 
-We'll define a type expression called Parser. The type expression Parsec
-takes three arguments: the input type, the state type, and the output type.
+It puzzles me that this isn't already defined somewhere. Here's a parse rule
+that matches a specific Text, the same way that `string` matches a String:
 
-For most expressions in this file, the input type will be String and the state
-type will be (). All we have left to specify is the output type, which can
-vary, so we won't fill in that argument.
+> matchText :: Text -> Parser Text
+> matchText t = T.pack <$> string (T.unpack t)
 
-> type Parser = Parsec String ()
+The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
+way to apply a plain function to the output of a monadic computation, such as a
+successful parse. Here, it "lifts" the `T.pack` function, of type `String ->
+Text`, so that it turns the `Parser String` on the right side of `<$>` into
+a `Parser Text`.
+
+TODO: This seems inefficient. If I understood the internals of the `tokens`
+combinator that `string` is built from, perhaps I could make a faster way of
+comparing chunks of text.
 
 
-Parser-making expressions
-=========================
+Common parsing functions
+========================
 
 As part of many expressions, we need a quick way to discard what we matched
-and use the empty string as its value:
+and use the empty text as its value:
 
+> nop :: Parser Text
 > nop = return ""
-
-The awkward thing about LL parsing is that you can consume part of a string,
-fail to match the rest of it, and be unable to backtrack. When we match a
-multi-character string, we usually want it to be an all-or-nothing thing. At
-the cost of a bit of efficiency, we'll use the `symbol` expression for
-multi-character strings, which wraps the `string` parse rule in `try` so it can
-backtrack.
-
-> symbol = try . string
 
 A lot of spans of Wikitext are mostly defined by what they're not. The
 `textWithout` rule matches and returns a sequence of 1 or more characters that
 are not in the given string.
 
-> textWithout :: String -> Parser String
-> textWithout chars = many1 (noneOf chars)
+> textWithout :: [Char] -> Parser Text
+> textWithout chars = T.pack <$> many1 (noneOf chars)
+
+The `symbol` rule matches a multi-character Text, but backtracks if it doesn't
+match instead of getting stuck:
+
+> symbol :: Text -> Parser Text
+> symbol = try . matchText
 
 This is similar to the `symbol` that's defined in Parsec's token-based
 parse rules, but we're not importing those because they don't coexist with
@@ -52,27 +61,25 @@ strings concatenated together. For example, in one context, we might accept
 plain text, links, and templates, but not line breaks.
 
 To make this easier, we'll define `textChoices`, which takes a list of
-expressions we're allowed to parse, tries all of them in that priority order
-(backtracking whenever one fails), and concatenates together their results.
-`textStrictChoices` is similar, but does not backtrack.
+expressions we're allowed to parse, tries all of them in that priority order,
+and concatenates together their results. This expression *does not backtrack*,
+so any sub-expression that starts to match should be prepared to finish the job
+or should be wrapped in `try`.
 
-> textChoices :: [Parser String] -> Parser String
-> textChoices options = concatMany (choice (map try options))
+> textChoices :: [Parser Text] -> Parser Text
+> textChoices options = concatMany (choice options)
 >
-> textStrictChoices :: [Parser String] -> Parser String
-> textStrictChoices options = concatMany (choice options)
->
-> concatMany :: Parser String -> Parser String
+> concatMany :: Parser Text -> Parser Text
 > concatMany combinator = do
 >   parts <- many1 combinator
->   return (concat parts)
+>   return (T.concat parts)
 
 Most of the expressions we write will match at least one character, allowing
 us to repeat them without allowing repeated matches of the empty string.
 However, there are cases where the empty string is a valid value for a
 sub-expression. In those cases, we wrap the sub-expression in `possiblyEmpty`.
 
-> possiblyEmpty :: Parser String -> Parser String
+> possiblyEmpty :: Parser Text -> Parser Text
 > possiblyEmpty combinator = do
 >   matched <- optionMaybe (try combinator)
 >   case matched of
@@ -87,31 +94,9 @@ We need to output something besides an error in the case where the ending token
 never appears, though. What we choose to do is to consume everything up to the
 end of the input, and return what we consumed.
 
-> delimitedSpan :: String -> String -> Parser String
+> delimitedSpan :: Text -> Text -> Parser Text
 > delimitedSpan open close = do
 >   symbol open
->   manyTill anyChar (symbol close <|> (eof >> nop))
-
-
-The "and-then" operator
------------------------
-
-I'm going to define a new operator that's going to be pretty useful in a lot of
-these expressions. Often I have a function that's in some monad, like `Parser
-String` for a suitably-defined type expression `Parser`, and I want to apply a
-transformation to its output, like `String -> String`.
-
-The `liftM` function almost does this: it converts `String -> String`
-to `Parser String -> Parser String`, for example. But it's just a function,
-and you apply functions on the left... so the last thing you do has to be the
-first thing you write. This is confusing because the rest of the parser
-expression is usually written in sequential order, especially when it's using
-`do` syntax.
-
-So this operator, the "and-then" operator, lets me write the thing that needs
-to happen to the output at the end. I could just define it as `(flip liftM)`, but
-that would be pointless. (Functional programming puns! Hooray!)
-
-> (&>) :: Monad m => m a -> (a -> b) -> m b
-> (&>) result f = liftM f result
+>   chars <- manyTill anyChar (symbol close <|> (eof >> nop))
+>   return (T.pack chars)
 
