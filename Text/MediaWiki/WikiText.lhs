@@ -12,6 +12,8 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > module Text.MediaWiki.WikiText where
 > import qualified Data.Text as T
 > import qualified Data.Text.IO as TIO
+> import qualified Text.MediaWiki.AnnotatedText as A
+> import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation)
 > import Data.Text (Text)
 > import Text.Parsec
 > import Text.Parsec.Error (ParseError, errorPos)
@@ -37,58 +39,11 @@ Some common shorthand for defining parse rules:
 
 > import Text.MediaWiki.ParseTools
 >   (matchText, symbol, nop, textWithout, textChoices, concatMany,
->    possiblyEmpty, delimitedSpan)
+>    possiblyEmpty, delimitedSpan, aPossiblyEmpty, aTextChoices)
 
 
 Data types
 ==========
-
-An internal link is represented as a record of a type we'll define here,
-called `WikiLink`.
-
-> data WikiLink = WikiLink {
->   namespace :: Text,
->   page :: Text,
->   section :: Text
-> } deriving (Show, Eq)
-
-`makeLink` is a constant that can be used as a template for making WikiLinks.
-
-> makeLink :: WikiLink
-> makeLink = WikiLink {namespace="", page="", section=""}
-
-Wiki links can be put together into linked text, which has a rendered
-plain-text value and a list of links.
-
-> data LinkedText = LinkedText [WikiLink] Text deriving (Show, Eq)
->
-> linkText :: WikiLink -> Text -> LinkedText
-> linkText link s = LinkedText [link] s
->
-> toLinked :: Text -> LinkedText
-> toLinked s = LinkedText [] s
->
-> emptyLinkedText :: LinkedText
-> emptyLinkedText = toLinked ""
->
-> addLinkedText :: LinkedText -> LinkedText -> LinkedText
-> addLinkedText (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (T.append s1 s2)
->
-> addLinkedTextSep :: Text -> LinkedText -> LinkedText -> LinkedText
-> addLinkedTextSep sep (LinkedText links1 s1) (LinkedText links2 s2) = LinkedText (links1 ++ links2) (T.append (T.append s1 sep) s2)
->
-> concatLinkedText :: [LinkedText] -> LinkedText
-> concatLinkedText = foldl addLinkedText emptyLinkedText
->
-> joinLinkedText :: Text -> [LinkedText] -> LinkedText
-> joinLinkedText sep [] = emptyLinkedText
-> joinLinkedText sep ts = foldl1 (addLinkedTextSep sep) ts
->
-> unlinesLinkedText :: [LinkedText] -> LinkedText
-> unlinesLinkedText ts = addLinkedText (joinLinkedText "\n" ts) (toLinked "\n")
->
-> discardLinks :: LinkedText -> Text
-> discardLinks (LinkedText links s) = s
 
 An invocation of a template is represented as a Map from parameter names to
 values.  Both the names and the values are Text.
@@ -145,6 +100,9 @@ It would be excessive to actually try to simulate MediaWiki's error handling,
 but we can write this expression that allows "loose brackets" to be matched
 as text:
 
+> looseBracket :: Parser Text
+> looseBracket = notFollowedBy (matchText "{|") >> oneButNotTwoOf "[]{}" <?> "junk bracket"
+>
 > oneButNotTwoOf :: [Char] -> Parser Text
 > oneButNotTwoOf chars = try (
 >   do
@@ -153,7 +111,6 @@ as text:
 >     return (T.singleton c)
 >   )
 >
-> looseBracket = notFollowedBy (matchText "{|") >> oneButNotTwoOf "[]{}" <?> "junk bracket"
 > extraneousCloseBrackets = symbol "]]" <?> "junk closing brackets"
 > extraneousCloseBraces   = symbol "}}" <?> "junk closing braces"
 
@@ -229,82 +186,64 @@ When parsing internal links, we return just their label. However, other
 details of the link are added to the LinkState.
 
      In:    [[word]]
-     Out:   LinkedText [makeLink {page="word"}] "word"
+     Out:   AnnotatedText [A.makeLink {page="word"}] "word"
 
      In:    [[word|this word]]
-     Out:   LinkedText [makeLink {page="word"}] "this word"
+     Out:   AnnotatedText [A.makeLink {page="word"}] "this word"
 
      In:    [[word#English]]
-     Out:   LinkedText [makeLink {page="word", section="English"}] "word"
+     Out:   AnnotatedText [A.makeLink {page="word", section="English"}] "word"
 
      In:    [[w:en:Word]]
-     Out:   LinkedText [makeLink {namespace="w:en", page="word"}] "Word"
+     Out:   AnnotatedText [A.makeLink {namespace="w:en", page="word"}] "Word"
 
      In:    [[Category:English nouns]]
-     Out:   LinkedText [makeLink {namespace="Category", page="English nouns"}] ""
+     Out:   AnnotatedText [A.makeLink {namespace="Category", page="English nouns"}] ""
 
 
-> internalLink :: Parser LinkedText
+> internalLink :: Parser AnnotatedText
 > internalLink = between (symbol "[[") (symbol "]]") internalLinkContents
 > internalLinkContents = do
 >   target <- plainTextInLink
 >   maybeText <- optionMaybe alternateText
 >   let link = (parseLink target) in do
->     case (namespace link) of
+>     case (A.namespace link) of
 >       -- Certain namespaces have special links that make their text disappear
->       "Image"    -> return (linkText link "")
->       "Category" -> return (linkText link "")
->       "File"     -> return (linkText link "")
+>       "Image"    -> return (A.annotate [link] "")
+>       "Category" -> return (A.annotate [link] "")
+>       "File"     -> return (A.annotate [link] "")
 >       -- If the text didn't disappear, find the text that labels the link
 >       _          -> case maybeText of
->         Just text  -> return (linkText link text)
+>         Just text  -> return (A.annotate [link] text)
 >         -- With no alternate text, the text is the name of the target page
->         Nothing    -> return (linkText link (page link))
+>         Nothing    -> return (A.annotate [link] (A.page link))
 >
 > internalLinkText :: Parser Text
-> internalLinkText = discardLinks <$> internalLink
+> internalLinkText = A.unannotate <$> internalLink
 >
 > alternateText :: Parser Text
 > alternateText = char '|' >> wikiTextAtEndOfLink
 >
-> parseLink :: Text -> WikiLink
+> parseLink :: Text -> Annotation
 > parseLink target =
->   WikiLink {namespace=namespace, page=page, section=section}
+>   A.makeLink {A.namespace=namespace, A.page=page, A.section=section}
 >   where
 >     (namespace, local) = tSplitLast ':' target
 >     (page, section) = tSplitFirst '#' local
 
-A LinkedText version of the `textChoices` operator:
+`annotatedWikiText` parses text that may or may not contain links, and returns
+it in a AnnotatedText data structure. `annotatedTextFrom` is a more general
+version that takes in a parsing expression that it will use to find annotated
+text -- for example, if there are project-specific templates that should be
+treated as links.
 
-> lTextChoices :: [Parser LinkedText] -> Parser LinkedText
-> lTextChoices options = lConcatMany (choice options)
->
-> lConcatMany :: Parser LinkedText -> Parser LinkedText
-> lConcatMany combinator = do
->   parts <- many1 combinator
->   return (concatLinkedText parts)
+> annotatedTextFrom :: Parser AnnotatedText -> Parser AnnotatedText
+> annotatedTextFrom expr = A.concat <$> many1 expr
 
-> lPossiblyEmpty :: Parser LinkedText -> Parser LinkedText
-> lPossiblyEmpty combinator = do
->   matched <- optionMaybe (try combinator)
->   case matched of
->     Just match -> return match
->     Nothing    -> return (toLinked "")
-
-
-`linkedWikiText` parses text that may or may not contain links, and returns it
-in a LinkedText data structure. `linkedTextFrom` is a more general version that
-takes in a parsing expression that it will use to find linked text -- for
-example, if there are project-specific templates that should be treated as
-links.
-
-> linkedTextFrom :: Parser LinkedText -> Parser LinkedText
-> linkedTextFrom expr = concatLinkedText <$> many1 expr
-
-> linkedWikiText :: Parser LinkedText
-> linkedWikiText      = linkedTextFrom linkedWikiTextPiece
-> linkedWikiTextPiece = internalLink <|> unlinkedWikiText
-> unlinkedWikiText    = toLinked <$> textChoices [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
+> annotatedWikiText :: Parser AnnotatedText
+> annotatedWikiText      = annotatedTextFrom annotatedWikiTextPiece
+> annotatedWikiTextPiece = internalLink <|> unannotatedWikiText
+> unannotatedWikiText    = A.fromText <$> textChoices [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
 
 
 Lists
@@ -313,8 +252,8 @@ Lists
 Here's a hierarchical data type for describing the contents of lists, which
 semantically can contain other lists.
 
-> data ListItem = Item LinkedText
->               | ListHeading LinkedText
+> data ListItem = Item AnnotatedText
+>               | ListHeading AnnotatedText
 >               | BulletList [ListItem]
 >               | OrderedList [ListItem]
 >               | IndentedList [ListItem]
@@ -324,18 +263,18 @@ Sometimes we just want the text that the list contains. `extractText`
 returns the text of the list items (whatever kind of items they are) separated
 by line breaks.
 
-> extractTextLines :: ListItem -> [LinkedText]
+> extractTextLines :: ListItem -> [AnnotatedText]
 > extractTextLines (Item t) = [t]
 > extractTextLines (ListHeading t) = [t]
 > extractTextLines (BulletList items) = extractTextLinesFromList items
 > extractTextLines (OrderedList items) = extractTextLinesFromList items
 > extractTextLines (IndentedList items) = extractTextLinesFromList items
 >
-> extractTextLinesFromList :: [ListItem] -> [LinkedText]
+> extractTextLinesFromList :: [ListItem] -> [AnnotatedText]
 > extractTextLinesFromList items = concat (map extractTextLines items)
 >
-> extractText :: ListItem -> LinkedText
-> extractText = unlinesLinkedText . extractTextLines
+> extractText :: ListItem -> AnnotatedText
+> extractText = A.unlines . extractTextLines
 
 > listItems :: Text -> Parser [ListItem]
 > listItems marker = do
@@ -354,7 +293,7 @@ by line breaks.
 > anyList :: Parser ListItem
 > anyList = subList ""
 >
-> anyListText :: Parser LinkedText
+> anyListText :: Parser AnnotatedText
 > anyListText = extractText <$> anyList <?> "list"
 >
 > listHeading :: Text -> Parser ListItem
@@ -363,11 +302,11 @@ by line breaks.
 > singleListItem :: Text -> Parser ListItem
 > singleListItem marker = Item <$> listItemContent marker
 >
-> listItemContent :: Text -> Parser LinkedText
+> listItemContent :: Text -> Parser AnnotatedText
 > listItemContent marker = do
 >   symbol marker
 >   optional sameLineSpaces
->   line <- linkedWikiText
+>   line <- annotatedWikiText
 >   eol
 >   return line
 >
@@ -496,11 +435,11 @@ These functions are designed to take in entire sections of wikitext
 (which have already been split by the parser in `Sections.lhs`) and return
 the plain text that they contain.
 
-> sectionLinkedText :: Parser LinkedText
-> sectionLinkedText = lPossiblyEmpty (lTextChoices [anyListText, linkedWikiText, toLinked <$> newLine]) <?> "section content"
+> sectionAnnotatedText :: Parser AnnotatedText
+> sectionAnnotatedText = aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromText <$> newLine]) <?> "section content"
 
 > sectionText :: Parser Text
-> sectionText = squishBlankLines <$> discardLinks <$> sectionLinkedText
+> sectionText = squishBlankLines <$> A.unannotate <$> sectionAnnotatedText
 >
 > squishBlankLines :: Text -> Text
 > squishBlankLines s = T.unlines (filter isNonEmptyText (T.lines s))
@@ -525,9 +464,9 @@ outputs its plain text, and returns nothing.
 > inspectText :: Text -> IO ()
 > inspectText input =
 >   let sourceName = "(input)" in
->     case parse sectionLinkedText sourceName input of
+>     case parse sectionAnnotatedText sourceName input of
 >       Left err -> showError input err
->       Right (LinkedText links text) -> do
+>       Right (AnnotatedText links text) -> do
 >         print text
 >         print links
 >

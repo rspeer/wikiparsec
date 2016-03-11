@@ -2,6 +2,8 @@
 
 > module Text.MediaWiki.ParseTools where
 > import qualified Data.Text as T
+> import qualified Text.MediaWiki.AnnotatedText as A
+> import Text.MediaWiki.AnnotatedText (AnnotatedText)
 > import Data.Text (Text)
 > import Text.Parsec
 > import Text.Parsec.Text
@@ -99,4 +101,24 @@ end of the input, and return what we consumed.
 >   symbol open
 >   chars <- manyTill anyChar (symbol close <|> (eof >> nop))
 >   return (T.pack chars)
+
+Expressions for AnnotatedText
+=============================
+
+AnnotatedText versions of some of the operators above:
+
+> aTextChoices :: [Parser AnnotatedText] -> Parser AnnotatedText
+> aTextChoices options = aConcatMany (choice options)
+>
+> aConcatMany :: Parser AnnotatedText -> Parser AnnotatedText
+> aConcatMany combinator = do
+>   parts <- many1 combinator
+>   return (A.concat parts)
+>
+> aPossiblyEmpty :: Parser AnnotatedText -> Parser AnnotatedText
+> aPossiblyEmpty combinator = do
+>   matched <- optionMaybe (try combinator)
+>   case matched of
+>     Just match -> return match
+>     Nothing    -> return A.empty
 
