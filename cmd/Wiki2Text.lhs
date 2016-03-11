@@ -5,13 +5,15 @@
 > import qualified Data.Text as T
 > import qualified Data.Text.IO as TIO
 > import Control.Monad
+> import System.Environment
 
 Top level
 =========
 
 > outputPlainTextSection :: WikiSection -> IO ()
 > outputPlainTextSection section = do
->   TIO.putStrLn (last (headings section))
+>   when (length (headings section) > 1) $
+>     outputPlainText (T.strip (last (headings section)))
 >   outputPlainText (content section)
 >
 > outputPlainTextPage :: T.Text -> IO ()
@@ -22,11 +24,12 @@ Top level
 >
 > handlePage :: WikiPage -> IO ()
 > handlePage page = do
->   when (pageNamespace page == (T.pack "0"))
+>   when (pageNamespace page == (T.pack "0")) $ do
+>     TIO.putStrLn (pageTitle page)
 >     (outputPlainTextPage (pageText page))
 
 > main :: IO ()
-> main = processMediaWikiDump "/wobbly/data/wiktionary/onepage.xml.bz2" handlePage
+> main = do
+>   args <- getArgs
+>   processMediaWikiDump (args !! 0) handlePage
 
-main = processMediaWikiDump "/wobbly/data/wordfreq/raw-input/wikipedia/enwiki-20141208-pages-articles.xml.bz2" handlePage
-main = processMediaWikiDump "/wobbly/data/wiktionary/enwiktionary-20151201-pages-articles.xml.bz2" handlePage

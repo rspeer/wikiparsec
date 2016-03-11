@@ -210,22 +210,20 @@ details of the link are added to the LinkState.
 >   target <- plainTextInLink
 >   maybeText <- optionMaybe alternateText
 >   let link = (parseLink target) in do
->     case (A.namespace link) of
->       -- Certain namespaces have special links that make their text disappear
->       "Image"    -> return (A.annotate [link] "")
->       "Category" -> return (A.annotate [link] "")
->       "File"     -> return (A.annotate [link] "")
->       -- If the text didn't disappear, find the text that labels the link
->       _          -> case maybeText of
->         Just text  -> return (A.annotate [link] text)
->         -- With no alternate text, the text is the name of the target page
->         Nothing    -> return (A.annotate [link] (A.page link))
+>     -- Find the text that labels the link
+>     case maybeText of
+>       Just text  -> return (A.annotate [link] text)
+>       -- With no alternate text, the text is the name of the target page
+>       Nothing    -> return (A.annotate [link] (A.page link))
 >
 > internalLinkText :: Parser Text
 > internalLinkText = A.unannotate <$> internalLink
 >
 > alternateText :: Parser Text
-> alternateText = char '|' >> wikiTextAtEndOfLink
+> alternateText = do
+>   char '|'
+>   text <- wikiTextAtEndOfLink
+>   let (before, after) = tSplitLast '|' text in (return after)
 >
 > parseLink :: Text -> Annotation
 > parseLink target =
