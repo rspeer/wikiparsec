@@ -11,6 +11,7 @@ normally be using Haskell, but it does seem like the right tool for the job.
 
 > module Text.MediaWiki.WikiText where
 > import qualified Data.Text as T
+> import qualified Data.Text.IO as TIO
 > import Data.Text (Text)
 > import Text.Parsec
 > import Text.Parsec.Error (ParseError, errorPos)
@@ -19,6 +20,7 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import Text.Parsec.Text
 > import Debug.Trace (trace)
 > import Control.Applicative ((<$>))
+> import Control.Monad (when)
 
 We're going to need to make use of Haskell's functional mapping type,
 Data.Map, to represent the contents of templates.
@@ -151,7 +153,9 @@ as text:
 >     return (T.singleton c)
 >   )
 >
-> looseBracket = notFollowedBy (matchText "{|") >> oneButNotTwoOf "[]{}"
+> looseBracket = notFollowedBy (matchText "{|") >> oneButNotTwoOf "[]{}" <?> "junk bracket"
+> extraneousCloseBrackets = symbol "]]" <?> "junk closing brackets"
+> extraneousCloseBraces   = symbol "}}" <?> "junk closing braces"
 
 Our `newLine` is like Parsec's built-in `newline` except it returns the newline
 character as Text.
@@ -160,17 +164,18 @@ character as Text.
 > newLine = ((newline <|> crlf) >> return "\n") <?> "newline"
 >
 > eol :: Parser Text
-> eol = (eof >> nop) <|> newLine
+> eol = (eof >> nop) <|> newLine <?> "end of line"
 
 Now we can define some spans of text that handle errors, and allow line breaks
 where appropriate
 
 > messyText :: Parser Text
-> messyText           = textChoices [plainText, looseBracket, symbol "]]", symbol "}}", newLine]
-> messyTextLine       = textChoices [plainText, looseBracket, symbol "]]", symbol "}}"]
-> messyTextInLink     = textChoices [plainTextInLink, looseBracket, symbol "}}", newLine]
-> messyTextInExtLink  = textChoices [plainText, oneButNotTwoOf "[{}", symbol "}}", newLine]
-> messyTextInTemplate = textChoices [plainTextInTemplate, looseBracket, symbol "]]", newLine]
+> messyText            = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces, newLine] <?> "plain text"
+> messyTextLine        = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces]          <?> "line of plain text"
+> messyTextInLink      = textChoices [plainTextInLink, looseBracket, extraneousCloseBraces, newLine]                    <?> "plain text inside link"
+> messyTextInExtLink   = textChoices [plainText, oneButNotTwoOf "[{}", extraneousCloseBraces, newLine]                  <?> "plain text inside external link"
+> messyTextAtEndOfLink = textChoices [plainText, looseBracket, extraneousCloseBraces, newLine]                          <?> "plain text at end of link"
+> messyTextInTemplate  = textChoices [plainTextInTemplate, looseBracket, extraneousCloseBrackets, newLine]              <?> "plain text inside template"
 
 Wikitext in general is either some big special environment like a list or a
 table -- which we'll handle elsewhere -- or it's made of links, templates, and
@@ -179,10 +184,11 @@ situations where we don't care about templates, we simply discard their
 contents using the `ignoredTemplate` rule.
 
 > wikiTextLine :: Parser Text
-> wikiTextLine       = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextLine]       <?> "line of wikitext"
-> wikiTextInLink     = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]     <?> "wikitext inside link"
-> wikiTextInExtLink  = textChoices [wikiTable, internalLinkText, ignoredTemplate, messyTextInExtLink]                    <?> "wikitext inside external link"
-> wikiTextInTemplate = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInTemplate] <?> "wikitext inside template"
+> wikiTextLine        = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextLine]       <?> "line of wikitext"
+> wikiTextInLink      = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]     <?> "wikitext inside link"
+> wikiTextAtEndOfLink = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextAtEndOfLink]<?> "wikitext at end of link"
+> wikiTextInExtLink   = textChoices [wikiTable, internalLinkText, ignoredTemplate, messyTextInExtLink]                    <?> "wikitext inside external link"
+> wikiTextInTemplate  = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInTemplate] <?> "wikitext inside template"
 
 Wiki syntax items
 =================
@@ -210,7 +216,7 @@ and `do` return what their last argument matches.
 >   urlText
 >   spaces
 >   messyTextInExtLink
-> bracketAndSchema = choice (map symbol ["[http://", "[https://", "[ftp://", "[news://", "[irc://", "[mailto:", "[//"])
+> bracketAndSchema = choice (map symbol ["[http://", "[https://", "[ftp://", "[news://", "[irc://", "[mailto:", "[//"]) <?> "external link schema"
 
 Internal links have many possible components. In general, they take the form:
 
@@ -259,7 +265,7 @@ details of the link are added to the LinkState.
 > internalLinkText = discardLinks <$> internalLink
 >
 > alternateText :: Parser Text
-> alternateText = char '|' >> messyTextInLink
+> alternateText = char '|' >> wikiTextAtEndOfLink
 >
 > parseLink :: Text -> WikiLink
 > parseLink target =
@@ -278,6 +284,14 @@ A LinkedText version of the `textChoices` operator:
 >   parts <- many1 combinator
 >   return (concatLinkedText parts)
 
+> lPossiblyEmpty :: Parser LinkedText -> Parser LinkedText
+> lPossiblyEmpty combinator = do
+>   matched <- optionMaybe (try combinator)
+>   case matched of
+>     Just match -> return match
+>     Nothing    -> return (toLinked "")
+
+
 `linkedWikiText` parses text that may or may not contain links, and returns it
 in a LinkedText data structure. `linkedTextFrom` is a more general version that
 takes in a parsing expression that it will use to find linked text -- for
@@ -290,7 +304,7 @@ links.
 > linkedWikiText :: Parser LinkedText
 > linkedWikiText      = linkedTextFrom linkedWikiTextPiece
 > linkedWikiTextPiece = internalLink <|> unlinkedWikiText
-> unlinkedWikiText    = toLinked <$> textChoices [externalLinkText, ignoredTemplate, messyTextLine]
+> unlinkedWikiText    = toLinked <$> textChoices [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
 
 
 Lists
@@ -483,7 +497,7 @@ These functions are designed to take in entire sections of wikitext
 the plain text that they contain.
 
 > sectionLinkedText :: Parser LinkedText
-> sectionLinkedText = lTextChoices [anyListText, linkedWikiText, toLinked <$> newLine] <?> "section content"
+> sectionLinkedText = lPossiblyEmpty (lTextChoices [anyListText, linkedWikiText, toLinked <$> newLine]) <?> "section content"
 
 > sectionText :: Parser Text
 > sectionText = squishBlankLines <$> discardLinks <$> sectionLinkedText
@@ -506,7 +520,7 @@ outputs its plain text, and returns nothing.
 >   let sourceName = "(input)" in
 >     case parse sectionText sourceName input of
 >       Left err -> showError input err
->       Right x -> putStrLn (T.unpack x)
+>       Right x -> TIO.putStrLn x
 >
 > inspectText :: Text -> IO ()
 > inspectText input =
@@ -531,9 +545,9 @@ Showing informative errors:
 >     putStrLn "********"
 >     putStr "parse error at "
 >     print err
->     putStrLn $ T.unpack (strLines !! (errorLine - 1))
+>     when (length strLines > 0) (TIO.putStrLn (strLines !! (min (length strLines - 1) (errorLine - 1))))
 >     putStr (replicate (errorCol - 1) ' ')
 >     putStrLn "^"
 >     putStrLn "\n"
->     putStrLn $ T.unpack str
+>     TIO.putStrLn str
 >     putStrLn "********"
