@@ -26,6 +26,7 @@ Top level
 >     (outputPlainTextPage (pageText page))
 
 > main :: IO ()
-> main = processMediaWikiDump "/wobbly/data/wordfreq/raw-input/wikipedia/enwiki-20141208-pages-articles.xml.bz2" handlePage
+> main = processMediaWikiDump "/wobbly/data/wiktionary/onepage.xml.bz2" handlePage
 
+main = processMediaWikiDump "/wobbly/data/wordfreq/raw-input/wikipedia/enwiki-20141208-pages-articles.xml.bz2" handlePage
 main = processMediaWikiDump "/wobbly/data/wiktionary/enwiktionary-20151201-pages-articles.xml.bz2" handlePage

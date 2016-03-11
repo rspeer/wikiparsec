@@ -101,7 +101,10 @@ but we can write this expression that allows "loose brackets" to be matched
 as text:
 
 > looseBracket :: Parser Text
-> looseBracket = notFollowedBy (matchText "{|") >> oneButNotTwoOf "[]{}" <?> "junk bracket"
+> looseBracket = do
+>   notFollowedBy (matchText "{|")
+>   notFollowedBy bracketAndSchema
+>   oneButNotTwoOf "[]{}" <?> "junk bracket"
 >
 > oneButNotTwoOf :: [Char] -> Parser Text
 > oneButNotTwoOf chars = try (
