@@ -10,7 +10,7 @@ Text.Wiki.MediaWiki.
 
 XML and text decoding:
 
-> import Data.Text (Text)
+> import Data.Text (Text, unpack)
 > import Data.XML.Types
 > import Data.Maybe
 > import Text.XML.Stream.Parse
@@ -51,7 +51,7 @@ tuples. Here, in particular, we're mapping text names to text values.
 > type AList = [AItem]
 >
 > justLookup :: Text -> AList -> Text
-> justLookup key aList = fromJust (lookup key aList)
+> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (unpack key))) (lookup key aList)
 
 Top level
 =========
