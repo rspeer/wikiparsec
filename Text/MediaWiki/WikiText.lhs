@@ -74,8 +74,13 @@ instead, we could take advantage of the fact that these spans are at the lowest
 level of syntax and we want to ignore them anyway.
 
 We'll just post-process the parse result to remove the sequences of
-apostrophes, by chaining it through the `discardSpans` function. (See
-`ParseTools.lhs` for the definition of the `<$>` operator.)
+apostrophes, by chaining it through the `discardSpans` function.
+
+The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
+way to apply a plain function to the output of a monadic computation, such as a
+successful parse. Here, it "lifts" the `discardSpans` function, of type `Text ->
+Text`, into a function that transforms a parse result: that is, a function of
+type `Parser Text -> Parser Text`.
 
 > discardSpans :: Text -> Text
 > discardSpans = (T.replace "''" "") . (T.replace "'''" "")
