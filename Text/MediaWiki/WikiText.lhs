@@ -201,29 +201,55 @@ details of the link are added to the LinkState.
      Out:   AnnotatedText [A.makeLink {namespace="w:en", page="word"}] "Word"
 
      In:    [[Category:English nouns]]
-     Out:   AnnotatedText [A.makeLink {namespace="Category", page="English nouns"}] ""
+     Out:   AnnotatedText [A.makeLink {namespace="Category", page="English nouns"}] "English nouns"
 
 
 > internalLink :: Parser AnnotatedText
-> internalLink = between (symbol "[[") (symbol "]]") internalLinkContents
-> internalLinkContents = do
+> internalLink = do
+>   symbol "[["
 >   target <- plainTextInLink
 >   maybeText <- optionMaybe alternateText
->   let link = (parseLink target) in do
->     -- Find the text that labels the link
->     case maybeText of
->       Just text  -> return (A.annotate [link] text)
->       -- With no alternate text, the text is the name of the target page
->       Nothing    -> return (A.annotate [link] (A.page link))
+>   let {
+>     link      = parseLink target;
+>     annotated = case maybeText of
+>                   Just text -> A.annotate [link] text
+>                   Nothing   -> A.annotate [link] (A.page link)
+>   } in do
+>        symbol "]]"
+>        return annotated
 >
 > internalLinkText :: Parser Text
 > internalLinkText = A.unannotate <$> internalLink
->
+
+There are complicated syntaxes on MediaWiki that look like internal links,
+particularly the Image: or File: syntax, which can have multiple
+vertical-bar-separated parts, and assigns properties such as alternate text to
+an image, as well as a plain-text caption that has no special syntax to
+introduce it -- it seems to be determined by process of elimination.
+
+Our best guess at which part of the syntax is the caption is the last one without an equals
+sign. If all parts have an equals sign, perhaps because there's an innocent equals sign in
+a link's text, then we return the last part.
+
+For example, in this image syntax:
+
+    [[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius's home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]
+
+the text we want to extract is:
+
+    Ainola, Sibelius's home from 1904 until his death
+
 > alternateText :: Parser Text
 > alternateText = do
 >   char '|'
 >   text <- wikiTextAtEndOfLink
->   let (before, after) = tSplitLast '|' text in (return after)
+>   return (extractLinkText text)
+>
+> extractLinkText :: Text -> Text
+> extractLinkText text =
+>   let parts      = T.split (== '|') text
+>       noEquals t = not (T.isInfixOf "=" t)
+>   in last (parts ++ (filter noEquals parts))
 >
 > parseLink :: Text -> Annotation
 > parseLink target =
@@ -233,7 +259,7 @@ details of the link are added to the LinkState.
 >     (page, section) = tSplitFirst '#' local
 
 `annotatedWikiText` parses text that may or may not contain links, and returns
-it in a AnnotatedText data structure. `annotatedTextFrom` is a more general
+it in an AnnotatedText data structure. `annotatedTextFrom` is a more general
 version that takes in a parsing expression that it will use to find annotated
 text -- for example, if there are project-specific templates that should be
 treated as links.
