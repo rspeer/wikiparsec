@@ -13,7 +13,7 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import qualified Data.Text as T
 > import qualified Data.Text.IO as TIO
 > import qualified Text.MediaWiki.AnnotatedText as A
-> import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation)
+> import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation, transformA)
 > import Data.Text (Text)
 > import Text.Parsec
 > import Text.Parsec.Error (ParseError, errorPos)
@@ -206,29 +206,55 @@ details of the link are added to the LinkState.
      Out:   AnnotatedText [A.makeLink {namespace="w:en", page="word"}] "Word"
 
      In:    [[Category:English nouns]]
-     Out:   AnnotatedText [A.makeLink {namespace="Category", page="English nouns"}] ""
+     Out:   AnnotatedText [A.makeLink {namespace="Category", page="English nouns"}] "English nouns"
 
 
 > internalLink :: Parser AnnotatedText
-> internalLink = between (symbol "[[") (symbol "]]") internalLinkContents
-> internalLinkContents = do
+> internalLink = do
+>   symbol "[["
 >   target <- plainTextInLink
 >   maybeText <- optionMaybe alternateText
->   let link = (parseLink target) in do
->     -- Find the text that labels the link
->     case maybeText of
->       Just text  -> return (A.annotate [link] text)
->       -- With no alternate text, the text is the name of the target page
->       Nothing    -> return (A.annotate [link] (A.page link))
+>   let {
+>     link      = parseLink target;
+>     annotated = case maybeText of
+>                   Just text -> A.annotate [link] text
+>                   Nothing   -> A.annotate [link] (A.page link)
+>   } in do
+>        symbol "]]"
+>        return annotated
 >
 > internalLinkText :: Parser Text
 > internalLinkText = A.unannotate <$> internalLink
->
+
+There are complicated syntaxes on MediaWiki that look like internal links,
+particularly the Image: or File: syntax, which can have multiple
+vertical-bar-separated parts, and assigns properties such as alternate text to
+an image, as well as a plain-text caption that has no special syntax to
+introduce it -- it seems to be determined by process of elimination.
+
+Our best guess at which part of the syntax is the caption is the last one without an equals
+sign. If all parts have an equals sign, perhaps because there's an innocent equals sign in
+a link's text, then we return the last part.
+
+For example, in this image syntax:
+
+    [[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius's home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]
+
+the text we want to extract is:
+
+    Ainola, Sibelius's home from 1904 until his death
+
 > alternateText :: Parser Text
 > alternateText = do
 >   char '|'
 >   text <- wikiTextAtEndOfLink
->   let (before, after) = tSplitLast '|' text in (return after)
+>   return (extractLinkText text)
+>
+> extractLinkText :: Text -> Text
+> extractLinkText text =
+>   let parts      = T.split (== '|') text
+>       noEquals t = not (T.isInfixOf "=" t)
+>   in last (parts ++ (filter noEquals parts))
 >
 > parseLink :: Text -> Annotation
 > parseLink target =
@@ -238,7 +264,7 @@ details of the link are added to the LinkState.
 >     (page, section) = tSplitFirst '#' local
 
 `annotatedWikiText` parses text that may or may not contain links, and returns
-it in a AnnotatedText data structure. `annotatedTextFrom` is a more general
+it in an AnnotatedText data structure. `annotatedTextFrom` is a more general
 version that takes in a parsing expression that it will use to find annotated
 text -- for example, if there are project-specific templates that should be
 treated as links.
@@ -353,10 +379,7 @@ standardized form as a mapping from argument names to values.
 > template = symbol "{{" >> (templateArgs 0)
 >
 > ignoredTemplate :: Parser Text
-> ignoredTemplate = do
->   template
->   possiblyEmpty wikiTableDetritus
->   nop
+> ignoredTemplate = template >> nop
 
 > templateArgs :: Int -> Parser TemplateData
 > templateArgs offset = do
@@ -412,7 +435,7 @@ Tables have complex formatting, and thus far we're just going to be skipping
 them.
 
 > wikiTable :: Parser Text
-> wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> nop))
+> wikiTable = wikiTableComplete
 >
 > wikiTableComplete :: Parser Text
 > wikiTableComplete = delimitedSpan "{|" "|}" >> nop
@@ -442,16 +465,16 @@ These functions are designed to take in entire sections of wikitext
 the plain text that they contain.
 
 > sectionAnnotatedText :: Parser AnnotatedText
-> sectionAnnotatedText = aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromText <$> newLine]) <?> "section content"
+> sectionAnnotatedText = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromText <$> newLine]) <?> "section content"
 
 > sectionText :: Parser Text
-> sectionText = squishBlankLines <$> A.unannotate <$> sectionAnnotatedText
+> sectionText = A.unannotate <$> sectionAnnotatedText
 >
 > squishBlankLines :: Text -> Text
-> squishBlankLines s = T.unlines (filter isNonEmptyText (T.lines s))
+> squishBlankLines s = T.unlines (filter isMeaningfulLine (T.lines s))
 >
-> isNonEmptyText :: Text -> Bool
-> isNonEmptyText s = (T.length s) > 0
+> isMeaningfulLine :: Text -> Bool
+> isMeaningfulLine s = (T.length s) > 0 && T.head s /= '|'
 
 
 Entry points

@@ -4,7 +4,7 @@ import Test.HUnit
 import Text.MediaWiki.Sections
 import Text.Parsec.Error
 import Control.Monad
-import Data.Text (pack, unpack)
+import Data.Text (pack, unpack, Text)
 import Data.Map (fromList)
 import Data.Either (rights)
 

@@ -2,6 +2,7 @@
 > module Text.MediaWiki.AnnotatedText where
 > import qualified Data.Text as T
 > import Data.Text (Text)
+> import Data.String (IsString, fromString)
 > import Prelude hiding (append, concat, unlines)
 
 Text can be marked up with things such as internal links. During parsing,
@@ -20,6 +21,7 @@ empty string for components that are absent or do not apply.
 >   section :: Text
 > } deriving (Show, Eq)
 
+
 `makeLink` is a constant that can be used as a template for making Annotations
 for internal links.
 
@@ -35,6 +37,9 @@ list of Annotations for it.
 >
 > annotate :: [Annotation] -> Text -> AnnotatedText
 > annotate annos t = AnnotatedText annos t
+>
+> annotations :: AnnotatedText -> [Annotation]
+> annotations (AnnotatedText annos t) = annos
 >
 > fromText :: Text -> AnnotatedText
 > fromText = annotate []
@@ -62,4 +67,11 @@ list of Annotations for it.
 >
 > unannotate :: AnnotatedText -> Text
 > unannotate (AnnotatedText a t) = t
+>
+> transformA :: (Text -> Text) -> AnnotatedText -> AnnotatedText
+> transformA op (AnnotatedText a t) = AnnotatedText a (op t)
 
+We can use string literals as AnnotatedText:
+
+> instance IsString AnnotatedText where
+>   fromString = (fromText . T.pack)
