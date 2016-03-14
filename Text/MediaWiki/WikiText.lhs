@@ -13,7 +13,7 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import qualified Data.Text as T
 > import qualified Data.Text.IO as TIO
 > import qualified Text.MediaWiki.AnnotatedText as A
-> import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation)
+> import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation, transformA)
 > import Data.Text (Text)
 > import Text.Parsec
 > import Text.Parsec.Error (ParseError, errorPos)
@@ -348,10 +348,7 @@ standardized form as a mapping from argument names to values.
 > template = symbol "{{" >> (templateArgs 0)
 >
 > ignoredTemplate :: Parser Text
-> ignoredTemplate = do
->   template
->   possiblyEmpty wikiTableDetritus
->   nop
+> ignoredTemplate = template >> nop
 
 > templateArgs :: Int -> Parser TemplateData
 > templateArgs offset = do
@@ -407,7 +404,7 @@ Tables have complex formatting, and thus far we're just going to be skipping
 them.
 
 > wikiTable :: Parser Text
-> wikiTable = (wikiTableComplete <|> (try wikiTableDetritus >> nop))
+> wikiTable = wikiTableComplete
 >
 > wikiTableComplete :: Parser Text
 > wikiTableComplete = delimitedSpan "{|" "|}" >> nop
@@ -437,16 +434,16 @@ These functions are designed to take in entire sections of wikitext
 the plain text that they contain.
 
 > sectionAnnotatedText :: Parser AnnotatedText
-> sectionAnnotatedText = aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromText <$> newLine]) <?> "section content"
+> sectionAnnotatedText = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromText <$> newLine]) <?> "section content"
 
 > sectionText :: Parser Text
-> sectionText = squishBlankLines <$> A.unannotate <$> sectionAnnotatedText
+> sectionText = A.unannotate <$> sectionAnnotatedText
 >
 > squishBlankLines :: Text -> Text
-> squishBlankLines s = T.unlines (filter isNonEmptyText (T.lines s))
+> squishBlankLines s = T.unlines (filter isMeaningfulLine (T.lines s))
 >
-> isNonEmptyText :: Text -> Bool
-> isNonEmptyText s = (T.length s) > 0
+> isMeaningfulLine :: Text -> Bool
+> isMeaningfulLine s = (T.length s) > 0 && T.head s /= '|'
 
 
 Entry points
