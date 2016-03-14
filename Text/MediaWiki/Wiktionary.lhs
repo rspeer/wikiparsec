@@ -1,12 +1,11 @@
 This file defines how to parse Wiktionary entries, as a layer above the basic
-handling of wiki syntax in `MediaWiki.lhs`.
+handling of wiki syntax in `Wikitext.lhs`.
 
-> module Text.Wiki.Wiktionary where
-> import Text.Wiki.MediaWiki
+> module Text.MediaWiki.Wiktionary where
+> import Text.MediaWiki.Wikitext
 > import Text.Parsec.Char
 
-Data types
-==========
+
 
 A WiktionaryTerm is a piece of text that can be defined on Wiktionary. It is
 defined by its term text, the language it's in (which may be unknown), and
@@ -46,14 +45,9 @@ Parse a section by concatenating the information from several subsections:
 >   return (concat sections)
 
 
-Top-level structure
-===================
-
-TODO: parse the complete structure of a Wiktionary page
-
-
 Language sections
-=================
+-----------------
+yeah this definitely doesn't work anymore
 
 > languageSection :: String -> Parser [WiktionaryRel]
 > languageSection pageName = do
@@ -64,8 +58,6 @@ Language sections
 >       partOfSpeechSection term 3, miscellaneousSection term 3
 >     ]
 
-Subsections
-===========
 
 Etymology sections
 ------------------
