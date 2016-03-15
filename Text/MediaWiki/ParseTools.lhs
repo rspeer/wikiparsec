@@ -4,9 +4,11 @@
 > import qualified Data.Text as T
 > import qualified Text.MediaWiki.AnnotatedText as A
 > import Text.MediaWiki.AnnotatedText (AnnotatedText)
+> import Prelude hiding (takeWhile)
 > import Data.Text (Text)
 > import Data.Attoparsec.Text
-> import Control.Applicative ((<$>))
+> import Data.Attoparsec.Combinator
+> import Control.Applicative ((<|>), (<$>), pure, empty)
 
 
 Common parsing functions
@@ -26,11 +28,14 @@ are not in the given string.
 `takeTill` expects, testing whether a character is in the given list of
 characters.
 
-> charIn :: [Char] -> Char -> Bool
-> charIn = flip elem
->
 > textWithout :: [Char] -> Parser Text
-> textWithout chars = takeTill (charIn chars)
+> textWithout chars = takeTill (inClass chars)
+>
+> textWith :: [Char] -> Parser Text
+> textWith chars = takeWhile1 (inClass chars)
+>
+> skipChars :: [Char] -> Parser ()
+> skipChars chars = skipWhile (inClass chars)
 
 Sometimes there are many different kinds of strings that could appear in a
 given context, including different kinds of strings concatenated together. For
@@ -67,9 +72,23 @@ end of the input, and return what we consumed.
 
 > delimitedSpan :: Text -> Text -> Parser Text
 > delimitedSpan open close = do
->   symbol open
->   chars <- manyTill anyChar (symbol close <|> (eof >> nop))
+>   string open
+>   chars <- manyTill anyChar (string close <|> (atEnd >> nop))
 >   return (T.pack chars)
+
+A limited version of Parsec's `notFollowedBy`:
+
+> notFollowedByChar :: Char -> Parser ()
+> notFollowedByChar c = do
+>   maybeChar <- peekChar
+>   case maybeChar of
+>     Nothing -> return ()
+>     Just c' -> if (c == c') then empty else return ()
+
+Another function missing in Attoparsec:
+
+> optionMaybe :: Parser a -> Parser (Maybe a)
+> optionMaybe p = Just <$> p <|> pure Nothing
 
 Expressions for AnnotatedText
 =============================

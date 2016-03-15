@@ -3,11 +3,8 @@
 Setup
 =====
 
-To parse the mess that is Wiktionary, we make use of Parsec, a well-regarded
-parser-combinator library for Haskell.
-
-Parsec is explicitly designed around the way Haskell works. I wouldn't
-normally be using Haskell, but it does seem like the right tool for the job.
+To parse the mess that is Wiktionary, we make use of Attoparsec, a
+well-regarded parser-combinator library for Haskell.
 
 > module Text.MediaWiki.WikiText where
 > import qualified Data.Text as T
@@ -15,13 +12,10 @@ normally be using Haskell, but it does seem like the right tool for the job.
 > import qualified Text.MediaWiki.AnnotatedText as A
 > import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation, transformA)
 > import Data.Text (Text)
-> import Text.Parsec
-> import Text.Parsec.Error (ParseError, errorPos)
-> import Text.Parsec.Pos (sourceLine)
-> import Text.Parsec.Char
-> import Text.Parsec.Text
+> import Data.Attoparsec.Text
+> import Data.Attoparsec.Combinator
 > import Debug.Trace (trace)
-> import Control.Applicative ((<$>))
+> import Control.Applicative ((<|>), (<$>), (*>), (<*))
 > import Control.Monad (when)
 
 We're going to need to make use of Haskell's functional mapping type,
@@ -37,13 +31,10 @@ this package:
 
 Some common shorthand for defining parse rules:
 
-> import Text.MediaWiki.ParseTools
->   (matchText, symbol, nop, textWithout, textChoices, concatMany,
->    possiblyEmpty, delimitedSpan, aPossiblyEmpty, aTextChoices)
+> import Text.MediaWiki.ParseTools (nop, textWith, textWithout, skipChars,
+>   textChoices, concatMany, notFollowedByChar, possiblyEmpty, delimitedSpan,
+>   aPossiblyEmpty, aTextChoices, optionMaybe)
 
-
-Data types
-==========
 
 An invocation of a template is represented as a Map from parameter names to
 values.  Both the names and the values are Text.
@@ -57,8 +48,8 @@ Spans of text
 Some formatting allows whitespace as long as it stays on the same line --
 for example, the whitespace around headings and after list bullets.
 
-> sameLineSpaces :: Parser ()
-> sameLineSpaces = skipMany (oneOf " \t")
+> optionalSameLineSpaces :: Parser ()
+> optionalSameLineSpaces = skipChars " \t"
 
 Here we're going to define some parsers that scan through characters, within a
 line, that aren't involved in any interesting Wiki syntax.
@@ -76,17 +67,17 @@ level of syntax and we want to ignore them anyway.
 We'll just post-process the parse result to remove the sequences of
 apostrophes, by chaining it through the `discardSpans` function.
 
-The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
-way to apply a plain function to the output of a monadic computation, such as a
-successful parse. Here, it "lifts" the `discardSpans` function, of type `Text ->
-Text`, into a function that transforms a parse result: that is, a function of
-type `Parser Text -> Parser Text`.
-
 > discardSpans :: Text -> Text
 > discardSpans = (T.replace "''" "") . (T.replace "'''" "")
 
 What we count as plain text has to depend on what environment we're in, such as
 whether we're currently parsing a link or a template.
+
+The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
+way to apply a plain function to the output of a monadic computation, such as a
+successful parse. Here, it "lifts" the `discardSpans` function, of type `Text ->
+Text`, into a function that transforms a parse result: that is, a function of
+type `Parser Text -> Parser Text`.
 
 > plainText :: Parser Text
 > plainText           = discardSpans <$> textWithout "[]{}\n"
@@ -102,34 +93,45 @@ have a meaning -- such as a single closing bracket when two closing brackets
 would end a link.
 
 It would be excessive to actually try to simulate MediaWiki's error handling,
-but we can write this expression that allows "loose brackets" to be matched
-as text:
+but we can write some expressions that allows various combinations of brackets
+to be matched as plain text:
+
+- `]]` in a context where we're not expecting to end an internal link
+- `}}` in a context where we're not expecting to end a template
+- A single `{` not followed by `|`
+- A single `]`
+- A single `}`
+
+We don't handle single opening brackets here because those often introduce
+external links. Instead, if the external link parser fails to parse a link,
+it'll just return the bracket as is.
 
 > looseBracket :: Parser Text
-> looseBracket = do
->   notFollowedBy (matchText "{|")
->   notFollowedBy bracketAndSchema
->   oneButNotTwoOf "[]{}" <?> "junk bracket"
+> looseBracket = oneButNotTwoOf "]}" <|> looseOpeningBrace
+>
+> looseOpeningBrace :: Parser Text
+> looseOpeningBrace = do
+>   char '{'
+>   notFollowedByChar '{'
+>   notFollowedByChar '|'
+>   return "{"
 >
 > oneButNotTwoOf :: [Char] -> Parser Text
 > oneButNotTwoOf chars = try (
 >   do
->     c <- oneOf chars
->     notFollowedBy (char c)
+>     c <- satisfy (inClass chars)
+>     notFollowedByChar c
 >     return (T.singleton c)
 >   )
 >
-> extraneousCloseBrackets = symbol "]]" <?> "junk closing brackets"
-> extraneousCloseBraces   = symbol "}}" <?> "junk closing braces"
-
-Our `newLine` is like Parsec's built-in `newline` except it returns the newline
-character as Text.
+> extraneousCloseBrackets = string "]]" <?> "junk closing brackets"
+> extraneousCloseBraces   = string "}}" <?> "junk closing braces"
 
 > newLine :: Parser Text
-> newLine = ((newline <|> crlf) >> return "\n") <?> "newline"
+> newLine = string "\n"
 >
 > eol :: Parser Text
-> eol = (eof >> nop) <|> newLine <?> "end of line"
+> eol = (atEnd >> nop) <|> newLine <?> "end of line"
 
 Now we can define some spans of text that handle errors, and allow line breaks
 where appropriate
@@ -152,7 +154,6 @@ contents using the `ignoredTemplate` rule.
 > wikiTextLine        = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextLine]       <?> "line of wikitext"
 > wikiTextInLink      = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]     <?> "wikitext inside link"
 > wikiTextAtEndOfLink = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextAtEndOfLink]<?> "wikitext at end of link"
-> wikiTextInExtLink   = textChoices [wikiTable, internalLinkText, ignoredTemplate, messyTextInExtLink]                    <?> "wikitext inside external link"
 > wikiTextInTemplate  = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInTemplate] <?> "wikitext inside template"
 
 Wiki syntax items
@@ -172,16 +173,22 @@ number as their text, which we'll disregard. There's also a type of external
 link that is just a bare URL in the text. Its effect on the text is exactly
 the same as if it weren't a link, so we can disregard that case.
 
-The following rules extract the text of an external link, as both `between`
-and `do` return what their last argument matches.
+The following rules extract the text of an external link.
 
 > externalLinkText :: Parser Text
-> externalLinkText = try (between bracketAndSchema (string "]") externalLinkContents)
-> externalLinkContents = do
+> externalLinkText = do
+>   char '['
+>   externalLinkMatch <|> return "["
+>
+> externalLinkMatch = do
+>   schema
 >   urlText
->   spaces
->   messyTextInExtLink
-> bracketAndSchema = choice (map symbol ["[http://", "[https://", "[ftp://", "[news://", "[irc://", "[mailto:", "[//"]) <?> "external link schema"
+>   externalLinkLabelOrEnd
+>
+> schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"]) <?> "external link schema"
+> externalLinkLabelOrEnd = externalLinkEnd <|> externalLinkLabel
+> externalLinkEnd = char ']' *> return ""
+> externalLinkLabel = skipSpace *> messyTextInExtLink <* externalLinkEnd
 
 Internal links have many possible components. In general, they take the form:
 
@@ -211,7 +218,7 @@ details of the link are added to the LinkState.
 
 > internalLink :: Parser AnnotatedText
 > internalLink = do
->   symbol "[["
+>   string "[["
 >   target <- plainTextInLink
 >   maybeText <- optionMaybe alternateText
 >   let {
@@ -220,7 +227,7 @@ details of the link are added to the LinkState.
 >                   Just text -> A.annotate [link] text
 >                   Nothing   -> A.annotate [link] (A.page link)
 >   } in do
->        symbol "]]"
+>        string "]]"
 >        return annotated
 >
 > internalLinkText :: Parser Text
@@ -310,17 +317,17 @@ by line breaks.
 
 > listItems :: Text -> Parser [ListItem]
 > listItems marker = do
->   lookAhead (matchText marker)
+>   lookAhead (string marker)
 >   many1 (listItem marker)
 >
 > listItem :: Text -> Parser ListItem
 > listItem marker = subList marker <|> singleListItem marker
 
 > subList :: Text -> Parser ListItem
-> subList marker =   try (bulletList (T.snoc marker '*'))
->                <|> try (orderedList (T.snoc marker '#'))
->                <|> try (indentedList (T.snoc marker ':'))
->                <|> try (listHeading (T.snoc marker ';'))
+> subList marker =   bulletList (T.snoc marker '*')
+>                <|> orderedList (T.snoc marker '#')
+>                <|> indentedList (T.snoc marker ':')
+>                <|> listHeading (T.snoc marker ';')
 >
 > anyList :: Parser ListItem
 > anyList = subList ""
@@ -336,8 +343,8 @@ by line breaks.
 >
 > listItemContent :: Text -> Parser AnnotatedText
 > listItemContent marker = do
->   symbol marker
->   optional sameLineSpaces
+>   string marker
+>   optionalSameLineSpaces
 >   line <- annotatedWikiText
 >   eol
 >   return line
@@ -376,7 +383,7 @@ Here, we define the basic syntax of templates, and return their contents in a
 standardized form as a mapping from argument names to values.
 
 > template :: Parser TemplateData
-> template = symbol "{{" >> (templateArgs 0)
+> template = string "{{" >> (templateArgs 0)
 >
 > ignoredTemplate :: Parser Text
 > ignoredTemplate = template >> nop
@@ -391,7 +398,7 @@ standardized form as a mapping from argument names to values.
 > templateArgName :: Parser Text
 > templateArgName = do
 >   name <- plainTextInArg
->   matchText "="
+>   string "="
 >   return name
 >
 > namedArg :: Text -> Int -> Parser TemplateData
@@ -407,9 +414,9 @@ standardized form as a mapping from argument names to values.
 >   return (Map.insert (intToText offset) value rest)
 >
 > templateRest :: Int -> Parser TemplateData
-> templateRest offset = endOfTemplate <|> (matchText "|" >> templateArgs offset)
+> templateRest offset = endOfTemplate <|> (string "|" >> templateArgs offset)
 >
-> endOfTemplate = symbol "}}" >> return Map.empty
+> endOfTemplate = string "}}" >> return Map.empty
 >
 > intToText :: Int -> Text
 > intToText = T.pack . show
@@ -423,7 +430,7 @@ general rule for parsing template expressions.
 
 > specificTemplate :: Text -> Parser TemplateData
 > specificTemplate name = do
->   symbol (T.append "{{" name)
+>   string (T.append "{{" name)
 >   parsed <- templateRest 1
 >   return (Map.insert "0" name parsed)
 
@@ -452,7 +459,7 @@ tables by skipping over all such lines.
 > wikiTableDetritus :: Parser Text
 > wikiTableDetritus = do
 >   newLine
->   matchText "|"
+>   string "|"
 >   textWithout "\n"
 >   try wikiTableDetritus <|> eol
 
@@ -485,37 +492,27 @@ outputs its plain text, and returns nothing.
 
 > outputPlainText :: Text -> IO ()
 > outputPlainText input =
->   let sourceName = "(input)" in
->     case parse sectionText sourceName input of
->       Left err -> showError input err
->       Right x -> TIO.putStrLn x
+>    case parseOnly (sectionText <* endOfInput) input of
+>     Left err -> showError input err
+>     Right x -> TIO.putStrLn x
 >
 > inspectText :: Text -> IO ()
 > inspectText input =
->   let sourceName = "(input)" in
->     case parse sectionAnnotatedText sourceName input of
->       Left err -> showError input err
->       Right (AnnotatedText links text) -> do
->         print text
->         print links
+>   case parseOnly (sectionAnnotatedText <* endOfInput) input of
+>     Left err -> showError input err
+>     Right (AnnotatedText links text) -> do
+>       print text
+>       print links
 >
 > inspectString :: String -> IO ()
 > inspectString input = inspectText $ T.pack input
 
 Showing informative errors:
 
-> showError :: Text -> ParseError -> IO ()
-> showError str err =
->   let strLines  = T.lines str
->       errorLine = sourceLine (errorPos err)
->       errorCol  = sourceColumn (errorPos err)
->   in do
->     putStrLn "********"
->     putStr "parse error at "
->     print err
->     when (length strLines > 0) (TIO.putStrLn (strLines !! (min (length strLines - 1) (errorLine - 1))))
->     putStr (replicate (errorCol - 1) ' ')
->     putStrLn "^"
->     putStrLn "\n"
->     TIO.putStrLn str
->     putStrLn "********"
+> showError :: Text -> String -> IO ()
+> showError str err = do
+>   putStrLn "********"
+>   putStr "parse error:"
+>   print err
+>   TIO.putStrLn str
+>   putStrLn "********"
