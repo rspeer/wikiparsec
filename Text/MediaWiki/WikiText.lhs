@@ -12,7 +12,7 @@ well-regarded parser-combinator library for Haskell.
 > import qualified Text.MediaWiki.AnnotatedText as A
 > import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation, transformA)
 > import Data.Text (Text)
-> import Data.Attoparsec.Text
+> import Data.Attoparsec.Text hiding (endOfLine)
 > import Data.Attoparsec.Combinator
 > import Debug.Trace (trace)
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
@@ -31,9 +31,9 @@ this package:
 
 Some common shorthand for defining parse rules:
 
-> import Text.MediaWiki.ParseTools (nop, textWith, textWithout, skipChars,
->   textChoices, concatMany, notFollowedByChar, possiblyEmpty, delimitedSpan,
->   aPossiblyEmpty, aTextChoices, optionMaybe)
+> import Text.MediaWiki.ParseTools (nop, appendChar, textWith, textWithout,
+>   skipChars, textChoices, concatMany, notFollowedByChar, possiblyEmpty,
+>   delimitedSpan, aPossiblyEmpty, aTextChoices, optionMaybe)
 
 
 An invocation of a template is represented as a Map from parameter names to
@@ -127,11 +127,19 @@ it'll just return the bracket as is.
 > extraneousCloseBrackets = string "]]" <?> "junk closing brackets"
 > extraneousCloseBraces   = string "}}" <?> "junk closing braces"
 
+Attoparsec has a misnamed combinator named `endOfLine`. I say it's misnamed
+because it matches an actual line break, but doesn't match at the end of
+the input.
+
+We define `newLine` here to match the line break (I don't think we need to
+handle `\r` when our input comes from XML), and `endOfLine` to also include
+the end of input.
+
 > newLine :: Parser Text
 > newLine = string "\n"
 >
-> eol :: Parser Text
-> eol = (atEnd >> nop) <|> newLine <?> "end of line"
+> endOfLine :: Parser Text
+> endOfLine = (endOfInput >> nop) <|> newLine <?> "end of line"
 
 Now we can define some spans of text that handle errors, and allow line breaks
 where appropriate
@@ -324,10 +332,10 @@ by line breaks.
 > listItem marker = subList marker <|> singleListItem marker
 
 > subList :: Text -> Parser ListItem
-> subList marker =   bulletList (T.snoc marker '*')
->                <|> orderedList (T.snoc marker '#')
->                <|> indentedList (T.snoc marker ':')
->                <|> listHeading (T.snoc marker ';')
+> subList marker =   bulletList (appendChar marker '*')
+>                <|> orderedList (appendChar marker '#')
+>                <|> indentedList (appendChar marker ':')
+>                <|> listHeading (appendChar marker ';')
 >
 > anyList :: Parser ListItem
 > anyList = subList ""
@@ -346,7 +354,7 @@ by line breaks.
 >   string marker
 >   optionalSameLineSpaces
 >   line <- annotatedWikiText
->   eol
+>   endOfLine
 >   return line
 >
 > bulletList marker   = BulletList <$> listItems marker
@@ -461,7 +469,7 @@ tables by skipping over all such lines.
 >   newLine
 >   string "|"
 >   textWithout "\n"
->   try wikiTableDetritus <|> eol
+>   try wikiTableDetritus <|> endOfLine
 
 
 Parsing sections at a time

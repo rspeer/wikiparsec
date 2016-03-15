@@ -11,14 +11,22 @@
 > import Control.Applicative ((<|>), (<$>), pure, empty)
 
 
-Common parsing functions
-========================
+Sensible names for things
+=========================
+
+Let's rename this function that appends a character to the end of a text,
+for people who don't keep a copy of SICP under their pillow:
+
+> appendChar = T.snoc
 
 As part of many expressions, we need a quick way to discard what we matched
 and use the empty text as its value:
 
 > nop :: Parser Text
 > nop = return ""
+
+Common parsing functions
+========================
 
 A lot of spans of Wikitext are mostly defined by what they're not. The
 `textWithout` rule matches and returns a sequence of 1 or more characters that
@@ -75,7 +83,7 @@ end of the input, and return what we consumed.
 > delimitedSpan :: Text -> Text -> Parser Text
 > delimitedSpan open close = do
 >   string open
->   chars <- manyTill anyChar (string close <|> (atEnd >> nop))
+>   chars <- manyTill anyChar (string close <|> (endOfInput >> nop))
 >   return (T.pack chars)
 
 A limited version of Parsec's `notFollowedBy`:
