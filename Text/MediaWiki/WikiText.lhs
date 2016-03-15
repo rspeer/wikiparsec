@@ -160,9 +160,9 @@ contents using the `ignoredTemplate` rule.
 
 > wikiTextLine :: Parser Text
 > wikiTextLine        = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextLine]       <?> "line of wikitext"
-> wikiTextInLink      = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]     <?> "wikitext inside link"
+> wikiTextInLink      = textChoices [internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]                <?> "wikitext inside link"
 > wikiTextAtEndOfLink = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextAtEndOfLink]<?> "wikitext at end of link"
-> wikiTextInTemplate  = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextInTemplate] <?> "wikitext inside template"
+> wikiTextInTemplate  = textChoices [internalLinkText, externalLinkText, ignoredTemplate, messyTextInTemplate]            <?> "wikitext inside template"
 
 Wiki syntax items
 =================
