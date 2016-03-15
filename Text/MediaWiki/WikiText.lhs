@@ -281,8 +281,8 @@ treated as links.
 
 > annotatedWikiText :: Parser AnnotatedText
 > annotatedWikiText      = annotatedTextFrom annotatedWikiTextPiece
-> annotatedWikiTextPiece = internalLink <|> unannotatedWikiText
-> unannotatedWikiText    = A.fromText <$> textChoices [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
+> annotatedWikiTextPiece = internalLink <|> simpleWikiTextPiece
+> simpleWikiTextPiece    = A.fromText <$> choice [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
 
 
 Lists

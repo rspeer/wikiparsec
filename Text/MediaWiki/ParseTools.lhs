@@ -24,12 +24,14 @@ A lot of spans of Wikitext are mostly defined by what they're not. The
 `textWithout` rule matches and returns a sequence of 1 or more characters that
 are not in the given string.
 
-`charIn` is a helper that we can use to return the `Char -> Bool` function that
-`takeTill` expects, testing whether a character is in the given list of
-characters.
-
+> takeTill1 :: (Char -> Bool) -> Parser Text
+> takeTill1 pred = do
+>   c    <- satisfy (not . pred)
+>   rest <- takeTill pred
+>   return (T.cons c rest)
+>
 > textWithout :: [Char] -> Parser Text
-> textWithout chars = takeTill (inClass chars)
+> textWithout chars = takeTill1 (inClass chars)
 >
 > textWith :: [Char] -> Parser Text
 > textWith chars = takeWhile1 (inClass chars)

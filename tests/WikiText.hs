@@ -5,9 +5,8 @@ import Text.MediaWiki.WikiText
 import Text.MediaWiki.AnnotatedText (Annotation, AnnotatedText, makeLink, namespace, page, section)
 import qualified Text.MediaWiki.AnnotatedText as A
 import Text.MediaWiki.HTML (extractWikiTextFromHTML)
-import Text.Parsec
-import Text.Parsec.Text
-import Text.Parsec.Error
+import Data.Attoparsec.Text
+import Data.Attoparsec.Combinator
 import Control.Monad
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -16,20 +15,20 @@ import Data.Either (rights)
 
 testParser :: (Eq a, Show a) => Parser a -> Text -> a -> Test
 testParser parser input output =
-  (T.unpack input) ~: parse parser "(test)" input ~?= Right output
+  (T.unpack input) ~: parseOnly parser input ~?= Right output
 
 testParserFail :: (Eq a, Show a) => Parser a -> Text -> Test
 testParserFail parser input =
-  (T.unpack input) ~: rights [parse parser "(test)" input] ~?= []
+  (T.unpack input) ~: rights [parseOnly parser input] ~?= []
 
-extractAnnotations :: Either ParseError AnnotatedText -> Either ParseError [Annotation]
+extractAnnotations :: Either String AnnotatedText -> Either String [Annotation]
 extractAnnotations result = case result of
   Left err       -> Left err
   Right annoText -> Right (A.annotations annoText)
 
 testAnnotations :: Parser AnnotatedText -> Text -> [Annotation] -> Test
 testAnnotations parser input outputAnnotations =
-  (T.unpack input) ~: extractAnnotations (parse parser "(test)" input) ~?= Right outputAnnotations
+  (T.unpack input) ~: extractAnnotations (parseOnly parser input) ~?= Right outputAnnotations
 
 linkTests = [
     testParser sectionText "''this'' [[word]]" "this word\n",
