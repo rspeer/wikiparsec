@@ -2,8 +2,11 @@ Some string-splitting functions that help us parse Wikitext without
 backtracking:
 
 > module Text.MediaWiki.SplitUtils (splitFirst, splitLast, tSplitFirst, tSplitLast) where
-> import qualified Data.Text as T
-> import Data.Text (Text)
+> import qualified Data.ByteString.Search as BSS
+> import qualified Data.ByteString.Char8 as Char8
+> import qualified Data.ByteString.UTF8 as UTF8
+> import qualified Data.ByteString as BS
+> import Data.ByteString (ByteString)
 
 `splitFirst` finds the first occurrence of a separator character, and
 splits the string at that point, returning the text before and after the

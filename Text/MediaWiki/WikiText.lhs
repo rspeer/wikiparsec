@@ -7,12 +7,16 @@ To parse the mess that is Wiktionary, we make use of Attoparsec, a
 well-regarded parser-combinator library for Haskell.
 
 > module Text.MediaWiki.WikiText where
-> import qualified Data.Text as T
-> import qualified Data.Text.IO as TIO
+> import qualified Data.ByteString.Char8 as Char8
+> import qualified Data.ByteString.UTF8 as UTF8
+> import qualified Data.ByteString as BS
+> import qualified Data.ByteString.Search as BSS
+> import Data.ByteString (ByteString)
 > import qualified Text.MediaWiki.AnnotatedText as A
 > import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation, transformA)
 > import Data.Text (Text)
-> import Data.Attoparsec.Text hiding (endOfLine)
+> import qualified Data.Text as T
+> import Data.Attoparsec.ByteString.Char8 hiding (endOfLine)
 > import Data.Attoparsec.Combinator
 > import Debug.Trace (trace)
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
@@ -39,7 +43,7 @@ Some common shorthand for defining parse rules:
 An invocation of a template is represented as a Map from parameter names to
 values.  Both the names and the values are Text.
 
-> type TemplateData = Map Text Text
+> type TemplateData = Map ByteString ByteString
 
 
 Spans of text
@@ -67,8 +71,8 @@ level of syntax and we want to ignore them anyway.
 We'll just post-process the parse result to remove the sequences of
 apostrophes, by chaining it through the `discardSpans` function.
 
-> discardSpans :: Text -> Text
-> discardSpans = (T.replace "''" "") . (T.replace "'''" "")
+> discardSpans :: ByteString -> ByteString
+> discardSpans = (BSS.replace "''" "") . (BSS.replace "'''" "")
 
 What we count as plain text has to depend on what environment we're in, such as
 whether we're currently parsing a link or a template.
@@ -77,9 +81,9 @@ The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
 way to apply a plain function to the output of a monadic computation, such as a
 successful parse. Here, it "lifts" the `discardSpans` function, of type `Text ->
 Text`, into a function that transforms a parse result: that is, a function of
-type `Parser Text -> Parser Text`.
+type `Parser ByteString -> Parser ByteString`.
 
-> plainText :: Parser Text
+> plainText :: Parser ByteString
 > plainText           = discardSpans <$> textWithout "[]{}\n"
 > plainTextInTemplate = discardSpans <$> textWithout "[]{}|\n"
 > plainTextInArg      = discardSpans <$> textWithout "[]{}|=\n"
@@ -106,17 +110,17 @@ We don't handle single opening brackets here because those often introduce
 external links. Instead, if the external link parser fails to parse a link,
 it'll just return the bracket as is.
 
-> looseBracket :: Parser Text
+> looseBracket :: Parser ByteString
 > looseBracket = oneButNotTwoOf "]}" <|> looseOpeningBrace
 >
-> looseOpeningBrace :: Parser Text
+> looseOpeningBrace :: Parser ByteString
 > looseOpeningBrace = do
 >   char '{'
 >   notFollowedByChar '{'
 >   notFollowedByChar '|'
 >   return "{"
 >
-> oneButNotTwoOf :: [Char] -> Parser Text
+> oneButNotTwoOf :: [Char] -> Parser ByteString
 > oneButNotTwoOf chars = try (
 >   do
 >     c <- satisfy (inClass chars)
@@ -135,16 +139,16 @@ We define `newLine` here to match the line break (I don't think we need to
 handle `\r` when our input comes from XML), and `endOfLine` to also include
 the end of input.
 
-> newLine :: Parser Text
+> newLine :: Parser ByteString
 > newLine = string "\n"
 >
-> endOfLine :: Parser Text
+> endOfLine :: Parser ByteString
 > endOfLine = (endOfInput >> nop) <|> newLine <?> "end of line"
 
 Now we can define some spans of text that handle errors, and allow line breaks
 where appropriate
 
-> messyText :: Parser Text
+> messyText :: Parser ByteString
 > messyText            = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces, newLine] <?> "plain text"
 > messyTextLine        = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces]          <?> "line of plain text"
 > messyTextInLink      = textChoices [plainTextInLink, looseBracket, extraneousCloseBraces, newLine]                    <?> "plain text inside link"
@@ -158,7 +162,7 @@ miscellaneous text.  We'll parse templates for their meaning below, but in
 situations where we don't care about templates, we simply discard their
 contents using the `ignoredTemplate` rule.
 
-> wikiTextLine :: Parser Text
+> wikiTextLine :: Parser ByteString
 > wikiTextLine        = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextLine]       <?> "line of wikitext"
 > wikiTextInLink      = textChoices [internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]                <?> "wikitext inside link"
 > wikiTextAtEndOfLink = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextAtEndOfLink]<?> "wikitext at end of link"
@@ -183,7 +187,7 @@ the same as if it weren't a link, so we can disregard that case.
 
 The following rules extract the text of an external link.
 
-> externalLinkText :: Parser Text
+> externalLinkText :: Parser ByteString
 > externalLinkText = do
 >   char '['
 >   externalLinkMatch <|> return "["
@@ -238,7 +242,7 @@ details of the link are added to the LinkState.
 >        string "]]"
 >        return annotated
 >
-> internalLinkText :: Parser Text
+> internalLinkText :: Parser ByteString
 > internalLinkText = A.unannotate <$> internalLink
 
 There are complicated syntaxes on MediaWiki that look like internal links,
@@ -259,7 +263,7 @@ the text we want to extract is:
 
     Ainola, Sibelius's home from 1904 until his death
 
-> alternateText :: Parser Text
+> alternateText :: Parser ByteString
 > alternateText = do
 >   char '|'
 >   text <- wikiTextAtEndOfLink
@@ -290,7 +294,7 @@ treated as links.
 > annotatedWikiText :: Parser AnnotatedText
 > annotatedWikiText      = annotatedTextFrom annotatedWikiTextPiece
 > annotatedWikiTextPiece = internalLink <|> simpleWikiTextPiece
-> simpleWikiTextPiece    = A.fromText <$> choice [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
+> simpleWikiTextPiece    = A.fromBytes <$> choice [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
 
 
 Lists
@@ -393,7 +397,7 @@ standardized form as a mapping from argument names to values.
 > template :: Parser TemplateData
 > template = string "{{" >> (templateArgs 0)
 >
-> ignoredTemplate :: Parser Text
+> ignoredTemplate :: Parser ByteString
 > ignoredTemplate = template >> nop
 
 > templateArgs :: Int -> Parser TemplateData
@@ -403,7 +407,7 @@ standardized form as a mapping from argument names to values.
 >     Just name -> namedArg name offset
 >     Nothing -> positionalArg offset
 >
-> templateArgName :: Parser Text
+> templateArgName :: Parser ByteString
 > templateArgName = do
 >   name <- plainTextInArg
 >   string "="
@@ -449,10 +453,10 @@ Tables
 Tables have complex formatting, and thus far we're just going to be skipping
 them.
 
-> wikiTable :: Parser Text
+> wikiTable :: Parser ByteString
 > wikiTable = wikiTableComplete
 >
-> wikiTableComplete :: Parser Text
+> wikiTableComplete :: Parser ByteString
 > wikiTableComplete = delimitedSpan "{|" "|}" >> nop
 
 MediaWiki templates can be used in horrifying ways, and one way that they're
@@ -464,7 +468,7 @@ such a template, we'll see a bunch of lines starting with |. Lines intended as
 text don't normally start with vertical bars. So we can clean up incomplete
 tables by skipping over all such lines.
 
-> wikiTableDetritus :: Parser Text
+> wikiTableDetritus :: Parser ByteString
 > wikiTableDetritus = do
 >   newLine
 >   string "|"
@@ -480,16 +484,16 @@ These functions are designed to take in entire sections of wikitext
 the plain text that they contain.
 
 > sectionAnnotatedText :: Parser AnnotatedText
-> sectionAnnotatedText = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromText <$> newLine]) <?> "section content"
+> sectionAnnotatedText = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromBytes <$> newLine]) <?> "section content"
 
-> sectionText :: Parser Text
+> sectionText :: Parser ByteString
 > sectionText = A.unannotate <$> sectionAnnotatedText
 >
-> squishBlankLines :: Text -> Text
-> squishBlankLines s = T.unlines (filter isMeaningfulLine (T.lines s))
+> squishBlankLines :: ByteString -> ByteString
+> squishBlankLines s = Char8.unlines (filter isMeaningfulLine (Char8.lines s))
 >
-> isMeaningfulLine :: Text -> Bool
-> isMeaningfulLine s = (T.length s) > 0 && T.head s /= '|'
+> isMeaningfulLine :: ByteString -> Bool
+> isMeaningfulLine s = (BS.length s) > 0 && Char8.head s /= '|' && Char8.head s /= '!'
 
 
 Entry points
@@ -498,29 +502,29 @@ Entry points
 Here's a function to be run at the IO level, which takes in Wikitext,
 outputs its plain text, and returns nothing.
 
-> outputPlainText :: Text -> IO ()
+> outputPlainText :: ByteString -> IO ()
 > outputPlainText input =
 >    case parseOnly (sectionText <* endOfInput) input of
 >     Left err -> showError input err
->     Right x -> TIO.putStrLn x
+>     Right x -> Char8.putStrLn x
 >
-> inspectText :: Text -> IO ()
-> inspectText input =
+> inspectBytes :: ByteString -> IO ()
+> inspectBytes input =
 >   case parseOnly (sectionAnnotatedText <* endOfInput) input of
 >     Left err -> showError input err
 >     Right (AnnotatedText links text) -> do
->       print text
+>       Char8.putStrLn text
 >       print links
 >
 > inspectString :: String -> IO ()
-> inspectString input = inspectText $ T.pack input
+> inspectString input = inspectBytes $ UTF8.fromString input
 
 Showing informative errors:
 
-> showError :: Text -> String -> IO ()
+> showError :: ByteString -> String -> IO ()
 > showError str err = do
 >   putStrLn "********"
 >   putStr "parse error:"
 >   print err
->   TIO.putStrLn str
+>   Char8.putStrLn str
 >   putStrLn "********"

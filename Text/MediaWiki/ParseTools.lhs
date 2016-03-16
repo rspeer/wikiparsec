@@ -1,12 +1,11 @@
 > {-# LANGUAGE RankNTypes, NoMonomorphismRestriction, OverloadedStrings #-}
 
 > module Text.MediaWiki.ParseTools where
-> import qualified Data.Text as T
 > import qualified Text.MediaWiki.AnnotatedText as A
+> import qualified Data.ByteString.Char8 as Char8
 > import Text.MediaWiki.AnnotatedText (AnnotatedText)
 > import Prelude hiding (takeWhile)
-> import Data.Text (Text)
-> import Data.Attoparsec.Text
+> import Data.Attoparsec.ByteString.Char8
 > import Data.Attoparsec.Combinator
 > import Control.Applicative ((<|>), (<$>), pure, empty)
 
@@ -14,15 +13,16 @@
 Sensible names for things
 =========================
 
-Let's rename this function that appends a character to the end of a text,
-for people who don't keep a copy of SICP under their pillow:
+Let's rename the functions that add a byte to the start or end of a
+ByteString, for people who don't keep a copy of SICP under their pillow:
 
-> appendChar = T.snoc
+> prependChar = Char8.cons
+> appendChar = Char8.snoc
 
 As part of many expressions, we need a quick way to discard what we matched
-and use the empty text as its value:
+and use the empty string as its value:
 
-> nop :: Parser Text
+> nop :: Parser ByteString
 > nop = return ""
 
 Common parsing functions
@@ -32,16 +32,16 @@ A lot of spans of Wikitext are mostly defined by what they're not. The
 `textWithout` rule matches and returns a sequence of 1 or more characters that
 are not in the given string.
 
-> takeTill1 :: (Char -> Bool) -> Parser Text
+> takeTill1 :: (Char -> Bool) -> Parser ByteString
 > takeTill1 pred = do
 >   c    <- satisfy (not . pred)
 >   rest <- takeTill pred
->   return (T.cons c rest)
+>   return (Char8.cons c rest)
 >
-> textWithout :: [Char] -> Parser Text
+> textWithout :: [Char] -> Parser ByteString
 > textWithout chars = takeTill1 (inClass chars)
 >
-> textWith :: [Char] -> Parser Text
+> textWith :: [Char] -> Parser ByteString
 > textWith chars = takeWhile1 (inClass chars)
 >
 > skipChars :: [Char] -> Parser ()
@@ -56,20 +56,20 @@ To make this easier, we'll define `textChoices`, which takes a list of
 expressions we're allowed to parse, tries all of them in that priority order,
 and concatenates together their results.
 
-> textChoices :: [Parser Text] -> Parser Text
+> textChoices :: [Parser ByteString] -> Parser ByteString
 > textChoices options = concatMany (choice options)
 >
-> concatMany :: Parser Text -> Parser Text
+> concatMany :: Parser ByteString -> Parser ByteString
 > concatMany combinator = do
 >   parts <- many1 combinator
->   return (T.concat parts)
+>   return (BS.concat parts)
 
 Most of the expressions we write will match at least one character, allowing
 us to repeat them without allowing repeated matches of the empty string.
 However, there are cases where the empty string is a valid value for a
 sub-expression. In those cases, we wrap the sub-expression in `possiblyEmpty`.
 
-> possiblyEmpty :: Parser Text -> Parser Text
+> possiblyEmpty :: Parser ByteString -> Parser ByteString
 > possiblyEmpty combinator = option "" combinator
 
 Sometimes a token starts some special environment that will consume everything
@@ -80,11 +80,11 @@ We need to output something besides an error in the case where the ending token
 never appears, though. What we choose to do is to consume everything up to the
 end of the input, and return what we consumed.
 
-> delimitedSpan :: Text -> Text -> Parser Text
+> delimitedSpan :: ByteString -> ByteString -> Parser ByteString
 > delimitedSpan open close = do
 >   string open
 >   chars <- manyTill anyChar (string close <|> (endOfInput >> nop))
->   return (T.pack chars)
+>   return (Char8.pack chars)
 
 A limited version of Parsec's `notFollowedBy`:
 
