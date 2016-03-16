@@ -1,13 +1,12 @@
 > {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
 
-> import Text.MediaWiki.XML (processMediaWikiDump, WikiPage,
+> import Text.MediaWiki.XML (processMediaWikiStdin, WikiPage,
 >                            pageNamespace, pageTitle, pageText, pageRedirect)
 > import Text.MediaWiki.WikiText (outputPlainText)
 > import Text.MediaWiki.Sections (parsePageIntoSections, WikiSection, headings, content)
 > import Data.ByteString (ByteString)
 > import qualified Data.ByteString.Char8 as Char8
 > import Control.Monad
-> import System.Environment
 
 Top level
 =========
@@ -32,6 +31,5 @@ Top level
 
 > main :: IO ()
 > main = do
->   args <- getArgs
->   processMediaWikiDump (args !! 0) handlePage
+>   processMediaWikiStdin handlePage
 

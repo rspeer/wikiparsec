@@ -53,6 +53,12 @@ Top level
 >   contents <- BSL.readFile filename
 >   let events = SAX.parse SAX.defaultParseOptions contents
 >   mapM_ sink (findPageTags events)
+>
+> processMediaWikiStdin :: (WikiPage -> IO ()) -> IO ()
+> processMediaWikiStdin sink = do
+>   contents <- BSL.getContents
+>   let events = SAX.parse SAX.defaultParseOptions contents
+>   mapM_ sink (findPageTags events)
 
 Parsing some XML
 ================
