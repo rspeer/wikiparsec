@@ -5,27 +5,15 @@ dump. This module won't parse the Wikitext itself; that's a job for
 Text.Wiki.MediaWiki.
 
 > module Text.MediaWiki.XML where
-> import qualified Data.ByteString.Lazy as ByteString
+> import qualified Data.ByteString.Lazy as BSL
+> import Data.ByteString (ByteString)
+> import Data.Maybe
 
 XML and text decoding:
 
-> import Data.Text (Text, unpack)
-> import Data.XML.Types
-> import Data.Maybe
-> import Text.XML.Stream.Parse
-
-Decompression:
-
-> import Data.Conduit.BZlib
-
-Crazy streaming framework:
-
-> import Data.Conduit
-> import qualified Data.Conduit.List as CL
-> import qualified Data.Conduit.Binary as Binary
-> import Control.Monad.Trans.Resource
-> import Control.Monad.Trans.Class (lift)
-> import Control.Monad (void)
+> import Data.Text (Text)
+> import qualified Data.Text as T
+> import qualified Text.XML.Expat.SAX as SAX
 
 The HTML processor that we'll run on the output:
 
@@ -37,77 +25,48 @@ Data types
 > data WikiPage = WikiPage {
 >   pageNamespace :: Text,
 >   pageTitle :: Text,
->   pageText :: Text
+>   pageText :: Text,
+>   pageRedirect :: Maybe Text
 > } deriving (Show, Eq)
->
-> type WikiConduit u = ConduitM Event WikiPage (ResourceT IO) u
 
 An AList is an association list, that type that shows up in functional
 languages, where you map x to y by just putting together a bunch of (x,y)
 tuples. Here, in particular, we're mapping text names to text values.
 
-> type AItem = (Text,Text)
-> type AList = [AItem]
+> type AList = [(Text, Text)]
 >
 > justLookup :: Text -> AList -> Text
-> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (unpack key))) (lookup key aList)
+> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (T.unpack key))) (lookup key aList)
+
+> makeWikiPage :: AList -> WikiPage
+> makeWikiPage subtags = WikiPage {
+>    pageNamespace = (justLookup "ns" subtags),
+>    pageTitle = (justLookup "title" subtags),
+>    pageText = extractWikiTextFromHTML (justLookup "text" subtags),
+>    pageRedirect = lookup "redirect" subtags
+> }
 
 Top level
 =========
 
-I honestly do not know what most of this code does. The general outline of it
-comes from
-http://haddock.stackage.org/lts-5.4/xml-conduit-1.3.3.1/Text-XML-Stream-Parse.html.
-
-The `runResourceT` function is something about freeing up I/O resources in case
-of exceptions, which is not actually a problem I was going to encounter, but
-xml-conduit makes me solve it anyway.
-
 > processMediaWikiDump :: String -> (WikiPage -> IO ()) -> IO ()
-> processMediaWikiDump filename sink = runResourceT $
->   Binary.sourceFile filename $= bunzip2 $$ parseBytes def =$ (void parseMediaWikiXML) =$ CL.mapM_ (lift . sink)
+> processMediaWikiDump filename sink = do
+>   contents <- BSL.readFile filename
+>   let events = SAX.parse SAX.defaultParseOptions contents
+>   mapM_ sink (findPageTags events)
 
 Parsing some XML
 ================
 
-I really apologize for the relative lack of types. The xml-conduit API is bad
-(everyone on StackOverflow agrees with this, but there's no alternative), and
-the functions it works with are nearly impossible to write correct type
-signatures for. I tried for hours.
+> findPageTags = handleEventStream [] []
 
-> ns :: Text -> Name
-> ns name = Name { nameLocalName=name, nameNamespace=Just "http://www.mediawiki.org/xml/export-0.10/", namePrefix=Nothing }
-
-> matchSingleChild name = do
->   contents <- manyIgnore (tagIgnoreAttrs (ns name) content)
->                          (ignoreTree (/= (ns name)))
->   case contents of
->     found:_ -> return found
->     _       -> error ("Couldn't find child tag: " ++ show name)
->
-> matchChild name = tagIgnoreAttrs (ns name) (itemize name)
->
-> itemize name = do
->   value <- content
->   return (name,value)
->
-> matchRevision = tagNoAttr (ns "revision") matchText
-> matchText = do
->   text <- matchSingleChild "text"
->   return ("text",text)
-
-> parseMediaWikiXML = tagIgnoreAttrs (ns "mediawiki") parsePages
-> parsePages = manyYield' parsePage
->
-> parsePage = tagNoAttr (ns "page") parsePageContent
->
-> parsePageContent :: WikiConduit WikiPage
-> parsePageContent =
->   let parsers = (choose [matchRevision, matchChild "ns", matchChild "title"]) in do
->     assoc <- manyIgnore parsers ignoreAllTrees
->     return $ WikiPage {
->       pageNamespace=(justLookup "ns" assoc),
->       pageTitle=(justLookup "title" assoc),
->       pageText=extractWikiTextFromHTML (justLookup "text" assoc)
->     }
-
+> handleEventStream :: AList -> [Text] -> [SAX.SAXEvent Text Text] -> [WikiPage]
+> handleEventStream subtags chunks [] = []
+> handleEventStream subtags chunks ((SAX.StartElement "page" attrs):rest) = handleEventStream [] [] rest
+> handleEventStream subtags chunks ((SAX.StartElement "redirect" attrs):rest) =
+>   let title = justLookup "title" attrs
+>   in handleEventStream (("redirect",title):subtags) [] rest
+> handleEventStream subtags chunks ((SAX.StartElement elt attrs):rest) = handleEventStream subtags [] rest
+> handleEventStream subtags chunks ((SAX.EndElement "page"):rest) = ((makeWikiPage subtags):(handleEventStream [] [] rest))
+> handleEventStream subtags chunks ((SAX.EndElement elt):rest) = handleEventStream ((elt, T.concat (reverse chunks)):subtags) [] rest
+> handleEventStream subtags chunks ((SAX.CharacterData t):rest) = handleEventStream subtags (t:chunks) rest

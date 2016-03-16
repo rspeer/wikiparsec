@@ -16,8 +16,6 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 Library
-  ghc-prof-options:
-    -fprof-auto
   exposed-modules:     Text.MediaWiki.SplitUtils, Text.MediaWiki.ParseTools,
                        Text.MediaWiki.Sections, Text.MediaWiki.XML, Text.MediaWiki.HTML
   -- other-modules:
@@ -30,22 +28,14 @@ Library
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup,
-                       xml-conduit,
-                       bzlib-conduit,
-                       conduit-extra,
-                       conduit,
-                       resourcet,
-                       xml-types,
+                       hexpat ==0.20.*,
                        containers,
                        transformers ==0.3.0.*
 
 Executable wiki2text
   ghc-options:
-    -prof
-  ghc-prof-options:
-    -fprof-auto
-  ghc-options:
     -threaded
+    -O2
   main-is:             cmd/Wiki2Text.lhs
   build-depends:       base,
                        bytestring,
@@ -55,11 +45,7 @@ Executable wiki2text
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup,
-                       xml-conduit,
-                       bzlib-conduit,
-                       conduit-extra,
-                       conduit,
-                       resourcet,
+                       hexpat ==0.20.*,
                        xml-types,
                        containers,
                        transformers ==0.3.0.*

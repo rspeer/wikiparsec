@@ -1,5 +1,5 @@
 > import Text.MediaWiki.XML (processMediaWikiDump, WikiPage,
->                                pageNamespace, pageTitle, pageText)
+>                            pageNamespace, pageTitle, pageText, pageRedirect)
 > import Text.MediaWiki.WikiText (outputPlainText)
 > import Text.MediaWiki.Sections (parsePageIntoSections, WikiSection, headings, content)
 > import qualified Data.Text as T
@@ -24,7 +24,7 @@ Top level
 >
 > handlePage :: WikiPage -> IO ()
 > handlePage page = do
->   when (pageNamespace page == (T.pack "0")) $ do
+>   when (pageNamespace page == (T.pack "0") && pageRedirect page == Nothing) $ do
 >     TIO.putStrLn (pageTitle page)
 >     (outputPlainTextPage (pageText page))
 
