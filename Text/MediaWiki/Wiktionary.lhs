@@ -2,9 +2,10 @@ This file defines how to parse Wiktionary entries, as a layer above the basic
 handling of wiki syntax in `Wikitext.lhs`.
 
 > module Text.MediaWiki.Wiktionary where
-> import Text.MediaWiki.Wikitext
-> import Text.Parsec.Char
-
+> import Text.MediaWiki.WikiText
+> import Data.Attoparsec.ByteString.Char8
+> import Data.Attoparsec.Combinator
+> import Control.Applicative ((<|>), (<$>), (*>), (<*))
 
 
 A WiktionaryTerm is a piece of text that can be defined on Wiktionary. It is
