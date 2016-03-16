@@ -23,15 +23,13 @@ Library
                        base,
                        bytestring,
                        utf8-string,
-                       text,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        stringsearch,
                        hexpat ==0.20.*,
-                       containers,
-                       transformers ==0.3.0.*
+                       containers
 
 Executable wiki2text
   ghc-options:
@@ -41,13 +39,10 @@ Executable wiki2text
   build-depends:       base,
                        bytestring,
                        utf8-string,
-                       text,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        stringsearch,
                        hexpat ==0.20.*,
-                       xml-types,
-                       containers,
-                       transformers ==0.3.0.*
+                       containers
