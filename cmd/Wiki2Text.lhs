@@ -1,9 +1,12 @@
+> {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
+
 > import Text.MediaWiki.XML (processMediaWikiDump, WikiPage,
 >                            pageNamespace, pageTitle, pageText, pageRedirect)
 > import Text.MediaWiki.WikiText (outputPlainText)
 > import Text.MediaWiki.Sections (parsePageIntoSections, WikiSection, headings, content)
 > import qualified Data.Text as T
 > import qualified Data.Text.IO as TIO
+> import qualified Data.ByteString.Char8 as Char8
 > import Control.Monad
 > import System.Environment
 
@@ -24,8 +27,8 @@ Top level
 >
 > handlePage :: WikiPage -> IO ()
 > handlePage page = do
->   when (pageNamespace page == (T.pack "0") && pageRedirect page == Nothing) $ do
->     TIO.putStrLn (pageTitle page)
+>   when (pageNamespace page == "0" && pageRedirect page == Nothing) $ do
+>     Char8.putStrLn (pageTitle page)
 >     (outputPlainTextPage (pageText page))
 
 > main :: IO ()

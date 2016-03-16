@@ -6,13 +6,13 @@ Text.Wiki.MediaWiki.
 
 > module Text.MediaWiki.XML where
 > import qualified Data.ByteString.Lazy as BSL
+> import qualified Data.ByteString as BS
 > import Data.ByteString (ByteString)
 > import Data.Maybe
+> import Data.Text (Text)
 
 XML and text decoding:
 
-> import Data.Text (Text)
-> import qualified Data.Text as T
 > import qualified Text.XML.Expat.SAX as SAX
 
 The HTML processor that we'll run on the output:
@@ -23,20 +23,20 @@ Data types
 ==========
 
 > data WikiPage = WikiPage {
->   pageNamespace :: Text,
->   pageTitle :: Text,
+>   pageNamespace :: ByteString,
+>   pageTitle :: ByteString,
 >   pageText :: Text,
->   pageRedirect :: Maybe Text
+>   pageRedirect :: Maybe ByteString
 > } deriving (Show, Eq)
 
 An AList is an association list, that type that shows up in functional
 languages, where you map x to y by just putting together a bunch of (x,y)
 tuples. Here, in particular, we're mapping text names to text values.
 
-> type AList = [(Text, Text)]
+> type AList = [(ByteString, ByteString)]
 >
-> justLookup :: Text -> AList -> Text
-> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (T.unpack key))) (lookup key aList)
+> justLookup :: ByteString -> AList -> ByteString
+> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (show key))) (lookup key aList)
 
 > makeWikiPage :: AList -> WikiPage
 > makeWikiPage subtags = WikiPage {
@@ -60,7 +60,7 @@ Parsing some XML
 
 > findPageTags = handleEventStream [] []
 
-> handleEventStream :: AList -> [Text] -> [SAX.SAXEvent Text Text] -> [WikiPage]
+> handleEventStream :: AList -> [ByteString] -> [SAX.SAXEvent ByteString ByteString] -> [WikiPage]
 > handleEventStream subtags chunks [] = []
 > handleEventStream subtags chunks ((SAX.StartElement "page" attrs):rest) = handleEventStream [] [] rest
 > handleEventStream subtags chunks ((SAX.StartElement "redirect" attrs):rest) =
@@ -68,5 +68,5 @@ Parsing some XML
 >   in handleEventStream (("redirect",title):subtags) [] rest
 > handleEventStream subtags chunks ((SAX.StartElement elt attrs):rest) = handleEventStream subtags [] rest
 > handleEventStream subtags chunks ((SAX.EndElement "page"):rest) = ((makeWikiPage subtags):(handleEventStream [] [] rest))
-> handleEventStream subtags chunks ((SAX.EndElement elt):rest) = handleEventStream ((elt, T.concat (reverse chunks)):subtags) [] rest
+> handleEventStream subtags chunks ((SAX.EndElement elt):rest) = handleEventStream ((elt, BS.concat (reverse chunks)):subtags) [] rest
 > handleEventStream subtags chunks ((SAX.CharacterData t):rest) = handleEventStream subtags (t:chunks) rest

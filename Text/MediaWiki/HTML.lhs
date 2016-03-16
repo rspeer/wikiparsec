@@ -6,13 +6,13 @@ This module is responsible for handling the HTML.
 
 > module Text.MediaWiki.HTML where
 > import Data.Text (Text)
-> import Data.Text.Encoding
+> import Data.ByteString (ByteString)
 > import qualified Data.Text as T
 > import Text.HTML.TagSoup hiding (parseTags, renderTags)
-> import Text.HTML.TagSoup.Fast
+> import Text.HTML.TagSoup.Fast.Utf8Only
 
-> extractWikiTextFromHTML :: Text -> Text
-> extractWikiTextFromHTML = T.concat . extractFromTags . parseTagsT . encodeUtf8
+> extractWikiTextFromHTML :: ByteString -> Text
+> extractWikiTextFromHTML = T.concat . extractFromTags . parseTagsT
 
 > skippedSpan :: Text -> Bool
 > skippedSpan tag = tag == "math" || tag == "code" || tag == "ref" ||
