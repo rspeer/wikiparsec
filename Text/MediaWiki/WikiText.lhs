@@ -270,7 +270,7 @@ the text we want to extract is:
 > extractLinkText text =
 >   let parts      = Char8.split '|' text
 >       noEquals t = not (BS.isInfixOf "=" t)
->   in last (parts ++ (filter noEquals parts))
+>   in last ([""] ++ parts ++ (filter noEquals parts))
 >
 > parseLink :: ByteString -> Annotation
 > parseLink target =
@@ -480,17 +480,18 @@ These functions are designed to take in entire sections of wikitext
 (which have already been split by the parser in `Sections.lhs`) and return
 the plain text that they contain.
 
-> sectionAnnotatedString :: Parser AnnotatedString
-> sectionAnnotatedString = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromBytes <$> newLine]) <?> "section content"
+> sectionAnnotated :: Parser AnnotatedString
+> sectionAnnotated = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromBytes <$> newLine]) <?> "section content"
 
 > sectionText :: Parser ByteString
-> sectionText = A.unannotate <$> sectionAnnotatedString
+> sectionText = A.unannotate <$> sectionAnnotated
 >
 > squishBlankLines :: ByteString -> ByteString
 > squishBlankLines s = Char8.unlines (filter isMeaningfulLine (Char8.lines s))
 >
 > isMeaningfulLine :: ByteString -> Bool
-> isMeaningfulLine s = (BS.length s) > 0 && Char8.head s /= '|' && Char8.head s /= '!'
+> isMeaningfulLine s = (BS.length s) > 0 && Char8.head s /= '|' && Char8.head s /= '!' && not (isDirective s)
+> isDirective s = (Char8.isPrefixOf "__" s) && (Char8.isSuffixOf "__" s)
 
 
 Entry points
@@ -507,7 +508,7 @@ outputs its plain text, and returns nothing.
 >
 > inspectBytes :: ByteString -> IO ()
 > inspectBytes input =
->   case parseOnly (sectionAnnotatedString <* endOfInput) input of
+>   case parseOnly (sectionAnnotated <* endOfInput) input of
 >     Left err -> showError input err
 >     Right (AnnotatedString links text) -> do
 >       Char8.putStrLn text

@@ -9,7 +9,6 @@ Text.Wiki.MediaWiki.
 > import qualified Data.ByteString as BS
 > import Data.ByteString (ByteString)
 > import Data.Maybe
-> import Data.Text (Text)
 
 XML and text decoding:
 
@@ -25,7 +24,7 @@ Data types
 > data WikiPage = WikiPage {
 >   pageNamespace :: ByteString,
 >   pageTitle :: ByteString,
->   pageText :: Text,
+>   pageText :: ByteString,
 >   pageRedirect :: Maybe ByteString
 > } deriving (Show, Eq)
 

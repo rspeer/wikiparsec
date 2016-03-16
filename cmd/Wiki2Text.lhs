@@ -4,8 +4,7 @@
 >                            pageNamespace, pageTitle, pageText, pageRedirect)
 > import Text.MediaWiki.WikiText (outputPlainText)
 > import Text.MediaWiki.Sections (parsePageIntoSections, WikiSection, headings, content)
-> import qualified Data.Text as T
-> import qualified Data.Text.IO as TIO
+> import Data.ByteString (ByteString)
 > import qualified Data.ByteString.Char8 as Char8
 > import Control.Monad
 > import System.Environment
@@ -16,10 +15,10 @@ Top level
 > outputPlainTextSection :: WikiSection -> IO ()
 > outputPlainTextSection section = do
 >   when (length (headings section) > 1) $
->     outputPlainText (T.strip (last (headings section)))
+>     outputPlainText (last (headings section))
 >   outputPlainText (content section)
 >
-> outputPlainTextPage :: T.Text -> IO ()
+> outputPlainTextPage :: ByteString -> IO ()
 > outputPlainTextPage text =
 >   case (parsePageIntoSections text) of
 >     Left err -> print err

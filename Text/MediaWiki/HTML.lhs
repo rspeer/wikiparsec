@@ -5,25 +5,24 @@ decoded as (potentially very sloppy) HTML, the contents of which are Wikitext.
 This module is responsible for handling the HTML.
 
 > module Text.MediaWiki.HTML where
-> import Data.Text (Text)
 > import Data.ByteString (ByteString)
-> import qualified Data.Text as T
+> import qualified Data.ByteString.Char8 as Char8
 > import Text.HTML.TagSoup hiding (parseTags, renderTags)
 > import Text.HTML.TagSoup.Fast.Utf8Only
 
-> extractWikiTextFromHTML :: ByteString -> Text
-> extractWikiTextFromHTML = T.concat . extractFromTags . parseTagsT
+> extractWikiTextFromHTML :: ByteString -> ByteString
+> extractWikiTextFromHTML = Char8.concat . extractFromTags . parseTags
 
-> skippedSpan :: Text -> Bool
+> skippedSpan :: ByteString -> Bool
 > skippedSpan tag = tag == "math" || tag == "code" || tag == "ref" ||
 >                   tag == "gallery" || tag == "hiero" || tag == "timeline"
 >
-> slashedAttrs :: [(Text,Text)] -> Bool
+> slashedAttrs :: [(ByteString,ByteString)] -> Bool
 > slashedAttrs ((name,value):rest) = slashed name || slashed value || slashedAttrs rest
 > slashedAttrs [] = False
-> slashed = T.isSuffixOf "/"
+> slashed = Char8.isSuffixOf "/"
 >
-> extractFromTags :: [Tag Text] -> [Text]
+> extractFromTags :: [Tag ByteString] -> [ByteString]
 > extractFromTags ((TagOpen tag attrs):rest) =
 >   if (skippedSpan tag && not (slashedAttrs attrs))
 >     then skipUntilClose tag rest
@@ -32,7 +31,7 @@ This module is responsible for handling the HTML.
 > extractFromTags (_:rest) = extractFromTags rest
 > extractFromTags [] = []
 >
-> skipUntilClose :: Text -> [Tag Text] -> [Text]
+> skipUntilClose :: ByteString -> [Tag ByteString] -> [ByteString]
 > skipUntilClose target ((TagClose tag):rest) =
 >   if tag == target
 >     then extractFromTags rest
