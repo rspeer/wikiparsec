@@ -1,9 +1,11 @@
 > {-# LANGUAGE RankNTypes, NoMonomorphismRestriction, OverloadedStrings #-}
 
 > module Text.MediaWiki.ParseTools where
-> import qualified Text.MediaWiki.AnnotatedText as A
+> import qualified Text.MediaWiki.AnnotatedString as A
 > import qualified Data.ByteString.Char8 as Char8
-> import Text.MediaWiki.AnnotatedText (AnnotatedText)
+> import qualified Data.ByteString.Char8 as Char8
+> import Data.ByteString (ByteString)
+> import Text.MediaWiki.AnnotatedString (AnnotatedString)
 > import Prelude hiding (takeWhile)
 > import Data.Attoparsec.ByteString.Char8
 > import Data.Attoparsec.Combinator
@@ -62,7 +64,7 @@ and concatenates together their results.
 > concatMany :: Parser ByteString -> Parser ByteString
 > concatMany combinator = do
 >   parts <- many1 combinator
->   return (BS.concat parts)
+>   return (Char8.concat parts)
 
 Most of the expressions we write will match at least one character, allowing
 us to repeat them without allowing repeated matches of the empty string.
@@ -100,19 +102,19 @@ Another function missing in Attoparsec:
 > optionMaybe :: Parser a -> Parser (Maybe a)
 > optionMaybe p = Just <$> p <|> pure Nothing
 
-Expressions for AnnotatedText
+Expressions for AnnotatedString
 =============================
 
-AnnotatedText versions of some of the operators above:
+AnnotatedString versions of some of the operators above:
 
-> aTextChoices :: [Parser AnnotatedText] -> Parser AnnotatedText
+> aTextChoices :: [Parser AnnotatedString] -> Parser AnnotatedString
 > aTextChoices options = aConcatMany (choice options)
 >
-> aConcatMany :: Parser AnnotatedText -> Parser AnnotatedText
+> aConcatMany :: Parser AnnotatedString -> Parser AnnotatedString
 > aConcatMany combinator = do
 >   parts <- many1 combinator
 >   return (A.concat parts)
 >
-> aPossiblyEmpty :: Parser AnnotatedText -> Parser AnnotatedText
+> aPossiblyEmpty :: Parser AnnotatedString -> Parser AnnotatedString
 > aPossiblyEmpty combinator = option A.empty combinator
 

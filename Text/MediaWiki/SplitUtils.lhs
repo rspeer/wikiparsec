@@ -1,10 +1,9 @@
 Some string-splitting functions that help us parse Wikitext without
 backtracking:
 
-> module Text.MediaWiki.SplitUtils (splitFirst, splitLast, tSplitFirst, tSplitLast) where
+> module Text.MediaWiki.SplitUtils (splitFirst, splitLast, strictReplace) where
 > import qualified Data.ByteString.Search as BSS
-> import qualified Data.ByteString.Char8 as Char8
-> import qualified Data.ByteString.UTF8 as UTF8
+> import qualified Data.ByteString.Lazy as BSL
 > import qualified Data.ByteString as BS
 > import Data.ByteString (ByteString)
 
@@ -12,32 +11,16 @@ backtracking:
 splits the string at that point, returning the text before and after the
 separator. If the separator never appears, the suffix will be the empty string.
 
-> splitFirst :: (Eq a) => a -> [a] -> ([a], [a])
-> splitFirst char [] = ([], [])
-> splitFirst char (next:rest) =
->   if char == next
->   then ([], rest)
->   else let (before, after) = splitFirst char rest
->         in (next:before, after)
+> splitFirst :: ByteString -> ByteString -> (ByteString, ByteString)
+> splitFirst = BSS.breakOn
 
-`splitLast` finds the *last* occurrence of a separator character
-and splits the string at that point. This is easiest to define as a reversal
-of `splitFirst`.
+`splitLast` does the same with the *last* occurrence, and it's easier to define
+as a reversal of `splitFirst`.
 
-> splitLast :: (Eq a) => a -> [a] -> ([a], [a])
-> splitLast char str =
->   let (beforeR, afterR) = splitFirst char (reverse str) in
->     (reverse afterR, reverse beforeR)
+> splitLast :: ByteString -> ByteString -> (ByteString, ByteString)
+> splitLast delim bytes =
+>   let (beforeR, afterR) = BSS.breakOn (BS.reverse delim) (BS.reverse bytes) in
+>     (BS.reverse afterR, BS.reverse beforeR)
 
-`tSplitFirst` and `tSplitLast` are versions of these that operate on Texts
-instead of Strings.
-
-> tSplitFirst :: Char -> Text -> (Text, Text)
-> tSplitFirst char t =
->   let (before, after) = splitFirst char (T.unpack t)
->   in  (T.pack before, T.pack after)
-
-> tSplitLast :: Char -> Text -> (Text, Text)
-> tSplitLast char t =
->   let (before, after) = splitLast char (T.unpack t)
->   in  (T.pack before, T.pack after)
+> strictReplace :: ByteString -> ByteString -> ByteString -> ByteString
+> strictReplace pat sub text = BSL.toStrict $ BSS.replace pat sub text

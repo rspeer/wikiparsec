@@ -28,6 +28,7 @@ Library
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
+                       stringsearch,
                        hexpat ==0.20.*,
                        containers,
                        transformers ==0.3.0.*
@@ -45,6 +46,7 @@ Executable wiki2text
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
+                       stringsearch,
                        hexpat ==0.20.*,
                        xml-types,
                        containers,

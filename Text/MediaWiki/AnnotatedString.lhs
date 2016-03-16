@@ -1,5 +1,5 @@
 > {-# LANGUAGE NoMonomorphismRestriction, OverloadedStrings #-}
-> module Text.MediaWiki.AnnotatedText where
+> module Text.MediaWiki.AnnotatedString where
 > import qualified Data.ByteString as BS
 > import qualified Data.ByteString.UTF8 as UTF8
 > import Data.ByteString (ByteString)
@@ -31,48 +31,48 @@ for internal links.
 
 The simplifying assumption here is that, in a parse rule that produces
 annotations, the annotations apply to the entire span of text that was parsed.
-So what we need to keep track of in AnnotatedText is one string (as a
+So what we need to keep track of in AnnotatedString is one string (as a
 ByteString) and a list of Annotations for it.
 
-> data AnnotatedText = AnnotatedText [Annotation] ByteString deriving (Show, Eq)
+> data AnnotatedString = AnnotatedString [Annotation] ByteString deriving (Show, Eq)
 >
-> annotate :: [Annotation] -> ByteString -> AnnotatedText
-> annotate annos t = AnnotatedText annos t
+> annotate :: [Annotation] -> ByteString -> AnnotatedString
+> annotate annos t = AnnotatedString annos t
 >
-> annotations :: AnnotatedText -> [Annotation]
-> annotations (AnnotatedText annos t) = annos
+> annotations :: AnnotatedString -> [Annotation]
+> annotations (AnnotatedString annos t) = annos
 >
-> fromBytes :: ByteString -> AnnotatedText
+> fromBytes :: ByteString -> AnnotatedString
 > fromBytes = annotate []
 >
-> empty :: AnnotatedText
+> empty :: AnnotatedString
 > empty = fromBytes ""
 >
-> append :: AnnotatedText -> AnnotatedText -> AnnotatedText
-> append (AnnotatedText a1 t1) (AnnotatedText a2 t2)
->   = AnnotatedText (a1 ++ a2) (BS.append t1 t2)
+> append :: AnnotatedString -> AnnotatedString -> AnnotatedString
+> append (AnnotatedString a1 t1) (AnnotatedString a2 t2)
+>   = AnnotatedString (a1 ++ a2) (BS.append t1 t2)
 >
-> appendSep :: ByteString -> AnnotatedText -> AnnotatedText -> AnnotatedText
-> appendSep sep (AnnotatedText a1 t1) (AnnotatedText a2 t2)
->   = AnnotatedText (a1 ++ a2) (BS.append (BS.append t1 sep) t2)
+> appendSep :: ByteString -> AnnotatedString -> AnnotatedString -> AnnotatedString
+> appendSep sep (AnnotatedString a1 t1) (AnnotatedString a2 t2)
+>   = AnnotatedString (a1 ++ a2) (BS.append (BS.append t1 sep) t2)
 >
-> concat :: [AnnotatedText] -> AnnotatedText
+> concat :: [AnnotatedString] -> AnnotatedString
 > concat = foldl append empty
 >
-> join :: ByteString -> [AnnotatedText] -> AnnotatedText
+> join :: ByteString -> [AnnotatedString] -> AnnotatedString
 > join sep [] = empty
 > join sep ats = foldl1 (appendSep sep) ats
 >
-> unlines :: [AnnotatedText] -> AnnotatedText
+> unlines :: [AnnotatedString] -> AnnotatedString
 > unlines ats = append (join "\n" ats) (fromBytes "\n")
 >
-> unannotate :: AnnotatedText -> Text
-> unannotate (AnnotatedText a t) = t
+> unannotate :: AnnotatedString -> ByteString
+> unannotate (AnnotatedString a t) = t
 >
-> transformA :: (ByteString -> ByteString) -> AnnotatedText -> AnnotatedText
-> transformA op (AnnotatedText a t) = AnnotatedText a (op t)
+> transformA :: (ByteString -> ByteString) -> AnnotatedString -> AnnotatedString
+> transformA op (AnnotatedString a t) = AnnotatedString a (op t)
 
-We can use string literals as AnnotatedText:
+We can use string literals as AnnotatedString:
 
-> instance IsString AnnotatedText where
+> instance IsString AnnotatedString where
 >   fromString = (fromBytes . UTF8.fromString)

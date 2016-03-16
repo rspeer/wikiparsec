@@ -10,12 +10,9 @@ well-regarded parser-combinator library for Haskell.
 > import qualified Data.ByteString.Char8 as Char8
 > import qualified Data.ByteString.UTF8 as UTF8
 > import qualified Data.ByteString as BS
-> import qualified Data.ByteString.Search as BSS
 > import Data.ByteString (ByteString)
-> import qualified Text.MediaWiki.AnnotatedText as A
-> import Text.MediaWiki.AnnotatedText (AnnotatedText(..), Annotation, transformA)
-> import Data.Text (Text)
-> import qualified Data.Text as T
+> import qualified Text.MediaWiki.AnnotatedString as A
+> import Text.MediaWiki.AnnotatedString (AnnotatedString(..), Annotation, transformA)
 > import Data.Attoparsec.ByteString.Char8 hiding (endOfLine)
 > import Data.Attoparsec.Combinator
 > import Debug.Trace (trace)
@@ -31,7 +28,7 @@ Data.Map, to represent the contents of templates.
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
-> import Text.MediaWiki.SplitUtils (tSplitFirst, tSplitLast)
+> import Text.MediaWiki.SplitUtils (splitFirst, splitLast, strictReplace)
 
 Some common shorthand for defining parse rules:
 
@@ -72,16 +69,16 @@ We'll just post-process the parse result to remove the sequences of
 apostrophes, by chaining it through the `discardSpans` function.
 
 > discardSpans :: ByteString -> ByteString
-> discardSpans = (BSS.replace "''" "") . (BSS.replace "'''" "")
+> discardSpans = (strictReplace "''" "") . (strictReplace "'''" "")
 
 What we count as plain text has to depend on what environment we're in, such as
 whether we're currently parsing a link or a template.
 
 The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
 way to apply a plain function to the output of a monadic computation, such as a
-successful parse. Here, it "lifts" the `discardSpans` function, of type `Text ->
-Text`, into a function that transforms a parse result: that is, a function of
-type `Parser ByteString -> Parser ByteString`.
+successful parse. Here, it "lifts" the `discardSpans` function, of type
+`ByteString -> ByteString`, into a function that transforms a parse result:
+that is, a function of type `Parser ByteString -> Parser ByteString`.
 
 > plainText :: Parser ByteString
 > plainText           = discardSpans <$> textWithout "[]{}\n"
@@ -125,7 +122,7 @@ it'll just return the bracket as is.
 >   do
 >     c <- satisfy (inClass chars)
 >     notFollowedByChar c
->     return (T.singleton c)
+>     return (Char8.singleton c)
 >   )
 >
 > extraneousCloseBrackets = string "]]" <?> "junk closing brackets"
@@ -213,22 +210,22 @@ When parsing internal links, we return just their label. However, other
 details of the link are added to the LinkState.
 
      In:    [[word]]
-     Out:   AnnotatedText [A.makeLink {page="word"}] "word"
+     Out:   AnnotatedString [A.makeLink {page="word"}] "word"
 
      In:    [[word|this word]]
-     Out:   AnnotatedText [A.makeLink {page="word"}] "this word"
+     Out:   AnnotatedString [A.makeLink {page="word"}] "this word"
 
      In:    [[word#English]]
-     Out:   AnnotatedText [A.makeLink {page="word", section="English"}] "word"
+     Out:   AnnotatedString [A.makeLink {page="word", section="English"}] "word"
 
      In:    [[w:en:Word]]
-     Out:   AnnotatedText [A.makeLink {namespace="w:en", page="word"}] "Word"
+     Out:   AnnotatedString [A.makeLink {namespace="w:en", page="word"}] "Word"
 
      In:    [[Category:English nouns]]
-     Out:   AnnotatedText [A.makeLink {namespace="Category", page="English nouns"}] "English nouns"
+     Out:   AnnotatedString [A.makeLink {namespace="Category", page="English nouns"}] "English nouns"
 
 
-> internalLink :: Parser AnnotatedText
+> internalLink :: Parser AnnotatedString
 > internalLink = do
 >   string "[["
 >   target <- plainTextInLink
@@ -269,29 +266,29 @@ the text we want to extract is:
 >   text <- wikiTextAtEndOfLink
 >   return (extractLinkText text)
 >
-> extractLinkText :: Text -> Text
+> extractLinkText :: ByteString -> ByteString
 > extractLinkText text =
->   let parts      = T.split (== '|') text
->       noEquals t = not (T.isInfixOf "=" t)
+>   let parts      = Char8.split '|' text
+>       noEquals t = not (BS.isInfixOf "=" t)
 >   in last (parts ++ (filter noEquals parts))
 >
-> parseLink :: Text -> Annotation
+> parseLink :: ByteString -> Annotation
 > parseLink target =
 >   A.makeLink {A.namespace=namespace, A.page=page, A.section=section}
 >   where
->     (namespace, local) = tSplitLast ':' target
->     (page, section) = tSplitFirst '#' local
+>     (namespace, local) = splitLast ":" target
+>     (page, section) = splitFirst "#" local
 
 `annotatedWikiText` parses text that may or may not contain links, and returns
-it in an AnnotatedText data structure. `annotatedTextFrom` is a more general
+it in an AnnotatedString data structure. `annotatedTextFrom` is a more general
 version that takes in a parsing expression that it will use to find annotated
 text -- for example, if there are project-specific templates that should be
 treated as links.
 
-> annotatedTextFrom :: Parser AnnotatedText -> Parser AnnotatedText
+> annotatedTextFrom :: Parser AnnotatedString -> Parser AnnotatedString
 > annotatedTextFrom expr = A.concat <$> many1 expr
 
-> annotatedWikiText :: Parser AnnotatedText
+> annotatedWikiText :: Parser AnnotatedString
 > annotatedWikiText      = annotatedTextFrom annotatedWikiTextPiece
 > annotatedWikiTextPiece = internalLink <|> simpleWikiTextPiece
 > simpleWikiTextPiece    = A.fromBytes <$> choice [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
@@ -303,8 +300,8 @@ Lists
 Here's a hierarchical data type for describing the contents of lists, which
 semantically can contain other lists.
 
-> data ListItem = Item AnnotatedText
->               | ListHeading AnnotatedText
+> data ListItem = Item AnnotatedString
+>               | ListHeading AnnotatedString
 >               | BulletList [ListItem]
 >               | OrderedList [ListItem]
 >               | IndentedList [ListItem]
@@ -314,28 +311,28 @@ Sometimes we just want the text that the list contains. `extractText`
 returns the text of the list items (whatever kind of items they are) separated
 by line breaks.
 
-> extractTextLines :: ListItem -> [AnnotatedText]
+> extractTextLines :: ListItem -> [AnnotatedString]
 > extractTextLines (Item t) = [t]
 > extractTextLines (ListHeading t) = [t]
 > extractTextLines (BulletList items) = extractTextLinesFromList items
 > extractTextLines (OrderedList items) = extractTextLinesFromList items
 > extractTextLines (IndentedList items) = extractTextLinesFromList items
 >
-> extractTextLinesFromList :: [ListItem] -> [AnnotatedText]
+> extractTextLinesFromList :: [ListItem] -> [AnnotatedString]
 > extractTextLinesFromList items = concat (map extractTextLines items)
 >
-> extractText :: ListItem -> AnnotatedText
+> extractText :: ListItem -> AnnotatedString
 > extractText = A.unlines . extractTextLines
 
-> listItems :: Text -> Parser [ListItem]
+> listItems :: ByteString -> Parser [ListItem]
 > listItems marker = do
 >   lookAhead (string marker)
 >   many1 (listItem marker)
 >
-> listItem :: Text -> Parser ListItem
+> listItem :: ByteString -> Parser ListItem
 > listItem marker = subList marker <|> singleListItem marker
 
-> subList :: Text -> Parser ListItem
+> subList :: ByteString -> Parser ListItem
 > subList marker =   bulletList (appendChar marker '*')
 >                <|> orderedList (appendChar marker '#')
 >                <|> indentedList (appendChar marker ':')
@@ -344,16 +341,16 @@ by line breaks.
 > anyList :: Parser ListItem
 > anyList = subList ""
 >
-> anyListText :: Parser AnnotatedText
+> anyListText :: Parser AnnotatedString
 > anyListText = extractText <$> anyList <?> "list"
 >
-> listHeading :: Text -> Parser ListItem
+> listHeading :: ByteString -> Parser ListItem
 > listHeading marker = ListHeading <$> listItemContent marker
 >
-> singleListItem :: Text -> Parser ListItem
+> singleListItem :: ByteString -> Parser ListItem
 > singleListItem marker = Item <$> listItemContent marker
 >
-> listItemContent :: Text -> Parser AnnotatedText
+> listItemContent :: ByteString -> Parser AnnotatedString
 > listItemContent marker = do
 >   string marker
 >   optionalSameLineSpaces
@@ -413,7 +410,7 @@ standardized form as a mapping from argument names to values.
 >   string "="
 >   return name
 >
-> namedArg :: Text -> Int -> Parser TemplateData
+> namedArg :: ByteString -> Int -> Parser TemplateData
 > namedArg name offset = do
 >   value <- possiblyEmpty wikiTextInTemplate
 >   rest <- templateRest offset
@@ -423,15 +420,15 @@ standardized form as a mapping from argument names to values.
 > positionalArg offset = do
 >   value <- possiblyEmpty wikiTextInTemplate
 >   rest <- templateRest (offset + 1)
->   return (Map.insert (intToText offset) value rest)
+>   return (Map.insert (intToString offset) value rest)
 >
 > templateRest :: Int -> Parser TemplateData
 > templateRest offset = endOfTemplate <|> (string "|" >> templateArgs offset)
 >
 > endOfTemplate = string "}}" >> return Map.empty
 >
-> intToText :: Int -> Text
-> intToText = T.pack . show
+> intToString :: Int -> ByteString
+> intToString = UTF8.fromString . show
 
 We can simplify some of this parsing in the case where we are looking for a
 *particular* template. We start by expecting two left braces and the name
@@ -440,9 +437,9 @@ of the template, then parse the rest of the template as usual.
 We set the template name as arg 0, as it would be if we were using the more
 general rule for parsing template expressions.
 
-> specificTemplate :: Text -> Parser TemplateData
+> specificTemplate :: ByteString -> Parser TemplateData
 > specificTemplate name = do
->   string (T.append "{{" name)
+>   string (BS.append "{{" name)
 >   parsed <- templateRest 1
 >   return (Map.insert "0" name parsed)
 
@@ -483,11 +480,11 @@ These functions are designed to take in entire sections of wikitext
 (which have already been split by the parser in `Sections.lhs`) and return
 the plain text that they contain.
 
-> sectionAnnotatedText :: Parser AnnotatedText
-> sectionAnnotatedText = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromBytes <$> newLine]) <?> "section content"
+> sectionAnnotatedString :: Parser AnnotatedString
+> sectionAnnotatedString = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromBytes <$> newLine]) <?> "section content"
 
 > sectionText :: Parser ByteString
-> sectionText = A.unannotate <$> sectionAnnotatedText
+> sectionText = A.unannotate <$> sectionAnnotatedString
 >
 > squishBlankLines :: ByteString -> ByteString
 > squishBlankLines s = Char8.unlines (filter isMeaningfulLine (Char8.lines s))
@@ -510,9 +507,9 @@ outputs its plain text, and returns nothing.
 >
 > inspectBytes :: ByteString -> IO ()
 > inspectBytes input =
->   case parseOnly (sectionAnnotatedText <* endOfInput) input of
+>   case parseOnly (sectionAnnotatedString <* endOfInput) input of
 >     Left err -> showError input err
->     Right (AnnotatedText links text) -> do
+>     Right (AnnotatedString links text) -> do
 >       Char8.putStrLn text
 >       print links
 >
