@@ -1,0 +1,4 @@
+Next steps:
+
+- Allow templates to be mapped to functions
+- Work on specific sections
