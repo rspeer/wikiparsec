@@ -20,10 +20,10 @@ well-regarded parser-combinator library for Haskell.
 > import Control.Monad (when)
 
 We're going to need to make use of Haskell's functional mapping type,
-Data.Map, to represent the contents of templates.
+Data.Map.Strict, to represent the contents of templates.
 
-> import Data.Map (Map)
-> import qualified Data.Map as Map
+> import Data.Map.Strict (Map)
+> import qualified Data.Map.Strict as Map
 
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
@@ -36,11 +36,9 @@ Some common shorthand for defining parse rules:
 >   skipChars, textChoices, concatMany, notFollowedByChar, possiblyEmpty,
 >   delimitedSpan, aPossiblyEmpty, aTextChoices, optionMaybe)
 
+Handling templates:
 
-An invocation of a template is represented as a Map from parameter names to
-values.  Both the names and the values are Text.
-
-> type TemplateData = Map ByteString ByteString
+> import Text.MediaWiki.Templates (TemplateData, TemplateProc, noTemplates, evalTemplate)
 
 
 Spans of text
@@ -155,15 +153,15 @@ where appropriate
 
 Wikitext in general is either some big special environment like a list or a
 table -- which we'll handle elsewhere -- or it's made of links, templates, and
-miscellaneous text.  We'll parse templates for their meaning below, but in
-situations where we don't care about templates, we simply discard their
-contents using the `ignoredTemplate` rule.
+miscellaneous text. When we encounter a template, we have to turn it into an
+AnnotatedText value and then a plain ByteString value, which the `templateText`
+rule does.
 
-> wikiTextLine :: Parser ByteString
-> wikiTextLine        = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextLine]       <?> "line of wikitext"
-> wikiTextInLink      = textChoices [internalLinkText, externalLinkText, ignoredTemplate, messyTextInLink]                <?> "wikitext inside link"
-> wikiTextAtEndOfLink = textChoices [wikiTable, internalLinkText, externalLinkText, ignoredTemplate, messyTextAtEndOfLink]<?> "wikitext at end of link"
-> wikiTextInTemplate  = textChoices [internalLinkText, externalLinkText, ignoredTemplate, messyTextInTemplate]            <?> "wikitext inside template"
+> wikiTextLine :: TemplateProc -> Parser ByteString
+> wikiTextLine tproc        = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]       <?> "line of wikitext"
+> wikiTextInLink tproc      = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                <?> "wikitext inside link"
+> wikiTextAtEndOfLink tproc = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]<?> "wikitext at end of link"
+> wikiTextInTemplate tproc  = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInTemplate]            <?> "wikitext inside template"
 
 Wiki syntax items
 =================
@@ -225,11 +223,11 @@ details of the link are added to the LinkState.
      Out:   AnnotatedString [A.makeLink {namespace="Category", page="English nouns"}] "English nouns"
 
 
-> internalLink :: Parser AnnotatedString
-> internalLink = do
+> internalLink :: TemplateProc -> Parser AnnotatedString
+> internalLink tproc = do
 >   string "[["
 >   target <- plainTextInLink
->   maybeText <- optionMaybe alternateText
+>   maybeText <- optionMaybe (alternateText tproc)
 >   let {
 >     link      = parseLink target;
 >     annotated = case maybeText of
@@ -239,8 +237,8 @@ details of the link are added to the LinkState.
 >        string "]]"
 >        return annotated
 >
-> internalLinkText :: Parser ByteString
-> internalLinkText = A.unannotate <$> internalLink
+> internalLinkText :: TemplateProc -> Parser ByteString
+> internalLinkText tproc = A.unannotate <$> (internalLink tproc)
 
 There are complicated syntaxes on MediaWiki that look like internal links,
 particularly the Image: or File: syntax, which can have multiple
@@ -260,10 +258,10 @@ the text we want to extract is:
 
     Ainola, Sibelius's home from 1904 until his death
 
-> alternateText :: Parser ByteString
-> alternateText = do
+> alternateText :: TemplateProc -> Parser ByteString
+> alternateText tproc = do
 >   char '|'
->   text <- wikiTextAtEndOfLink
+>   text <- wikiTextAtEndOfLink tproc
 >   return (extractLinkText text)
 >
 > extractLinkText :: ByteString -> ByteString
@@ -279,19 +277,13 @@ the text we want to extract is:
 >     (namespace, local) = splitLast ":" target
 >     (page, section) = splitFirst "#" local
 
-`annotatedWikiText` parses text that may or may not contain links, and returns
-it in an AnnotatedString data structure. `annotatedTextFrom` is a more general
-version that takes in a parsing expression that it will use to find annotated
-text -- for example, if there are project-specific templates that should be
-treated as links.
+`annotatedWikiText` parses text that may or may not contain links or templates,
+and returns it in an AnnotatedString data structure.
 
-> annotatedTextFrom :: Parser AnnotatedString -> Parser AnnotatedString
-> annotatedTextFrom expr = A.concat <$> many1 expr
-
-> annotatedWikiText :: Parser AnnotatedString
-> annotatedWikiText      = annotatedTextFrom annotatedWikiTextPiece
-> annotatedWikiTextPiece = internalLink <|> simpleWikiTextPiece
-> simpleWikiTextPiece    = A.fromBytes <$> choice [wikiTable, externalLinkText, ignoredTemplate, messyTextLine]
+> annotatedWikiText :: TemplateProc -> Parser AnnotatedString
+> annotatedWikiText tproc = A.concat <$> many1 (annotatedWikiTextPiece tproc)
+> annotatedWikiTextPiece tproc = internalLink tproc <|> templateValue tproc <|> simpleWikiTextPiece
+> simpleWikiTextPiece = A.fromBytes <$> choice [wikiTable, externalLinkText, messyTextLine]
 
 
 Lists
@@ -324,43 +316,43 @@ by line breaks.
 > extractText :: ListItem -> AnnotatedString
 > extractText = A.unlines . extractTextLines
 
-> listItems :: ByteString -> Parser [ListItem]
-> listItems marker = do
+> listItems :: TemplateProc -> ByteString -> Parser [ListItem]
+> listItems tproc marker = do
 >   lookAhead (string marker)
->   many1 (listItem marker)
+>   many1 (listItem tproc marker)
 >
-> listItem :: ByteString -> Parser ListItem
-> listItem marker = subList marker <|> singleListItem marker
+> listItem :: TemplateProc -> ByteString -> Parser ListItem
+> listItem tproc marker = subList tproc marker <|> singleListItem tproc marker
 
-> subList :: ByteString -> Parser ListItem
-> subList marker =   bulletList (appendChar marker '*')
->                <|> orderedList (appendChar marker '#')
->                <|> indentedList (appendChar marker ':')
->                <|> listHeading (appendChar marker ';')
+> subList :: TemplateProc -> ByteString -> Parser ListItem
+> subList tproc marker = bulletList tproc (appendChar marker '*')
+>                    <|> orderedList tproc (appendChar marker '#')
+>                    <|> indentedList tproc (appendChar marker ':')
+>                    <|> listHeading tproc (appendChar marker ';')
 >
-> anyList :: Parser ListItem
-> anyList = subList ""
+> anyList :: TemplateProc -> Parser ListItem
+> anyList tproc = subList tproc ""
 >
-> anyListText :: Parser AnnotatedString
-> anyListText = extractText <$> anyList <?> "list"
+> anyListText :: TemplateProc -> Parser AnnotatedString
+> anyListText tproc = extractText <$> anyList tproc <?> "list"
 >
-> listHeading :: ByteString -> Parser ListItem
-> listHeading marker = ListHeading <$> listItemContent marker
+> listHeading :: TemplateProc -> ByteString -> Parser ListItem
+> listHeading tproc marker = ListHeading <$> listItemContent tproc marker
 >
-> singleListItem :: ByteString -> Parser ListItem
-> singleListItem marker = Item <$> listItemContent marker
+> singleListItem :: TemplateProc -> ByteString -> Parser ListItem
+> singleListItem tproc marker = Item <$> listItemContent tproc marker
 >
-> listItemContent :: ByteString -> Parser AnnotatedString
-> listItemContent marker = do
+> listItemContent :: TemplateProc -> ByteString -> Parser AnnotatedString
+> listItemContent tproc marker = do
 >   string marker
 >   optionalSameLineSpaces
->   line <- annotatedWikiText
+>   line <- annotatedWikiText tproc
 >   endOfLine
 >   return line
 >
-> bulletList marker   = BulletList <$> listItems marker
-> orderedList marker  = OrderedList <$> listItems marker
-> indentedList marker = IndentedList <$> listItems marker
+> bulletList tproc marker   = BulletList <$> listItems tproc marker
+> orderedList tproc marker  = OrderedList <$> listItems tproc marker
+> indentedList tproc marker = IndentedList <$> listItems tproc marker
 >
 > isPlainItem :: ListItem -> Bool
 > isPlainItem (Item s) = True
@@ -391,18 +383,26 @@ Wiktionary.
 Here, we define the basic syntax of templates, and return their contents in a
 standardized form as a mapping from argument names to values.
 
-> template :: Parser TemplateData
-> template = string "{{" >> (templateArgs 0)
+> template :: TemplateProc -> Parser TemplateData
+> template tproc = string "{{" >> (templateArgs tproc 0)
 >
-> ignoredTemplate :: Parser ByteString
-> ignoredTemplate = template >> nop
+> templateValue :: TemplateProc -> Parser AnnotatedString
+> templateValue tproc = (evalTemplate tproc) <$> template tproc
+>
+> templateText :: TemplateProc -> Parser ByteString
+> templateText tproc = A.unannotate <$> templateValue tproc
 
-> templateArgs :: Int -> Parser TemplateData
-> templateArgs offset = do
+A point that might be confusing: the following parsers take a TemplateProc as
+their first argument not because they'll be using it to evaluate this template
+we're parsing, but because the template might contain nested templates that
+have to be evaluated.
+
+> templateArgs :: TemplateProc -> Int -> Parser TemplateData
+> templateArgs tproc offset = do
 >   nameMaybe <- optionMaybe (try templateArgName)
 >   case nameMaybe of
->     Just name -> namedArg name offset
->     Nothing -> positionalArg offset
+>     Just name -> namedArg tproc name offset
+>     Nothing -> positionalArg tproc offset
 >
 > templateArgName :: Parser ByteString
 > templateArgName = do
@@ -410,20 +410,20 @@ standardized form as a mapping from argument names to values.
 >   string "="
 >   return name
 >
-> namedArg :: ByteString -> Int -> Parser TemplateData
-> namedArg name offset = do
->   value <- possiblyEmpty wikiTextInTemplate
->   rest <- templateRest offset
+> namedArg :: TemplateProc -> ByteString -> Int -> Parser TemplateData
+> namedArg tproc name offset = do
+>   value <- possiblyEmpty (wikiTextInTemplate tproc)
+>   rest <- templateRest tproc offset
 >   return (Map.insert name value rest)
 >
-> positionalArg :: Int -> Parser TemplateData
-> positionalArg offset = do
->   value <- possiblyEmpty wikiTextInTemplate
->   rest <- templateRest (offset + 1)
+> positionalArg :: TemplateProc -> Int -> Parser TemplateData
+> positionalArg tproc offset = do
+>   value <- possiblyEmpty (wikiTextInTemplate tproc)
+>   rest <- templateRest tproc (offset + 1)
 >   return (Map.insert (intToString offset) value rest)
 >
-> templateRest :: Int -> Parser TemplateData
-> templateRest offset = endOfTemplate <|> (string "|" >> templateArgs offset)
+> templateRest :: TemplateProc -> Int -> Parser TemplateData
+> templateRest tproc offset = endOfTemplate <|> (string "|" >> templateArgs tproc offset)
 >
 > endOfTemplate = string "}}" >> return Map.empty
 >
@@ -437,10 +437,10 @@ of the template, then parse the rest of the template as usual.
 We set the template name as arg 0, as it would be if we were using the more
 general rule for parsing template expressions.
 
-> specificTemplate :: ByteString -> Parser TemplateData
-> specificTemplate name = do
+> specificTemplate :: TemplateProc -> ByteString -> Parser TemplateData
+> specificTemplate tproc name = do
 >   string (BS.append "{{" name)
->   parsed <- templateRest 1
+>   parsed <- templateRest tproc 1
 >   return (Map.insert "0" name parsed)
 
 
@@ -456,22 +456,6 @@ them.
 > wikiTableComplete :: Parser ByteString
 > wikiTableComplete = delimitedSpan "{|" "|}" >> nop
 
-MediaWiki templates can be used in horrifying ways, and one way that they're
-sometimes used (particularly on Wikipedia) is to start a table that is then
-ended outside the template.
-
-We don't know which templates leave tables hanging open, but when we skip over
-such a template, we'll see a bunch of lines starting with |. Lines intended as
-text don't normally start with vertical bars. So we can clean up incomplete
-tables by skipping over all such lines.
-
-> wikiTableDetritus :: Parser ByteString
-> wikiTableDetritus = do
->   newLine
->   string "|"
->   textWithout "\n"
->   try wikiTableDetritus <|> endOfLine
-
 
 Parsing sections at a time
 --------------------------
@@ -480,11 +464,11 @@ These functions are designed to take in entire sections of wikitext
 (which have already been split by the parser in `Sections.lhs`) and return
 the plain text that they contain.
 
-> sectionAnnotated :: Parser AnnotatedString
-> sectionAnnotated = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText, annotatedWikiText, A.fromBytes <$> newLine]) <?> "section content"
+> sectionAnnotated :: TemplateProc -> Parser AnnotatedString
+> sectionAnnotated tproc = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText tproc, annotatedWikiText tproc, A.fromBytes <$> newLine]) <?> "section content"
 
-> sectionText :: Parser ByteString
-> sectionText = A.unannotate <$> sectionAnnotated
+> sectionText :: TemplateProc -> Parser ByteString
+> sectionText tproc = A.unannotate <$> sectionAnnotated tproc
 >
 > squishBlankLines :: ByteString -> ByteString
 > squishBlankLines s = Char8.unlines (filter isMeaningfulLine (Char8.lines s))
@@ -502,13 +486,13 @@ outputs its plain text, and returns nothing.
 
 > outputPlainText :: ByteString -> IO ()
 > outputPlainText input =
->    case parseOnly (sectionText <* endOfInput) input of
+>    case parseOnly (sectionText noTemplates <* endOfInput) input of
 >     Left err -> showError input err
 >     Right x -> Char8.putStrLn x
 >
 > inspectBytes :: ByteString -> IO ()
 > inspectBytes input =
->   case parseOnly (sectionAnnotated <* endOfInput) input of
+>   case parseOnly (sectionAnnotated noTemplates <* endOfInput) input of
 >     Left err -> showError input err
 >     Right (AnnotatedString links text) -> do
 >       Char8.putStrLn text

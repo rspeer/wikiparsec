@@ -3,6 +3,7 @@
 import Test.HUnit
 import Text.MediaWiki.WikiText
 import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString, makeLink, namespace, page, section)
+import Text.MediaWiki.Templates (noTemplates, useArg)
 import qualified Text.MediaWiki.AnnotatedString as A
 import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 import Data.Attoparsec.ByteString.Char8
@@ -12,7 +13,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.UTF8 as UTF8
-import Data.Map (fromList)
+import qualified Data.Map.Strict as Map
 import Data.Either (rights)
 
 testParser :: (Eq a, Show a) => Parser a -> ByteString -> a -> Test
@@ -33,45 +34,48 @@ testAnnotations parser input outputAnnotations =
   (UTF8.toString input) ~: extractAnnotations (parseOnly parser input) ~?= Right outputAnnotations
 
 linkTests = [
-    testParser sectionText "''this'' [[word]]" "this word\n",
-    testParser sectionText "[[word|''this'' word]]" "this word\n",
-    testParser sectionText "[[word|here's a word]]" "here's a word\n",
-    testParser sectionText "this [[word#English]]" "this word\n",
-    testParser sectionText "these [[w:en:word]]s" "these words\n",
-    testParser sectionText "[[Category:English nouns]]" "English nouns\n",
-    testParser sectionText "uphold[ing] the wages system" "uphold[ing] the wages system\n",
+    testParser (sectionText noTemplates) "''this'' [[word]]" "this word\n",
+    testParser (sectionText noTemplates) "[[word|''this'' word]]" "this word\n",
+    testParser (sectionText noTemplates) "[[word|here's a word]]" "here's a word\n",
+    testParser (sectionText noTemplates) "this [[word#English]]" "this word\n",
+    testParser (sectionText noTemplates) "these [[w:en:word]]s" "these words\n",
+    testParser (sectionText noTemplates) "[[Category:English nouns]]" "English nouns\n",
+    testParser (sectionText noTemplates) "uphold[ing] the wages system" "uphold[ing] the wages system\n",
 
-    testAnnotations sectionAnnotated "this [[word]]" [makeLink {page="word"}],
-    testAnnotations sectionAnnotated "[[word|''this'' word]]" [makeLink {page="word"}],
-    testAnnotations sectionAnnotated "this [[word#English]]" [makeLink {page="word", section="#English"}],
-    testAnnotations sectionAnnotated "this [[w:en:word]]" [makeLink {namespace="w:en:", page="word"}],
-    testAnnotations sectionAnnotated "[[Category:English nouns]]" [makeLink {namespace="Category:", page="English nouns"}]
+    testAnnotations (sectionAnnotated noTemplates) "this [[word]]" [makeLink {page="word"}],
+    testAnnotations (sectionAnnotated noTemplates) "[[word|''this'' word]]" [makeLink {page="word"}],
+    testAnnotations (sectionAnnotated noTemplates) "this [[word#English]]" [makeLink {page="word", section="#English"}],
+    testAnnotations (sectionAnnotated noTemplates) "this [[w:en:word]]" [makeLink {namespace="w:en:", page="word"}],
+    testAnnotations (sectionAnnotated noTemplates) "[[Category:English nouns]]" [makeLink {namespace="Category:", page="English nouns"}]
     ]
 
 templateTests = [
-    testParser template "{{archaic}}" $ fromList
+    testParser (template noTemplates) "{{archaic}}" $ Map.fromList
         [("0", "archaic")],
-    testParser template "{{t+|fr|exemple|m}}" $ fromList
+    testParser (template noTemplates) "{{t+|fr|exemple|m}}" $ Map.fromList
         [("0", "t+"), ("1", "fr"), ("2", "exemple"), ("3", "m")],
-    testParser (specificTemplate "t+") "{{t+|fr|exemple|m}}" $ fromList
+    testParser (specificTemplate noTemplates "t+") "{{t+|fr|exemple|m}}" $ Map.fromList
         [("0", "t+"), ("1", "fr"), ("2", "exemple"), ("3", "m")],
-    testParser template "{{t|ja|例え|tr=[[たとえ]], tatoe}}" $ fromList
-        [("0", "t"), ("1", "ja"), ("2", "例え"), ("tr", "たとえ, tatoe")]
+    testParser (template noTemplates) "{{t|ja|例え|tr=[[たとえ]], tatoe}}" $ Map.fromList
+        [("0", "t"), ("1", "ja"), ("2", "例え"), ("tr", "たとえ, tatoe")],
+    testParser (wikiTextLine noTemplates) "ceci est un {{t+|fr|exemple|m}}" "ceci est un ",
+    let tproc = const (useArg "2") in      
+      testParser (wikiTextLine tproc) "ceci est un {{t+|fr|exemple|m}}" "ceci est un exemple"
     ]
 
 listTests = [
-    testParser anyList "* item 1\n* item 2"
+    testParser (anyList noTemplates) "* item 1\n* item 2"
         $ BulletList [Item "item 1", Item "item 2"],
-    testParser anyList "# item 1\n# item 2\n"
+    testParser (anyList noTemplates) "# item 1\n# item 2\n"
         $ OrderedList [Item "item 1", Item "item 2"],
-    testParser anyList "# item 1\n#* item 2a\n#* item 2b\n# item 3"
+    testParser (anyList noTemplates) "# item 1\n#* item 2a\n#* item 2b\n# item 3"
         $ OrderedList [Item "item 1", BulletList [Item "item 2a", Item "item 2b"], Item "item 3"],
-    testParser anyList ":;definition list\n::a syntax that's rarely used for its original purpose"
+    testParser (anyList noTemplates) ":;definition list\n::a syntax that's rarely used for its original purpose"
         $ IndentedList [ListHeading "definition list", IndentedList [Item "a syntax that's rarely used for its original purpose"]],
-    testParser anyListText "# item 1\n#; heading\n#* item 2a\n#* item 2b\n# item 3\n"
+    testParser (anyListText noTemplates) "# item 1\n#; heading\n#* item 2a\n#* item 2b\n# item 3\n"
         $ "item 1\nheading\nitem 2a\nitem 2b\nitem 3\n",
-    testParserFail anyListText "",
-    testParserFail wikiTextLine ""
+    testParserFail (anyListText noTemplates) "",
+    testParserFail (wikiTextLine noTemplates) ""
     ]
 
 -- Test on a section from Wikipedia's featured article as I wrote this,
@@ -95,20 +99,20 @@ articleSectionText = Char8.unlines [
 
 
 sectionTests = [
-    testParser sectionText articleSectionWikitext articleSectionText
+    testParser (sectionText noTemplates) articleSectionWikitext articleSectionText
     ]
 
 
 tableTests = [
    testParser wikiTable "{|\npointless table\n|}" "",
-   testParser sectionText "\n|incomplete table\n|}" ""
+   testParser (sectionText noTemplates) "\n|incomplete table\n|}" ""
    ]
 
 miscTests = [
     testParser looseBracket "}" "}",
-    testParser sectionText "[[Image:Levellers declaration and standard.gif|thumb|200px|Woodcut from a [[Diggers]] document by [[William Everard (Digger)|William Everard]]]]" "Woodcut from a Diggers document by William Everard\n",
-    testParser sectionText "{{template||arg1=1|arg2={{!}}|arg3=}}" "",
-    testParser sectionText "{{template|arg1 = {{sub|1}}\n|arg2 = {{sub|3\n}}\n}}\n|template detritus\n|}\nnormal text" "normal text\n"
+    testParser (sectionText noTemplates) "[[Image:Levellers declaration and standard.gif|thumb|200px|Woodcut from a [[Diggers]] document by [[William Everard (Digger)|William Everard]]]]" "Woodcut from a Diggers document by William Everard\n",
+    testParser (sectionText noTemplates) "{{template||arg1=1|arg2={{!}}|arg3=}}" "",
+    testParser (sectionText noTemplates) "{{template|arg1 = {{sub|1}}\n|arg2 = {{sub|3\n}}\n}}\n|template detritus\n|}\nnormal text" "normal text\n"
     ]
 
 

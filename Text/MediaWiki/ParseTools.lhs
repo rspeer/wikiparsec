@@ -27,6 +27,7 @@ and use the empty string as its value:
 > nop :: Parser ByteString
 > nop = return ""
 
+
 Common parsing functions
 ========================
 
@@ -102,8 +103,9 @@ Another function missing in Attoparsec:
 > optionMaybe :: Parser a -> Parser (Maybe a)
 > optionMaybe p = Just <$> p <|> pure Nothing
 
-Expressions for AnnotatedString
-=============================
+
+Expressions for AnnotatedStrings
+================================
 
 AnnotatedString versions of some of the operators above:
 
@@ -117,4 +119,5 @@ AnnotatedString versions of some of the operators above:
 >
 > aPossiblyEmpty :: Parser AnnotatedString -> Parser AnnotatedString
 > aPossiblyEmpty combinator = option A.empty combinator
+
 
