@@ -2,3 +2,7 @@
 *.swp
 build/
 dist/
+.hsenv
+hsenv.log
+cabal.sandbox.config
+*.prof
