@@ -13,7 +13,6 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.UTF8 as UTF8
-import qualified Data.Map.Strict as Map
 import Data.Either (rights)
 
 testParser :: (Eq a, Show a) => Parser a -> ByteString -> a -> Test
@@ -50,13 +49,13 @@ linkTests = [
     ]
 
 templateTests = [
-    testParser (template noTemplates) "{{archaic}}" $ Map.fromList
+    testParser (template noTemplates) "{{archaic}}" $
         [("0", "archaic")],
-    testParser (template noTemplates) "{{t+|fr|exemple|m}}" $ Map.fromList
+    testParser (template noTemplates) "{{t+|fr|exemple|m}}" $
         [("0", "t+"), ("1", "fr"), ("2", "exemple"), ("3", "m")],
-    testParser (specificTemplate noTemplates "t+") "{{t+|fr|exemple|m}}" $ Map.fromList
+    testParser (specificTemplate noTemplates "t+") "{{t+|fr|exemple|m}}" $
         [("0", "t+"), ("1", "fr"), ("2", "exemple"), ("3", "m")],
-    testParser (template noTemplates) "{{t|ja|例え|tr=[[たとえ]], tatoe}}" $ Map.fromList
+    testParser (template noTemplates) "{{t|ja|例え|tr=[[たとえ]], tatoe}}" $
         [("0", "t"), ("1", "ja"), ("2", "例え"), ("tr", "たとえ, tatoe")],
     testParser (wikiTextLine noTemplates) "ceci est un {{t+|fr|exemple|m}}" "ceci est un ",
     let tproc = const (useArg "2") in      

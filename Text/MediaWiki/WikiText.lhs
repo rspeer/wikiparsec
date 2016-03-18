@@ -19,12 +19,6 @@ well-regarded parser-combinator library for Haskell.
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
 > import Control.Monad (when)
 
-We're going to need to make use of Haskell's functional mapping type,
-Data.Map.Strict, to represent the contents of templates.
-
-> import Data.Map.Strict (Map)
-> import qualified Data.Map.Strict as Map
-
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
@@ -38,7 +32,7 @@ Some common shorthand for defining parse rules:
 
 Handling templates:
 
-> import Text.MediaWiki.Templates (TemplateData, TemplateProc, noTemplates, evalTemplate)
+> import Text.MediaWiki.Templates (TemplateProc, noTemplates, evalTemplate)
 
 
 Spans of text
@@ -383,7 +377,7 @@ Wiktionary.
 Here, we define the basic syntax of templates, and return their contents in a
 standardized form as a mapping from argument names to values.
 
-> template :: TemplateProc -> Parser TemplateData
+> template :: TemplateProc -> Parser Annotation
 > template tproc = string "{{" >> (templateArgs tproc 0)
 >
 > templateValue :: TemplateProc -> Parser AnnotatedString
@@ -397,7 +391,7 @@ their first argument not because they'll be using it to evaluate this template
 we're parsing, but because the template might contain nested templates that
 have to be evaluated.
 
-> templateArgs :: TemplateProc -> Int -> Parser TemplateData
+> templateArgs :: TemplateProc -> Int -> Parser Annotation
 > templateArgs tproc offset = do
 >   nameMaybe <- optionMaybe (try templateArgName)
 >   case nameMaybe of
@@ -410,22 +404,23 @@ have to be evaluated.
 >   string "="
 >   return name
 >
-> namedArg :: TemplateProc -> ByteString -> Int -> Parser TemplateData
+> namedArg :: TemplateProc -> ByteString -> Int -> Parser Annotation
 > namedArg tproc name offset = do
 >   value <- possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc offset
->   return (Map.insert name value rest)
+>   return ((name,value):rest)
 >
-> positionalArg :: TemplateProc -> Int -> Parser TemplateData
+> positionalArg :: TemplateProc -> Int -> Parser Annotation
 > positionalArg tproc offset = do
 >   value <- possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc (offset + 1)
->   return (Map.insert (intToString offset) value rest)
+>   let name = (intToString offset) in return ((name,value):rest)
 >
-> templateRest :: TemplateProc -> Int -> Parser TemplateData
+> templateRest :: TemplateProc -> Int -> Parser Annotation
 > templateRest tproc offset = endOfTemplate <|> (string "|" >> templateArgs tproc offset)
 >
-> endOfTemplate = string "}}" >> return Map.empty
+> endOfTemplate :: Parser Annotation
+> endOfTemplate = string "}}" >> return []
 >
 > intToString :: Int -> ByteString
 > intToString = UTF8.fromString . show
@@ -437,11 +432,11 @@ of the template, then parse the rest of the template as usual.
 We set the template name as arg 0, as it would be if we were using the more
 general rule for parsing template expressions.
 
-> specificTemplate :: TemplateProc -> ByteString -> Parser TemplateData
+> specificTemplate :: TemplateProc -> ByteString -> Parser Annotation
 > specificTemplate tproc name = do
 >   string (BS.append "{{" name)
 >   parsed <- templateRest tproc 1
->   return (Map.insert "0" name parsed)
+>   return (("0",name):parsed)
 
 
 Tables
