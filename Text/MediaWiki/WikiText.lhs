@@ -208,19 +208,19 @@ When parsing internal links, we return just their label. However, other
 details of the link are added to the LinkState.
 
      In:    [[word]]
-     Out:   AnnotatedString [A.makeLink {page="word"}] "word"
+     Out:   AnnotatedString [[("page", "word")]] "word"
 
      In:    [[word|this word]]
-     Out:   AnnotatedString [A.makeLink {page="word"}] "this word"
+     Out:   AnnotatedString [[("page", "word")]] "this word"
 
      In:    [[word#English]]
-     Out:   AnnotatedString [A.makeLink {page="word", section="English"}] "word"
+     Out:   AnnotatedString [[("page", "word"), ("section", "English")]] "word"
 
      In:    [[w:en:Word]]
-     Out:   AnnotatedString [A.makeLink {namespace="w:en", page="word"}] "Word"
+     Out:   AnnotatedString [[("namespace", "w:en"), ("page", "word")]] "Word"
 
      In:    [[Category:English nouns]]
-     Out:   AnnotatedString [A.makeLink {namespace="Category", page="English nouns"}] "English nouns"
+     Out:   AnnotatedString [[("namespace", "Category"), ("page", "English nouns")]] "English nouns"
 
 
 > internalLink :: TemplateProc -> Parser AnnotatedString
@@ -232,7 +232,7 @@ details of the link are added to the LinkState.
 >     link      = parseLink target;
 >     annotated = case maybeText of
 >                   Just text -> A.annotate [link] text
->                   Nothing   -> A.annotate [link] (A.page link)
+>                   Nothing   -> A.annotate [link] (A.get "page" link)
 >   } in do
 >        string "]]"
 >        return annotated
@@ -272,7 +272,7 @@ the text we want to extract is:
 >
 > parseLink :: ByteString -> Annotation
 > parseLink target =
->   A.makeLink {A.namespace=namespace, A.page=page, A.section=section}
+>   A.makeLink namespace page section
 >   where
 >     (namespace, local) = splitLast ":" target
 >     (page, section) = splitFirst "#" local

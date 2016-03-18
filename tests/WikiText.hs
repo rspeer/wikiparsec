@@ -2,7 +2,7 @@
 
 import Test.HUnit
 import Text.MediaWiki.WikiText
-import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString, makeLink, namespace, page, section)
+import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString, makeLink)
 import Text.MediaWiki.Templates (noTemplates, useArg)
 import qualified Text.MediaWiki.AnnotatedString as A
 import Text.MediaWiki.HTML (extractWikiTextFromHTML)
@@ -42,11 +42,11 @@ linkTests = [
     testParser (sectionText noTemplates) "[[Category:English nouns]]" "English nouns\n",
     testParser (sectionText noTemplates) "uphold[ing] the wages system" "uphold[ing] the wages system\n",
 
-    testAnnotations (sectionAnnotated noTemplates) "this [[word]]" [makeLink {page="word"}],
-    testAnnotations (sectionAnnotated noTemplates) "[[word|''this'' word]]" [makeLink {page="word"}],
-    testAnnotations (sectionAnnotated noTemplates) "this [[word#English]]" [makeLink {page="word", section="#English"}],
-    testAnnotations (sectionAnnotated noTemplates) "this [[w:en:word]]" [makeLink {namespace="w:en:", page="word"}],
-    testAnnotations (sectionAnnotated noTemplates) "[[Category:English nouns]]" [makeLink {namespace="Category:", page="English nouns"}]
+    testAnnotations (sectionAnnotated noTemplates) "this [[word]]" [makeLink "" "word" ""],
+    testAnnotations (sectionAnnotated noTemplates) "[[word|''this'' word]]" [makeLink "" "word" ""],
+    testAnnotations (sectionAnnotated noTemplates) "this [[word#English]]" [makeLink "" "word" "#English"],
+    testAnnotations (sectionAnnotated noTemplates) "this [[w:en:word]]" [makeLink "w:en:" "word" ""],
+    testAnnotations (sectionAnnotated noTemplates) "[[Category:English nouns]]" [makeLink "Category:" "English nouns" ""]
     ]
 
 templateTests = [

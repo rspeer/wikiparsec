@@ -11,23 +11,29 @@ we will want to keep track of the annotations on text, without having to
 use a full-blown AST to represent which spans the annotations applied to.
 
 Annotations can represent MediaWiki links, which have a `namespace`, `page`,
-and `section`, or more complex relationships expressed by templates. To avoid
-proliferation of abstractions, we keep them all in the same type, using the
-empty string for components that are absent or do not apply.
+and `section`, or more complex relationships expressed by templates. We
+represent these all using an association list (a list of tuples).
 
-> data Annotation = Annotation {
->   rel :: ByteString,
->   namespace :: ByteString,
->   page :: ByteString,
->   section :: ByteString
-> } deriving (Show, Eq)
+> type ByteAssoc = (ByteString, ByteString)
+> type Annotation = [ByteAssoc]
 
 
 `makeLink` is a constant that can be used as a template for making Annotations
 for internal links.
 
-> makeLink :: Annotation
-> makeLink = Annotation {rel="Link", namespace="", page="", section=""}
+> makeLink :: ByteString -> ByteString -> ByteString -> Annotation
+> makeLink namespace page section = filterEmpty [
+>   ("namespace", namespace),
+>   ("page", page),
+>   ("section", section)]
+>
+> filterEmpty :: [ByteAssoc] -> [ByteAssoc]
+> filterEmpty annot = filter (\assoc -> (snd assoc) /= "") annot
+>
+> get :: ByteString -> Annotation -> ByteString
+> get key annot = case (lookup key annot) of
+>   Just x -> x
+>   Nothing -> ""
 
 The simplifying assumption here is that, in a parse rule that produces
 annotations, the annotations apply to the entire span of text that was parsed.
@@ -72,7 +78,7 @@ ByteString) and a list of Annotations for it.
 > transformA :: (ByteString -> ByteString) -> AnnotatedString -> AnnotatedString
 > transformA op (AnnotatedString a t) = AnnotatedString a (op t)
 
-We can use string literals as AnnotatedString:
+We can use a string literal as an AnnotatedString:
 
 > instance IsString AnnotatedString where
 >   fromString = (fromBytes . UTF8.fromString)
