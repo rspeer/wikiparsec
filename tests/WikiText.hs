@@ -3,7 +3,7 @@
 import Test.HUnit
 import Text.MediaWiki.WikiText
 import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString, makeLink)
-import Text.MediaWiki.Templates (noTemplates, useArg)
+import Text.MediaWiki.Templates (noTemplates, idTemplate, useArg)
 import qualified Text.MediaWiki.AnnotatedString as A
 import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 import Data.Attoparsec.ByteString.Char8
@@ -58,7 +58,8 @@ templateTests = [
     testParser (template noTemplates) "{{t|ja|例え|tr=[[たとえ]], tatoe}}" $
         [("0", "t"), ("1", "ja"), ("2", "例え"), ("tr", "たとえ, tatoe")],
     testParser (wikiTextLine noTemplates) "ceci est un {{t+|fr|exemple|m}}" "ceci est un ",
-    let tproc = const (useArg "2") in      
+    testParser (wikiTextLine (const idTemplate)) "{{archaic}} {{form of|you|informal}}" "archaic form of",
+    let tproc = const (useArg "2") in
       testParser (wikiTextLine tproc) "ceci est un {{t+|fr|exemple|m}}" "ceci est un exemple"
     ]
 
