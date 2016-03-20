@@ -13,6 +13,7 @@ well-regarded parser-combinator library for Haskell.
 > import Data.ByteString (ByteString)
 > import qualified Text.MediaWiki.AnnotatedString as A
 > import Text.MediaWiki.AnnotatedString (AnnotatedString(..), Annotation, transformA)
+> import Text.MediaWiki.AList (get)
 > import Data.Attoparsec.ByteString.Char8 hiding (endOfLine)
 > import Data.Attoparsec.Combinator
 > import Debug.Trace (trace)
@@ -226,7 +227,7 @@ details of the link are added to the LinkState.
 >     link      = parseLink target;
 >     annotated = case maybeText of
 >                   Just text -> A.annotate [link] text
->                   Nothing   -> A.annotate [link] (A.get "page" link)
+>                   Nothing   -> A.annotate [link] (get "page" link)
 >   } in do
 >        string "]]"
 >        return annotated

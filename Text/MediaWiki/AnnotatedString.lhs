@@ -2,9 +2,11 @@
 > module Text.MediaWiki.AnnotatedString where
 > import qualified Data.ByteString as BS
 > import qualified Data.ByteString.UTF8 as UTF8
+> import Text.MediaWiki.AList (ByteAssoc, get, filterEmpty)
 > import Data.ByteString (ByteString)
 > import Data.String (IsString, fromString)
 > import Prelude hiding (append, concat, unlines)
+
 
 Text can be marked up with things such as internal links. During parsing,
 we will want to keep track of the annotations on text, without having to
@@ -14,7 +16,6 @@ Annotations can represent MediaWiki links, which have a `namespace`, `page`,
 and `section`, or more complex relationships expressed by templates. We
 represent these all using an association list (a list of tuples).
 
-> type ByteAssoc = (ByteString, ByteString)
 > type Annotation = [ByteAssoc]
 
 
@@ -26,14 +27,6 @@ for internal links.
 >   ("namespace", namespace),
 >   ("page", page),
 >   ("section", section)]
->
-> filterEmpty :: [ByteAssoc] -> [ByteAssoc]
-> filterEmpty annot = filter (\assoc -> (snd assoc) /= "") annot
->
-> get :: ByteString -> Annotation -> ByteString
-> get key annot = case (lookup key annot) of
->   Just x -> x
->   Nothing -> ""
 
 The simplifying assumption here is that, in a parse rule that produces
 annotations, the annotations apply to the entire span of text that was parsed.
