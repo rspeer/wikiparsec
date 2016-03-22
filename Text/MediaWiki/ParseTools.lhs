@@ -103,6 +103,13 @@ Another function missing in Attoparsec:
 > optionMaybe :: Parser a -> Parser (Maybe a)
 > optionMaybe p = Just <$> p <|> pure Nothing
 
+A function that turns a parser into a pure function:
+
+> parseOrDefault :: a -> Parser a -> ByteString -> a
+> parseOrDefault def parser text =
+>   case parseOnly parser input of
+>     Left err -> def
+>     Right x  -> x
 
 Expressions for AnnotatedStrings
 ================================

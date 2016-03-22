@@ -294,9 +294,9 @@ semantically can contain other lists.
 >               | IndentedList [ListItem]
 >               deriving (Show, Eq)
 
-Sometimes we just want the text that the list contains. `extractText`
-returns the text of the list items (whatever kind of items they are) separated
-by line breaks.
+Sometimes we just want the text that the list contains. `extractTextLines`
+returns the texts of the list items (whatever kind of items they are) as
+a list of AnnotatedStrings.
 
 > extractTextLines :: ListItem -> [AnnotatedString]
 > extractTextLines (Item t) = [t]
@@ -307,9 +307,32 @@ by line breaks.
 >
 > extractTextLinesFromList :: [ListItem] -> [AnnotatedString]
 > extractTextLinesFromList items = concat (map extractTextLines items)
->
+
+`extractText` concatenates the result of `extractTextLines` into a single
+AnnotatedString, with the list item texts separated by line breaks.
+
 > extractText :: ListItem -> AnnotatedString
 > extractText = A.unlines . extractTextLines
+
+In some cases (such as Wiktionary definition lists), we want to extract only
+the texts from the top level of a list, not from the sublists.
+
+> extractTopLevel :: ListItem -> [AnnotatedString]
+> extractTopLevel (Item t) = error "This is an individual item, not a list"
+> extractTopLevel (ListHeading t) = error "This is an individual item, not a list"
+> extractTopLevel (BulletList items) = extractTopLevelFromList items
+> extractTopLevel (OrderedList items) = extractTopLevelFromList items
+> extractTopLevel (IndentedList items) = extractTopLevelFromList items
+> extractTopLevel (BulletList items) = extractTopLevelFromList items
+>
+> extractTopLevelFromList :: [ListItem] -> [AnnotatedString]
+> extractTextLinesFromList items = concat (map extractItemsFromList items)
+>
+> extractItemsFromList :: ListItem -> [AnnotatedString]
+> extractItemsFromList (Item t) = [t]
+> extractItemsFromList _ = []
+
+And here are the rules for parsing lists:
 
 > listItems :: TemplateProc -> ByteString -> Parser [ListItem]
 > listItems tproc marker = do
