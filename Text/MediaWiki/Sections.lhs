@@ -148,5 +148,8 @@ add the heading for it before we scan its lines.
 > pPage :: LineParser [WikiSection]
 > pPage = convertSections <$> many pSection
 >
-> parsePageIntoSections :: ByteString -> Either ParseError [WikiSection]
-> parsePageIntoSections text = parse pPage "" (preparePage text)
+> parsePageIntoSections :: ByteString -> [WikiSection]
+> parsePageIntoSections text = 
+>   case (parse pPage "" (preparePage text)) of
+>     Left err       -> []
+>     Right sections -> sections

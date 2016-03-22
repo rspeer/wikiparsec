@@ -106,7 +106,7 @@ Another function missing in Attoparsec:
 A function that turns a parser into a pure function:
 
 > parseOrDefault :: a -> Parser a -> ByteString -> a
-> parseOrDefault def parser text =
+> parseOrDefault def parser input =
 >   case parseOnly parser input of
 >     Left err -> def
 >     Right x  -> x

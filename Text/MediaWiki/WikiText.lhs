@@ -323,10 +323,9 @@ the texts from the top level of a list, not from the sublists.
 > extractTopLevel (BulletList items) = extractTopLevelFromList items
 > extractTopLevel (OrderedList items) = extractTopLevelFromList items
 > extractTopLevel (IndentedList items) = extractTopLevelFromList items
-> extractTopLevel (BulletList items) = extractTopLevelFromList items
 >
 > extractTopLevelFromList :: [ListItem] -> [AnnotatedString]
-> extractTextLinesFromList items = concat (map extractItemsFromList items)
+> extractTopLevelFromList items = concat (map extractItemsFromList items)
 >
 > extractItemsFromList :: ListItem -> [AnnotatedString]
 > extractItemsFromList (Item t) = [t]

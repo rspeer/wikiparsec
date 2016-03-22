@@ -1,21 +1,35 @@
 > {-# LANGUAGE OverloadedStrings #-}
 > import Text.MediaWiki.Templates
 > import qualified Text.MediaWiki.AnnotatedString as A
-> import Text.MediaWiki.AnnotatedString (AnnotatedString, Annotation, get, filterEmpty, lookupOne)
+> import Text.MediaWiki.AList (get, filterEmpty, lookupOne, getOne, ByteAssoc)
+> import Text.MediaWiki.AnnotatedString (AnnotatedString, Annotation)
 > import Text.MediaWiki.ParseTools
 > import Text.MediaWiki.WikiText
 > import Text.MediaWiki.Sections
 > import Text.MediaWiki.Wiktionary.Base
+> import Data.ByteString (ByteString)
+> import qualified Data.ByteString.Char8 as Char8
+> import Data.Attoparsec.ByteString.Char8
 
 
 Parsing sections
 ================
 
+> enHandlePage :: ByteString -> ByteString -> [WiktionaryRel]
+> enHandlePage title text =
+>   let sections = parsePageIntoSections text in
+>     concat (map (enDispatchSection title) sections)
+>
+> enHandleFile :: ByteString -> String -> IO ()
+> enHandleFile title filename = do
+>   contents <- getContents filename
+>   mapM_ print (enHandlePage title contents)
+
 Choosing an appropriate section parser
 --------------------------------------
 
 > enDispatchSection :: ByteString -> WikiSection -> [WiktionaryRel]
-> enDispatchSection term (WikiSection {headings=headings, content=content}) =
+> enDispatchSection title (WikiSection {headings=headings, content=content}) =
 >   if (length headings) < 3
 >     then []
 >     else let {
@@ -25,14 +39,14 @@ Choosing an appropriate section parser
 >       etymNumber = enFindEtymologyNumber subheads;
 >       sectionType = enGetSectionType (last subheads)
 >     } in case maybePos of
->       Just pos -> enParseSection language term pos etymNumber sectionType content
+>       Just pos -> enParseSection language title pos etymNumber sectionType content
 >       Nothing  -> []
 >
 > enParseSection :: Language -> ByteString -> ByteString -> ByteString -> ByteString -> ByteString -> [WiktionaryRel]
-> enParseSection language term pos etymNumber sectionType content =
+> enParseSection language title pos etymNumber sectionType content =
 >   let {
 >     partialSense = pos ++ "/" ++ etymNumber;
->     thisTerm = WiktionaryTerm { text=term, language=Just language, sense=partialSense }
+>     thisTerm = WiktionaryTerm { text=title, language=Just language, sense=partialSense }
 >   } in enParseSectionContent sectionType thisTerm content
 >
 > enParseSectionContent :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
@@ -74,18 +88,18 @@ We skip entries in the sub-lists called 'Symbols and characters', 'Han
 characters and language-specific varieties', and 'Lojban-specific parts of
 speech'.
 
-> PARTS_OF_SPEECH :: [ByteString]
-> PARTS_OF_SPEECH = [
+> partsOfSpeech :: [ByteString]
+> partsOfSpeech = [
 >   "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
 >   "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
 >   "Interjection", "Noun", "Numeral", "Participle", "Particle",
 >   "Postposition", "Preposition", "Pronoun", "Proper noun", "Verb",
 >   "Circumfix", "Combining form", "Infix", "Interfix", "Prefix", "Root",
 >   "Suffix", "Phrase", "Proverb", "Prepositional phrase"
-> ]
+>   ]
 >
 > enFindPartOfSpeech :: [ByteString] -> Maybe ByteString
-> enFindPartOfSpeech = findHeading PARTS_OF_SPEECH
+> enFindPartOfSpeech = findHeading partsOfSpeech
 >
 > enFindEtymologyNumber :: [ByteString] -> ByteString
 > enFindEtymologyNumber headings =
@@ -97,9 +111,9 @@ Generalizing the type of a heading:
 
 > enGetSectionType :: ByteString -> ByteString
 > enGetSectionType heading =
->   if elem heading PARTS_OF_SPEECH
+>   if elem heading partsOfSpeech
 >     then "POS"
->     else if isPrefixOf "Etymology " heading
+>     else if Char8.isPrefixOf "Etymology " heading
 >       then "Etymology"
 >       else heading
 
@@ -118,7 +132,8 @@ The following labels are basically just part of the syntax of an entry, and
 we'd like to skip them. We also include the empty string here, corresponding
 to template arguments that aren't there.
 
-> IGNORED_LABELS = [
+> ignoredLabels :: [ByteString]
+> ignoredLabels = [
 >   "", "and", "&", "or", "_", "now", "except", "except in", "outside",
 >   "especially", "chiefly", "mainly", "mostly", "particularly", "primarily",
 >   "excluding", "extremely", "frequently", "including", "literally",
@@ -128,7 +143,8 @@ to template arguments that aren't there.
 
 These labels provide grammatical (not semantic) information:
 
-> GRAMMAR_LABELS = [ "abbreviation", "acronym", "active", "active voice",
+> grammarLabels :: [ByteString]
+> grammarLabels = [ "abbreviation", "acronym", "active", "active voice",
 >   "in the active", "ambitransitive", "archaic-verb-form", "attributive",
 >   "attributively", "auxiliary", "by ellipsis", "by extension", "causative",
 >   "collectively", "comparable", "copulative", "copular", "countable",
@@ -148,28 +164,28 @@ These labels provide grammatical (not semantic) information:
 > enLabelAnnotation :: ByteString -> Annotation
 > enLabelAnnotation label = [("rel", labelType label), ("language", "en"), ("page", label)]
 >
-> labelType label :: ByteString -> ByteString
-> labelType label = if elem label GRAMMAR_LABELS then "grammar-label" else "context-label"
+> labelType :: ByteString -> ByteString
+> labelType label = if elem label grammarLabels then "grammar-label" else "context-label"
 >
 > handleLabelTemplate template =
 >   let {
 >     entries     = map (\arg -> get arg template) ["1", "2", "3", "4"];
->     goodEntries = filter (\val -> not (elem val IGNORED_LABELS)) entries;
+>     goodEntries = filter (\val -> not (elem val ignoredLabels)) entries;
 >     annotations = map enLabelAnnotation goodEntries
->   } in annotate annotations ""
+>   } in A.annotate annotations ""
 
 Links
 -----
 
-> handleLinkTemplate :: AList -> AnnotatedString
+> handleLinkTemplate :: ByteAssoc -> AnnotatedString
 > handleLinkTemplate template =
->   let { linkText = (getOne ["3", "2"] template),
+>   let { linkText = (getOne ["3", "2"] template);
 >         annot = filterEmpty $
 >           [("language", (get "1" template)),
 >            ("page", (get "2" template)),
 >            ("gloss", (getOne ["4", "gloss"] template)),
->            ("pos", (get "pos" template)] }
->   in (annotate [annot] linkText)
+>            ("pos", (get "pos" template))] }
+>   in (A.annotate [annot] linkText)
 
 Putting it all together
 -----------------------

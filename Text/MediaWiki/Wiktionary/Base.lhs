@@ -3,16 +3,17 @@
 This file defines how to parse Wiktionary entries, as a layer above the basic
 handling of wiki syntax in `Wikitext.lhs`.
 
-> module Text.MediaWiki.Wiktionary where
+> module Text.MediaWiki.Wiktionary.Base where
 > import Text.MediaWiki.WikiText
 > import qualified Text.MediaWiki.AnnotatedString as A
-> import qualified Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString)
+> import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString)
 > import Text.MediaWiki.AList
 > import Data.Attoparsec.ByteString.Char8
 > import Data.Attoparsec.Combinator
-> import qualified Data.ByteString (ByteString)
+> import Data.ByteString (ByteString)
 > import qualified Data.ByteString.Char8 as Char8
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
+> import Data.List (intersect)
 
 Data types
 ----------
@@ -60,11 +61,11 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 > annotationToTerm :: Annotation -> WiktionaryTerm
 > annotationToTerm annot = WiktionaryTerm {
 >   text=(get "page" annot),
->   language=(lookupMaybe ["language", "section"] annot),
+>   language=(lookupOne ["language", "section"] annot),
 >   sense=(lookup "sense" annot)
 >   }
 >
-> annotationToRel :: WiktionaryTerm -> Annotation -> [WiktionaryRel]
+> annotationToRel :: WiktionaryTerm -> Annotation -> WiktionaryRel
 > annotationToRel thisTerm annot =
 >   makeRel (getDefault "link" "rel" annot) thisTerm (annotationToTerm annot)
 
@@ -72,11 +73,6 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 Definition lists
 ----------------
 
-> definitionList :: Parser [AnnotatedString]
-> definitionList = do
->   listItems <- (orderedList "#")
->   return (extractTopLevel listItems)
->
 > definitionToRels :: Language -> WiktionaryTerm -> AnnotatedString -> [WiktionaryRel]
 > definitionToRels language thisTerm definition =
 >   [makeRel "definition" thisTerm (simpleTerm language (A.unannotate definition))]
@@ -93,7 +89,7 @@ Looking up sections
 > findPrefixedHeading :: ByteString -> [ByteString] -> Maybe ByteString
 > findPrefixedHeading prefix headings =
 >   let {
->     filtered = filter (isPrefixOf prefix) headings;
+>     filtered = filter (Char8.isPrefixOf prefix) headings;
 >     mapped   = map (Char8.drop (Char8.length prefix)) filtered
 >   } in maybeHead mapped
 >
