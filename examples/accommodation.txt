@@ -1,0 +1,167 @@
+==English==
+{{wikipedia|dab=accommodation}}
+{{Webster 1913}}
+
+===Etymology===
+From {{etyl|fr|en}} {{m|fr|accommodation}} from {{etyl|la|en}} {{m|la|accommodātiō||adjustment, accommodation, compliance}}, from {{m|la|accommodō||adapt, put in order}}. Superficially {{suffix|accommodate|tion|lang=en}}. The sense of "lodging" was first attested in 1600.
+
+===Pronunciation===
+* {{a|UK}} {{IPA|/ə.ˌkɒm.ə.ˈdeɪ.ʃən/|lang=en}}
+* {{a|US}} {{IPA|/ə.ˌkɑm.ə.ˈdeɪ.ʃən/|lang=en}}
+* {{rhymes|eɪʃən|lang=en}}
+
+===Noun===
+{{en-noun|~}}
+
+# {{senseid|en|lodging}} {{label|en|chiefly|British|usually|a mass noun}} [[lodging|Lodging]] in a [[dwelling]] or similar living quarters afforded to travellers in hotels or on cruise ships, or prisoners, etc.
+# {{label|en|physical}} [[adaptation|Adaptation]] or [[adjustment]].
+## {{label|en|countable|uncountable|followed by ''to''}} The act of fitting or adapting, or the state of being fitted or adapted; adaptation; adjustment.
+##* {{rfdate}}, Sir {{w|Matthew Hale (jurist)|Matthew Hale}} (1609-1676)
+##*: The organization of the body with '''accommodation''' to its functions.
+## {{label|en|countable|uncountable}} A convenience, a fitting, something satisfying a need.
+##* {{quote-book|year=1898|author={{w|Winston Churchill (novelist)|Winston Churchill}}
+|title={{w|The Celebrity}}|chapter=10
+|passage=Mr. Cooke had had a sloop yacht built at Far Harbor, the completion of which had been delayed, and which was but just delivered. […] The Maria had a cabin, which was finished in hard wood and yellow plush, and '''accommodations''' for keeping things cold.}}
+## {{label|en|countable|physiology|biology}} The adaptation or adjustment of an organism, organ, or part.
+## {{label|en|countable|medical}} The adjustment of the eye to a change of the distance from an observed object.
+# {{label|en|personal}} [[adaptation|Adaptation]] or [[adjustment]].
+## {{label|en|countable|uncountable}} Willingness to accommodate; obligingness.
+## {{label|en|countable|uncountable}} Adjustment of differences; state of agreement; reconciliation; settlement; compromise.
+##* {{rfdate}}, {{w|Thomas Babington Macaulay, 1st Baron Macaulay|Thomas Macaulay}} (1800-1859)
+##*: To come to terms of '''accommodation'''.
+## {{label|en|countable}} The application of a writer's language, on the ground of analogy, to something not originally referred to or intended.
+##* {{rfdate}}, {{w|William Paley}} (1743-1805)
+##: Many of those quotations from the Old Testament were probably intended as nothing more than '''accommodations'''.
+## {{label|en|countable|commerce}} A loan of money.
+## {{label|en|countable|commerce}} An accommodation bill or note.
+## {{label|en|countable|legal}} An offer of [[substitute]] [[goods]] to [[fulfill]] a [[contract]], which will bind the [[purchaser]] if [[accepted]].
+# {{label|en|countable|geology}} The place where sediments can make, or have made, a sedimentation.
+
+====Derived terms====
+: ''The definitions should be entered into dedicated entries for the terms defined.''
+* [[accommodation bill]], or '''note,''' ''(Commerce):'' a bill of exchange which a person accepts, or a note which a person makes and delivers to another, not upon a consideration received, but for the purpose of raising money on credit
+* [[accommodation coach]], or '''train:''' one running at moderate speed and stopping at all or nearly all stations
+* [[accommodation ladder]], ''(Nautical):'' a light ladder hung over the side of a ship at the gangway, useful in ascending from, or descending to, small boats
+* [[holiday accommodation]]
+
+====Translations====
+{{trans-top|lodging}}
+* Arabic: {{t|ar|الإِقَامَة}}
+* Bulgarian: {{t+|bg|квартира}}, {{t+|bg|жилище}}
+* Chinese:
+*: Mandarin: {{t|cmn|住處|sc=Hani}}, {{t+|cmn|住处|tr=zhùchù|sc=Hani}}, {{t+|cmn|膳宿|tr=shànsù|sc=Hani}}, {{t+|cmn|住宿|tr=zhùsù|sc=Hani}}
+* Czech: {{t|cs|ubytování|n}}
+* Finnish: {{t+|fi|majoitus}}
+* French: {{t+|fr|hébergement}}
+* German: {{t+|de|Unterkunft|f}}
+* Hebrew: {{t|he|לִינָה|f|tr=liná|sc=Hebr}}, {{t+|he|מְגוּרִים|m-p|tr=megurím}}
+* Ido: {{t+|io|lojeyo}}
+* Japanese: {{t+|ja|宿泊|tr=しゅくはく, shukuhaku}}
+* Khmer: {{t-needed|km}}
+{{trans-mid}}
+* Korean: {{t|ko|숙박|sc=Kore}}
+* Macedonian: {{t|mk|сместување|n|tr=smestúvanje}}
+* Malay: {{t|ms|penginapan}}, {{t|ms|pemalaman}}, {{t|ms|permalaman}}, {{t|ms|lojing}}, {{t|ms|akomodasi}}
+* Maori: {{t|mi|wharenoho}}
+* Polish: {{t|pl|zakwaterowanie|n}}
+* Portuguese: {{t+|pt|alojamento|m}}, {{t+|pt|hospedagem|f}}
+* Romanian: {{t+|ro|cazare|f}}
+* Russian: {{t+|ru|жильё|n}}, {{qualifier|military}} {{t+|ru|расквартирова́ние|n}}, {{t+|ru|жили́ще|n}}
+* Serbo-Croatian:
+*: Cyrillic: {{t|sh|смјештај|m}}
+*: Roman: {{t+|sh|smještaj|m}}
+* Spanish: {{t+|es|alojamiento|m}}, {{t+|es|hospedaje|m}}
+* Vietnamese: {{t-needed|vi}}
+{{trans-bottom}}
+
+{{trans-top|state of being fitted and adapted}}
+* Bulgarian: {{t+|bg|приспособяване}}
+* Chinese:
+*: Mandarin: {{t|cmn|適應|sc=Hani}}, {{t+|cmn|适应|tr=shìyìng|sc=Hani}}, {{t+|cmn|調節|sc=Hani}}, {{t+|cmn|调节|tr=tiáojié|sc=Hani}}, {{t+|cmn|和解|tr=héjiě|sc=Hani}}
+* Finnish: {{t+|fi|soveltuminen}}
+* French: {{t+|fr|accommodation}}
+* German: {{t+|de|Anpassung}}
+* Indonesian: {{t+|id|akomodasi}}
+{{trans-mid}}
+* Italian: {{t|it|sistemazione}}, {{t+|it|alloggio}}
+* Japanese: {{t+|ja|設備|tr=setsubi}}
+* Khmer: {{t-needed|km}}
+* Macedonian: {{t|mk|прилагодување|n|tr=prilagodúvanje}}
+* Polish: {{t+|pl|przystosowanie|n}}
+* Portuguese: {{t|pt|acomodamento|m}}, {{t+|pt|acomodação|f}}
+* Russian: {{t+|ru|согласова́ние|n}}
+{{trans-bottom}}
+
+{{trans-top|adjustment of the eye}}
+* Bulgarian: {{t+|bg|приспособяване}}, {{t+|bg|привикване}}
+* Czech: {{t+|cs|akomodace|f}}
+* Dutch: {{t+|nl|accommodatie|f}}
+* Finnish: {{t+|fi|sopeutuminen}}
+* French: {{t+|fr|accommodation}}
+{{trans-mid}}
+* Japanese: {{t+|ja|調節|tr=chōsetsu}}, {{t+|ja|調整|tr=chōsei}}
+* Macedonian: {{t|mk|привикнување|n|tr=priviknúvanje}}
+* Polish: {{t+|pl|akomodacja|f}}
+* Russian: {{t+|ru|аккомода́ция|f}}
+{{trans-bottom}}
+
+====External links====
+* {{R:Webster 1913}}
+* {{R:OneLook}}
+
+----
+
+==French==
+
+===Pronunciation===
+* {{audio|Fr-accommodation.ogg|audio|lang=fr}}
+
+===Noun===
+{{fr-noun|f}}
+
+# {{l|en|accommodation}}
+
+===External links===
+* {{R:TLFi}}
+
+[[ar:accommodation]]
+[[ca:accommodation]]
+[[de:accommodation]]
+[[et:accommodation]]
+[[el:accommodation]]
+[[es:accommodation]]
+[[fa:accommodation]]
+[[fr:accommodation]]
+[[ko:accommodation]]
+[[hi:accommodation]]
+[[io:accommodation]]
+[[id:accommodation]]
+[[it:accommodation]]
+[[kn:accommodation]]
+[[ku:accommodation]]
+[[lt:accommodation]]
+[[li:accommodation]]
+[[hu:accommodation]]
+[[mg:accommodation]]
+[[ml:accommodation]]
+[[ms:accommodation]]
+[[my:accommodation]]
+[[fj:accommodation]]
+[[nl:accommodation]]
+[[ja:accommodation]]
+[[ps:accommodation]]
+[[pl:accommodation]]
+[[pt:accommodation]]
+[[ru:accommodation]]
+[[sa:accommodation]]
+[[simple:accommodation]]
+[[fi:accommodation]]
+[[sv:accommodation]]
+[[ta:accommodation]]
+[[te:accommodation]]
+[[th:accommodation]]
+[[chr:accommodation]]
+[[tr:accommodation]]
+[[vi:accommodation]]
+[[zh:accommodation]]
+

@@ -11,9 +11,11 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Data.Attoparsec.ByteString.Char8
 > import Data.Attoparsec.Combinator
 > import Data.ByteString (ByteString)
+> import qualified Data.ByteString.UTF8 as UTF8
 > import qualified Data.ByteString.Char8 as Char8
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
 > import Data.List (intersect)
+> import Data.Maybe
 
 Data types
 ----------
@@ -35,11 +37,20 @@ interchangeably.
 > data WiktionaryTerm = WiktionaryTerm {
 >   text :: ByteString,
 >   language :: Maybe Language,
->   sense :: Maybe ByteString
-> } deriving (Show, Eq)
+>   sense :: Maybe ByteString,
+>   pos :: Maybe ByteString,
+>   etym :: Maybe ByteString
+> } deriving (Eq)
+>
+> instance Show WiktionaryTerm where
+>   show term =
+>     let {
+>       pieces = map (fromMaybe (UTF8.fromString "?"))
+>                    [language term, Just (text term), etym term, pos term, sense term]
+>     } in UTF8.toString (Char8.intercalate "/" pieces)
 >
 > simpleTerm language text = WiktionaryTerm {
->   text=text, language=Just language, sense=Nothing
+>   text=text, language=Just language, sense=Nothing, pos=Nothing, etym=Nothing
 >   }
 
 A WiktionaryRel expresses a relationship between terms that we can extract
@@ -49,7 +60,7 @@ from a page.
 >   relation :: ByteString,
 >   fromTerm :: WiktionaryTerm,
 >   toTerm :: WiktionaryTerm
-> }
+> } deriving (Show, Eq)
 >
 > makeRel :: ByteString -> WiktionaryTerm -> WiktionaryTerm -> WiktionaryRel
 > makeRel rel from to = WiktionaryRel { relation=rel, fromTerm=from, toTerm=to }
@@ -62,7 +73,9 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 > annotationToTerm annot = WiktionaryTerm {
 >   text=(get "page" annot),
 >   language=(lookupOne ["language", "section"] annot),
->   sense=(lookup "sense" annot)
+>   pos=(lookup "pos" annot),
+>   sense=(lookup "sense" annot),
+>   etym=(lookup "etym" annot)
 >   }
 >
 > annotationToRel :: WiktionaryTerm -> Annotation -> WiktionaryRel

@@ -21,8 +21,8 @@ cases output nothing at all.
 
 First: the syntax of a template is represented as an association list from
 parameter names to values.  Both the names and the values are ByteStrings.
-Conveniently, this makes it the same type as an Annotation (from
-AnnotatedString).
+This makes it the same type as an Annotation (from AnnotatedString), but we'll
+alias the type for clarity.
 
 To customize the values of templates for different wikis, we'll be passing
 around an object called a TemplateProc, which looks up the name of the template
@@ -37,7 +37,8 @@ and returns a way to manipulate the text. That is:
   and returns an AnnotatedString, which we're calling a TemplateAction.
 
 > type TemplateProc = ByteString -> TemplateAction
-> type TemplateAction = (Annotation -> AnnotatedString)
+> type Template = Annotation
+> type TemplateAction = (Template -> AnnotatedString)
 >
 > noTemplates :: TemplateProc
 > noTemplates = const skipTemplate
@@ -56,6 +57,6 @@ ones such as "1". We do this to keep types consistent as we emulate PHP.
 > useArg arg = A.fromBytes . (getDefault "" arg)
 > idTemplate = useArg "0"
 >
-> evalTemplate :: TemplateProc -> Annotation -> AnnotatedString
+> evalTemplate :: TemplateProc -> Template -> AnnotatedString
 > evalTemplate tproc tdata =
 >   let action = tproc (getDefault "" "0" tdata) in action tdata

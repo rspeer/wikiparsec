@@ -22,12 +22,15 @@ Parsing sections
 >
 > enHandleFile :: ByteString -> String -> IO ()
 > enHandleFile title filename = do
->   contents <- getContents filename
+>   contents <- Char8.readFile filename
 >   mapM_ print (enHandlePage title contents)
 
 Choosing an appropriate section parser
 --------------------------------------
 
+> fakeRel :: ByteString -> ByteString -> WiktionaryRel
+> fakeRel s1 s2 = makeRel "debug" (simpleTerm "en" s1) (simpleTerm "en" s2)
+>
 > enDispatchSection :: ByteString -> WikiSection -> [WiktionaryRel]
 > enDispatchSection title (WikiSection {headings=headings, content=content}) =
 >   if (length headings) < 3
@@ -45,13 +48,12 @@ Choosing an appropriate section parser
 > enParseSection :: Language -> ByteString -> ByteString -> ByteString -> ByteString -> ByteString -> [WiktionaryRel]
 > enParseSection language title pos etymNumber sectionType content =
 >   let {
->     partialSense = pos ++ "/" ++ etymNumber;
->     thisTerm = WiktionaryTerm { text=title, language=Just language, sense=partialSense }
+>     thisTerm = WiktionaryTerm { text=title, language=Just language, etym=Just etymNumber, pos=Just pos, sense=Nothing }
 >   } in enParseSectionContent sectionType thisTerm content
 >
 > enParseSectionContent :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
 > enParseSectionContent "POS" = enParseDefinition
-> enParseSectionContent _ = const (const [])
+> enParseSectionContent x = const (const [])
 
 
 The part-of-speech/definition section
@@ -73,7 +75,7 @@ Parsing the definition section. (TODO: adjust the term with a sense number?)
 > pDefinition = do
 >   -- Skip miscellaneous lines at the start of the section, including
 >   -- the template that looks like {{en-noun}} or whatever
->   concatMany [wikiTextLine enTemplates, newLine]
+>   textChoices [templateText enTemplates, newLine]
 >   defList <- orderedList enTemplates "#"
 >   return (extractTopLevel defList)
 
@@ -159,7 +161,7 @@ These labels provide grammatical (not semantic) information:
 >   "possessive pronoun", "postpositive", "productive", "reciprocal",
 >   "reflexive", "set phrase", "singular", "singular only", "singulare tantum",
 >   "no plural", "transitive", "uncountable", "usually plural",
->   "usually in the plural", "usually in plural"]
+>   "usually in the plural", "usually in plural", "mass noun", "a mass noun"]
 
 > enLabelAnnotation :: ByteString -> Annotation
 > enLabelAnnotation label = [("rel", labelType label), ("language", "en"), ("page", label)]
@@ -167,9 +169,10 @@ These labels provide grammatical (not semantic) information:
 > labelType :: ByteString -> ByteString
 > labelType label = if elem label grammarLabels then "grammar-label" else "context-label"
 >
+> handleLabelTemplate :: Template -> AnnotatedString
 > handleLabelTemplate template =
 >   let {
->     entries     = map (\arg -> get arg template) ["1", "2", "3", "4"];
+>     entries     = map (\arg -> get arg template) ["2", "3", "4", "5"];
 >     goodEntries = filter (\val -> not (elem val ignoredLabels)) entries;
 >     annotations = map enLabelAnnotation goodEntries
 >   } in A.annotate annotations ""
@@ -177,7 +180,7 @@ These labels provide grammatical (not semantic) information:
 Links
 -----
 
-> handleLinkTemplate :: ByteAssoc -> AnnotatedString
+> handleLinkTemplate :: Template -> AnnotatedString
 > handleLinkTemplate template =
 >   let { linkText = (getOne ["3", "2"] template);
 >         annot = filterEmpty $
