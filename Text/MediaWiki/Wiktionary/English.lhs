@@ -71,13 +71,13 @@ Parsing the definition section. (TODO: adjust the term with a sense number?)
 >   let defs = parseOrDefault [] pDefinition text in
 >     concat (map (definitionToRels "en" thisTerm) defs)
 >
-> pDefinition :: Parser [AnnotatedString]
+> pDefinition :: Parser [(ByteString, AnnotatedString)]
 > pDefinition = do
 >   -- Skip miscellaneous lines at the start of the section, including
 >   -- the template that looks like {{en-noun}} or whatever
 >   textChoices [templateText enTemplates, newLine]
 >   defList <- orderedList enTemplates "#"
->   return (extractTopLevel defList)
+>   return (extractNumberedDefs defList)
 
 
 Finding headings

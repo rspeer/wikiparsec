@@ -8,6 +8,7 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import qualified Text.MediaWiki.AnnotatedString as A
 > import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString)
 > import Text.MediaWiki.AList
+> import Text.MediaWiki.Sections (stripSpaces)
 > import Data.Attoparsec.ByteString.Char8
 > import Data.Attoparsec.Combinator
 > import Data.ByteString (ByteString)
@@ -45,9 +46,13 @@ interchangeably.
 > instance Show WiktionaryTerm where
 >   show term =
 >     let {
->       pieces = map (fromMaybe (UTF8.fromString "?"))
->                    [language term, Just (text term), etym term, pos term, sense term]
->     } in UTF8.toString (Char8.intercalate "/" pieces)
+>       question = UTF8.fromString "?";
+>       pieces = map (fromMaybe question)
+>                    [language term, Just (Char8.concat ["\"", text term, "\""]),
+>                     etym term, pos term, sense term];
+>       trimUnknown list = if (last list) == question then trimUnknown (init list) else list;
+>       usefulPieces = trimUnknown pieces
+>     } in UTF8.toString (Char8.intercalate "/" usefulPieces)
 >
 > simpleTerm language text = WiktionaryTerm {
 >   text=text, language=Just language, sense=Nothing, pos=Nothing, etym=Nothing
@@ -86,10 +91,40 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 Definition lists
 ----------------
 
-> definitionToRels :: Language -> WiktionaryTerm -> AnnotatedString -> [WiktionaryRel]
+Reading a numbered list of definitions, and associating the definitions with
+their numbers (which will become strings such as "def.1.1"):
+
+TODO give an example because this is all confusing
+
+> type LabeledDef = (ByteString, AnnotatedString)
+>
+> extractNumberedDefs = extractNumbered "def"
+>
+> extractNumbered :: ByteString -> ListItem -> [LabeledDef]
+> extractNumbered prefix (OrderedList items) = extractNumberedIter prefix 1 items
+>
+> extractNumberedIter :: ByteString -> Int -> [ListItem] -> [LabeledDef]
+> extractNumberedIter prefix counter list =
+>   let newPrefix = Char8.concat [prefix, ".", UTF8.fromString (show counter)]
+>   in case list of
+>     ((Item item):rest)         -> (newPrefix, item):(extractNumberedIter prefix (counter + 1) rest)
+>     ((OrderedList items):rest) -> (extractNumberedIter newPrefix 1 items)
+>                                   ++ (extractNumberedIter prefix (counter + 1) rest)
+>     _:rest                     -> extractNumberedIter prefix counter rest
+>     []                         -> []
+
+Converting definitions to relations:
+
+> definitionToRels :: Language -> WiktionaryTerm -> LabeledDef -> [WiktionaryRel]
 > definitionToRels language thisTerm definition =
->   [makeRel "definition" thisTerm (simpleTerm language (A.unannotate definition))]
->   ++ (map (annotationToRel thisTerm) (A.annotations definition))
+>   let {
+>     defSense = fst definition;
+>     defValue = snd definition;
+>     termSense = thisTerm {sense=Just defSense}
+>   } in
+>     [makeRel "definition" termSense
+>             (simpleTerm language (stripSpaces (A.unannotate defValue)))]
+>     ++ (map (annotationToRel termSense) (A.annotations defValue))
 
 
 Looking up sections
