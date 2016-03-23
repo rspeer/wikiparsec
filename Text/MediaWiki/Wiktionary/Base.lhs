@@ -4,7 +4,9 @@ This file defines how to parse Wiktionary entries, as a layer above the basic
 handling of wiki syntax in `Wikitext.lhs`.
 
 > module Text.MediaWiki.Wiktionary.Base where
+> import Prelude hiding (takeWhile)
 > import Text.MediaWiki.WikiText
+> import Text.MediaWiki.ParseTools
 > import qualified Text.MediaWiki.AnnotatedString as A
 > import Text.MediaWiki.AnnotatedString (Annotation, AnnotatedString)
 > import Text.MediaWiki.AList
@@ -120,11 +122,45 @@ Converting definitions to relations:
 >   let {
 >     defSense = fst definition;
 >     defValue = snd definition;
->     termSense = thisTerm {sense=Just defSense}
+>     termSense = thisTerm {sense=Just defSense};
+>     defPieces = splitDefinition (stripSpaces (A.unannotate defValue))
 >   } in
->     [makeRel "definition" termSense
->             (simpleTerm language (stripSpaces (A.unannotate defValue)))]
+>     (map (makeDefinitionRel termSense language) defPieces)
 >     ++ (map (annotationToRel termSense) (A.annotations defValue))
+>
+> makeDefinitionRel termSense language definition =
+>   makeRel "definition" termSense (simpleTerm language definition)
+>
+> splitDefinition :: ByteString -> [ByteString]
+> splitDefinition definition =
+>   case parseOnly pDefinitionText definition of
+>     Right results -> results
+>     Left err -> error err
+
+
+Parsing the language of definitions
+-----------------------------------
+
+> pDefinitionText :: Parser [ByteString]
+> pDefinitionText = (pDefCommas <|> pDefSemicolons <|> pDefAnything)
+>
+> pCommaItem     = textWithout " ,;:."
+> pSemicolonItem = textWithout ";."
+>
+> pDefCommas :: Parser [ByteString]
+> pDefCommas = sepBy1 pCommaItem (string ", ") <* endOfInput
+>
+> pDefSemicolons :: Parser [ByteString]
+> pDefSemicolons = do
+>   items <- sepBy1 pSemicolonItem (string "; ")
+>   option '.' (char '.')
+>   endOfInput
+>   return items
+>
+> pDefAnything :: Parser [ByteString]
+> pDefAnything = do
+>   text <- takeWhile (const True)
+>   return [text]
 
 
 Looking up sections
