@@ -17,7 +17,8 @@ cabal-version:       >=1.8
 
 Library
   exposed-modules:     Text.MediaWiki.SplitUtils, Text.MediaWiki.ParseTools,
-                       Text.MediaWiki.Sections, Text.MediaWiki.XML, Text.MediaWiki.HTML
+                       Text.MediaWiki.Sections, Text.MediaWiki.XML, Text.MediaWiki.HTML,
+                       Data.LanguageNames
   -- other-modules:
   build-depends:       HUnit,
                        base,

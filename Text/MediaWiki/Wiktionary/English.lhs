@@ -11,6 +11,7 @@
 > import Data.ByteString (ByteString)
 > import qualified Data.ByteString.Char8 as Char8
 > import Data.Attoparsec.ByteString.Char8
+> import Data.LanguageNames
 
 
 Parsing sections
@@ -37,7 +38,7 @@ Choosing an appropriate section parser
 >   if (length headings) < 3
 >     then []
 >     else let {
->       language = headings !! 1;
+>       language = lookupLanguage "en" (headings !! 1);
 >       subheads = drop 2 headings;
 >       maybePos = enFindPartOfSpeech subheads;
 >       etymNumber = enFindEtymologyNumber subheads;
