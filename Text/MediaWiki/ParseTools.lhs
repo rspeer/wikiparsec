@@ -59,11 +59,19 @@ To make this easier, we'll define `textChoices`, which takes a list of
 expressions we're allowed to parse, tries all of them in that priority order,
 and concatenates together their results.
 
+> optionalTextChoices :: [Parser ByteString] -> Parser ByteString
+> optionalTextChoices options = concatMany (choice options)
+>
 > textChoices :: [Parser ByteString] -> Parser ByteString
-> textChoices options = concatMany (choice options)
+> textChoices options = concatMany1 (choice options)
 >
 > concatMany :: Parser ByteString -> Parser ByteString
 > concatMany combinator = do
+>   parts <- many' combinator
+>   return (Char8.concat parts)
+>
+> concatMany1 :: Parser ByteString -> Parser ByteString
+> concatMany1 combinator = do
 >   parts <- many1 combinator
 >   return (Char8.concat parts)
 

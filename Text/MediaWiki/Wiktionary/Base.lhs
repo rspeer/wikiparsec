@@ -17,6 +17,7 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import qualified Data.ByteString.UTF8 as UTF8
 > import qualified Data.ByteString.Char8 as Char8
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
+> import Control.Monad
 > import Data.List (intersect)
 > import Data.Maybe
 
@@ -73,6 +74,19 @@ from a page.
 > makeRel rel from to = WiktionaryRel { relation=rel, fromTerm=from, toTerm=to }
 > makeGenericRel = makeRel "RelatedTo"
 
+Working with annotations:
+
+> assocContains :: (Eq a) => a -> [(a, b)] -> Bool
+> assocContains key alist =
+>   case lookup key alist of
+>     Just value -> True
+>     Nothing    -> False
+>
+> linkableAnnotation :: Annotation -> Bool
+> linkableAnnotation = assocContains "page"
+>
+> linkableAnnotations :: AnnotatedString -> [Annotation]
+> linkableAnnotations astring = filter linkableAnnotation (A.annotations astring)
 
 Converting an Annotation representing a term to a WiktionaryTerm:
 
@@ -88,6 +102,18 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 > annotationToRel :: WiktionaryTerm -> Annotation -> WiktionaryRel
 > annotationToRel thisTerm annot =
 >   makeRel (getDefault "link" "rel" annot) thisTerm (annotationToTerm annot)
+
+We might have an annotation assigning a sense ID to this text:
+
+> findSenseID :: AnnotatedString -> Maybe ByteString
+> findSenseID astring = findSenseIDInList (A.annotations astring)
+>
+> findSenseIDInList :: [Annotation] -> Maybe ByteString
+> findSenseIDInList (annot:rest) =
+>   case (lookup "senseID" annot) of
+>     Just x -> Just x
+>     Nothing -> findSenseIDInList rest
+> findSenseIDInList [] = Nothing
 
 
 Definition lists
@@ -120,13 +146,15 @@ Converting definitions to relations:
 > definitionToRels :: Language -> WiktionaryTerm -> LabeledDef -> [WiktionaryRel]
 > definitionToRels language thisTerm definition =
 >   let {
->     defSense = fst definition;
 >     defValue = snd definition;
->     termSense = thisTerm {sense=Just defSense};
+>     -- get a sense either from the SenseID annotation, or failing that,
+>     -- from the label that comes with the definition
+>     defSense = mplus (findSenseID defValue) (Just (fst definition));
+>     termSense = thisTerm {sense=defSense};
 >     defPieces = splitDefinition (stripSpaces (A.unannotate defValue))
 >   } in
 >     (map (makeDefinitionRel termSense language) defPieces)
->     ++ (map (annotationToRel termSense) (A.annotations defValue))
+>     ++ (map (annotationToRel termSense) (linkableAnnotations defValue))
 >
 > makeDefinitionRel termSense language definition =
 >   makeRel "definition" termSense (simpleTerm language definition)

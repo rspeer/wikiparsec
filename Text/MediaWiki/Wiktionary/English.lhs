@@ -1,4 +1,5 @@
 > {-# LANGUAGE OverloadedStrings #-}
+> module Text.MediaWiki.Wiktionary.English where
 > import Text.MediaWiki.Templates
 > import qualified Text.MediaWiki.AnnotatedString as A
 > import Text.MediaWiki.AList (get, filterEmpty, lookupOne, getOne, ByteAssoc)
@@ -20,10 +21,10 @@ Parsing sections
 >   let sections = parsePageIntoSections text in
 >     concat (map (enDispatchSection title) sections)
 >
-> enHandleFile :: ByteString -> String -> IO ()
+> enHandleFile :: String -> String -> IO ()
 > enHandleFile title filename = do
 >   contents <- Char8.readFile filename
->   mapM_ print (enHandlePage title contents)
+>   mapM_ print (enHandlePage (Char8.pack title) contents)
 
 Choosing an appropriate section parser
 --------------------------------------
@@ -75,7 +76,7 @@ Parsing the definition section. (TODO: adjust the term with a sense number?)
 > pDefinitionSection = do
 >   -- Skip miscellaneous lines at the start of the section, including
 >   -- the template that looks like {{en-noun}} or whatever
->   textChoices [templateText enTemplates, newLine]
+>   optionalTextChoices [templateText enTemplates, newLine]
 >   defList <- orderedList enTemplates "#"
 >   return (extractNumberedDefs defList)
 
@@ -143,7 +144,8 @@ to template arguments that aren't there.
 >   "of an", "often", "originally", "possibly", "rarely", "slightly",
 >   "sometimes", "somewhat", "strongly", "typically", "usually", "very"]
 
-These labels provide grammatical (not semantic) information:
+These labels provide grammatical (not semantic) information. We'll keep them
+separate in case we ever want to output them:
 
 > grammarLabels :: [ByteString]
 > grammarLabels = [ "abbreviation", "acronym", "active", "active voice",
@@ -163,19 +165,29 @@ These labels provide grammatical (not semantic) information:
 >   "no plural", "transitive", "uncountable", "usually plural",
 >   "usually in the plural", "usually in plural", "mass noun", "a mass noun"]
 
-> enLabelAnnotation :: ByteString -> Annotation
-> enLabelAnnotation label = [("rel", labelType label), ("language", "en"), ("page", label)]
->
-> labelType :: ByteString -> ByteString
-> labelType label = if elem label grammarLabels then "grammar-label" else "context-label"
->
 > handleLabelTemplate :: Template -> AnnotatedString
 > handleLabelTemplate template =
 >   let {
 >     entries     = map (\arg -> get arg template) ["2", "3", "4", "5"];
->     goodEntries = filter (\val -> not (elem val ignoredLabels)) entries;
+>     goodEntries = filter (\val -> not (elem val ignoredLabels || elem val grammarLabels)) entries;
 >     annotations = map enLabelAnnotation goodEntries
 >   } in A.annotate annotations ""
+>
+> enLabelAnnotation :: ByteString -> Annotation
+> enLabelAnnotation label = [("rel", "context"), ("language", "en"), ("page", label)]
+
+
+Sense IDs
+---------
+Hooray! Wiktionary is finally starting to mark word senses with stable IDs
+instead of just numbered lists. But we need to be able to extract that
+information, mapping the sense number to the sense.
+
+We'll make a "senseID" annotation that we pass on to the definition parser in
+Wiktionary.Base.
+
+> handleSenseIDTemplate :: Template -> AnnotatedString
+> handleSenseIDTemplate template = A.annotate [[("senseID", get "2" template)]] ""
 
 Links
 -----
@@ -201,4 +213,5 @@ Putting it all together
 > enTemplates "label"   = handleLabelTemplate
 > enTemplates "lbl"     = handleLabelTemplate
 > enTemplates "lb"      = handleLabelTemplate
+> enTemplates "senseid" = handleSenseIDTemplate
 > enTemplates _         = skipTemplate

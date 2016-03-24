@@ -1,0 +1,198 @@
+{{also|Discover}}
+==English==
+{{slim-wikipedia|dab=discover|lang=en}}
+
+===Alternative forms===
+* [[discovre]] {{qualifier|obsolete}}
+
+===Etymology===
+From {{etyl|fro|en}} {{m|fro|descovrir}}, from {{etyl|la|en}} {{m|la|discooperiō}}, from {{m|la|dis-}} + {{m|la|cooperiō}}.
+
+===Pronunciation===
+* {{a|RP}} {{IPA|/dɪsˈkʌvə/|lang=en}}
+* {{a|Northern England}} {{IPA|/dɪsˈkʊvə/|lang=en}}
+* {{a|GenAm}} {{IPA|/dɪsˈkʌvɚ/|lang=en}}
+* {{audio|en-us-discover.ogg|Audio (US)|lang=en}}
+* {{rhymes|ʌvə(ɹ)|lang=en}}
+* {{hyphenation|dis|cov|er|lang=en}}
+
+===Verb===
+{{en-verb}}
+
+# {{label|en|transitive|obsolete}} To remove the [[cover]] from; to [[uncover]] (a head, building etc.).
+# {{label|en|transitive|now|_|rare}} To [[expose]], [[uncover]].
+#: {{ux|en|The gust of wind '''discovered''' a bone in the sand.}}
+# {{label|en|transitive|chess}} To [[create]] by moving a piece out of another piece's line of attack.
+#: {{ux|en|This move '''discovers''' an attack on a vital pawn.}}
+# {{label|en|transitive|archaic}} To [[reveal]] (information); to [[divulge]], make known.
+#: {{ux|en|I '''discovered''' my plans to the rest of the team.}}
+#* Shakespeare
+#*: Go, draw aside the curtains, and '''discover''' / The several caskets to this noble prince.
+#* Francis Bacon
+#*: Prosperity doth best '''discover''' vice; but adversity doth best '''discover''' virtue.
+# {{label|en|transitive|obsolete}} To [[reconnoitre]], [[explore]] (an area).
+#* {{RQ:Mlry MrtArthr1}}, Bk.V, ch.ix:
+#*: they seyde the same, and were aggreed that Sir Clegis, Sir Claryon, and Sir Clement the noble, that they sholde '''dyscover''' the woodys, bothe the dalys and the downys.
+# To [[find]] or [[learn]] something for the first time.
+#: {{ux|en|Turning the corner, I '''discovered''' a lovely little shop. I '''discovered''' that they sold widgets.}}
+#* {{quote-magazine|date=2013-08-10|volume=408|issue=8848|magazine={{w|The Economist}}
+|title=[http://www.economist.com/news/leaders/21583277-worlds-biggest-polluter-going-green-it-needs-speed-up-transition-can-china Can China clean up fast enough?]
+|passage=All this has led to an explosion of protest across China, including among a middle class that has '''discovered''' nimbyism.}}
+# {{label|en|obsolete}} To manifest without design; to [[show]]; to [[exhibit]].
+#* C. J. Smith
+#*: The youth '''discovered''' a taste for sculpture.
+#* '''1806''', Alexander Hunter, ''Culina Famulatrix Medicinæ'', p.125:
+#*: The English Cooks keep all their Spices in separate boxes, but the French Cooks make a spicey mixture that does not '''discover''' a predominancy of any one of the spices over the others.
+
+====Synonyms====
+* {{sense|expose something previously covered}} [[expose]], [[reveal]], [[uncover]]
+* {{sense|find something for the first time}} [[come across]], [[find]]
+
+====Antonyms====
+* {{sense|expose something previously covered}} [[conceal]], [[cover]], [[cover up]], [[hide]]
+
+====Derived terms====
+* [[discovery]]
+* [[discovered attack]]
+* [[discovered check]]
+
+====Translations====
+{{trans-top|expose something previously covered}}
+* Bulgarian: {{t+|bg|нами́рам|impf|sc=Cyrl}}
+* Catalan: {{t+|ca|descobrir}}
+* Chinese:
+*: Mandarin: {{t+|cmn|暴露|tr=bàolù|sc=Hani}}
+* Czech: {{t+|cs|objevit}}, {{t|cs|odkrýt}}
+* Dutch: {{t+|nl|blootleggen}}, {{t+|nl|onthullen}}
+* Esperanto: {{t|eo|malkovri}}
+* Finnish: {{t+|fi|paljastaa}}
+* French: {{t+|fr|découvrir}}
+* Georgian: {{t|ka|მიგნება|sc=Geor}}, {{t|ka|აღმოჩენა|sc=Geor}}
+* Greek: {{t+|el|αποκαλύπτω}}
+* Hungarian: {{t+|hu|felfedez}}
+{{trans-mid}}
+* Ido: {{t+|io|deskovrar}}
+* Korean: {{t+|ko|발견하다|sc=Kore}}, {{t+|ko|찾아내다|sc=Kore}}
+* Latin: {{t|la|dispicio}}, {{t|la|dispecto}}, {{t|la|reperio}}
+* Macedonian: {{t|mk|открива|sc=Cyrl}}
+* Maori: {{t|mi|tūhura}}
+* Occitan: {{t+|oc|descobrir}}
+* Old English: {{t|ang|abeþecian}}, {{t|ang|afindan}}, {{t|ang|abarian}}
+* Persian: {{t+|fa|آشکار کردن|tr=āŝkār kardan|sc=fa-Arab}}
+* Portuguese: {{t+|pt|descobrir}}, {{t+|pt|descobrir}}
+* Romanian: {{t+|ro|descoperi}}
+* Russian: {{t+|ru|раскрыва́ть|impf}}, {{t+|ru|раскры́ть|pf}}, {{t+|ru|обнару́живать|impf}}, {{t+|ru|обнару́жить|pf}}
+* Scottish Gaelic: {{t|gd|rùisg}}
+* Spanish: {{t+|es|descubrir}}, {{t+|es|destapar}}
+* Swedish: {{t+|sv|avslöja}}, {{t+|sv|upptäcka}}
+* Welsh: {{t+|cy|darganfod}}
+{{trans-bottom}}
+
+{{trans-top|find something for the first time}}
+* Arabic: {{t|ar|اِكْتَشَفَ}}
+* Armenian: {{t+|hy|հայտնաբերել|sc=Armn}}
+* Bulgarian: {{t+|bg|откри́вам|impf|sc=Cyrl}}
+* Catalan: {{t+|ca|descobrir}}
+* Chinese:
+*: Mandarin: {{t|cmn|發現|sc=Hani}}, {{t+|cmn|发现|tr=fāxiàn|sc=Hani}}, {{t|cmn|發覺|sc=Hani}}, {{t+|cmn|发觉|tr=fājué|sc=Hani}} (also spelled: [[發見]]/[[发见]]), {{t+|cmn|查出|tr=cháchū|sc=Hani}}
+* Czech: {{t+|cs|objevit}}
+* Danish: {{t|da|opdage}}
+* Dutch: {{t+|nl|ontdekken}}
+* Esperanto: {{t|eo|malkovri}}
+* Finnish: {{t+|fi|löytää}}
+* French: {{t+|fr|découvrir}}
+* Friulian: {{t|fur|scuvierzi}}
+* Georgian: {{t|ka|აღმოაჩინო|sc=Geor}}
+* German: {{t+|de|entdecken}}
+* Greek: {{t+|el|ανακαλύπτω}}
+* Ido: {{t+|io|trovar}}, {{t+|io|deskovrar}}
+* Interlingua: {{t|ia|discoperir}}
+* Italian: {{t+|it|scoprire}}, {{t|it|discoprire}}
+* Japanese: {{t|ja|発見する|tr=はっけんする, hakken-suru}}, {{t|ja|見つける|tr=みつける, mitsukeru|sc=Jpan}}
+{{trans-mid}}
+* Norman: {{t|nrf|dêcouvri}}
+* Latin: {{t|la|detego}}, {{t+|la|invenio}}, {{t|la|dispicio}}, {{t|la|dispecto}}
+* Lojban: {{t|jbo|facki}}
+* Macedonian: {{t|mk|пронаоѓа|sc=Cyrl}}, {{t|mk|открива|sc=Cyrl}}
+* Malay: {{t|ms|menemui}}
+* Norwegian:
+*: Bokmål: {{t+|nb|oppdage}}
+* Persian: {{t+|fa|کشف کردن|tr=kašf kardan|sc=fa-Arab}}, {{t+|fa|یافتن|tr=yāftan|sc=fa-Arab}}
+* Polish: {{t+|pl|odkrywać}}, {{t+|pl|odkryć}}
+* Portuguese: {{t+|pt|descobrir}}
+* Romanian: {{t+|ro|descoperi}}
+* Russian: {{t+|ru|открыва́ть|impf}}, {{t+|ru|откры́ть|pf}}, {{t+|ru|обнару́живать|impf}}, {{t+|ru|обнару́жить|pf}}
+* Scots: {{t|sco|diskiver}}
+* Scottish Gaelic: {{t|gd|faigh a-mach}}
+* Spanish: {{t+|es|descubrir}}
+* Swedish: {{t+|sv|upptäcka}}
+* Turkish: {{t+|tr|keşfetmek}}
+* Venetian: {{t|vec|scovèrzar}}, {{t|vec|scoverzèr}}, {{t|vec|scuajar}}, {{t|vec|scoprir}}
+* Vietnamese: {{t+|vi|phát hiện}}, {{t+|vi|phát kiến}}
+{{trans-bottom}}
+
+{{checktrans-top}}
+* Catalan: {{t+check|ca|descobrir}}
+* Hebrew: {{t-check|he|לגלות|tr=legalot}}, {{t-check|he|לחשוף|tr=lakhsof}}
+* Italian: {{t+check|it|scoprire}}
+* Malayalam: {{t-check|ml|കണ്ടുപിടിയ്ക്കുക}}
+* {{ttbc|no}}: <!--do not wikify--> [[oppdage]]
+{{trans-mid}}
+* Romanian: {{t+check|ro|descoperi}}
+* Sardinian: {{t-check|sc|scoberri}}
+* Sicilian: {{t-check|scn|scopriri}}, {{t+check|scn|addunarisi}}
+* Slovene: {{t+check|sl|odkriti}}
+* Telugu: {{t+check|te|కనిపెట్టు}}
+{{trans-bottom}}
+
+====See also====
+* [[invent]]
+* [[detect]]
+* [[find]]
+* [[stumble upon]]
+
+===Anagrams===
+* [[discovre#English|discovre]]
+* [[divorces#English|divorces]], [[divorcés#English|divorcés]]
+
+[[Category:1000 English basic words]]
+
+[[az:discover]]
+[[zh-min-nan:discover]]
+[[cs:discover]]
+[[cy:discover]]
+[[de:discover]]
+[[et:discover]]
+[[el:discover]]
+[[es:discover]]
+[[eu:discover]]
+[[fa:discover]]
+[[fr:discover]]
+[[ko:discover]]
+[[hy:discover]]
+[[io:discover]]
+[[it:discover]]
+[[kn:discover]]
+[[ku:discover]]
+[[lo:discover]]
+[[li:discover]]
+[[hu:discover]]
+[[mg:discover]]
+[[ml:discover]]
+[[my:discover]]
+[[nl:discover]]
+[[ja:discover]]
+[[no:discover]]
+[[oc:discover]]
+[[pl:discover]]
+[[ru:discover]]
+[[simple:discover]]
+[[fi:discover]]
+[[sv:discover]]
+[[ta:discover]]
+[[te:discover]]
+[[th:discover]]
+[[chr:discover]]
+[[tr:discover]]
+[[vi:discover]]
+[[zh:discover]]

@@ -11,7 +11,7 @@ import Data.Either (rights)
 
 testSecParser :: ByteString -> [WikiSection] -> Test
 testSecParser input output =
-  (toString input) ~: parsePageIntoSections input ~?= Right output
+  (toString input) ~: parsePageIntoSections input ~?= output
 
 sectionTests = [
     testSecParser "top section\n==Section 1==\ntest\n==Section 2==\nmore\n\n===Section 2.1===\n=Whoops=\ni am not good with computer\n== fake heading" $
