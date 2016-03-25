@@ -4,6 +4,7 @@
 > import qualified Text.MediaWiki.AnnotatedString as A
 > import Text.MediaWiki.AList (get, filterEmpty, lookupOne, getOne, ByteAssoc)
 > import Text.MediaWiki.AnnotatedString (AnnotatedString, Annotation)
+> import Text.MediaWiki.SplitUtils
 > import Text.MediaWiki.ParseTools
 > import Text.MediaWiki.WikiText
 > import Text.MediaWiki.Sections
@@ -293,12 +294,15 @@ Translations
 Form-of templates
 -----------------
 
+> pageName :: ByteString -> ByteString
+> pageName name = fst (splitFirst "#" name)
+
 > handleAbstractFormTemplate :: Template -> AnnotatedString
 > handleAbstractFormTemplate template =
 >   let annot = filterEmpty $
 >         [("rel", Char8.append "form/" (get "1" template)),
 >          ("language", (get "lang" template)),
->          ("page", (get "2" template)),
+>          ("page", pageName (get "2" template)),
 >          ("form", (get "1" template))]
 >   in A.annotate [annot] ""
 >
@@ -307,7 +311,7 @@ Form-of templates
 >   let annot = filterEmpty $
 >         [("rel", Char8.append "form/" form),
 >          ("language", (get "lang" template)),
->          ("page", (get "1" template)),
+>          ("page", pageName (get "1" template)),
 >          ("form", form)]
 >   in A.annotate [annot] ""
 >
@@ -318,38 +322,48 @@ Form-of templates
 >       annot = filterEmpty $
 >         [("rel", Char8.append "form/" formStr),
 >          ("language", (get "lang" template)),
->          ("page", (get "1" template))]
+>          ("page", pageName (get "1" template))]
 >   in A.annotate [annot] ""
 >
 > handleLanguageFormsTemplate :: Language -> [ByteString] -> Template -> AnnotatedString
 > handleLanguageFormsTemplate language forms template =
 >   let annotations = [[("rel", Char8.append "form/" form),
 >                       ("language", language),
->                       ("page", get "1" template),
->                       ("form", form)] | form <- forms]
+>                       ("page", pageName (get "1" template))] | form <- forms]
 >   in A.annotate annotations ""
+>
+> handleSpanishFormTemplate :: Template -> AnnotatedString
+> handleSpanishFormTemplate template =
+>   let forms = filter (/= "") [getOne keys template | keys <-
+>                                [["pers", "person"],
+>                                 ["num", "number"],
+>                                 ["tense"],
+>                                 ["mood"],
+>                                 ["gen", "gender"]]]
+>       formal = case (get "formal" template) of
+>                  "y"   -> ["formal"]
+>                  "yes" -> ["formal"]
+>                  "n"   -> ["informal"]
+>                  "no"  -> ["informal"]
+>                  _     -> []
+>       formStr = Char8.intercalate "+" (formal ++ forms)
+>       annot = filterEmpty $
+>         [("rel", Char8.append "form/" formStr),
+>          ("language", "es"),
+>          ("page", pageName (getOne ["1", "inf", "verb", "infinitive"] template))]
+>   in A.annotate [annot] ""
 
 We need to handle:
 
-- active participle of
+- [[Category:Form-of_templates]]
 - feminine plural past participle of
 - feminine singular past participle of
-- future participle of
+- masculine plural past participle of
+- masculine singular past participle of
+- neuter singular past participle of
 - gerund of
 - imperative of
-- masculine plural past participle of
-- neuter singular past participle of
-- participle of
-- passive of
-- passive participle of
-- past active participle of
-- past passive participle of
-- present active participle of
-- present participle of
-- present passive participle of
-- present tense of
 - reflexive of
-- (x) supine of
 - verbal noun of
 
 
@@ -380,22 +394,35 @@ Putting it all together
 > enTemplates "inflection of"       = handleInflectionTemplate
 > enTemplates "conjugation of"      = handleInflectionTemplate
 >
-> enTemplates "en-simple past of"   = handleLanguageFormsTemplate "en" ["past"]
-> enTemplates "en-past of"          = handleLanguageFormsTemplate "en" ["past", "past+ptcp"]
-> enTemplates "past of"             = handleFormTemplate "past"
-> enTemplates "past tense of"       = handleFormTemplate "past"
-> enTemplates "past participle of"  = handleFormTemplate "past+ptcp"
-> enTemplates "en-third-person singular of"          = handleLanguageFormsTemplate "en" ["3+s"]
-> enTemplates "en-third person singular of"          = handleLanguageFormsTemplate "en" ["3+s"]
-> enTemplates "en-archaic second-person singular of" = handleLanguageFormsTemplate "en" ["archaic+2+s"]
-> enTemplates "en-archaic third-person singular of"  = handleLanguageFormsTemplate "en" ["archaic+3+s"]
+> enTemplates "en-simple past of"                    = handleLanguageFormsTemplate "en" ["past"]
+> enTemplates "en-past of"                           = handleLanguageFormsTemplate "en" ["past", "past+ptcp"]
+> enTemplates "past of"                              = handleFormTemplate "past"
+> enTemplates "past tense of"                        = handleFormTemplate "past"
+> enTemplates "past participle of"                   = handleFormTemplate "past+ptcp"
+> enTemplates "past active participle of"            = handleFormTemplate "past+actv+ptcp"
+> enTemplates "past passive participle of"           = handleFormTemplate "past+pasv+ptcp"
+> enTemplates "present tense of"                     = handleFormTemplate "pres"
+> enTemplates "present participle of"                = handleFormTemplate "pres+ptcp"
+> enTemplates "present active participle of"         = handleFormTemplate "pres+actv+ptcp"
+> enTemplates "present passive participle of"        = handleFormTemplate "pres+pasv+ptcp"
+> enTemplates "future participle of"                 = handleFormTemplate "fut+ptcp"
+> enTemplates "participle of"                        = handleFormTemplate "ptcp"
+> enTemplates "active participle of"                 = handleFormTemplate "ptcp+actv"
+> enTemplates "passive participle of"                = handleFormTemplate "ptcp+pasv"
+> enTemplates "en-third-person singular of"          = handleLanguageFormsTemplate "en" ["3+s+pres"]
+> enTemplates "en-third person singular of"          = handleLanguageFormsTemplate "en" ["3+s+pres"]
+> enTemplates "en-archaic second-person singular of" = handleLanguageFormsTemplate "en" ["archaic+2+s+pres"]
+> enTemplates "en-archaic third-person singular of"  = handleLanguageFormsTemplate "en" ["archaic+3+s+pres"]
 > enTemplates "second-person singular past of"       = handleFormTemplate "archaic+2+s+past"
 >
 > enTemplates "en-comparative of"   = handleLanguageFormsTemplate "en" ["comp"]
 > enTemplates "en-superlative of"   = handleLanguageFormsTemplate "en" ["sup"]
 >
 > enTemplates "plural of"                   = handleFormTemplate "p"
+> enTemplates "gerund of"                   = handleFormTemplate "ger"
 > enTemplates "en-irregular plural of"      = handleLanguageFormsTemplate "en" ["p"]
+>
+> enTemplates "es-verb form of" = handleSpanishFormTemplate
 >
 > enTemplates _         = skipTemplate
 

@@ -1,0 +1,31 @@
+==Telugu==
+
+===Alternative forms===
+{{l|te|మేషం}}
+
+===Noun===
+{{te-noun|tr=mēshamu|g=m}}
+
+# [[ram]] or male sheep.
+
+{{Zodiac|Image:Aries_symbol.png|lang=te|మీనరాశి|వృషభరాశి|w=మేషము}}
+
+====Synonyms====
+* {{l|te|పొట్టేలు}}
+
+===Proper noun===
+{{te-proper noun|tr=mēshamu}}
+
+# {{label|te|astronomy}} The Zodiac sign [[Aries]].
+
+====Derived terms====
+* {{l|te|మేషసంక్రాంతి}}
+
+====Synonyms====
+* {{l|te|మేషరాశి}}
+
+[[Category:te:Sheep]]
+[[Category:te:Constellations in the zodiac]]
+
+[[te:మేషము]]
+

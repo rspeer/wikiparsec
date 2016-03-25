@@ -182,7 +182,7 @@ Parsing the language of definitions
 >
 > pDefSemicolons :: Parser [ByteString]
 > pDefSemicolons = do
->   items <- sepBy1 pSemicolonItem (string "; ")
+>   items <- sepBy pSemicolonItem (string "; ")
 >   option '.' (char '.')
 >   endOfInput
 >   return items

@@ -1,0 +1,78 @@
+{{also|Dando|dẫn độ}}
+==Esperanto==
+
+===Noun===
+{{eo-head}}
+
+# [[dandy]]
+# [[fop]]
+
+{{Universala Vortaro}}
+
+----
+
+==Galician==
+
+===Verb===
+{{gl-verb-form|gerund}}
+
+# {{inflection of|dar|lang=gl||gerund}}
+
+----
+
+==Italian==
+
+===Verb===
+{{head|it|gerund}}
+
+# {{gerund of|dare#Italian|dare|lang=it}}
+
+[[Category:Italian verb forms]]
+
+----
+
+==Latin==
+
+===Participle===
+{{la-part-form|dandō}}
+
+# {{inflection of|dandus||dat|m|s|lang=la}}
+# {{inflection of|dandus||dat|n|s|lang=la}}
+# {{inflection of|dandus||abl|m|s|lang=la}}
+# {{inflection of|dandus||abl|n|s|lang=la}}
+
+----
+
+==Portuguese==
+
+===Pronunciation===
+* {{a|PT}} {{IPA|/ˈdɐ̃.du/|lang=pt}}
+
+===Verb===
+{{pt-verb-form}}
+
+# {{pt-verb form of|dar|ar|present participle}}.
+
+----
+
+==Spanish==
+
+===Verb===
+{{es-verb-form}}
+
+# {{es-verb form of|mood=ger|ending=ar|dar}}
+
+[[ast:dando]]
+[[de:dando]]
+[[el:dando]]
+[[es:dando]]
+[[eo:dando]]
+[[fr:dando]]
+[[io:dando]]
+[[mg:dando]]
+[[nl:dando]]
+[[pt:dando]]
+[[ru:dando]]
+[[fi:dando]]
+[[sv:dando]]
+
