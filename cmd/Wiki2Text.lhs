@@ -19,9 +19,8 @@ Top level
 >
 > outputPlainTextPage :: ByteString -> IO ()
 > outputPlainTextPage text =
->   case (parsePageIntoSections text) of
->     Left err -> print err
->     Right sections -> mapM_ outputPlainTextSection sections
+>   let sections = (parsePageIntoSections text) in
+>     mapM_ outputPlainTextSection sections
 >
 > handlePage :: WikiPage -> IO ()
 > handlePage page = do

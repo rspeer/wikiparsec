@@ -1,0 +1,40 @@
+==Esperanto==
+
+===Verb===
+{{eo-head}}
+
+# {{eo-form of|perd|as}}
+
+----
+
+==Galician==
+
+===Verb===
+{{gl-verb-form}}
+
+# {{inflection of|perder||lang=gl|2|s|pres|subj}}
+
+----
+
+==Latin==
+
+===Verb===
+{{la-verb-form|perdās}}
+
+# {{inflection of|perdō||2|s|pres|actv|subj|lang=la}}
+
+----
+
+==Portuguese==
+
+===Noun===
+{{pt-noun-form|f}}
+
+# {{plural of|perda|lang=pt}}
+
+[[de:perdas]]
+[[el:perdas]]
+[[fr:perdas]]
+[[mg:perdas]]
+[[pt:perdas]]
+

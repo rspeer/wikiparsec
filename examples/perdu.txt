@@ -1,0 +1,94 @@
+{{also|perdû}}
+==English==
+
+===Alternative forms===
+* [[perdue]]
+
+===Etymology===
+{{borrowing|en|fr|perdu}}.
+
+===Adjective===
+{{en-adj|-}}
+
+# [[hidden|Hidden]].
+# [[lost|Lost]] (from a soldier given a mission he is not expected to return from).
+
+====Usage notes====
+This word occurs in Shakespeare's ''King Lear'' in the sense 'lost'. See citations tab for details.
+
+===Noun===
+{{en-noun}}
+
+# One placed on [[watch]], or in [[ambush]].
+# A [[soldier]] sent on a [[forlorn hope]].
+#* '''1605''', [[w: William Shakespeare|William Shakespeare]], ''[[s: The Tragedy of King Lear|The Tragedy of King Lear]]'', IV. vii. 35:
+#*: To watch, poor '''perdu''', / With this thin helm?
+
+===Anagrams===
+* [[drupe#English|drupe]], [[duper#English|duper]], [[prude#English|prude]]
+
+----
+
+==Esperanto==
+
+===Verb===
+{{eo-head}}
+
+# {{eo-form of|perd|u}}
+
+----
+
+==French==
+
+===Pronunciation===
+* {{IPA|/pɛʁ.dy/|lang=fr}}
+
+===Verb===
+{{fr-past participle}}
+
+# {{inflection of|perdre||past|part|lang=fr}}
+
+===Adjective===
+{{fr-adj}}
+
+# [[lost]]
+
+===Anagrams===
+* [[drupe#French|drupe]], [[duper#French|duper]]
+
+===External links===
+* {{R:TLFi}}
+
+----
+
+==German==
+
+===Etymology===
+{{borrowing|fr|perdu|lang=de}}.
+
+===Pronunciation===
+* {{audio|De-perdu.ogg|Audio|lang=de}}
+
+===Adjective===
+{{de-adj|-}}
+
+# [[lost]]
+
+===External links===
+* {{R:Duden}}
+
+[[de:perdu]]
+[[et:perdu]]
+[[el:perdu]]
+[[fr:perdu]]
+[[ko:perdu]]
+[[io:perdu]]
+[[id:perdu]]
+[[hu:perdu]]
+[[mg:perdu]]
+[[ru:perdu]]
+[[fi:perdu]]
+[[chr:perdu]]
+[[vi:perdu]]
+[[zh:perdu]]
+

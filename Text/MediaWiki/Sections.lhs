@@ -59,8 +59,11 @@ into two types: headings and non-headings.
 >
 > parseTextLine :: ByteString -> TextLine
 > parseTextLine text =
->   let (innerText, level) = headingWithLevel (stripSpaces text)
->   in  (if level == 0 then (Plain text) else (Heading level (stripSpaces innerText)))
+>   if Char8.isPrefixOf "----" text
+>     then (Plain "")   -- remove horizontal rules
+>     else
+>       let (innerText, level) = headingWithLevel (stripSpaces text)
+>       in  (if level == 0 then (Plain text) else (Heading level (stripSpaces innerText)))
 >
 > headingWithLevel :: ByteString -> (ByteString, Int)
 > headingWithLevel text =

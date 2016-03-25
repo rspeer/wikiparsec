@@ -161,9 +161,11 @@ Converting definitions to relations:
 >
 > splitDefinition :: ByteString -> [ByteString]
 > splitDefinition definition =
->   case parseOnly pDefinitionText definition of
->     Right results -> results
->     Left err -> error err
+>   if definition == "" then []
+>   else
+>     case parseOnly pDefinitionText definition of
+>       Right results -> results
+>       Left err -> error err
 
 
 Parsing the language of definitions

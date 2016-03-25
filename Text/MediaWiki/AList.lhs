@@ -19,10 +19,11 @@ Useful things to do with association lists.
 >     Just x  -> x
 >     Nothing -> def
 >
-> lookupOne :: (Eq a) => [a] -> [(a, b)] -> Maybe b
+> lookupOne :: (Eq a) => [a] -> [(a, ByteString)] -> Maybe ByteString
 > lookupOne [] alist = Nothing
 > lookupOne (arg:rest) alist =
 >   case (lookup arg alist) of
+>     Just "" -> lookupOne rest alist
 >     Just x  -> Just x
 >     Nothing -> lookupOne rest alist
 >

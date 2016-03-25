@@ -15,7 +15,7 @@ import qualified Data.Map as Map
 import Data.ByteString (ByteString)
 
 lookupLanguage :: ByteString -> ByteString -> ByteString
-lookupLanguage lang name = Map.findWithDefault "und" (lang, name) languageNames
+lookupLanguage lang name = Map.findWithDefault name (lang, name) languageNames
 
 languageNames = Map.fromList [
 """.strip()
@@ -26,7 +26,7 @@ def main():
         used_names = set()
         names = langcodes.DB.query("select subtag, name from language_name where language=? order by name, entry_order", namelang)
         for code, name in names:
-            if name not in used_names:
+            if len(code) == 2 and name not in used_names:
                 used_names.add(name)
                 print('  (("%s","%s"),"%s"),' % (namelang, name, code))
     # fake entry to finish the list
