@@ -318,8 +318,8 @@ In some cases (such as Wiktionary definition lists), we want to extract only
 the texts from the top level of a list, not from the sublists.
 
 > extractTopLevel :: ListItem -> [AnnotatedString]
-> extractTopLevel (Item t) = error "This is an individual item, not a list"
-> extractTopLevel (ListHeading t) = error "This is an individual item, not a list"
+> extractTopLevel (Item item) = [item]
+> extractTopLevel (ListHeading item) = []
 > extractTopLevel (BulletList items) = extractTopLevelFromList items
 > extractTopLevel (OrderedList items) = extractTopLevelFromList items
 > extractTopLevel (IndentedList items) = extractTopLevelFromList items
@@ -328,7 +328,7 @@ the texts from the top level of a list, not from the sublists.
 > extractTopLevelFromList items = concat (map extractItemsFromList items)
 >
 > extractItemsFromList :: ListItem -> [AnnotatedString]
-> extractItemsFromList (Item t) = [t]
+> extractItemsFromList (Item item) = [item]
 > extractItemsFromList _ = []
 
 And here are the rules for parsing lists:

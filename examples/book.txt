@@ -1,0 +1,937 @@
+==English==
+{{wikipedia}}
+
+===Pronunciation===
+* {{enPR|bo͝ok}}, {{IPA|/bʊk/|lang=en}}
+* {{audio|en-us-book.ogg|Audio (US)|lang=en}} ''plural'' {{audio|en-us-books.ogg|Audio (US)|lang=en}}
+* {{audio|En-uk-book.ogg|Audio (UK)|lang=en}}
+* {{rhymes|ʊk|lang=en}}
+
+===Etymology 1===
+From {{etyl|enm|en}} {{m|enm|book}}, from {{etyl|ang|en}} {{m|ang|bōc||a book, a document, register, catalog, a legal document, a bill of divorce, a charter, a title deed, conveyance, a volume, literary work, pages, main division of a work}}, from {{etyl|gem-pro|en}} {{m|gem-pro|*bōks||beech, book}}, from {{etyl|ine-pro|en}} {{m|ine-pro|*bʰeh₂ǵos||beech}}.
+{{rel-top|cognates}}Cognate with {{etyl|sco|-}} {{m|sco|buik}}, {{m|sco|beuk||book}}, {{etyl|fy|-}} {{m|fy|boek||book}}, {{etyl|nds-de|-}} {{m|nds-de|Book}}, {{etyl|nds-nl|-}} {{m|nds-nl|book}}, {{etyl|nl|-}} {{m|nl|boek||book}}, {{etyl|de|-}} {{m|de|Buch||book}}, {{etyl|da|-}} {{m|da|bog}}, {{etyl|sv|-}} {{m|sv|bok||book}}. Related also to {{etyl|la|-}} {{m|la|fāgus||beech}}, {{etyl|ru|-}} {{m|ru|бук||beech}}, {{etyl|sq|-}} {{m|sq|bung||chestnut, oak}}, {{etyl|grc|-}} {{m|grc|φηγός||oak}}, {{etyl|hy|-}} {{m|hy|բուն||trunk}}, {{etyl|ku|-}} {{m|ku|bûz||elm}}. More at {{l|en|beech}}, {{l|en|buckwheat}}.
+{{rel-bottom}}
+The sense development of ''beech'' to ''book'' is explained by the fact that smooth gray beech bark was commonly used as [[bookfell]].<ref>J.P. Mallory, ''Encyclopedia of Indo-European Culture'', s.v. "beech" (London: Fitroy-Dearborn, 1997), 58.</ref>
+
+====Noun====
+[[Image:Pieni2.jpg|thumb|A hard-cover book]]
+{{en-noun}}
+
+# A collection of sheets of paper bound together to hinge at one edge, containing printed or written material, pictures, etc.
+#: ''She opened the '''book''' to page 37 and began to read aloud.''
+#: ''He was frustrated because he couldn't find anything about dinosaurs in the '''book'''.''
+# A long work fit for [[publication]], typically [[prose]], such as a [[novel]] or [[textbook]], and typically published as such a bound collection of sheets.
+#: ''I have three copies of his first '''book'''.''
+# A major division of a long work.
+#: ''Genesis is the first '''book''' of the Bible.''
+#: ''Many readers find the first '''book''' of ''A Tale of Two Cities'' to be confusing.''
+# {{label|en|gambling}} A record of betting (from the use of a notebook to record what each person has bet).
+#: ''I'm running a '''book''' on who is going to win the race.''
+# A convenient collection, in a form resembling a book, of small paper items for individual use.
+#: ''a '''book''' of stamps''
+#: ''a '''book''' of raffle tickets''
+# {{label|en|theatre}} The script of a [[musical]].
+# {{label|en|usually|in the plural}} Records of the accounts of a business.
+# A long document stored (as [[data]]) that is or will become a book; an [[e-book]].
+# {{label|en|legal}} A colloquial reference to a [[book award]], a recognition for receiving the highest grade in a class (traditionally an actual book, but recently more likely a letter or certificate acknowledging the achievement).
+# {{label|en|whist}} Six [[trick]]s taken by one side.
+# {{label|en|poker slang}} [[four of a kind]]<ref>Weisenberg, Michael (2000) ''[http://www.poker1.com/mcu/pokerdictionary/mculib_dictionary_info.asp The Official Dictionary of Poker].'' MGI/Mike Caro University. ISBN 978-1880069523</ref>
+# {{label|en|sports}} A document, held by the referee, of the incidents happened in the game.
+# {{label|en|sports|by extension}} A list of all players who have been booked (received a warning) in a game.
+#* {{quote-journal|date=March 2, 2011
+|author=Andy Campbell
+|title=Celtic 1 - 0 Rangers
+|work=BBC
+|url=http://news.bbc.co.uk/sport2/hi/football/9409758.stm
+|page=
+|passage=Celtic captain Scott Brown joined team-mate Majstorovic in the '''book''' and Rangers' John Fleck was also shown a yellow card as an ill-tempered half drew to a close.}}
+
+=====Synonyms=====
+* {{sense|bound paper sheets containing writing}} ''See'' '''[[Wikisaurus:book]]'''
+* {{sense|convenient collection of small paper items, such as stamps}} [[booklet]]
+* {{sense|major division of a published work, larger than a chapter}} [[tome]], [[volume]]
+* {{sense|script of a musical}} [[libretto]]
+* {{sense|records of the accounts of a business}} [[account]]s, [[record]]s
+
+=====Derived terms=====
+{{rel-top3|Terms derived from ''book'' (noun)}}
+* [[address book]]
+* [[audiobook]]
+* [[book account]]
+* [[book agent]]
+* [[book-answerer]]
+* [[book award]]
+* [[book-bearer]]
+* [[bookbinder]]
+* [[book-board]]
+* [[book-bosomed]]
+* [[book-bound]]
+* [[book-boy]]
+* [[book-burning]]
+* [[book canvasser]]
+* [[bookcase]]
+* [[book-cloth]]
+* [[book club]]
+* [[book concern]]
+* [[book-crab]]
+* [[book-credit]]
+* [[book-debt]]
+* [[book-edge gilder]]
+* [[book-edge marbler]]
+* [[book end]], [[bookend]]
+* [[bookery]]
+* [[booketeria]]
+* [[book-farmer]]
+* [[book-folder]]
+* [[book-form]]
+* [[bookful]]
+* [[book-ghoul]]
+* [[book-gill]]
+* [[book hand]]
+* [[book-holder]]
+* [[bookhood]]
+* [[book-house]]
+* [[book-hunt]]
+* [[bookie]]
+* [[bookish]]
+* [[bookism]]
+* [[bookjacket]]
+* [[bookkeeper]]
+* [[bookkeeping]]
+* [[book-label]]
+* [[book-lare]]
+* [[book-law]]
+* [[book-lear]]
+* [[book-learned]]
+* [[book-learning]]
+* [[book-length]]
+* [[bookless]]
+* [[booklet]]
+* [[booklike]]
+* [[bookling]]
+* [[booklore]]
+* [[booklouse]]
+* [[book lung]]
+* [[bookly]]
+* [[bookmaker]]
+* [[bookmaking]]
+* [[bookman]]
+{{rel-mid3}}
+* [[bookmark]], [[bookmarker]]
+* [[book match]]
+* [[book-mate]]
+* [[book-mindedness]]
+* [[book mite]]
+* [[bookmobile]]
+* [[book-muslin]]
+* [[book name]]
+* [[book-number]]
+* [[book-oath]]
+* [[book of first entry]]
+* [[Book of God]]
+* [[book of lading]]
+* [[book of life]]
+* [[book of original entry]]
+* [[book of rates]]
+* [[book of reference]]
+* [[Book of the Dead]]
+* [[book of the film]]
+* [[book of the living]]
+* [[book of words]]
+* [[book-packet]]
+* [[book piles]]
+* [[bookplate]]
+* [[book pocket]]
+* [[book-post]]
+* [[book-postage]]
+* [[book-press]]
+* [[book price]]
+* [[book prop]]
+* [[book-rate]]
+* [[book-read]]
+* [[bookrest]]
+* [[book-scorpion]]
+* [[bookseller]]
+* [[bookselling]]
+* [[bookshelf]]
+* [[bookshop]]
+* [[book-shy]]
+* [[booksie]], [[booksy]]
+* [[book-slide]]
+* [[book-society]]
+* [[book-stack]]
+* [[bookstall]]
+* [[book-stamp]]
+* [[bookstand]]
+* [[bookstore]]
+* [[book support]]
+* [[booksy]]
+* [[book-table]]
+* [[book token]]
+* [[book trade]]
+* [[book-tray]]
+* [[book-trough]]
+* [[book type]]
+* [[book value]]
+* [[bookwards]]
+* [[book-ways]]
+* [[bookwise]]
+* [[bookwork]]
+* [[book-world]]
+{{rel-mid3}}
+* [[bookworm]]
+* [[book-wright]]
+* [[booky]]
+* [[bring to book]]
+* [[burn book]]
+* [[by the book]]
+* [[casebook]]
+* [[checkbook]]
+* [[chequebook]], [[cheque book]]
+* [[closed book]]
+* [[close the books]]
+* [[coffee-table book]]
+* [[comic book]]
+* [[cookbook]]
+* [[cookery book]]
+* [[cook the books]]
+* [[copybook]]
+* [[coursebook]]
+* [[e-book]]
+* [[exercise book]]
+* [[fuck book]]
+* the [[Good Book]]
+* [[guidebook]]
+* [[handbook]]
+* [[hymn book]]
+* [[in anyone's book]]
+* [[in my book]]
+* [[in someone's bad books]]
+* [[in someone's good books]]
+* [[in the books]]
+* [[know like a book]]
+* [[logbook]]
+* [[make book]]
+* [[matchbook]]
+* [[notebook]]
+* [[off the books]]
+* [[on the books]]
+* [[open book]]
+* [[passbook]]
+* [[pension book]]
+* [[phrasebook]]
+* [[pocket-book]], [[pocketbook]]
+* [[prayer book]]
+* [[ration book]]
+* [[reading book]]
+* [[read like a book]]
+* [[reference book]]
+* [[rough book]]
+* [[scrapbook]]
+* [[sketch book]]
+* [[songbook]]
+* [[storybook]]
+* [[suit one's book]]
+* [[take a leaf out of someone's book]]
+* [[talk like a book]]
+* [[textbook]]
+* [[throw the book at]]
+* [[without book]]
+* [[wordbook]]
+* [[workbook]]
+* [[yearbook]]
+{{rel-bottom}}
+
+=====Translations=====
+{{trans-top|collection of sheets of paper bound together containing printed or written material}}
+* Abaza: {{t|abq|книга}}, {{t|abq|апхьага}}, {{t|abq|кьтап}}
+* Abkhaz: {{t|ab|ашәҟәы|sc=Cyrl}}
+* Adyghe: {{t|ady|тхылъ}}
+* Afrikaans: {{t+|af|boek}}
+* Ainu: {{t|ain|カㇺビソㇱ|tr=kambisosh}}
+* Alabama: {{t|akz|holisso}}
+* Albanian: {{t+|sq|libër|m}}
+* Amharic: {{t|am|መጽሃፍ|tr=mäṣhaf|sc=Ethi}}
+* Arabic: {{t+|ar|كِتَاب|m}}, {{t|ar|سِفْر|m}}
+*: Algerian Arabic: {{t|arq|كتاب|m|tr=ktab|sc=Arab}}
+*: Egyptian Arabic: {{t|arz|كتاب|m|tr=ketæb|sc=Arab}}
+*: Hijazi Arabic: {{t|acw|كتاب|m|tr=kitāb|sc=Arab}}
+*: Moroccan Arabic: {{t|ary|كتاب|m|tr=ktab|sc=Arab}}
+*: Tunisian Arabic: {{t|aeb|كتاب|m|tr=ktēb|sc=Arab}}
+* Aragonese: {{t|an|libro|m}}
+* Aramaic:
+*: Syriac: {{t|syr|ܟܬܒܐ|m|tr=kṯāḇā|sc=Syrc}}
+* Armenian: {{t+|hy|գիրք}}
+* Aromanian: {{t|rup|vivlie}}, {{t|rup|carte}}
+* Assamese: {{t|as|পুস্তক|n|tr=pustôk|sc=Beng}}
+* Asturian: {{t+|ast|llibru|m}}
+* Avar: {{t|av|тӏахьал|sc=Cyrl}}
+* Aymara: {{t|ay|panka}}
+* Azeri: {{t+|az|kitab}}
+* Bambara: {{t|bm|gafɛ}}
+* Bashkir: {{t|ba|китап|sc=Cyrl}}
+* Basque: {{t+|eu|liburu}}
+* Belarusian: {{t+|be|кні́га|f}}
+* Bengali: {{t+|bn|বই|tr=bôi|sc=Beng}}, {{t|bn|গ্রন্থ|tr=grônthô|sc=Beng}}, {{t|bn|পুস্তক|tr=pustôk|sc=Beng}}
+* Breton: {{t+|br|levr|m}}
+* Bulgarian: {{t+|bg|кни́га|f}}
+* Burmese: {{t+|my|စာအုပ်|sc=Mymr}}
+* Buryat: {{t|bua|ном|sc=Cyrl}}
+* Catalan: {{t+|ca|llibre|m}}
+* Chagatai: {{t|chg|كتاب|tr=kitab|sc=fa-Arab}}
+* Chamorro: {{t|ch|lepblo}}
+* Chechen: {{t|ce|китаб|sc=Cyrl}}, {{t|ce|жайна}}, {{t|ce|книга}}
+* Cherokee: {{t+|chr|ᎪᏪᎵ|sc=Cher}}
+* Cheyenne: {{t|chy|mȯxe'ėstoo'e}}
+* Chinese:
+*: Cantonese: {{t|yue|書|sc=Hani}}, {{t|yue|书|tr=syu1|sc=Hani}}
+*: Dungan: {{t|dng|шу|tr=shu|sc=Cyrl}}
+*: Mandarin: {{t+|cmn|書|sc=Hani}}, {{t+|cmn|书|tr=shū|sc=Hani}}
+*: Min Dong: {{t|cdo|書|sc=Hani}}, {{t|cdo|书|tr=cṳ̆|sc=Hani}}
+*: Min Nan: {{t+|nan|冊|tr=chheh|sc=Hani}}, {{t+|nan|書|sc=Hani}}, {{t|nan|书|tr=chu|sc=Hani}}
+*: Wu: {{t|wuu|書|sc=Hani}}, {{t|wuu|书|tr=sr|sc=Hani}}
+* Chuvash: {{t|cv|кӗнеке|sc=Cyrl}}
+* Coptic: {{t|cop|ϫⲱⲙ|m|tr=dʒōm}}
+* Cornish: {{t|kw|lyver|m}}
+* Corsican: {{t+|co|libru|m}}
+* Crimean Tatar: {{t|crh|kitap}}
+* Czech: {{t+|cs|kniha|f}}
+* Danish: {{t+|da|bog|c}}
+* Dhivehi: {{t|dv|ފޮތް|sc=Thaa}}
+* Dutch: {{t+|nl|boek|n}}
+* Eastern Mari: {{t|chm|книга}}
+* Elfdalian: {{t|dlc|buok|f}}
+* Erzya: {{t|myv|конёвкс}}, {{t|myv|книга}}
+* Esperanto: {{t+|eo|libro}}
+* Estonian: {{t+|et|raamat}}
+* Evenki: {{t|evn|книга}}
+* Ewe: {{t|ee|agbalẽ}}
+* Extremaduran: {{t|ext|llibru|m}}
+* Faroese: {{t+|fo|bók|f}}
+* Fijian: {{t+|fj|vola}}
+* Finnish: {{t+|fi|kirja}}
+* French: {{t+|fr|livre|m}}, {{t+|fr|bouquin|m}}
+* Friulian: {{t|fur|libri|m}}
+* Gagauz: {{t|gag|kitap}}
+* Galician: {{t+|gl|libro|m}}
+* Georgian: {{t+|ka|წიგნი|sc=Geor}}
+* German: {{t+|de|Buch|n}}
+*: Alemannic German: {{t|gsw|Buech|n}}
+*: Central Franconian: {{t|gmw-cfr|Boch|n}}
+*: Pennsylvania German: {{t|pdc|Buch|n}}
+* Gilaki: {{t|glk|کیتاب|tr=kitāb|sc=fa-Arab}}
+* Gothic: {{t|got|𐌱𐍉𐌺𐍉𐍃|f|sc=Goth}}
+* Greek: {{t+|el|βιβλίο|n}}, {{t+|el|τόμος|m}}
+*: Ancient: {{t|grc|βιβλίον|n|sc=polytonic}}
+* Greenlandic: {{t|kl|atuagaq}}
+* Guaraní: {{t+|gn|kuatiañe'ẽ}}
+* Gujarati: {{t+|gu|પુસ્તક|f|tr=pustak|sc=Gujr}}
+* Haitian Creole: {{t|ht|liv}}
+* Hausa: {{t+|ha|littafi}}
+* Hawaiian: {{t|haw|puke}}, {{t|haw|liwele}} {{qualifier|very rare}}
+* Hebrew: {{t+|he|סֵפֶר|m|tr=séfer}}
+* Hiligaynon: {{t|hil|tulún-an}}
+* Hindi: {{t|hi|पुस्तक|f}}, {{t+|hi|किताब|f}}
+* Hungarian: {{t+|hu|könyv}}
+* Iban: {{t|iba|surat}}, {{t|iba|bup}}
+* Icelandic: {{t+|is|bók|f}}
+* Ido: {{t+|io|libro}}
+* Igbo: {{t|ig|akwụkwọ}}
+* Indonesian: {{t+|id|buku}}, {{t+|id|kitab}}
+* Interlingua: {{t|ia|libro}}
+* Interlingue: {{t+|ie|libre}}
+* Inuktitut: {{t+|iu|ᕿᒥᕐᕈᐊᑦ|sc=Cans}}
+* Irish: {{t+|ga|leabhar|m}}
+* Isan: {{t|tts|ปึ้ง|tr=pụ̂ng}}
+* Istriot: {{t|ist|leîbro|m}}
+* Italian: {{t+|it|libro|m}}
+* Japanese: {{t+|ja|本|tr=ほん, hon}}, {{t+|ja|書籍|tr=しょせき, shoseki|sc=Jpan}}
+* Javanese: {{t+|jv|ꦧꦸꦏꦸ|tr=buku}}
+* Kabardian: {{t|kbd|тхылъ}}
+* Kabyle: {{t|kab|adlis}}
+* Kalmyk: {{t|xal|дегтр|sc=Cyrl}}
+* Kannada: {{t+|kn|ಪುಸ್ತಕ|sc=Knda}}
+* Karachay-Balkar: {{t|krc|китап|tr=kitap|sc=Cyrl}}
+* Karakalpak: {{t|kaa|kitap}}
+* Karelian: {{t|krl|kirju}}
+* Kashubian: {{t|csb|knéżka|f}}, {{t|csb|ksążka|f}}, {{t|csb|knéga|f}}
+* Kazakh: {{t+|kk|кітап|sc=Cyrl}}
+* Khakas: {{t|kjh|книга|tr=kniga|sc=Cyrl}}, {{t|kjh|пічік|tr=píçík|sc=Cyrl}}
+* Khanty: {{t-check|kca|книга}} {{qualifier|Kazym dialect}}, {{t-check|kca|кинишка}} {{qualifier|Kazym dialect}}, {{t-check|kca|ԓўӈатты нєпек}} {{qualifier|Kazym dialect}}
+* Khmer: {{t+|km|សៀវភៅ|tr=sīəwpıw|sc=Khmr}}
+* Kikuyu: {{t|ki|rifuku}}
+* Kildin Sami: {{t|sjd|кыррьй}}, {{t|sjd|кнӣга}}
+* Kinyarwanda: {{t|rw|igitabo|c7|c8}}
+* Kis: {{t|kis|egetabu}}
+* Komi-Zyrian: {{t|kpv|небӧг|sc=Cyrl}}, {{t|kpv|книга}}
+* Konkani: {{t|kok|पुस्तक|tr=pustak}}
+* Korean: {{t+|ko|책|sc=Kore}} ({{t+|ko|冊|sc=Kore}}), {{t+|ko|도서|sc=Kore}} ({{t+|ko|圖書|sc=Kore}})
+* Kumyk: {{t|kum|китап|tr=kitap|sc=Cyrl}}
+* Kurdish:
+*: Kurmanji: {{t+|ku|pirtûk|f}}, {{t+|ku|kitêb|f}}
+*: Sorani: {{t|ckb|پەرتوک|tr=pertuk}}, {{t|ckb|کتاو|tr=ktaw}}
+* Kwanyama: {{t|kj|embo}}
+* Kyrgyz: {{t+|ky|китеп|sc=Cyrl}}
+* Ladino:
+*: Hebrew: {{t|lad|ליב׳רו|m}}
+*: Latin: {{t|lad|livro|m}}
+* Lak: {{t|lbe|лу}}
+* Lakota: {{t|lkt|wówapi}}
+* Lao: {{t+|lo|ປຶ້ມ|sc=Laoo}}, {{t+|lo|ປຶ້ມຂຽນ|sc=Laoo}}, {{t|lo|ຫນັງສື|sc=Laoo}}, {{t|lo|ສັດຖະ|sc=Laoo}}, {{t|lo|ພັບ|sc=Laoo}}
+* Latin: {{t+|la|liber|m}}, {{t|la|codex|m}}
+* Latvian: {{t+|lv|grāmata|f}}
+* Laz: {{t-needed|lzz}}
+* Lezgi: {{t|lez|улуб|sc=Cyrl}}
+* Ligurian: {{t|lij|lìbbro|m}}
+* Limburgish: {{t+|li|book|f}}
+* Lingala: {{t|ln|búku|c9a|c10a}}
+* Lithuanian: {{t+|lt|knyga|f}}
+* Lojban: {{t+|jbo|cukta}}
+{{trans-mid}}
+* Low German:
+*: Dutch Low Saxon: {{t+|nds-nl|book|n}}
+*: German Low German: {{t+|nds-de|Book|n}}
+* Luganda: {{t|lg|ekitabo}}
+* Luhya: {{t|luy|sitabu}}
+* Luxembourgish: {{t+|lb|Buch|n}}
+* Lü: {{t-needed|khb}}
+* Macedonian: {{t|mk|книга|f}}
+* Malagasy: {{t+|mg|boky}}
+* Malay: {{t+|ms|buku}}, {{t+|ms|kitab}}, {{t+|ms|pustaka}}
+* Malayalam: {{t+|ml|പുസ്തകം|sc=Mlym}}
+* Malecite-Passamaquoddy: {{t|pqm|wikhikon}}
+* Maltese: {{t+|mt|ktieb|m}}
+* Mansi: {{t|mns|кнӣга}}
+* Manx: {{t|gv|lioar|m}}
+* Maori: {{t|mi|pukapuka}}
+* Marathi: {{t|mr|पुस्तक|f|sc=Deva}}
+* Maricopa: {{t|mrc|onyor}}
+* Mingrelian: {{t|xmf|სუფარა|m}}
+* Mirandese: {{t|mwl|lhibro|m}}
+* Miyako: {{t|mvi|むとぅ|tr=mutu}}
+* Moksha: {{t|mdf|книга}}
+* Mon: {{t|mnw|လိက် အုပ်|tr=lòik up}}
+* Mongolian: {{t+|mn|ном|sc=Cyrl}}
+* Motu: {{t|meu|buka}}
+* Nahuatl: {{t+|nah|amoxtli}}
+*: Classical Nahuatl: {{t|nci|āmoxtli}}
+* Navajo: {{t|nv|naaltsoos}}
+* Neapolitan: {{t|nap|lìbbro|m}}
+* Nepali: {{t|ne|पुस्तक|tr=pustak}}, {{t|ne|किताप|tr=kitāp}}
+* Newari: {{t|new|सफू|tr=saphū}}
+* Nogai: {{t|nog|китап|sc=Cyrl}}
+* North Frisian: {{qualifier|Mooring}} {{t|frr|bök|n}}, {{qualifier|Föhr-Amrum}} {{t|frr|buk|n}}
+* Northern Thai: {{t-needed|nod}}
+* Norwegian:
+*: Bokmål: {{t+|no|bok|m|f}}
+*: Nynorsk: {{t+|nn|bok|f}}
+* Novial: {{t|nov|libre}}
+* Occitan: {{t+|oc|libre|m}}
+* Okinawan: {{t|ryu|sumuchi|sc=Jpan}}, {{t|ryu|書物|tr=しむち, shimuchi}}, {{t|ryu|書物|tr=すむち, sumuchi}}, {{t|ryu|書物|tr=しゅむち, shumuchi}}
+* Old Church Slavonic: {{t|cu|боукꙑ|f|sc=Cyrs}}, {{t|cu|кънига|f|sc=Cyrs}}
+* Old East Slavic: {{t|orv|кънига|f|sc=Cyrs}}
+* Old English: {{t|ang|bōc|f}}
+* Old Irish: {{t|sga|lebor|m}}
+* Old Provençal: {{t|pro|libre}}
+* Old Prussian: {{t|prg|lāiskas|m}}
+* Oriya: {{t+|or|ବହି|tr=bahi|sc=Orya}}
+* Ossetian: {{t|os|чиныг|sc=Cyrl}}
+* Ottoman Turkish: {{t|ota|کتاب|tr=kitâb|sc=ota-Arab}}
+* Pali: {{t|pi|पोत्थक|tr=potthaka}}
+* Papiamentu: {{t|pap|buki}}
+* Pashto: {{t+|ps|کتاب|m|tr=kitab|sc=ps-Arab}}
+* Pawnee: {{t|paw|raáwihaakaraaʾit}} {{qualifier|Skiri}}, {{t|paw|raáwihaakaraaʾiitusuʾ}} {{qualifier|Skiri}}
+* Persian: {{t+|fa|کِتاب|tr=ketâb}}, {{t+|fa|نسک|tr=nask}}, {{qualifier|Middle Persian}} {{t|fa|نامک|tr=nâmak|sc=fa-Arab}}
+* Phu Thai: {{t-needed|pht}}
+* Piedmontese: {{t|pms|lìber}}
+* Polish: {{t+|pl|książka|f}}, {{t+|pl|księga|f}}
+* Portuguese: {{t+|pt|livro|m}}
+* Pukapukan: {{t|pkp|lau}}, {{t|pkp|puka}}
+* Punjabi: {{t|pa|ਪੁਸਤਕ|m|tr=pustak|sc=Guru}}
+* Quechua: {{t+|qu|liwru}}
+* Rajasthani: {{t|raj|पोथी|tr=pothī|f}}
+* Romani: {{t|rom|ginadyi|f}}
+* Romanian: {{t+|ro|carte|f}}
+* Romansch: {{t|rm|cudesch}}
+* Russian: {{t+|ru|кни́га|f}}, {{t+|ru|кни́жка|f}}
+* Rusyn: {{t|rue|кни́га|f|sc=Cyrl}}
+* Samogitian: {{t|sgs|kninga|f}}
+* Sanskrit: {{t|sa|पुस्तक|n|tr=pustaka}}, {{t|sa|ग्रन्थ|n|tr=grantha}}
+* Saterland Frisian: {{t|stq|Bouk|n}}
+* Scots: {{t|sco|beuk}}
+* Scottish Gaelic: {{t+|gd|leabhar|m}}
+* Serbo-Croatian:
+*: Cyrillic: {{t|sh|књи̏га|f}}
+*: Roman: {{t+|sh|knjȉga|f}}
+* Shan: {{t|shn|ပပ်ႉ|tr=pap5}}, {{t|shn|ၸႃႇဢုၵ်ႉ|tr=tsaa2 ʔuk5}}
+* Shona: {{t|sn|bhuku}}
+* Shor: {{t|cjs|ном|tr=nom|sc=Cyrl}}, {{t|cjs|книга}}
+* Sicilian: {{t+|scn|libbru|m}}
+* Sikaiana: {{t|sky|laumea}}
+* Silesian: {{t|szl|kniga|f}}
+* Sindhi: {{t|sd|ڪتاب|m|tr=kitaabu|alt=ڪِتابُ|sc=sd-Arab}}
+* Sinhalese: {{t+|si|පොත|sc=Sinh}}
+* Skolt Sami: {{t|sms|ǩeˊrjj}}
+* Slovak: {{t+|sk|kniha|f}}
+* Slovene: {{t+|sl|knjíga|f}}
+* Slovincian: {{t|zlw-slv|knega|f}}
+* Somali: {{t+|so|buug|m}}, {{t|so|kitaab|m}}
+* Sorbian:
+*: Lower Sorbian: {{t|dsb|knigły|f-p}}
+*: Upper Sorbian: {{t|hsb|kniha|f}}
+* Sotho: {{t+|st|buka}}
+* Southern Altai: {{t|alt|бичик|tr=biçik|sc=Cyrl}}, {{t|alt|книга}}
+* Southern Thai: {{t-needed|sou}}
+* Spanish: {{t+|es|libro|m}}
+* Sundanese: {{t|su|ᮘᮥᮊᮥ|tr=buku}}
+* Svan: {{t|sva|ლა̈ირ}}
+* Swahili: {{t+|sw|kitabu}}, {{t+|sw|vitabu|p}}
+* Swazi: {{t+|ss|íncwadzí|c9|c10}}
+* Swedish: {{t+|sv|bok|c}}
+* Tagalog: {{t+|tl|libro}}, {{t+|tl|aklat}}
+* Tajik: {{t+|tg|китоб}}
+* Tamil: {{t+|ta|நூல்|sc=Taml}}, {{t+|ta|புத்தகம்|sc=Taml}}
+* Tatar: {{t+|tt|китап}}
+* Telugu: {{t+|te|పుస్తకం|sc=Telu}}, {{t|te|పొత్తం|sc=Telu}}
+* Thai: {{t+|th|หนังสือ|tr=nǎngsěu|sc=Thai}}, {{t+|th|สมุด|tr=sàmòot|sc=Thai}}
+* Tibetan: {{t|bo|དཔེ་ཆ|sc=Tibt}}
+* Tigre: {{t|tig|ክታብ|sc=Ethi}}
+* Tigrinya: {{t|ti|መጽሓፍ|tr=mäṣḥaf|sc=Ethi}}
+* Tlingit: {{t|tli|x’úx’}}
+* Tok Pisin: {{t|tpi|buk}}
+* Tswana: {{t|tn|buka}}
+* Tundra Nenets: {{t|yrk|книга}}, {{t|yrk|толаӈгобць’}}
+* Turkish: {{t+|tr|kitap}}, {{t+|tr|betik}}
+* Turkmen: {{t|tk|kitap}}
+* Tuvaluan: {{t|tvl|tusi}}
+* Tuvan: {{t|tyv|ном|sc=Cyrl}}
+* Udmurt: {{t|udm|книга}}
+* Ukrainian: {{t|uk|кни́жка|f}}, {{t+|uk|кни́га|f}} {{qualifier|elevated style}}
+* Unami: {{t|unm|lekhikàn}}
+* Urdu: {{t+|ur|کتاب|f|tr=kitāb}}, {{t|ur|پستک|f|tr=pustak}}
+* Urhobo: {{t|urh|e̖be}}
+* Uyghur: {{t+|ug|كىتاب|sc=ug-Arab}}
+* Uzbek: {{t+|uz|kitob}}
+* Venetian: {{t|vec|łìbro|m}}
+* Veps: {{t|vep|kirj}}
+* Vietnamese: {{t+|vi|sách}}, {{t|vi|cuốn sách}}, {{t|vi|quyển sách}}, {{qualifier|notebook}} {{t+|vi|sổ}}, {{qualifier|textbook}} {{t+|vi|sách giáo khoa}}
+* Vilamovian: {{t|wym|büch|n}}
+* Volapük: {{t+|vo|buk}}
+* Walloon: {{t+|wa|live|m}}
+* Waray-Waray: {{t|war|basahon}}, {{t|war|barasahon}}
+* Welsh: {{t+|cy|llyfr|m}}
+* West Frisian: {{t+|fy|boek|n}}
+* White Hmong: {{t|mww|ntawv}}
+* Wiradhuri: {{t|wrh|garrandarang}}
+* Wolof: {{t|wo|tééré|alt=tééré bi}}, {{t+|wo|téere}}
+* Xhosa: {{t|xh|incwadi|c9|c10}}
+* Yakut: {{t|sah|кинигэ}}
+* Yiddish: {{t|yi|בוך|n}}, {{t|yi|ספֿר|m|tr=seyfer|sc=Hebr}} {{qualifier|usually religious or spiritual}}, {{t|yi|חיבור|m|tr=khiber|sc=Hebr}}
+* Yoruba: {{t|yo|ìwé}}
+* Yucatec Maya: {{t|yua|hu’un}}
+* Zazaki: {{t|zza|wanebend|m}}
+* Zhuang: {{t|za|saw}}
+* Zulu: {{t+|zu|ibhuku|c5|c6}}, {{t+|zu|incwadi|c9|c10}}
+{{trans-bottom}}
+
+{{trans-top|record of betting}}
+* Arabic: {{t|ar|يسجل}}
+* Bengali: {{t|bn|বুক|sc=Beng}}
+* Chinese:
+*: Mandarin: {{t+|cmn|記錄|sc=Hani}}, {{t+|cmn|记录|tr=jìlù|sc=Hani}}
+* German: {{t|de|Wettliste|f}}, {{t+|de|Buch|n}}
+{{trans-mid}}
+* Greek: {{t+|el|στοίχημα|n}}
+* Japanese: {{t+|ja|記録|tr=きろく, kiroku|sc=Jpan}}
+* Swahili: {{t+|sw|kitabu}}
+* Vietnamese: {{t|vi|đánh bài}}, {{t+|vi|đánh cuộc}}
+{{trans-bottom}}
+
+{{trans-top|convenient collection of small paper items, such as stamps}}
+* Catalan: {{t+|ca|àlbum|m}}
+* Czech: {{t+|cs|album|n}}
+* Danish: {{t+|da|album|n}}
+* Dutch: {{t+|nl|boek|n}}, {{t+|nl|album|n}}
+* Ewe: {{t|ee|agbalẽ}}
+* Finnish: {{t+|fi|albumi}}
+* Georgian: {{t|ka|ალბომი|sc=Geor}}
+* German: {{t+|de|Album|n}}
+* Greek: {{t+|el|άλμπουμ|n}}
+* Italian: {{t|it|blocchetto|m}}
+* Japanese: {{t+|ja|束|tr=たば, taba|sc=Jpan}}, {{t|ja|綴り|tr=つづり, tsuzuri|sc=Jpan}}
+* Macedonian: {{t|mk|албум|m}}
+{{trans-mid}}
+* Persian: {{t+|fa|آلبوم|sc=fa-Arab}}
+* Portuguese: {{t+|pt|álbum|m}}
+* Russian: {{t+|ru|альбо́м|m}}
+* Serbo-Croatian:
+*: Cyrillic: {{t|sh|албум|m}}
+*: Roman: {{t|sh|album|m}}
+* Slovene: {{t|sl|album|m}}
+* Spanish: {{t+|es|álbum|m}}
+* Swahili: {{t+|sw|kitabu}}
+* Swedish: {{t+|sv|häfte|n}}
+* Turkish: {{t+|tr|albüm}}
+* Vietnamese: {{t+|vi|sổ}}
+* Welsh: {{t|cy|albwm|f}}
+{{trans-bottom}}
+
+{{trans-top|major division of a published work, larger than a chapter}}
+* Bulgarian: {{t+|bg|том|m}}
+* Catalan: {{t+|ca|llibre|m}}
+* Czech: {{t+|cs|kniha|f}}
+* Danish: {{t|da|bind|n}}
+* Dutch: {{t+|nl|boek|n}}
+* Ewe: {{t|ee|agbalẽ}}
+* Finnish: {{t+|fi|kirja}}
+* Greek: {{t+|el|βιβλίο|n}}, {{t+|el|τόμος|m}}
+* Japanese: {{t+|ja|巻|tr=かん, kan|sc=Jpan}}, {{t+|ja|編|tr=へん, hen|sc=Jpan}}
+{{trans-mid}}
+* Macedonian: {{t|mk|книга|f}}, {{t|mk|том|m}}
+* Old English: {{t|ang|bōc|f}}
+* Portuguese: {{t+|pt|livro|m}}, {{t+|pt|parte|f}}
+* Russian: {{t+|ru|кни́га|f}}
+* Swahili: {{t+|sw|kitabu}}
+* Swedish: {{t+|sv|bok|c}} {{qualifier|if physically bound into one book}}, {{t+|sv|volym|c}} {{qualifier|if part of a multi-book format}}
+* Turkish: {{t+|tr|cilt}}
+* Vietnamese: {{t+|vi|tập}}, {{t+|vi|quyển}}
+{{trans-bottom}}
+
+{{trans-top|script of a musical}}
+* Bengali: {{t|bn|স্বরলিপি|sc=Beng}}
+* Bulgarian: {{t|bg|либрето|n}}
+* Ewe: {{t|ee|agbalẽ|n}}
+* Finnish: {{t+|fi|libretto}}
+* Greek: {{t|el|σενάριο μιούζικαλ|n}}
+{{trans-mid}}
+* Japanese: {{t|ja|台本|tr=だいほん, daihon|sc=Jpan}}, {{t+|ja|脚本|tr=きゃくほん, kyakuhon|sc=Jpan}}
+* Portuguese: {{t|pt|livreto|m}}
+* Spanish: {{t+|es|libreto|m}}
+* Swahili: {{t+|sw|kitabu}}
+{{trans-bottom}}
+
+{{trans-top|usually in plural: records of the accounts of a business}}
+* Arabic: {{t|ar|سِجِلّ|m}}
+* Bengali: {{t|bn|খাতা|sc=Beng}}
+* Catalan: {{t+|ca|llibres|m-p}}
+* Dutch: {{t+|nl|boeken|n-p}}
+* Ewe: {{t|ee|agbalẽwo|n-p}}
+* Finnish: {{t+|fi|kirjanpito}}
+* German: {{t+|de|Bücher|n-p}}
+* Greek: ([[λογιστικά]]) {{t+|el|βιβλία|n-p}}
+{{trans-mid}}
+* Japanese: {{t+|ja|帳簿|tr=ちょうぼ, chōbo|sc=Jpan}}
+* Persian: {{t|fa|دفاتر حسابداری|tr=fa|sc=fa-Arab}}
+* Polish: {{t|pl|księgi}}
+* Portuguese: {{t+|pt|livro|m}}
+* Sardinian: {{t|sc|libbaru}}
+* Swahili: {{t+|sw|kitabu}}
+* Swedish: {{t+|sv|bokföring|c}}
+* Tagalog: {{t+|tl|libro}}
+* Vietnamese: {{t|vi|sổ sách kế toán}}
+{{trans-bottom}}
+
+{{trans-see|ebook|e-book}}
+
+{{checktrans-top}}
+* Breton: {{t+check|br|levr|m}}, {{qualifier|1}} {{t+check|br|levrioù|p}}
+* Guaraní: {{t-check|gn|kuatia ñe'ẽ}}
+* Interlingua: {{t-check|ia|libro}}
+* Manchu: {{t-check|mnc|bithe|sc=Mong}}
+* Novial: {{t-check|nov|libre}}
+* Tupinambá: {{t-check|tpn|papera}}
+* Volapük: {{t+check|vo|buk}}
+{{trans-bottom}}
+
+=====See also=====
+* [[incunable]]
+* [[scroll]]
+* [[tome]]
+* [[volume]]
+
+====Verb====
+{{en-verb}}
+
+# {{label|en|transitive}} To [[reserve]] (something) for future use.
+#: ''I want to '''book''' a hotel room for tomorrow night''
+#: ''I can '''book''' tickets for the concert next week.''
+# {{label|en|transitive}} To [[write down]], to [[register]] or [[record]] in a book or as in a book.
+#: ''They '''booked''' that message from the hill''
+# {{label|en|law enforcement|transitive}} To [[record]] the name and other details of a suspected offender and the offence for later judicial action.
+#: ''The police '''booked''' him for driving too fast.''
+# {{label|en|sports}} To issue with a [[caution]], usually a [[yellow card]], or a [[red card]] if a yellow card has already been issued.
+# {{label|en|intransitive|slang}} To travel very fast.
+#: ''He was really '''booking''', until he passed the speed trap.''
+# To record [[bet|bets]] as [[bookmaker]].
+# {{label|en|transitive|law student slang}} To receive the highest [[grade]] in a class.
+#: ''The top three students had a bet on which one was going to '''book''' their intellectual property class.''
+# {{label|en|intransitive|slang}} To leave.
+#: ''He was here earlier, but he '''booked'''.''
+
+=====Synonyms=====
+* {{sense|to reserve}} [[reserve]]
+* {{sense|to write down}} make a note of, [[note]] down, [[record]], [[write down]]
+* {{sense|to travel very fast}} [[bomb]] {{qualifier|slang}}, [[hurtle]], [[rocket]] {{qualifier|informal}}, [[speed]], [[shoot]], [[whiz]] {{qualifier|informal}}
+
+=====Derived terms=====
+{{rel-top|Terms derived from the verb “book”}}
+* [[bookable]]
+* {{l|en|booking}}
+* [[double-book]]
+* [[overbook]]
+{{rel-mid}}
+* [[rebook]]
+* [[unbook]]
+* [[underbook]]
+{{rel-bottom}}
+
+=====Translations=====
+{{trans-top|to reserve}}
+* Arabic: {{t|ar|حَجَزَ}}, imperfect: {{t|ar|يَحْجُزُ}}
+* Bulgarian: {{t+|bg|запазвам}}
+* Catalan: {{t+|ca|reservar}}
+* Chinese:
+*: Mandarin: {{t+|cmn|預訂|sc=Hani}}, {{t+|cmn|预订|tr=yùdìng|sc=Hani}}
+* Czech: {{t+|cs|rezervovat}}, {{t|cs|zarezervovat}}, {{t|cs|zabukovat}}
+* Danish: {{t+|da|reservere}}
+* Dutch: {{t+|nl|boeken}}, {{t+|nl|reserveren}}
+* Esperanto: {{t|eo|rezervi}}
+* Finnish: {{t+|fi|varata}}, {{t|fi|[[tehdä]] [[varaus]]}}
+* French: {{t+|fr|réserver}}
+* Galician: {{t|gl|reservar}}
+* Georgian: {{t|ka|რეგისტრირება|sc=Geor}}, {{t|ka|რეგისტრაციაში გატარება|sc=Geor}}, {{t|ka|დაბრონვა}}, {{t|ka|ბრონირება}}
+* German: {{t+|de|buchen}}, {{t+|de|reservieren}}
+* Greek: {{t+|el|κρατώ}}, {{t|el|προκρατ}}, {{t+|el|κλείνω}}
+* Hungarian: {{t+|hu|lefoglal}}
+* Indonesian: {{t+|id|pesan}}
+* Interlingua: {{t|ia|reservar}}
+* Italian: {{t+|it|prenotare}}, {{t+|it|riservare}}
+* Japanese: {{t+|ja|予約|tr=よやくする, yoyaku-surú|alt=予約する|sc=Jpan}}
+* Norman: {{t|nrf|boutchi}}
+{{trans-mid}}
+* Korean: {{t+|ko|예약|alt=예약하다|sc=Kore}} ({{t+|ko|豫約|sc=Kore}} + {{t+|ko|하다|sc=Kore}})
+* Macedonian: {{t|mk|резерви́ра}}, {{t|mk|закажува}}
+* Malay: {{t|ms|tempah}}
+* Maori: {{t|mi|tāpui}}
+* Ngazidja Comorian: {{t|zdj|kaɗimia|alt=ukaɗimia}}
+* Norwegian: {{t|no|bestille}}, {{t|no|reservere}}
+* Persian: {{t|fa|رزرو کردن|tr=rezerv kardan}}
+* Polish: {{t+|pl|zarezerwować|pf}}, {{t+|pl|zabukować|pf}}
+* Portuguese: {{t+|pt|reservar}}
+* Romanian: {{t+|ro|rezerva}}
+* Russian: {{t+|ru|брони́ровать|impf}}, {{t+|ru|заброни́ровать|pf}} {{qualifier|esp. hotel rooms}}, {{t+|ru|резерви́ровать|impf}}, {{t+|ru|зарезерви́ровать|pf}}, {{t+|ru|зака́зывать|impf}}, {{t+|ru|заказа́ть|pf}}
+* Serbo-Croatian: {{t+|sh|predbilježiti}}, {{t+|sh|rezervirati}}, {{t+|sh|bukirati}} (colloquial)
+* Slovak: {{t|sk|rezervovať}}, {{t|sk|zarezervovať}}
+* Spanish: {{t+|es|reservar}}
+* Swahili: {{t+|sw|kitabu}}
+* Swedish: {{t+|sv|boka}}
+* Turkish: {{t|tr|yer ayırma}}, {{t+|tr|kitap}}
+* Vietnamese: [[thuê]] {{t+|vi|phòng}} (to rent a hotel room), {{t|vi|mua vé}} (concert, train, airplane, etc.)
+* Welsh: {{t+|cy|cadw}}
+{{trans-bottom}}
+
+{{trans-top|to write down, register, record}}
+* Bulgarian: {{t+|bg|записвам}}
+* Catalan: {{t+|ca|anotar}}
+* Danish: {{t|da|nedskrive}}, {{t|da|notere}}
+* Dutch: {{t|nl|te boek stellen}}, {{t+|nl|noteren}}
+* Finnish: {{t|fi|kirjoittaa ylös}}, {{t+|fi|kirjata}}, {{t|fi|[[kirjoittaa]] [[muistiin]]}}, {{t+|fi|rekisteröidä}}
+* Galician: {{t|gl|anotar}}
+* German: {{t+|de|notieren}}, {{t+|de|schreiben}}
+* Greek: {{t+|el|γράφω}}, {{t+|el|καταχωρώ}}, {{t+|el|σημειώνω}}
+* Italian: {{t+|it|annotare}}, {{t|it|trascrivere}}
+{{trans-mid}}
+* Japanese: {{t|ja|記入|tr=きにゅうする, kinyū suru|alt=記入する|sc=Jpan}}
+* Macedonian: {{t|mk|внесува}}, {{t|mk|запишува}}, {{t|mk|заведува}}
+* Norwegian: {{t|no|notere}}, {{t|no|nedskrive}}
+* Polish: {{t+|pl|spisać}}
+* Portuguese: {{t+|pt|anotar}}
+* Spanish: {{t+|es|anotar}}
+* Swahili: {{t+|sw|kitabu}}
+* Swedish: {{t+|sv|bokföra}}, {{t|sv|skriva in}}
+* Vietnamese: [[ghi]] {{t+|vi|xuống}}
+{{trans-bottom}}
+
+{{trans-top|to record the details of an offender}}
+* Arabic: {{t-check|ar|يعاقب}}
+* Dutch: {{t+check|nl|beboeten}}
+* Finnish: {{t+|fi|rekisteröidä}}
+* Galician: {{t-check|gl|multar}}
+* German: {{t+check|de|bestrafen}}
+* Italian: {{t+check|it|ammonire}}
+* Japanese: {{t|ja|[[調書]]を[[取る]]|tr=ちょうしょをとる, chōsho o toru|sc=Jpan}}
+{{trans-mid}}
+* Polish: {{t+check|pl|ukarać}}
+* Portuguese: {{t+|pt|multar}}
+* Spanish: {{t-check|es|multar}}
+* Swahili: {{t+check|sw|kitabu}}
+* Vietnamese: {{t+check|vi|phạt}}
+* Welsh: {{t+check|cy|cosbi}}, {{t+check|cy|bwcio}}
+{{trans-bottom}}
+
+{{trans-top|sports: to issue with a caution}}
+* Finnish: {{t+|fi|varoittaa}}, {{t|fi|[[antaa]] [[varoitus]]}}
+{{trans-mid}}
+* Italian: {{t+|it|ammonire}}
+{{trans-bottom}}
+
+<!--Note: add SLANG terms to this table, where these exist-->
+{{trans-top|slang: to travel very fast}}
+* Dutch: {{t+|nl|boeken}}, {{t+|nl|vlammen}}
+* Finnish: {{t+|fi|luukuttaa}}
+* German: {{t+|de|rasen}}
+{{trans-mid}}
+* Japanese: {{t|ja|[[スピード]]を[[出す]]|tr=supīdo wo dasu|sc=Jpan}}, {{t|ja|飛ばす|tr=とばす, tobasu|sc=Jpan}}
+* Swahili: {{t+|sw|kitabu}}
+* Vietnamese: [[chạy]] {{t+|vi|trốn}} (implies escaping from someone)
+{{trans-bottom}}
+
+{{trans-top|to record bets as bookmaker}}
+{{trans-mid}}
+{{trans-bottom}}
+
+{{trans-top|to receive the highest grade in a class}}
+{{trans-mid}}
+{{trans-bottom}}
+
+{{trans-top|slang: to leave}}
+* Finnish: {{t|fi|nostaa kytkintä}}
+{{trans-mid}}
+{{trans-bottom}}
+
+{{checktrans-top}}
+* Volapük: {{qualifier|1}} {{t-check|vo|resärfön}}
+{{trans-bottom}}
+
+===Etymology 2===
+From {{etyl|enm|en}} {{m|enm|book}}, from {{etyl|ang|en}} {{m|ang|bōc}}, first and third person singular preterite of {{m|ang|bacan||to bake}}. Cognate with {{etyl|sco|-}} {{m|sco|beuk||baked}}, {{etyl|de|-}} {{m|de|buk||baked}} and probably {{etyl|sq|-}} {{m|sq|bukë||bread, baked dough}}. More at {{l|en|bake}}.
+
+====Verb====
+{{head|en|verb form}}
+
+# {{label|en|UK|_|dialectal|Northern England}} {{en-simple past of|bake}}
+
+===Statistics===
+* {{rank|taking|information|seem|468|book|story|deep|meet}}
+
+===Anagrams===
+* {{l|en|boko}}
+* {{l|en|kobo}}
+
+===References===
+<references/>
+
+[[Category:1000 English basic words]]
+[[Category:en:Poker]]
+
+----
+
+==Limburgish==
+
+===Pronunciation===
+{{rfp|lang=li}}
+
+===Noun===
+{{li-noun|g=n}}
+
+# {{l|en|book}}
+
+----
+
+==Middle English==
+
+===Etymology===
+From {{etyl|ang|enm}} {{m|ang|bōc}}.
+
+===Noun===
+{{enm-noun}}
+
+# {{alternative form of|booke|lang=enm}}
+
+[[af:book]]
+[[ar:book]]
+[[az:book]]
+[[zh-min-nan:book]]
+[[be:book]]
+[[bs:book]]
+[[ca:book]]
+[[cs:book]]
+[[cy:book]]
+[[da:book]]
+[[de:book]]
+[[dv:book]]
+[[et:book]]
+[[el:book]]
+[[es:book]]
+[[eo:book]]
+[[eu:book]]
+[[fa:book]]
+[[fr:book]]
+[[gv:book]]
+[[gd:book]]
+[[gl:book]]
+[[ko:book]]
+[[hy:book]]
+[[hi:book]]
+[[hr:book]]
+[[io:book]]
+[[id:book]]
+[[ie:book]]
+[[iu:book]]
+[[zu:book]]
+[[it:book]]
+[[kn:book]]
+[[ka:book]]
+[[kk:book]]
+[[sw:book]]
+[[ku:book]]
+[[ky:book]]
+[[lo:book]]
+[[lv:book]]
+[[lt:book]]
+[[li:book]]
+[[hu:book]]
+[[mk:book]]
+[[mg:book]]
+[[ml:book]]
+[[mt:book]]
+[[ms:book]]
+[[my:book]]
+[[fj:book]]
+[[nl:book]]
+[[ja:book]]
+[[no:book]]
+[[oc:book]]
+[[uz:book]]
+[[km:book]]
+[[nds:book]]
+[[pl:book]]
+[[pt:book]]
+[[ro:book]]
+[[ru:book]]
+[[sm:book]]
+[[sa:book]]
+[[sg:book]]
+[[sq:book]]
+[[si:book]]
+[[simple:book]]
+[[sk:book]]
+[[so:book]]
+[[sr:book]]
+[[fi:book]]
+[[sv:book]]
+[[tl:book]]
+[[ta:book]]
+[[te:book]]
+[[th:book]]
+[[tg:book]]
+[[chr:book]]
+[[tr:book]]
+[[uk:book]]
+[[ur:book]]
+[[ug:book]]
+[[vec:book]]
+[[vi:book]]
+[[wa:book]]
+[[zh:book]]
+

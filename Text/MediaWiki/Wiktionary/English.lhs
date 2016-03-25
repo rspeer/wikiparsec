@@ -12,6 +12,8 @@
 > import qualified Data.ByteString.Char8 as Char8
 > import Data.Attoparsec.ByteString.Char8
 > import Data.LanguageNames
+> import Control.Applicative ((<|>), (<$>), (*>), (<*))
+> import Control.Monad
 
 
 Parsing sections
@@ -55,6 +57,7 @@ Choosing an appropriate section parser
 >
 > enParseSectionContent :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
 > enParseSectionContent "POS" = enParseDefinition
+> enParseSectionContent "Translations" = enParseTranslations
 > enParseSectionContent x = const (const [])
 
 
@@ -66,7 +69,7 @@ from the text of a definition:
 
 > enDefinitionToRels = definitionToRels "en"
 
-Parsing the definition section. (TODO: adjust the term with a sense number?)
+Parsing the definition section:
 
 > enParseDefinition :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
 > enParseDefinition thisTerm text =
@@ -81,6 +84,76 @@ Parsing the definition section. (TODO: adjust the term with a sense number?)
 >   defList <- orderedList enTemplates "#"
 >   return (extractNumberedDefs defList)
 
+
+The translation section
+-----------------------
+
+> enParseTranslations :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
+> enParseTranslations thisTerm text =
+>   let translationMaybe = parseOnly (pTranslationSection thisTerm) text in
+>     case translationMaybe of
+>       Right translations -> translations
+>       Left err -> error err
+>
+> pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryRel]
+> pTranslationSection thisTerm = concat <$> many1 (pTranslationGroup thisTerm)
+> 
+> pTranslationGroup :: WiktionaryTerm -> Parser [WiktionaryRel]
+> pTranslationGroup thisTerm = do
+>   optionalTextChoices [newLine]
+>   maybeSense <- pTranslationTopTemplate
+>   let senseTerm = thisTerm {sense=maybeSense}
+>   items <- concat <$> many1 pTranslationColumn
+>   optionalTextChoices [newLine]
+>   return (map (annotationToRel senseTerm) (filter translationsOnly items))
+>
+> translationsOnly :: Annotation -> Bool
+> translationsOnly annot = (get "rel" annot) == "translation"
+
+The `pTranslationTopTemplate` rule parses the template that starts a
+translation section, which may or may not be labeled with a word sense. It
+returns a Maybe ByteString that contains the word sense if present.
+
+> pTranslationTopTemplate :: Parser (Maybe ByteString)
+> pTranslationTopTemplate = pTransTop <|> pCheckTransTop
+>
+> pTransTop = do
+>   template <- specificTemplate enTemplates "trans-top"
+>   newLine
+>   return (lookup "1" template)
+> pCheckTransTop = do
+>   specificTemplate enTemplates "checktrans-top"
+>   newLine
+>   return Nothing
+
+A column of translations (yes, this is purely a layout thing) ends with either
+{{trans-mid}}, which separates columns, or {{trans-bottom}}, which ends the section.
+The translations themselves are contained in a bulleted list.
+
+> pTranslationColumn :: Parser [Annotation]
+> pTranslationColumn = concat <$> many1 (pTranslationItem <|> pTranslationBlankLine) <* pTranslationColumnEnd
+> pTranslationColumnEnd = specificTemplate enTemplates "trans-mid" <|> specificTemplate enTemplates "trans-bottom" <* many1 newLine
+
+The procedure for getting translations out of a bunch of bullet points involved a few
+chained procedures, which of course occur from right to left:
+
+  - Parse a bullet-pointed list entry.
+
+  - Find the items the bullet-pointed list entry contains. There may be
+    multiple of them, because some translation entries are nested lists --
+    multiple kinds of translations for the same language, for example.
+    `extractTopLevel` turns these items into a flat list.
+
+  - `extractTopLevel` gave us a list of AnnotatedStrings. We want just their
+    annotations, representing everything we want to know about the
+    translations, in one big list. So we `A.concat` all the AnnotatedStrings
+    together, and then take the combined list of annotations from that.
+
+> pTranslationItem :: Parser [Annotation]
+> pTranslationItem = A.annotations <$> A.concat <$> extractTopLevel <$> listItem enTemplates "*"
+>
+> pTranslationBlankLine :: Parser [Annotation]
+> pTranslationBlankLine = newLine >> return []
 
 Finding headings
 ================
@@ -190,18 +263,104 @@ Wiktionary.Base.
 > handleSenseIDTemplate :: Template -> AnnotatedString
 > handleSenseIDTemplate template = A.annotate [[("senseID", get "2" template)]] ""
 
+
 Links
 -----
 
 > handleLinkTemplate :: Template -> AnnotatedString
 > handleLinkTemplate template =
->   let { linkText = (getOne ["3", "2"] template);
->         annot = filterEmpty $
->           [("language", (get "1" template)),
->            ("page", (get "2" template)),
->            ("gloss", (getOne ["4", "gloss"] template)),
->            ("pos", (get "pos" template))] }
->   in (A.annotate [annot] linkText)
+>   let text  = (getOne ["3", "2"] template)
+>       annot = filterEmpty $
+>         [("language", (get "1" template)),
+>          ("page", (get "2" template)),
+>          ("gloss", (getOne ["4", "gloss"] template)),
+>          ("pos", (get "pos" template))]
+>   in (A.annotate [annot] text)
+
+
+Translations
+------------
+
+> handleTranslationTemplate :: Template -> AnnotatedString
+> handleTranslationTemplate template =
+>   let annot = [("rel", "translation"),
+>                ("language", (get "1" template)),
+>                ("page", (get "2" template))]
+>       text  = getOne ["alt", "2"] template
+>   in A.annotate [annot] text
+
+
+Form-of templates
+-----------------
+
+> handleAbstractFormTemplate :: Template -> AnnotatedString
+> handleAbstractFormTemplate template =
+>   let text  = (getOne ["3", "2"] template)
+>       annot = filterEmpty $
+>         [("rel", "form"),
+>          ("language", (get "lang" template)),
+>          ("page", (get "2" template)),
+>          ("form", (get "1" template))]
+>   in A.annotate [annot] text
+>
+> handleFormTemplate :: ByteString -> Template -> AnnotatedString
+> handleFormTemplate form template =
+>   let text  = (getOne ["2", "1"] template)
+>       annot = filterEmpty $
+>         [("rel", "form"),
+>          ("language", (get "lang" template)),
+>          ("page", (get "1" template)),
+>          ("form", form)]
+>   in A.annotate [annot] text
+>
+> handleInflectionTemplate :: Template -> AnnotatedString
+> handleInflectionTemplate template =
+>   let text  = (getOne ["2", "1"] template)
+>       forms = filter (/= "") [get "3" template, get "4" template, get "5" template, get "6" template]
+>       annot = filterEmpty $
+>         [("rel", "form"),
+>          ("language", (get "lang" template)),
+>          ("page", (get "1" template)),
+>          ("form", Char8.intercalate "|" forms)]
+>   in A.annotate [annot] text
+
+We need to handle:
+
+- en-comparative of
+- en-simple past of
+- en-irregular plural of
+- en-past of
+- en-superlative of
+- en-third-person singular of
+
+- active participle of
+- feminine plural past participle of
+- feminine singular past participle of
+- future participle of
+- gerund of
+- imperative of
+- masculine plural past participle of
+- neuter singular past participle of
+- participle of
+- passive of
+- passive participle of
+- past active participle of
+- past participle of
+- past passive participle of
+- past tense of
+- present active participle of
+- present participle of
+- present passive participle of
+- present tense of
+- reflexive of
+- second-person singular past of
+- (x) supine of
+- verbal noun of
+
+- plural of
+- past tense of
+- past participle of
+
 
 Putting it all together
 -----------------------
@@ -215,4 +374,18 @@ Putting it all together
 > enTemplates "lbl"     = handleLabelTemplate
 > enTemplates "lb"      = handleLabelTemplate
 > enTemplates "senseid" = handleSenseIDTemplate
+> enTemplates "t"       = handleTranslationTemplate
+> enTemplates "t+"      = handleTranslationTemplate
+> enTemplates "t-"      = handleTranslationTemplate
+> enTemplates "tø"      = handleTranslationTemplate
+> enTemplates "form of" = handleAbstractFormTemplate
+> enTemplates "alternative form of" = handleFormTemplate "alternate"
+> enTemplates "alternate form of"   = handleFormTemplate "alternate"
+> enTemplates "alt form of"         = handleFormTemplate "alternate"
+> enTemplates "alt form"            = handleFormTemplate "alternate"
+> enTemplates "altform"             = handleFormTemplate "alternate"
+> enTemplates "inflection of"       = handleInflectionTemplate
+> enTemplates "conjugation of"      = handleInflectionTemplate
+> -- ignore the more uncertain translation templates, t-check and t+check
 > enTemplates _         = skipTemplate
+
