@@ -13,43 +13,43 @@ From {{etyl|enm|en}} {{m|enm|abaten}}, from {{etyl|fro|en}} {{m|fro|abatre||to b
 ====Verb====
 {{en-verb|abat}}
 
-# {{label|en|transitive|obsolete|outside|legal}} To put an end to; to cause to cease. {{defdate|attested since about 1150 to 1350}}<ref name=SOED/>
+# {{label|en|transitive|obsolete|outside|legal}} To put an end to; to cause to cease. {{defdate|attested since about 1150 to 1350}}
 #: ''to '''abate''' a nuisance''
-# {{label|en|intransitive}} To become null and void. {{defdate|attested since the late 15th century}}<ref name=SOED/>
+# {{label|en|intransitive}} To become null and void. {{defdate|attested since the late 15th century}}
 #: ''The writ has '''abated'''.''
-# {{label|en|transitive|legal}} To [[nullify]]; make void. {{defdate|attested since the late 15th century}}<ref name=SOED/>
+# {{label|en|transitive|legal}} To [[nullify]]; make void. {{defdate|attested since the late 15th century}}
 #: ''to '''abate''' a writ''
-# {{label|en|transitive|obsolete}} To [[humble]]; to lower in status; to bring someone down physically or mentally. {{defdate|attested from around 1150 to 1350 until the mid 1600s}}<ref name=SOED/>
+# {{label|en|transitive|obsolete}} To [[humble]]; to lower in status; to bring someone down physically or mentally. {{defdate|attested from around 1150 to 1350 until the mid 1600s}}
 #* [[w:Geoffrey Chaucer|Geoffrey Chaucer]]
 #*: ''The hyer that they were in this present lyf, the moore shulle they be '''abated''' and defouled in helle.''
-# {{label|en|intransitive|obsolete}} To be humbled; to be brought down physically or mentally. {{defdate|attested from around 1150 to 1350 until the mid 1600s}}<ref name=SOED/>
-# {{label|en|transitive|obsolete}} To curtail; to deprive. {{defdate|attested from around 1350 to 1470 until the mid 1800s}}<ref name=SOED/>
+# {{label|en|intransitive|obsolete}} To be humbled; to be brought down physically or mentally. {{defdate|attested from around 1150 to 1350 until the mid 1600s}}
+# {{label|en|transitive|obsolete}} To curtail; to deprive. {{defdate|attested from around 1350 to 1470 until the mid 1800s}}
 #: ''Order restrictions and prohibitions to '''abate''' an emergency situation.''
 #* '''1605''', [[w:William Shakespeare|William Shakespeare]], ''King Lear'', II.ii:
 #*: ''She hath '''abated''' me of half my train.''
-# {{label|en|transitive}} To [[reduce]] in amount, size, or value. {{defdate|attested since 1325}}<ref name = Chambers>{{R:CDOE|page=2}}</ref><ref name=SOED/>
+# {{label|en|transitive}} To [[reduce]] in amount, size, or value. {{defdate|attested since 1325}}
 #: ''Legacies are liable to be '''abated''' entirely or in proportion, upon a deficiency of assets.''
 #* {{RQ:Authorized Version|Deuteronomy|34|7}}
 #*: His eye was not dim, nor his natural force '''abated'''.
-# {{label|en|intransitive}} To decrease in size, value, or amount. {{defdate|attested since 1325}}<ref name = Chambers/>
-# {{label|en|transitive}} To [[moderate]]; to lessen in force, [[intensity]], to [[subside]]. {{defdate|attested since around 1150 to 1350}}<ref name=SOED/>
+# {{label|en|intransitive}} To decrease in size, value, or amount. {{defdate|attested since 1325}}
+# {{label|en|transitive}} To [[moderate]]; to lessen in force, [[intensity]], to [[subside]]. {{defdate|attested since around 1150 to 1350}}
 #* '''1597''', [[w:Francis Bacon|Francis Bacon]], ''[http://www.gutenberg.org/ebooks/575 Essays or Counsels, Civil and Morall]'':
 #*: Not that they feel it so, but only to '''abate''' the edge of envy.
 #* '''1855''', [[w:Thomas Babington Macaulay|Thomas Babington Macaulay]], ''History of England from the Accession of James II, Part 3'', [http://books.google.com/books?id=MN5CNdgbSTYC&pg=PA267 page 267]:
 #*: The fury of Glengarry{{...|, not being inflamed by any fresh provocation,}} rapidly '''abated'''.
-# {{label|en|intransitive}} To decrease in intensity or force; to subside. {{defdate|attested since around 1150 to 1350}}<ref name=SOED/>
+# {{label|en|intransitive}} To decrease in intensity or force; to subside. {{defdate|attested since around 1150 to 1350}}
 #* {{circa|1719}} [[w:Daniel Defoe|Daniel Defoe]], ''[[w:Robinson Crusoe|Robinson Crusoe]]'':
 #*: {{...}} in the morning, the wind having '''abated''' overnight, the sea was calm, {{...}}
-# {{label|en|transitive}} To [[deduct]] or [[omit]]. {{defdate|attested since around 1350 to 1470}}<ref name=SOED/>
+# {{label|en|transitive}} To [[deduct]] or [[omit]]. {{defdate|attested since around 1350 to 1470}}
 #: ''We will '''abate''' this price from the total.''
 #* '''1845''', [[w:Thomas Fuller|Thomas Fuller]], ''The Church History of Britain'', Volume 3, [http://books.google.com/books?id=OfefAAAAMAAJ&pg=PA100 page 100]:
 #*: Allowing nine thousand parishes ('''abating''' the odd hundreds) in England and Wales {{...}}
-# {{label|en|transitive}} To [[bar]] or [[except]]. {{defdate|attested since the late 1500s}}<ref name=SOED/>
+# {{label|en|transitive}} To [[bar]] or [[except]]. {{defdate|attested since the late 1500s}}
 #* [[w:Samuel Johnson|Samuel Johnson]]
 #*: '''''Abating''' his brutality, he was a very good master.''
 # {{label|en|transitive}} To cut away or hammer down, in such a way as to leave a figure in relief, as a sculpture, or in metalwork.
-# {{label|en|transitive|obsolete}} To dull the edge or point of; to [[blunt]]. {{defdate|attested from the mid 1500s till the late 1600s}}<ref name=SOED/>
-# {{label|en|transitive|archaic}} To [[destroy]], or [[level]] to the ground. {{defdate|attested since around 1350 to 1470}}<ref name=SOED/>
+# {{label|en|transitive|obsolete}} To dull the edge or point of; to [[blunt]]. {{defdate|attested from the mid 1500s till the late 1600s}}
+# {{label|en|transitive|archaic}} To [[destroy]], or [[level]] to the ground. {{defdate|attested since around 1350 to 1470}}
 #* '''1542''', [[w:Edward Hall|Edward Hall]], ''The Union of the Noble and Illustre Famelies of Lancastre and York'':
 #*: The kynge of Scottes planted his siege before the castell of Norham, and sore '''abated''' the walls.
 
@@ -208,15 +208,15 @@ From {{etyl|enm|en}} {{m|enm|abaten}}, from {{etyl|fro|en}} {{m|fro|abatre||to b
 ====Noun====
 {{en-noun}} {{term-context|obsolete|lang=en}}
 
-# [[abatement|Abatement]]. {{defdate|from around 1400 until the late 1600s}}<ref name=SOED>{{R:SOED5|page=2}}</ref>
+# [[abatement|Abatement]]. {{defdate|from around 1400 until the late 1600s}}
 
 ===Etymology 2===
-From {{etyl|xno|en}} {{m|fro|abatre}}, an alteration of {{m|fro|enbatre}}, from {{etyl|fro|en}} {{m|fro|en}} + {{m|fro|batre||to beat}}.<ref name=Chambers/>
+From {{etyl|xno|en}} {{m|fro|abatre}}, an alteration of {{m|fro|enbatre}}, from {{etyl|fro|en}} {{m|fro|en}} + {{m|fro|batre||to beat}}.
 
 ====Verb====
 {{en-verb|abat}}
 
-# {{label|en|intransitive|legal}} To enter a [[tenement]] without permission after the owner has died and before the heir takes possession. {{defdate|First attested around 1350 to 1470.}}<ref name=SOED/>
+# {{label|en|intransitive|legal}} To enter a [[tenement]] without permission after the owner has died and before the heir takes possession. {{defdate|First attested around 1350 to 1470.}}
 
 ===Etymology 3===
 From {{etyl|it|en}} {{m|it|abate}}, from {{etyl|la|en}} {{m|la|abbas|abbās, abbātis}}, from {{etyl|grc|en}} {{m|grc|ἀββᾶς}}, from {{etyl|arc|en}} {{m|arc|אבא||father|tr=’abbā|sc=Hebr}}.
@@ -227,12 +227,11 @@ From {{etyl|it|en}} {{m|it|abate}}, from {{etyl|la|en}} {{m|la|abbas|abbās, abb
 ====Noun====
 {{en-noun}}
 
-# An Italian [[abbot]], or other member of the clergy. {{defdate|First attested in the early 18th century.}}<ref name=SOED/>
+# An Italian [[abbot]], or other member of the clergy. {{defdate|First attested in the early 18th century.}}
 
 ===References===
 * {{R:OneLook}}
 * {{R:Webster 1913}}
-<references/>
 
 ----
 

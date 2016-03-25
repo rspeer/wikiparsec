@@ -73,6 +73,9 @@ from a page.
 > makeRel :: ByteString -> WiktionaryTerm -> WiktionaryTerm -> WiktionaryRel
 > makeRel rel from to = WiktionaryRel { relation=rel, fromTerm=from, toTerm=to }
 > makeGenericRel = makeRel "RelatedTo"
+>
+> assignRel :: ByteString -> WiktionaryRel -> WiktionaryRel
+> assignRel rel relObj = relObj {relation=rel}
 
 Working with annotations:
 
@@ -144,18 +147,24 @@ TODO give an example because this is all confusing
 Converting definitions to relations:
 
 > definitionToRels :: Language -> WiktionaryTerm -> LabeledDef -> [WiktionaryRel]
-> definitionToRels language thisTerm definition =
->   let {
->     defValue = snd definition;
->     -- get a sense either from the SenseID annotation, or failing that,
->     -- from the label that comes with the definition
->     defSense = mplus (findSenseID defValue) (Just (fst definition));
->     termSense = thisTerm {sense=defSense};
->     defPieces = splitDefinition (stripSpaces (A.unannotate defValue))
->   } in
->     (map (makeDefinitionRel termSense language) defPieces)
->     ++ (map (annotationToRel termSense) (linkableAnnotations defValue))
->
+> definitionToRels language thisTerm defPair =
+>   let defText = snd defPair
+>       -- get a sense either from the SenseID annotation, or failing that,
+>       -- from the label that comes with the definition
+>       defSense = mplus (findSenseID defText) (Just (fst defPair))
+>       termSense = thisTerm {sense=defSense}
+>       defPieces = splitDefinition (stripSpaces (A.unannotate defText))
+>   in (map (makeDefinitionRel termSense language) defPieces)
+>      ++ (map (annotationToRel termSense) (linkableAnnotations defText))
+
+The simpler version for entries in a list, such as a "Synonyms" section:
+
+> entryToRels :: WiktionaryTerm -> AnnotatedString -> [WiktionaryRel]
+> entryToRels thisTerm defText =
+>   let defSense  = findSenseID defText
+>       termSense = thisTerm {sense=defSense}
+>   in map (annotationToRel termSense) (linkableAnnotations defText)
+
 > makeDefinitionRel termSense language definition =
 >   makeRel "definition" termSense (simpleTerm language definition)
 >

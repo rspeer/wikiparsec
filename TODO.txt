@@ -1,4 +1,6 @@
 Next steps:
 
-- Allow templates to be mapped to functions
-- Work on specific sections
+- stream through the whole Wiktionary dump
+- JSON output
+- normalize the names of inflections
+- deal with language names better

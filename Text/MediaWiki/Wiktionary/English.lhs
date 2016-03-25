@@ -59,6 +59,16 @@ Choosing an appropriate section parser
 > enParseSectionContent :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
 > enParseSectionContent "POS" = enParseDefinition
 > enParseSectionContent "Translations" = enParseTranslations
+> enParseSectionContent "Synonyms" = enParseRelation "synonym"
+> enParseSectionContent "Antonyms" = enParseRelation "antonym"
+> enParseSectionContent "Hyponyms" = enParseRelation "hyponym"
+> enParseSectionContent "Hypernyms" = enParseRelation "hypernym"
+> enParseSectionContent "Meronyms" = enParseRelation "meronym"
+> enParseSectionContent "Troponyms" = enParseRelation "troponym"
+> enParseSectionContent "Coordinate terms" = enParseRelation "coordinate"
+> enParseSectionContent "Derived terms" = enParseRelation "derived"
+> enParseSectionContent "Related terms" = enParseRelation "related"
+> enParseSectionContent "See also" = enParseRelation "related"
 > enParseSectionContent x = const (const [])
 
 
@@ -90,11 +100,7 @@ The translation section
 -----------------------
 
 > enParseTranslations :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
-> enParseTranslations thisTerm text =
->   let translationMaybe = parseOnly (pTranslationSection thisTerm) text in
->     case translationMaybe of
->       Right translations -> translations
->       Left err -> error err
+> enParseTranslations thisTerm text = parseOrDefault [] (pTranslationSection thisTerm) text
 >
 > pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryRel]
 > pTranslationSection thisTerm = concat <$> many1 (pTranslationGroup thisTerm)
@@ -155,6 +161,21 @@ chained procedures, which of course occur from right to left:
 >
 > pTranslationBlankLine :: Parser [Annotation]
 > pTranslationBlankLine = newLine >> return []
+
+
+Relation sections
+-----------------
+
+> enParseRelation :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
+> enParseRelation rel thisTerm text = parseOrDefault [] (pRelationSection rel thisTerm) text
+>
+> pRelationSection :: ByteString -> WiktionaryTerm -> Parser [WiktionaryRel]
+> pRelationSection rel thisTerm = map (assignRel rel)
+>                                 <$> concat
+>                                 <$> map (entryToRels thisTerm)
+>                                 <$> extractTextLines
+>                                 <$> bulletList enTemplates "*"
+
 
 Finding headings
 ================
@@ -263,6 +284,9 @@ Wiktionary.Base.
 
 > handleSenseIDTemplate :: Template -> AnnotatedString
 > handleSenseIDTemplate template = A.annotate [[("senseID", get "2" template)]] ""
+>
+> handleSenseTemplate :: Template -> AnnotatedString
+> handleSenseTemplate template = A.annotate [[("senseID", get "1" template)]] ""
 
 
 Links
@@ -325,15 +349,15 @@ Form-of templates
 >          ("page", pageName (get "1" template))]
 >   in A.annotate [annot] ""
 >
-> handleLanguageFormsTemplate :: Language -> [ByteString] -> Template -> AnnotatedString
-> handleLanguageFormsTemplate language forms template =
+> handleSpecificFormsTemplate :: Language -> [ByteString] -> Template -> AnnotatedString
+> handleSpecificFormsTemplate language forms template =
 >   let annotations = [[("rel", Char8.append "form/" form),
 >                       ("language", language),
 >                       ("page", pageName (get "1" template))] | form <- forms]
 >   in A.annotate annotations ""
 >
-> handleSpanishFormTemplate :: Template -> AnnotatedString
-> handleSpanishFormTemplate template =
+> handleSpanishVerbTemplate :: Template -> AnnotatedString
+> handleSpanishVerbTemplate template =
 >   let forms = filter (/= "") [getOne keys template | keys <-
 >                                [["pers", "person"],
 >                                 ["num", "number"],
@@ -347,10 +371,34 @@ Form-of templates
 >                  "no"  -> ["informal"]
 >                  _     -> []
 >       formStr = Char8.intercalate "+" (formal ++ forms)
->       annot = filterEmpty $
+>       annot =
 >         [("rel", Char8.append "form/" formStr),
 >          ("language", "es"),
 >          ("page", pageName (getOne ["1", "inf", "verb", "infinitive"] template))]
+>   in A.annotate [annot] ""
+>
+> handleSpanishCompoundTemplate template =
+>   let forms = filter (/= "") [get key template | key <- ["mood", "person"]]
+>       formStr = Char8.intercalate "+" ("compound":forms)
+>       annot =
+>         [("rel", Char8.append "form/" formStr),
+>          ("language", "es"),
+>          ("page", pageName (getOne ["3", "1"] template))]
+>   in A.annotate [annot] ""
+
+There are many templates named "xx-verb form of", and they tend to work in
+similar ways: several arguments to the template are symbols for various kinds
+of inflections, and we just want to join these symbols together. We just need
+to know which language it is, and which template arguments to look up.
+
+> handleLanguageFormTemplate :: Language -> [ByteString] -> Template -> AnnotatedString
+> handleLanguageFormTemplate language formKeys template =
+>   let forms = filter (/= "") [get key template | key <- formKeys]
+>       formStr = Char8.intercalate "+" forms
+>       annot =
+>         [("rel", Char8.append "form/" formStr),
+>          ("language", language),
+>          ("page", pageName (get "1" template))]
 >   in A.annotate [annot] ""
 
 We need to handle:
@@ -378,6 +426,7 @@ Putting it all together
 > enTemplates "label"   = handleLabelTemplate
 > enTemplates "lbl"     = handleLabelTemplate
 > enTemplates "lb"      = handleLabelTemplate
+> enTemplates "sense"   = handleSenseTemplate
 > enTemplates "senseid" = handleSenseIDTemplate
 > enTemplates "t"       = handleTranslationTemplate
 > enTemplates "t+"      = handleTranslationTemplate
@@ -394,8 +443,8 @@ Putting it all together
 > enTemplates "inflection of"       = handleInflectionTemplate
 > enTemplates "conjugation of"      = handleInflectionTemplate
 >
-> enTemplates "en-simple past of"                    = handleLanguageFormsTemplate "en" ["past"]
-> enTemplates "en-past of"                           = handleLanguageFormsTemplate "en" ["past", "past+ptcp"]
+> enTemplates "en-simple past of"                    = handleSpecificFormsTemplate "en" ["past"]
+> enTemplates "en-past of"                           = handleSpecificFormsTemplate "en" ["past", "past+ptcp"]
 > enTemplates "past of"                              = handleFormTemplate "past"
 > enTemplates "past tense of"                        = handleFormTemplate "past"
 > enTemplates "past participle of"                   = handleFormTemplate "past+ptcp"
@@ -409,20 +458,29 @@ Putting it all together
 > enTemplates "participle of"                        = handleFormTemplate "ptcp"
 > enTemplates "active participle of"                 = handleFormTemplate "ptcp+actv"
 > enTemplates "passive participle of"                = handleFormTemplate "ptcp+pasv"
-> enTemplates "en-third-person singular of"          = handleLanguageFormsTemplate "en" ["3+s+pres"]
-> enTemplates "en-third person singular of"          = handleLanguageFormsTemplate "en" ["3+s+pres"]
-> enTemplates "en-archaic second-person singular of" = handleLanguageFormsTemplate "en" ["archaic+2+s+pres"]
-> enTemplates "en-archaic third-person singular of"  = handleLanguageFormsTemplate "en" ["archaic+3+s+pres"]
+> enTemplates "en-third-person singular of"          = handleSpecificFormsTemplate "en" ["3+s+pres"]
+> enTemplates "en-third person singular of"          = handleSpecificFormsTemplate "en" ["3+s+pres"]
+> enTemplates "en-archaic second-person singular of" = handleSpecificFormsTemplate "en" ["archaic+2+s+pres"]
+> enTemplates "en-archaic third-person singular of"  = handleSpecificFormsTemplate "en" ["archaic+3+s+pres"]
 > enTemplates "second-person singular past of"       = handleFormTemplate "archaic+2+s+past"
->
-> enTemplates "en-comparative of"   = handleLanguageFormsTemplate "en" ["comp"]
-> enTemplates "en-superlative of"   = handleLanguageFormsTemplate "en" ["sup"]
 >
 > enTemplates "plural of"                   = handleFormTemplate "p"
 > enTemplates "gerund of"                   = handleFormTemplate "ger"
-> enTemplates "en-irregular plural of"      = handleLanguageFormsTemplate "en" ["p"]
 >
-> enTemplates "es-verb form of" = handleSpanishFormTemplate
+> enTemplates "en-irregular plural of"      = handleSpecificFormsTemplate "en" ["p"]
+> enTemplates "en-comparative of"           = handleSpecificFormsTemplate "en" ["comp"]
+> enTemplates "en-superlative of"           = handleSpecificFormsTemplate "en" ["sup"]
+>
+> enTemplates "de-inflected form of" = handleSpecificFormsTemplate "de" ["?"]
+> enTemplates "de-zu-infinitive of"  = handleSpecificFormsTemplate "de" ["zu"]
+> enTemplates "de-verb form of"      = handleLanguageFormTemplate "de" ["2","3","4","5"]
+>
+> enTemplates "es-verb form of"      = handleSpanishVerbTemplate
+> enTemplates "es-compound of"       = handleSpanishCompoundTemplate
+>
+> enTemplates "pt-noun form of" = handleLanguageFormTemplate "pt" ["2","3","4"]
+> enTemplates "pt-adj form of"  = handleLanguageFormTemplate "pt" ["2","3","4"]
+> enTemplates "pt-verb form of" = handleLanguageFormTemplate "pt" ["3","4","5","6"]
 >
 > enTemplates _         = skipTemplate
 
