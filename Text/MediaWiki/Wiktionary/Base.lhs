@@ -22,6 +22,7 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Data.List (intersect)
 > import Data.Maybe
 > import Data.Aeson (ToJSON, toJSON, toEncoding, (.=), encode, object, pairs)
+> import Data.LanguageNames
 
 Data types
 ----------
@@ -130,18 +131,35 @@ Working with annotations:
 
 Converting an Annotation representing a term to a WiktionaryTerm:
 
-> annotationToTerm :: Annotation -> WiktionaryTerm
-> annotationToTerm annot = WiktionaryTerm {
+(TODO: explain why languages get complicated here)
+
+> annotationToTerm :: Language -> Annotation -> WiktionaryTerm
+> annotationToTerm thisLang annot = WiktionaryTerm {
 >   text=(get "page" annot),
->   language=(lookupOne ["language", "section"] annot),
+>   language=(annotationLanguage thisLang annot),
 >   pos=(lookup "pos" annot),
 >   sense=(lookup "sense" annot),
 >   etym=(lookup "etym" annot)
 >   }
 >
+> annotationLanguage :: Language -> Annotation -> Maybe Language
+> annotationLanguage thisLang annot =
+>   case (lookup "language" annot) of
+>     Just language -> Just language
+>     Nothing ->
+>       case (lookup "section" annot) of
+>         Just section ->
+>           if (Char8.head section) == '#'
+>             then Just (lookupLanguage thisLang (Char8.tail section))
+>             else Nothing
+>         Nothing -> Nothing
+>
 > annotationToRel :: WiktionaryTerm -> Annotation -> WiktionaryRel
 > annotationToRel thisTerm annot =
->   makeRel (getDefault "link" "rel" annot) thisTerm (annotationToTerm annot)
+>   let thisLang  = fromMaybe "und" (language thisTerm)
+>       otherTerm = annotationToTerm thisLang annot
+>       rel       = getDefault "link" "rel" annot
+>   in makeRel rel thisTerm otherTerm
 
 We might have an annotation assigning a sense ID to this text:
 
