@@ -30,7 +30,8 @@ Library
                        fast-tagsoup-utf8-only,
                        stringsearch,
                        hexpat ==0.20.*,
-                       containers
+                       containers,
+                       aeson
 
 Executable wiki2text
   ghc-options:
@@ -46,4 +47,5 @@ Executable wiki2text
                        fast-tagsoup-utf8-only,
                        stringsearch,
                        hexpat ==0.20.*,
-                       containers
+                       containers,
+                       aeson

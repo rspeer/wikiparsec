@@ -1,6 +1,5 @@
 Next steps:
 
 - stream through the whole Wiktionary dump
-- JSON output
 - normalize the names of inflections
 - deal with language names better

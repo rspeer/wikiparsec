@@ -11,6 +11,8 @@
 > import Text.MediaWiki.Wiktionary.Base
 > import Data.ByteString (ByteString)
 > import qualified Data.ByteString.Char8 as Char8
+> import qualified Data.ByteString.Lazy.Char8 as LChar8
+> import qualified Data.Aeson as Ae
 > import Data.Attoparsec.ByteString.Char8
 > import Data.LanguageNames
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
@@ -28,7 +30,7 @@ Parsing sections
 > enHandleFile :: String -> String -> IO ()
 > enHandleFile title filename = do
 >   contents <- Char8.readFile filename
->   mapM_ print (enHandlePage (Char8.pack title) contents)
+>   mapM_ (LChar8.putStrLn . Ae.encode) (enHandlePage (Char8.pack title) contents)
 
 Choosing an appropriate section parser
 --------------------------------------
@@ -272,6 +274,11 @@ separate in case we ever want to output them:
 > enLabelAnnotation :: ByteString -> Annotation
 > enLabelAnnotation label = [("rel", "context"), ("language", "en"), ("page", label)]
 
+Qualifiers are similar to labels, but take just a single argument.
+
+> handleQualifierTemplate template =
+>   let label = get "1" template
+>   in  A.annotate [enLabelAnnotation label] ""
 
 Sense IDs
 ---------
@@ -419,19 +426,20 @@ Putting it all together
 -----------------------
 
 > enTemplates :: TemplateProc
-> enTemplates "l"       = handleLinkTemplate
-> enTemplates "link"    = handleLinkTemplate
-> enTemplates "m"       = handleLinkTemplate
-> enTemplates "mention" = handleLinkTemplate
-> enTemplates "label"   = handleLabelTemplate
-> enTemplates "lbl"     = handleLabelTemplate
-> enTemplates "lb"      = handleLabelTemplate
-> enTemplates "sense"   = handleSenseTemplate
-> enTemplates "senseid" = handleSenseIDTemplate
-> enTemplates "t"       = handleTranslationTemplate
-> enTemplates "t+"      = handleTranslationTemplate
-> enTemplates "t-"      = handleTranslationTemplate
-> enTemplates "tø"      = handleTranslationTemplate
+> enTemplates "l"         = handleLinkTemplate
+> enTemplates "link"      = handleLinkTemplate
+> enTemplates "m"         = handleLinkTemplate
+> enTemplates "mention"   = handleLinkTemplate
+> enTemplates "label"     = handleLabelTemplate
+> enTemplates "lbl"       = handleLabelTemplate
+> enTemplates "lb"        = handleLabelTemplate
+> enTemplates "qualifier" = handleQualifierTemplate
+> enTemplates "sense"     = handleSenseTemplate
+> enTemplates "senseid"   = handleSenseIDTemplate
+> enTemplates "t"         = handleTranslationTemplate
+> enTemplates "t+"        = handleTranslationTemplate
+> enTemplates "t-"        = handleTranslationTemplate
+> enTemplates "tø"        = handleTranslationTemplate
 > -- ignore the more uncertain translation templates, t-check and t+check
 >
 > enTemplates "form of"             = handleAbstractFormTemplate
@@ -442,6 +450,9 @@ Putting it all together
 > enTemplates "altform"             = handleFormTemplate "alternate"
 > enTemplates "inflection of"       = handleInflectionTemplate
 > enTemplates "conjugation of"      = handleInflectionTemplate
+> enTemplates "initialism of"       = useArg "1"
+> enTemplates "acronym of"          = useArg "1"
+> enTemplates "synonym of"          = useArg "1"
 >
 > enTemplates "en-simple past of"                    = handleSpecificFormsTemplate "en" ["past"]
 > enTemplates "en-past of"                           = handleSpecificFormsTemplate "en" ["past", "past+ptcp"]

@@ -15,28 +15,37 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Data.Attoparsec.Combinator
 > import Data.ByteString (ByteString)
 > import qualified Data.ByteString.UTF8 as UTF8
+> import qualified Data.ByteString.Lazy.UTF8 as LUTF8
 > import qualified Data.ByteString.Char8 as Char8
 > import Control.Applicative ((<|>), (<$>), (*>), (<*))
 > import Control.Monad
 > import Data.List (intersect)
 > import Data.Maybe
+> import Data.Aeson (ToJSON, toJSON, toEncoding, (.=), encode, object, pairs)
 
 Data types
 ----------
-Here's a simple one: a Language is a ByteString, abstracted so we can possibly
-change it later.
+Here's a simple one: a Language is a ByteString. We give the type its own
+name to clarify what kind of thing we're expecting in functions that take
+Languages as arguments.
+
+A Language is intended to contain a BCP 47 language code, such as "en". It
+could also contain a natural-language name of the language, such as "West
+Frisian", in cases where our data files don't know the appropriate language
+code.
 
 > type Language = ByteString
 
 A WiktionaryTerm is a piece of text that can be defined on Wiktionary. It is
-defined by its term text, the language it's in (which may be unknown), and
-a string that identifies its word sense (which may be unknown or missing).
+defined by its term text, which is required, along with other fields which may
+be unknown or missing: the language it's in, a label for its word sense, its
+part of speech, and its etymology label (which is like a much broader word
+sense).
 
-Languages are provided as rather un-standardized strings. It's outside the
-scope of this Haskell code to recognize BCP 47 language codes and their
-corresponding names (we'll be using the `langcodes` module in Python for that
-later). So English could appear as `en`, `eng`, `en-US`, or `English`
-interchangeably.
+(Wiktionary entries for etymologically-unrelated homographs separate them into
+sections named, for example, "Etymology 1" and "Etymology 2". In these cases,
+"1" and "2" are the etymology labels. Most words only have a single etymology,
+and by default their etymology label is "1".)
 
 > data WiktionaryTerm = WiktionaryTerm {
 >   text :: ByteString,
@@ -45,17 +54,28 @@ interchangeably.
 >   pos :: Maybe ByteString,
 >   etym :: Maybe ByteString
 > } deriving (Eq)
+
+We export a term to JSON by constructing an object that keeps the values that
+are `Just val`, and excludes the ones that are `Nothing`. We also use this
+JSON representation as the string representation of a WiktionaryTerm.
+
+> instance ToJSON WiktionaryTerm where
+>   toJSON term =
+>     let maybePairs = [("text", Just (text term)),
+>                       ("language", language term),
+>                       ("etym", etym term),
+>                       ("pos", pos term),
+>                       ("sense", sense term)]
+>         existingPairs = filterMaybeValues maybePairs
+>     in object [key .= value | (key, value) <- existingPairs]
 >
 > instance Show WiktionaryTerm where
->   show term =
->     let {
->       question = UTF8.fromString "?";
->       pieces = map (fromMaybe question)
->                    [language term, Just (Char8.concat ["\"", text term, "\""]),
->                     etym term, pos term, sense term];
->       trimUnknown list = if (last list) == question then trimUnknown (init list) else list;
->       usefulPieces = trimUnknown pieces
->     } in UTF8.toString (Char8.intercalate "/" usefulPieces)
+>   show term = LUTF8.toString (encode term)
+>
+> filterMaybeValues :: [(a, Maybe b)] -> [(a, b)]
+> filterMaybeValues ((key, Just val):rest) = (key, val):(filterMaybeValues rest)
+> filterMaybeValues ((key, Nothing):rest) = filterMaybeValues rest
+> filterMaybeValues [] = []
 >
 > simpleTerm language text = WiktionaryTerm {
 >   text=text, language=Just language, sense=Nothing, pos=Nothing, etym=Nothing
@@ -70,12 +90,23 @@ from a page.
 >   toTerm :: WiktionaryTerm
 > } deriving (Show, Eq)
 >
+> instance ToJSON WiktionaryRel where
+>   toJSON rel = object ["rel" .= (relation rel), "from" .= fromTerm rel, "to" .= toTerm rel]
+>
 > makeRel :: ByteString -> WiktionaryTerm -> WiktionaryTerm -> WiktionaryRel
 > makeRel rel from to = WiktionaryRel { relation=rel, fromTerm=from, toTerm=to }
 > makeGenericRel = makeRel "RelatedTo"
 >
 > assignRel :: ByteString -> WiktionaryRel -> WiktionaryRel
 > assignRel rel relObj = relObj {relation=rel}
+
+ByteStrings don't have a toJSON, apparently. Let's fix that.
+
+> instance ToJSON ByteString where
+>   toJSON bs = toJSON (UTF8.toString bs)
+
+Annotations
+-----------
 
 Working with annotations:
 
