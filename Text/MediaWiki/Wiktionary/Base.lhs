@@ -121,6 +121,12 @@ Working with annotations:
 >
 > linkableAnnotations :: AnnotatedString -> [Annotation]
 > linkableAnnotations astring = filter linkableAnnotation (A.annotations astring)
+>
+> linkAnnotation :: Annotation -> Bool
+> linkAnnotation a = (getDefault "link" "rel" a) == "link"
+>
+> linkAnnotations :: AnnotatedString -> [Annotation]
+> linkAnnotations astring = filter linkAnnotation (A.annotations astring)
 
 Converting an Annotation representing a term to a WiktionaryTerm:
 
@@ -194,7 +200,7 @@ The simpler version for entries in a list, such as a "Synonyms" section:
 > entryToRels thisTerm defText =
 >   let defSense  = findSenseID defText
 >       termSense = thisTerm {sense=defSense}
->   in map (annotationToRel termSense) (linkableAnnotations defText)
+>   in map (annotationToRel termSense) (linkAnnotations defText)
 
 > makeDefinitionRel termSense language definition =
 >   makeRel "definition" termSense (simpleTerm language definition)

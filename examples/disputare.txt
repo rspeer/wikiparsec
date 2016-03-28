@@ -1,0 +1,68 @@
+==Italian==
+
+===Etymology===
+From {{etyl|la|it}} {{m|la|disputare}}.
+
+===Verb===
+{{it-verb}}
+
+# {{label|it|intransitive}} To [[dispute]], to [[discuss]], to [[argue]].
+# {{label|it|intransitive}} To [[compete]], to [[contend]].
+# {{label|it|transitive}} To dispute, to [[contest]], to [[fight]].
+# {{label|it|transitive}} (''sports'') To [[take part]] in, to [[play]].
+
+====Synonyms====
+* (1) [[dibattere]], [[discutere]]
+* (2) [[gareggiare]]
+* (3) [[contendere]]
+* (4) [[giocare]]
+
+====Derived terms====
+{{der-top}}
+* [[disputa]]
+* [[disputabile]]
+* [[disputarsi]]
+{{der-mid}}
+* [[disputatore]]
+* [[disputazione]]
+{{der-bottom}}
+
+====Conjugation====
+{{it-conj-are|disput|avere}}
+
+===Anagrams===
+* [[depurasti#Italian|depurasti]]
+* [[disputerà#Italian|disputerà]]
+
+----
+
+==Latin==
+
+===Verb===
+{{la-verb-form|disputāre}}
+
+# {{inflection of|disputō||pres|actv|inf|lang=la}}
+# {{inflection of|disputō||2|s|pres|pasv|impr|lang=la}}
+# {{inflection of|disputō||2|s|pres|pasv|indc|lang=la}}
+
+----
+
+==Spanish==
+
+===Verb===
+{{es-verb-form}}
+
+# {{es-verb form of|person=first-person|number=singular|tense=future|mood=subjunctive|ending=ar|disputar}}
+# {{es-verb form of|person=third-person|number=singular|tense=future|mood=subjunctive|ending=ar|disputar}}
+
+[[es:disputare]]
+[[fr:disputare]]
+[[ko:disputare]]
+[[io:disputare]]
+[[it:disputare]]
+[[mg:disputare]]
+[[nl:disputare]]
+[[ja:disputare]]
+[[pl:disputare]]
+[[ro:disputare]]
+

@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                wikiparsec
-version:             0.1.0
+version:             0.2.0
 synopsis:            An LL parser for extracting information from Wiki text, particularly Wiktionary.
 -- description:
 homepage:            http://github.com/LuminosoInsight/wikiparsec
@@ -49,3 +49,21 @@ Executable wiki2text
                        hexpat ==0.20.*,
                        containers,
                        aeson
+
+Executable wiktionary-parser
+  ghc-options:
+    -threaded
+    -O2
+  main-is:             cmd/WiktionaryParser.lhs
+  build-depends:       base,
+                       bytestring,
+                       utf8-string,
+                       attoparsec ==0.13.*,
+                       parsec ==3.1.*,
+                       tagsoup,
+                       fast-tagsoup-utf8-only,
+                       stringsearch,
+                       hexpat ==0.20.*,
+                       containers,
+                       aeson
+

@@ -1,0 +1,320 @@
+==English==
+{{wikipedia}}
+[[Image:Be-map.png|thumb|right|Map of Belgium]]
+
+===Etymology===
+From {{etyl|la|en}} {{m|la|Belgium}}, from the name of the tribe of {{m|en|Belgae}}.
+
+===Pronunciation===
+* {{a|UK|US}} {{IPA|/ˈbɛldʒəm/|lang=en}}
+* {{audio|en-us-Belgium.ogg|Audio (US)|lang=en}}
+
+===Proper noun===
+{{en-proper noun}}
+
+# A country in [[Western Europe]] that has borders with the [[Netherlands]], [[Germany]], [[Luxembourg]] and [[France]].
+
+=====Usage notes=====
+When describing the country's [[monarch]], he or she should not be called "[[king|King]] (or [[queen|Queen]]) of Belgium", but "King (or Queen) of the [[Belgians]]".
+
+====Synonyms====
+* [[Kingdom of Belgium]] {{qualifier|official name}}
+
+====Meronyms====
+* [[Wallonia]]
+* [[Flanders]]
+* [[Brussels-Capital Region]]
+* [[Brussels]] {{qualifier|capital city}}
+
+====Related terms====
+* [[Belgian]]
+
+====Translations====
+{{trans-top|country in Europe}}
+* Acehnese: {{t|ace|Bèlgia}}
+* Afrikaans: {{t|af|België}}
+* Albanian: {{t+|sq|Belgjikë|f}}
+* Amharic: {{t|am|ቤልጅግ|sc=Ethi}}
+* Arabic: {{t|ar|بِلْجِيكَا|f|tr=biljīkā}}
+* Aragonese: {{t|an|Belchica}}
+* Aramaic: {{t|arc|ܒܠܓܝܟܐ}}
+* Armenian: {{t|hy|Բելգիա}}
+* Aromanian: {{t|rup|Belghia}}
+* Asturian: {{t+|ast|Bélxica|f}}
+* Azeri: {{t+|az|Belçika}}
+* Bashkir: {{t|ba|Бельгия|sc=Cyrl}}
+* Basque: {{t+|eu|Belgika}}
+* Bavarian: {{t|bar|Belgien}}
+* Belarusian: {{t|be|Бе́льгія|f}}
+* Bengali: {{t+|bn|বেলজিয়াম|tr=beljiẏam|sc=Beng}}
+* Bishnupriya Manipuri: {{t|bpy|বেলজিয়াম|tr=bēlajiẏām}}
+* Breton: {{t+|br|Belgia}}
+* Bulgarian: {{t+|bg|Бе́лгия|f}}
+* Burmese: {{t|my|ဘယ်လ်ဂျီယမ်နိုင်ငံ|sc=Mymr}}, {{t|my|ဘယ်လ်ဂျီယမ်|sc=Mymr}}
+* Catalan: {{t+|ca|Bèlgica|f}}
+* Cebuano: {{t|ceb|Belhika}}
+* Chechen: {{t|ce|Бельге|sc=Cyrl}}
+* Cherokee: {{t|chr|ᏇᎵᏣᎻ|tr=Quelitsami|sc=Cher}}
+* Chinese:
+*: Cantonese: {{t|yue|比利時|sc=Hani}}, {{t|yue|比利时|tr=bei2 lei6 si4|sc=Hani}}
+*: Hakka: {{t|hak|比利時|sc=Hani}}, {{t|hak|比利时|tr=Pí-li-sṳ̀|sc=Hani}}
+*: Mandarin: {{t|cmn|比利時|sc=Hani}}, {{t+|cmn|比利时|tr=Bǐlìshí|sc=Hani}}
+*: Min Nan: {{t|nan|比利時|sc=Hani}}, {{t|nan|比利时|tr=Pí-lī-sî|sc=Hani}}
+* Chuvash: {{t|cv|Бельги|sc=Cyrl}}
+* Cornish: {{t|kw|Pow Belg}}
+* Corsican: {{t|co|Belgica}}
+* Crimean Tatar: {{t|crh|Belçika}}
+* Czech: {{t+|cs|Belgie|f}}
+* Danish: {{t+|da|Belgien}}
+* Dhivehi: {{t|dv|ބެލްޖިއަމް}}
+* Dutch: {{t+|nl|België|n}}
+* Dzongkha: {{t|dz|བེལ་ཇིཡམ་|sc=Tibt}}
+* Esperanto: {{t+|eo|Belgio}}, {{t|eo|Belgujo}}
+* Estonian: {{t+|et|Belgia}}
+* Ewe: {{t|ee|Belgium}}
+* Faroese: {{t+|fo|Belgia}}
+* Finnish: {{t+|fi|Belgia}}
+* Franco-Provençal: {{t|frp|Bèlg·ique}}
+* French: {{t+|fr|Belgique|f}}
+* Friulian: {{t|fur|Belgjo}}
+* Galician: {{t+|gl|Bélxica|f}}
+* Georgian: {{t|ka|ბელგია|sc=Geor}}
+* German: {{t+|de|Belgien|n}}
+*: Alemannic: {{t|gsw|Belgien}}
+*: Central Franconian: {{t|gmw-cfr|Belljie}}
+* Greek: {{t+|el|Βέλγιο|n}}
+* Greenlandic: {{t+|kl|Belgia}}
+* Gujarati: {{t|gu|બેલ્જિયમ|tr=beljiyam}}
+* Haitian Creole: {{t|ht|Bèljik}}
+* Hawaiian: {{t|haw|Pelekiuma}}
+* Hebrew: {{t+|he|בֶּלְגְּיָה|tr=bélgya}}
+* Hindi: {{t+|hi|बेल्जियम}}
+* Hungarian: {{t+|hu|Belgium}}
+* Icelandic: {{t+|is|Belgía|f}}
+* Ido: {{t+|io|Belgia}}
+* Ilocano: {{t|ilo|Belgium}}
+* Indonesian: {{t|id|Belgia}}
+* Interlingua: {{t+|ia|Belgica}}, {{t+|ia|Belgio}}
+* Interlingue: {{t|ie|Belgia}}
+* Irish: {{t|ga|Beilg|f|alt=An Bheilg}}, {{t|ga|Ríocht na Beilge|f}}
+* Italian: {{t+|it|Belgio|m}}
+* Japanese: {{t+|ja|ベルギー|tr=Berugī}}
+* Javanese: {{t|jv|Bèlgia}}
+* Norman: {{t|nrf|Belgique|f}}
+* Kabyle: {{t|kab|Biljik}}
+* Kamba: {{t|kam|Belgium}}, {{t|kam|Belgium}}, {{t|kam|Belgium}}
+* Kapampangan: {{t|pam|Belgium}}
+* Kashubian: {{t+|csb|Belgijskô}}
+* Kazakh: {{t|kk|Белгия|sc=Cyrl}}
+* Khmer: {{t|km|បែលហ្ស៊ិក|tr=bael zik|sc=Khmr}}
+* Kinyarwanda: {{t|rw|Ububirigi}}
+* Komi-Zyrian: {{t|kpv|Бельгия|sc=Cyrl}}
+* Korean: {{t+|ko|^벨기에|sc=Hang}}
+* Kurdish:
+*: Sorani: {{t|ku|به‌لجیکا|sc=ku-Arab}}
+* Kyrgyz: {{t|ky|Бельгия|sc=Cyrl}}
+* Ladino: {{t|lad|Beljika}}
+* Lao: {{t+|lo|ແບນຊິກ|sc=Laoo}}
+* Latin: {{t|la|Belgia}}, {{t|la|Belgica|f}}
+* Latvian: {{t+|lv|Beļģija|f}}
+* Ligurian: {{t|lij|Belgiò}}
+* Limburgish: {{t|li|Belsj}}
+* Lingala: {{t|ln|Bɛ́ljika}}
+* Lithuanian: {{t+|lt|Belgija|f}}
+* Livonian: {{t|liv|Belgij}}
+{{trans-mid}}
+* Lojban: {{t|jbo|Belgique}}
+* Low German:
+*: Dutch Low Saxon: {{t+|nds-nl|België}}
+*: German Low German: {{t+|nds-de|Belgien}}
+* Lower Sorbian: {{t|dsb|Belgiska}}
+* Luhya: {{t|luy|Belgium}}
+* Luxembourgish: {{t+|lb|Belsch|f}}
+* Macedonian: {{t+|mk|Белгија|f}}
+* Malagasy: {{t|mg|Belzika}}
+* Malay: {{t|ms|Belgium}}
+* Malayalam: {{t|ml|ബെല്‍ജിയം|sc=Mlym}}
+* Maltese: {{t|mt|Belġju}}
+* Manx: {{t|gv|Yn Velg}}
+* Maori: {{t|mi|Peratiamu}}, {{t|mi|Peratiamu}}
+* Marathi: {{t|mr|बेल्जियम|sc=Deva}}
+* Meru: {{t|mer|Belgium}}
+* Mongolian: {{t+|mn|Бельги|sc=Cyrl}}
+* Nahuatl: {{t|nah|Belxicān}}
+* Nauruan: {{t|na|Belgium}}
+* Navajo: {{t|nv|Bélgii bikéyah}}
+* Neapolitan: {{t|nap|Belge}}
+* Nepali: {{t|ne|बेल्जियम|tr=beljiyam|sc=Deva}}
+* Norman: {{t|nrf|Belgique}}
+* Northern Sami: {{t|se|Belgia}}
+* Norwegian: {{t+|no|Belgia}}
+*: Nynorsk: {{t+|nn|Belgia}}
+* Novial: {{t|nov|Belgia}}
+* Occitan: {{t+|oc|Belgica}}
+* Old English: {{t|ang|Belgice}}
+* Ossetian: {{t|os|Бельги}}
+* Papiamentu: {{t|pap|Bélgika}}
+* Pashto: {{t|ps|بلجيم|sc=Arab}}
+* Pennsylvania German: {{t|pdc|Belgien}}
+* Persian: {{t+|fa|بلژیک|tr=belžik}}
+* Piedmontese: {{t|pms|Belgi}}
+* Polish: {{t+|pl|Belgia|f}}
+* Portuguese: {{t+|pt|Bélgica}}
+* Quechua: {{t|qu|Bilhika}}
+* Romani: {{t|rom|Beljiya}}
+* Romanian: {{t+|ro|Belgia|f}}
+* Romansch: {{t|rm|Belgia}}
+* Russian: {{t+|ru|Бе́льгия|f}}
+* Samogitian: {{t|sgs|Belgėjė}}
+* Sanskrit: {{t|sa|बेल्जियम}}
+* Saterland Frisian: {{t|stq|Belgien}}
+* Scots: {{t|sco|Belgium}}
+* Scottish Gaelic: {{t|gd|Beilg|alt=A' Bheilg|f}}
+* Serbo-Croatian:
+*: Cyrillic: {{t|sh|Белгија|f|sc=Cyrl}}
+*: Roman: {{t+|sh|Belgija|f}}
+* Sicilian: {{t|scn|Belgiu|m}}
+* Silesian: {{t|szl|Belgijo}}
+* Slovak: {{t+|sk|Belgicko|n}}
+* Slovene: {{t+|sl|Bélgija|f}}
+* Spanish: {{t+|es|Bélgica|f}}
+* Sranan Tongo: {{t|srn|Belgikondre}}
+* Sundanese: {{t|su|Bélgia}}
+* Swahili: {{t+|sw|Ubelgiji}}, {{t+|sw|Ubelgiji}}
+* Swedish: {{t+|sv|Belgien}}
+* Tagalog: {{t+|tl|Belhika}}
+* Tajik: {{t|tg|Белгия|sc=Cyrl}}
+* Tamil: {{t|ta|பெல்ஜியம்}}
+* Telugu: {{t+|te|బెల్జియం}}
+* Tetum: {{t|tet|Béljika}}
+* Thai: {{t|th|ประเทศเบลเยียม|tr=bprà-têet been-yiiam|sc=Thai}}, {{t+|th|เบลเยียม|tr=been-yiiam|sc=Thai}}
+* Tibetan: {{t|bo|པེར་ཅིན}}
+* Tok Pisin: {{t|tpi|Beljiam}}
+* Turkish: {{t+|tr|Belçika}}
+* Turkmen: {{t|tk|Belgiýa}}
+* Udmurt: {{t|udm|Бельгия}}
+* Ukrainian: {{t+|uk|Бе́льгія|f}}
+* Upper Sorbian: {{t|hsb|Belgiska}}
+* Urdu: {{t|ur|بلجئیم|tr=beljiyam}}
+* Uyghur: {{t|ug|بېلگىيە|sc=Arab}}
+* Uzbek: {{t+|uz|Belgiya|sc=Cyrl}}
+* Venetian: {{t|vec|Belgio}}
+* Vietnamese: {{t|vi|Bỉ}}
+* Volapük: {{t+|vo|Belgän}}
+* Võro: {{t|vro|Belgiä}}
+* Walloon: {{t+|wa|Beldjike}}
+* Waray-Waray: {{t|war|Belhika}}
+* Welsh: {{t+|cy|Gwlad Belg|f}}
+* West Flemish: {{t|vls|België}}
+* West Frisian: {{t+|fy|Belgje}}
+* Wolof: {{t|wo|Beljik}}
+* Yiddish: {{t|yi|בעלגיע}}
+* Yoruba: {{t|yo|Belgium}}
+* Zazaki: {{qualifier|Southern Zazaki}} {{t|zza|Belçıka}}
+{{trans-bottom}}
+
+===See also===
+* [[Appendix:Place names in Belgium]]
+* {{list:countries of Europe/en}}
+
+[[Category:en:Belgium]]
+[[Category:en:Exonyms]]
+
+----
+
+==Hungarian==
+{{wikipedia|lang=hu}}
+
+===Pronunciation===
+* {{hu-IPA}}
+* {{hyphenation|Bel|gi|um|lang=hu}}
+
+===Proper noun===
+{{head|hu|proper noun}}
+
+# {{l|en|Belgium}}
+
+====Declension====
+{{hu-decl-ok|Belgiu|m|ot|n=sg}}{{hu-pos-otok|Belgium||ai|n=sg}}
+
+====Related terms====
+* [[Belga Királyság]]
+* [[belga]]
+
+[[Category:hu:Countries]]
+[[Category:hu:Exonyms]]
+
+----
+
+==Latin==
+{{wikipedia|lang=la}}
+
+===Proper noun===
+{{la-proper noun|Belgium|Belgii|Belgiī|n|second}}
+
+# [[#English|Belgium]]
+
+====Inflection====
+{{la-decl-2nd-N|loc=1|num=sg|Belgi}}
+
+====Synonyms====
+* {{l|la|Belgica}}
+
+[[Category:la:Countries]]
+[[Category:la:Place names]]
+[[Category:la:Countries of Europe]]
+
+[[ar:Belgium]]
+[[ast:Belgium]]
+[[az:Belgium]]
+[[bn:Belgium]]
+[[bg:Belgium]]
+[[cs:Belgium]]
+[[cy:Belgium]]
+[[da:Belgium]]
+[[de:Belgium]]
+[[et:Belgium]]
+[[el:Belgium]]
+[[es:Belgium]]
+[[eu:Belgium]]
+[[fr:Belgium]]
+[[fy:Belgium]]
+[[gl:Belgium]]
+[[ko:Belgium]]
+[[hi:Belgium]]
+[[hr:Belgium]]
+[[io:Belgium]]
+[[id:Belgium]]
+[[ia:Belgium]]
+[[it:Belgium]]
+[[kl:Belgium]]
+[[kn:Belgium]]
+[[sw:Belgium]]
+[[ku:Belgium]]
+[[lo:Belgium]]
+[[lv:Belgium]]
+[[lb:Belgium]]
+[[lt:Belgium]]
+[[hu:Belgium]]
+[[mn:Belgium]]
+[[nl:Belgium]]
+[[ja:Belgium]]
+[[nn:Belgium]]
+[[uz:Belgium]]
+[[km:Belgium]]
+[[nds:Belgium]]
+[[pl:Belgium]]
+[[pt:Belgium]]
+[[ro:Belgium]]
+[[ru:Belgium]]
+[[simple:Belgium]]
+[[sk:Belgium]]
+[[fi:Belgium]]
+[[sv:Belgium]]
+[[ta:Belgium]]
+[[th:Belgium]]
+[[tg:Belgium]]
+[[tr:Belgium]]
+[[uk:Belgium]]
+[[zh:Belgium]]
+

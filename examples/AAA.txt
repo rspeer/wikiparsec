@@ -1,0 +1,119 @@
+==Translingual==
+{{wikipedia}}
+
+===Symbol===
+{{head|mul|symbol}}
+
+# A standard size of [[dry cell battery]] smaller than [[AA]].
+
+----
+
+==English==
+{{wikipedia}}
+
+===Pronunciation===
+Usually pronounced as either ''[[triple]] A'' or ''[[three]] A''.
+
+===Symbol===
+{{head|en|symbol}}
+
+# {{label|en|sports|North America}} The highest level of [[minor league]] baseball, often used by extension in other sports to indicate the highest level of minor league play in that sport as well.
+# A very [[narrow]] [[shoe]] [[size]].
+# {{label|en|finance}} The highest credit rating given by debt analysis agencies such as Standard & Poor's, Moody's, and A.M. Best.
+# {{label|en|video games}} A quality [[video game]] expected to sell well, typically with a higher budget than budget software.
+
+===Initialism===
+{{rfc-header|Initialism}}
+{{head|en|initialism}}
+
+# {{w|Abdominal aortic aneurysm}}
+# {{w|Abortion Assistance Association}}
+# Access All Areas, Sony music project
+# Access Approval Authority
+# Accumulated Adjustments Account, in US Federal Income Tax
+# Acquisition Approval Authority
+# Action Awareness Alert
+# {{label|en|dated}} {{w|Associated Actors and Artistes of America|Actors and Artistes of America}} now, the [[AAAA]].
+# [[adaptive array antenna|Adaptive array antenna]]
+# Administration, authorization, and authentication, in software security
+# [[advanced acoustic array|Advanced acoustic array]]
+# AEGIS acquisition agent
+# Aerospace engineering, applied mechanics, and aviation
+# {{w|Agricultural Adjustment Act}}
+# {{w|Agricultural Adjustment Administration}}
+# {{w|Agricultural Aviation Association}}
+# {{w|Agricultural Adjustment Association}}
+# Air avenue of approach
+# [[airborne array aperture|Airborne array aperture]]
+# Airborne assault area
+# Aircraft alert area
+# Airport airspace analysis
+# [[Alaska]]
+# {{w|All American Aviation}}
+# {{w|Allegheny Airlines}}
+# {{label|en|British|arts|historical}} [[w:Allied Artists' Association|Allied Artists' Association]]
+# {{w|Allied Artists of America}}
+# Allocations, assessments, and analysis
+# Alternate assembly area
+# {{label|en|British}} [[w:Amateur Athletic Association|Amateur Athletic Association]]
+# [[w:American Abstract Artists|American Abstract Artists]]
+# {{label|en|dated}} {{w|American Academy of Allergy}}, now see [[AAAAI]]
+# {{w|American Academy of Actuaries}}
+# {{w|American Academy of Advertising}}
+# {{w|American Accordionists Association}}
+# {{w|American Accounting Association}}
+# {{w|American Airship Association}}
+# {{w|American Ambulance Association}}
+# {{w|American Antarctic Association}}
+# {{w|American Anthropological Association}}
+# {{w|American Arbitration Association}}
+# {{w|American Association of Anatomists}}
+# {{w|American Astronomers Association}}
+# {{w|American Australian Association}}
+# {{label|en|US}} [[w:American Automobile Association|American Automobile Association]]
+# Angle angle angle, a geometric proof
+# [[w:ANSI Artists of America|ANSI Artists of America]]
+# {{label|en|military}} [[anti-aircraft]] [[artillery]]
+# {{w|Antique Airplane Association}}
+# {{w|Appraisers Association of America}}
+# {{w|Archives of American Art}}
+# {{w|Area-Agency on Aging}}
+# {{w|Argentine Anticommunist Alliance}}
+# {{w|Armenian Assembly of America}}
+# {{w|Army Athletic Association}}
+# {{label|en|dated|US}} [[w:United States Army Audit Agency|Army Audit Agency]], the [[USAAA]], United States Army Audit Agency.
+# [[aromatic amino acid|Aromatic amino acid]]
+# Arrival and assembly area
+# Assign alternate area
+# {{w|Associated Agents of America}}
+# {{w|Association of Accounting Administrators}}
+# {{w|Association of Average Adjusters}}
+# Astronaut-actuated abort
+# Attitude, awareness and accountability, a ski safety program
+# {{label|en|dated}} {{w|Australian Association of Accountants}}
+# {{w|Australian Automobile Association}}
+# Authentication, authorization and accounting
+# Authorization accounting activity; authorized accounting activity
+# Automated airlift analysis
+# [[w|Public corporations of the Government of Puerto Rico|Autoridad de Acueductos y Alcantarillados]] (Aqueduct and Sewer Authority, Puerto Rico)
+# Awaiting aircraft availability
+
+===References===
+
+{{wikipedia|dab=AAA}}
+
+[[Category:English three-letter words]]
+
+[[ar:AAA]]
+[[cs:AAA]]
+[[de:AAA]]
+[[et:AAA]]
+[[fr:AAA]]
+[[hu:AAA]]
+[[pl:AAA]]
+[[pt:AAA]]
+[[ro:AAA]]
+[[sk:AAA]]
+[[ta:AAA]]
+[[tr:AAA]]
+

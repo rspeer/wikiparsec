@@ -1,0 +1,179 @@
+==English==
+{{slim-wikipedia}}
+[[Image:60-40 Solder.jpg|thumb|right|A spool of solder.]]
+
+===Etymology===
+From {{etyl|enm|en}} {{m|enm|solderen}}, from {{etyl|fro|en}} {{m|fro|solder}} (Modern French {{m|fr|souder}}) from {{etyl|la|en}} {{m|la|solidāre}}, present active infinitive of {{m|la|solidō||make solid}}.
+
+===Pronunciation===
+{{der-top|Pronunciation}}
+* {{enPR|sŏl'də(r)}}, {{IPA|/ˈsɒldə(ɹ)/|lang=en}}
+* {{rhymes|ɒldə(ɹ)|lang=en}}
+* {{audio|en-uk-solder.ogg|Audio (UK)|lang=en}}
+* {{enPR|sōl'də(r)}}, {{IPA|/ˈsəʊldə(ɹ)/|lang=en}}
+* {{rhymes|əʊldə(ɹ)|lang=en}}
+* {{audio|en-au-solder.ogg|Audio (AUS)|lang=en}}
+* {{audio|en-ca-solder.ogg|Audio (CA)|lang=en}}
+* {{a|CanE|GenAm}} {{enPR|sŏd′ər}}, {{IPA|/ˈsɑdɚ/|lang=en}}
+* {{rhymes|ɒdə(ɹ)|lang=en}}
+* {{audio|en-us-solder.ogg|Audio (US)|lang=en}}
+* {{enPR|sōd'ə(r)}}, {{IPA|/ˈsəʊdə(ɹ)/|lang=en}}
+* {{rhymes|əʊdə(ɹ)|lang=en}}
+{{der-bottom}}
+* [http://www.languagehat.com/archives/001382.php LanguageHat discussion on the many pronunciations of “solder”]
+
+===Noun===
+{{en-noun|-}}
+
+# Any of various [[alloy]]s, often of [[tin]] and [[lead]], that are used to join small pieces of [[metal]] together
+
+====Translations====
+{{trans-top|any of various alloys that are used to join small pieces of metal together}}
+* Armenian: {{t+|hy|զոդ}}
+* Chinese:
+*: Mandarin: {{t+|cmn|焊料|tr=hànliào|sc=Hani}}
+* Czech: {{t+|cs|pájka|f}}
+* Danish: {{t|da|loddemetal|n}}
+* Finnish: {{t|fi|juote}}, {{t|fi|juotosmetalli}}, {{t|fi|juotostina}}
+* French: {{t+|fr|soudure|f}}
+* German: {{t|de|Lötmetall|n}}, {{t+|de|Lot|n}}, {{t|de|Lötdraht|m}}, {{t+|de|Lötzinn|n}}
+* Greek: {{t+|el|συγκολλώ}}
+* Icelandic: {{t|is|lóðmálmur|m}}, {{t|is|lóðtin|n}}, {{t|is|brasmálmur|m}}, {{t|is|loðningarefni|n}}
+* Japanese: {{t|ja|半田|tr=はんだ, handa|sc=Jpan}}
+{{trans-mid}}
+* Korean: {{t+|ko|땜납|tr=ddaemnap|sc=Kore}}
+* Latvian: {{t|lv|lode|f}}
+* Persian: {{t+|fa|لحیم|tr=lahim|sc=fa-Arab}}
+* Polish: {{t+|pl|cyna|f}}, {{t|pl|spoiwo lutownicze|n}} {{qualifier|formal}}, {{t+|pl|lut|m}}
+* Portuguese: {{t+|pt|solda|f}}
+* Russian: {{t+|ru|припо́й|m}}
+* Serbo-Croatian: {{t+|sh|lem|m}}
+* Spanish: {{t|es|estaño para soldar|m}}, {{t+|es|estaño|m}}
+* Turkish: {{t+|tr|lehim}}
+* Welsh: {{t+|cy|sodr|m}}
+{{trans-bottom}}
+
+{{checktrans-top}}
+* Welsh: {{t-check|cy|sodr}}
+{{trans-bottom}}
+
+===Verb===
+{{en-verb}}
+
+# {{senseid|en|to join with solder}} To join with (or as if with) solder.
+
+====Antonyms====
+* [[desolder]]
+
+====Derived terms====
+* [[solderer]]
+* [[soldering iron]]
+
+====Translations====
+{{trans-top|to join with solder}}
+* Arabic: {{t-needed|ar}}
+* Armenian: {{t+|hy|զոդել}}
+* Bulgarian: {{t|bg|запоя́вам|sc=Cyrl}}, {{t+|bg|споя́вам|sc=Cyrl}}
+* Chinese:
+*: Mandarin: {{t+|cmn|焊接|tr=hànjiē|sc=Hani}}
+* Czech: {{t|cs|pájet}}, {{t|cs|letovat}}
+* Danish: {{t|da|lodde}}
+* Dutch: {{t+|nl|solderen}}
+* Esperanto: {{t|eo|luti}}
+* Finnish: {{t+|fi|juottaa}}
+* French: {{t+|fr|souder}}
+* Georgian: {{t-needed|ka}}
+* German: {{t+|de|löten}}
+* Hebrew: {{t-needed|he}}
+* Hindi: {{t-needed|hi}}
+* Hungarian: {{t+|hu|forraszt}}
+* Icelandic: {{t|is|lóða}}, {{t|is|brasa}}, {{t|is|sjóða saman}}, {{t+|is|kveikja}}, {{t|is|kveikja saman}}
+{{trans-mid}}
+* Japanese: {{t|ja|はんだづけ|tr=handadzuke suru|alt=はんだづけする|sc=Jpan}}
+* Korean: {{t-needed|ko}}
+* Latin: {{t+|la|plumbō}}
+* Latvian: {{t|lv|lodēt}}
+* Macedonian: {{t|mk|леми|tr=lémi}}
+* Persian: {{t|fa|لحیم کردن|tr=lahim kardan|sc=fa-Arab}}
+* Polish: {{t+|pl|lutować}}
+* Portuguese: {{t+|pt|soldar}}
+* Quechua: {{t|qu|chapiy}}
+* Romanian: {{t-needed|ro}}
+* Russian: {{t+|ru|пая́ть|impf}}, {{t+|ru|припая́ть|pf}}, {{t+|ru|спая́ть|pf}}
+* Serbo-Croatian: {{t+|sh|zalemiti}}
+* Spanish: {{t+|es|soldar}}
+* Swedish: {{t+|sv|löda}}
+* Thai: {{t-needed|th}}
+* Turkish: {{t+|tr|lehimlemek}}
+* Vietnamese: {{t+|vi|hàn}}
+{{trans-bottom}}
+
+===See also===
+* [[braze]]
+* [[flux]]
+* [[weld]]
+
+===Anagrams===
+* [[resold#English|resold]]
+
+[[Category:en:Alloys]]
+
+----
+
+==French==
+
+===Etymology===
+Cf. {{m|fr|solde}}.
+
+===Verb===
+{{fr-verb}}
+
+# to [[close]] (a deal)
+# {{label|fr|finance}} to [[settle]], to [[pay off]] (debt)
+# to [[sell]] at sales, to have a [[sale]]
+# {{label|fr|reflexive|~ '''par'''}} to [[end up]] (in), to [[result]] (in)
+
+====Conjugation====
+{{fr-conj-auto}}
+
+====Related terms====
+* [[solde#French|solde]]
+* [[solderie]]
+* [[soldeur]]
+
+===Anagrams===
+* [[drôles#French|drôles]]
+
+===External links===
+* {{R:TLFi}}
+
+[[cs:solder]]
+[[cy:solder]]
+[[et:solder]]
+[[el:solder]]
+[[fa:solder]]
+[[fr:solder]]
+[[ko:solder]]
+[[hy:solder]]
+[[io:solder]]
+[[id:solder]]
+[[it:solder]]
+[[kn:solder]]
+[[ku:solder]]
+[[hu:solder]]
+[[mg:solder]]
+[[ml:solder]]
+[[my:solder]]
+[[nl:solder]]
+[[ja:solder]]
+[[pl:solder]]
+[[ru:solder]]
+[[fi:solder]]
+[[sv:solder]]
+[[ta:solder]]
+[[te:solder]]
+[[chr:solder]]
+[[tr:solder]]
+[[vi:solder]]
+[[zh:solder]]
+
