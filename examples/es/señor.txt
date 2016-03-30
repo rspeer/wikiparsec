@@ -1,0 +1,135 @@
+== {{lengua|es}} ==
+{{pron-graf|fone=seˈɲoɾ}}
+
+=== Etimología ===
+{{etimología|la|senior|mayor|glosa-alt=mayor, de más edad}}, forma comparativa de {{l+|la|senex|glosa=viejo}}, del protoindoeuropeo {{l+|ine|*sénos|glosa=viejo}}
+
+=== {{sustantivo masculino|es}} ===
+{{inflect.es.adj.ad-lib|señor|señores|señora|señoras|link=s}}
+
+;1: {{plm|persona}} que [[poseer|posee]] o goza de [[autoridad]] sobre algo.
+{{sinónimo|amo|dueño}}
+:*'''Ejemplo:''' "la señora de la casa"
+
+;2: En particular, titular de un [[privilegio]] [[nobiliario]].
+{{relacionado|don}}
+
+;3: {{plm|vocativo}} de cortesía que se antepone al nombre, apellido o tratamiento de una persona.
+
+;4: El [[amo]] respecto a sus criados.
+
+;5: {{plm|suegro}}.
+{{uso|familiar}}
+
+;6: Respecto de los [[aldeano]]s, el [[habitante]] de las ciudades que usa traje y modales finos.
+
+=== {{adjetivo|es}} ===
+{{inflect.es.adj.reg-cons}}
+
+;7: Por extensión, de gran [[importancia]] o gravedad.
+:*'''Ejemplo:'''
+::"El Real Zaragoza venía de darse una ''señora paliza'' para ganar al Barça y encarrilar su eliminatoria y procuró administrar los esfuerzos, mientras que el Espanyol, sin De La Peña. se dejó caer en brazos de Luis García y Tamudo como únicas respuestas a la superioridad en el control de juego y de los espacios de su enemigo." [http://www.elperiodicodearagon.com/noticias/noticia.asp?pkid=298301 Sergio García explota. Dos goles del delantero y su perfecta sociedad con Óscar atropellan al Espanyol]. ''El Periódico de Aragón'', 12 de mayo de 2008
+
+;8: {{plm|decoroso}}, propio de [[caballero]]s.
+
+{{clear}}
+
+=== Locuciones ===
+
+{{rel-arriba|Locuciones con «señor»}}
+* [[descansar en el Señor|descansar]] o [[dormir en el Señor]]: Morir, dicho de la muerte de los justos.
+* [[quedar señor del campo]]: (Milicia) Haber vencido la batalla, manteniéndose en la campaña o terreno en donde se dio o estaba el enemigo.|| (Figurado) Haber vencido en cualquier disputa o contienda.
+* [[señor de horca y cuchillo]]: El que tenía derecho de vida y muerte sobre sus [[vasallo]]s.
+{{rel-centro}}
+* [[señor de sí]]
+* [[señor mayor]]: Persona de edad avanzada respecto de las demás de su casa.
+{{rel-abajo}}
+
+=== Refranes ===
+
+* [[no es señor quien señor nace, sino el que lo sabe ser]]
+* [[ninguno puede servir a dos señores]]: Proverbio tomado del [[evangelio]], con que se significa que el que ha de atender a una obligación se ha de desprender de otra incompatible con ella.
+
+=== Véase también ===
+{{w}}
+
+* [[Gran Señor]]
+* [[Señor]]: [[Dios]] y [[Jesucristo]].
+
+{{clear}}
+
+=== Traducciones ===
+{{trad-arriba}}
+{{t+|de|?|Herr|m}}
+{{t+|ar|?|ﺳﻴﺪ}} (seyd) {{m}}
+{{t+|hy|?|պարոն}} (paron) {{m}}
+{{t+|az|1|cənab}}
+{{t+|ca|1|senyor|m}}
+{{t+|cs|?|pan}}
+{{t+|zh|?|先生|tr=xiānsheng}}
+{{t+|ko|?|씨}} (ssi)
+{{t+|da|?|herr|m}}
+{{t+|sk|?|pán|m}}
+{{t+|sl|?|gospod|m}}
+{{t+|eo|?|1|sinjoro}}
+{{t+|fo|?||m}}
+{{t+|fi|?|herra|m}}
+{{t+|fr|1|monsieur|m|,|2|maître|m}}
+{{t+|fy|?|hear|m}}
+{{t+|gd|?|maighstir}}
+{{t+|cy|?|syr}}
+{{t+|ka|?|ბატონი}} (batoni) {{m}}
+{{t+|el|?|κύριος|tr=kírios}}
+{{t+|he|?|אדון}} (adon)
+{{trad-centro}}
+{{t+|hi|?|महोदय}} (mahodaya)
+{{t+|hu|?|úr}}
+{{t+|en|1|mister|m|,|2|master}}
+{{t+|ga|?|an tuasal}}
+{{t+|is|?|herra|m}}
+{{t+|it|?|signore|m}}
+{{t+|ku|?|mamoste}}
+{{t+|lo|?|ຖເກົາ}} (thao)
+{{t+|lv|?|kungs}}
+{{t+|lt|?|ponas}}
+{{t+|lb|?|Här}}
+{{t+|gv|?|whooinney}}
+{{t+|nl|?|heer}}
+{{t+|pl|?|pan|m}}
+{{t+|pt|?|senhor|m}}
+{{t+|ro|?|domn|m}}
+{{t+|ru|?|господин|tr=gospodin|m}}
+{{t+|sa|?|महानुभाव}} (mahānubhāva)
+{{t+|sv|?|herr|m}}
+{{t+|tr|?|beyefendi}}
+{{t+|uk|?|пан|tr=pan}}
+{{trad-abajo}}
+
+== Referencias y notas ==
+
+[[ca:señor]]
+[[chr:señor]]
+[[cs:señor]]
+[[el:señor]]
+[[en:señor]]
+[[fi:señor]]
+[[fj:señor]]
+[[fr:señor]]
+[[hu:señor]]
+[[id:señor]]
+[[ie:señor]]
+[[io:señor]]
+[[ko:señor]]
+[[mg:señor]]
+[[nl:señor]]
+[[no:señor]]
+[[oc:señor]]
+[[pl:señor]]
+[[pt:señor]]
+[[ru:señor]]
+[[sv:señor]]
+[[ta:señor]]
+[[tr:señor]]
+[[vi:señor]]
+[[zh:señor]]
+

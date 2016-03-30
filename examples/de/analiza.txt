@@ -1,0 +1,107 @@
+== analiza ({{Sprache|Polnisch}}) ==
+=== {{Wortart|Substantiv|Polnisch}}, {{f}} ===
+
+{{Polnisch Substantiv Übersicht
+|Nominativ Singular=analiza
+|Genitiv Singular=analizy
+|Dativ Singular=analizie
+|Akkusativ Singular=analizę
+|Instrumental Singular=analizą
+|Lokativ Singular=analizie
+|Vokativ Singular=analizo
+|Nominativ Plural=analizy
+|Genitiv Plural=analiz
+|Dativ Plural=analizom
+|Akkusativ Plural=analizy
+|Instrumental Plural=analizami
+|Lokativ Plural=analizach
+|Vokativ Plural=analizy
+}}
+
+{{Worttrennung}}
+:a·na·li·za, {{Pl.}} a·na·li·zy
+
+{{Aussprache}}
+:{{IPA}} {{Lautschrift|anaˈlʲiza}}, {{Pl.}} {{Lautschrift|anaˈlʲizɨ}}
+:{{Hörbeispiele}} {{Audio|Pl-analiza.ogg}}
+
+{{Bedeutungen}}
+:[1] [[Untersuchung]] einer [[Problematik]] von verschiedenen Seiten und [[Betrachtung]] der Einzelteile; Analyse, Auswertung
+:[2] [[Ergebnis]] von [1]; Analyse
+:[3] ''[[Chemie]]:'' [[Aufspaltung]] in einzelne  Bestandteile und [[Untersuchung]] dieser; Analyse
+:[4] ''[[Medizin]]:'' [[Ermittlung]] der [[chemisch]]en [[Zusammensetzung]]; Analyse, Untersuchung
+
+{{Synonyme}}
+:[1] [[badanie]], [[rozpatrywanie]]
+:[4] [[badanie]]
+
+{{Gegenwörter}}
+:[1–4] [[synteza]]
+
+{{Unterbegriffe}}
+:[1] [[analiza literacka]], [[analiza logiczna]], [[analiza matematyczna]], [[autoanaliza]], [[psychoanaliza]]
+:[3] [[analiza absorpcyjna]]
+:[4] [[analiza krwi]], [[analiza moczu]]
+
+{{Beispiele}}
+:[1] Ten problem wymaga dokładnej ''analizy.''
+::Dieses Problem bedarf einer genauen ''Analyse.''
+:[3] ''Analiza'' wody okazała, że składa się z tlenu i wodoru.
+::Die ''Analyse'' des Wassers ergab, dass es sich aus Sauerstoff und Wasserstoff zusammensetzt.
+:[4] Pielęgniarka oddała mocz pacjenta do ''analizy.''
+::Die Krankenpflegerin gab den Urin des Patienten zur ''Untersuchung.''
+
+{{Charakteristische Wortkombinationen}}
+:[4] [[laboratorium]]
+
+{{Wortbildungen}}
+:[[analityczny]], [[analityk]], [[analizator]], [[analizować]]
+
+==== Übersetzungen ====
+{{Ü-Tabelle|Ü-links=
+:{{Übersetzungen umleiten|1|Analyse|1}} {{f}}, {{Übersetzungen umleiten||Auswertung|}} {{f}}
+:{{Übersetzungen umleiten|2|Analyse|}} {{f}}
+:{{Übersetzungen umleiten|3|Analyse|}} {{f}}
+:{{Übersetzungen umleiten|4|Analyse|}} {{f}}, {{Übersetzungen umleiten||Untersuchung}} {{f}}
+|Ü-rechts=
+}}
+
+{{Referenzen}}
+:[1–4] {{Wikipedia|spr=pl|analiza}}
+:[1] {{Ref-Pons|pl}}
+:[1] {{Ref-SJP-PWN|analiza}}
+:[1] {{Ref-SJP-Doroszewski|analiza}}
+<!-- Bitte ersetzen: ą = %B1, ć = %E6, Ć = %C6, ę = %EA, ł = %B3, Ł = %A3, ń = %F1, ó = %F3, ś = %B6, Ś = %A6, ź = %BC, Ź = %AC, ż = %BF, Ż = %AF -->
+:[1] {{Ref-SO-PWN|analiza}}
+{{Referenzen prüfen|Polnisch}}
+:[1–4] {{Ref-Pons|pl}}
+:[1–4] {{Ref-SJP-PWN}}
+:[*] {{Ref-SO-PWN}}
+
+{{Ähnlichkeiten}}
+:[[alkoholiza]], [[analogia]]
+
+[[chr:analiza]]
+[[csb:analiza]]
+[[el:analiza]]
+[[en:analiza]]
+[[es:analiza]]
+[[et:analiza]]
+[[eu:analiza]]
+[[fi:analiza]]
+[[fr:analiza]]
+[[hu:analiza]]
+[[io:analiza]]
+[[li:analiza]]
+[[lo:analiza]]
+[[lt:analiza]]
+[[mg:analiza]]
+[[mk:analiza]]
+[[nl:analiza]]
+[[pl:analiza]]
+[[ro:analiza]]
+[[ru:analiza]]
+[[sh:analiza]]
+[[sr:analiza]]
+[[sv:analiza]]
+

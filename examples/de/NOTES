@@ -1,0 +1,20 @@
+Link to a root form:    
+
+    {{Grundformverweis Dekl|Citrin}}
+
+{{Bedeutungen}} starts the definition section
+{{Synonyme}} starts a synonym section
+{{Gegenwörter}} starts an antonym section
+{{Sinnverwandte Wörter}} is "cognate words", which are also synonyms
+{{Unterbegriffe}} is "under words": hyponyms
+{{Oberbegriffe}} is hypernyms
+{{Wortbildungen}} is "derived terms"
+
+
+Nouns indicate their singular and plural in one template:
+
+    {{Englisch Substantiv Übersicht
+    |Singular=mask
+    |Plural=masks
+    }}
+

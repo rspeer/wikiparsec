@@ -1,0 +1,15 @@
+== Citrins ({{Sprache|Deutsch}}) ==
+=== {{Wortart|Deklinierte Form|Deutsch}} ===
+
+{{Worttrennung}}
+:Ci·trins
+
+{{Aussprache}}
+:{{IPA}} {{Lautschrift|ʦiˈtʀiːns}}
+:{{Hörbeispiele}} {{Audio|}}
+
+{{Grammatische Merkmale}}
+*Genitiv Singular des Substantivs '''[[Citrin]]'''
+
+{{Grundformverweis Dekl|Citrin}}
+

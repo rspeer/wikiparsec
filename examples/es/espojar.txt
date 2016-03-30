@@ -1,0 +1,82 @@
+== {{lengua|es}} ==
+{{pron-graf|fone=des.poˈxaɾ}}
+
+=== Etimología ===
+{{etimología|osp|despojar|despojar}}, y este del latín {{l+|la|despolio|dēspoliāre}}.
+
+=== {{verbo transitivo|es}} ===
+;1: Privar a uno de lo que goza y tiene; desposeerle de ello con violencia.<ref name="dlc1914">{{DLC1914|}}</ref>
+;2 {{derecho}}: Quitar jurídicamente la posesión de los bienes o habitación que uno tenía, para dárselo a su legítimo dueño, precediendo sentencia para ello.<ref name="dlc1914" />
+
+=== Conjugación ===
+{{es.v.conj.ar|despoj}}
+
+=== Véase también ===
+* [[despojarse]]
+
+{{clear}}
+
+=== Traducciones ===
+{{trad-arriba}}
+<!--{{t+|de|}}-->
+<!--{{t+|ar|}}-->
+<!--{{t+|bg|}}-->
+<!--{{t+|ca|}}-->
+<!--{{t+|eo|}}-->
+<!--{{t+|fr|}}-->
+{{trad-centro}}
+<!--{{t+|en|}}-->
+<!--{{t+|it|}}-->
+<!--{{t+|ja|}}-->
+<!--{{t+|nl|}}-->
+<!--{{t+|pl|}}-->
+<!--{{t+|pt|}}-->
+{{trad-abajo}}
+
+== {{lengua|osp}} ==
+{{pron-graf|leng=osp}}
+
+=== Etimología ===
+{{etimología|leng=osp|la|despolio|alt=dēspoliāre}}.
+
+=== {{verbo transitivo|osp}} ===
+;1: {{plm}} ({{l|es|privar}}).
+
+== {{lengua|roa-ptg}} ==
+{{pron-graf|leng=roa-ptg}}
+
+=== Etimología ===
+{{etimología|leng=roa-ptg|osp|despojar|despojar}}, y este del latín {{l+|la|despolio|dēspoliāre}}. Cognado de {{l+|roa-ptg|debullar}}.
+
+=== {{verbo transitivo|roa-ptg}} ===
+;1: {{plm}} ({{l|es|privar}}).
+
+== {{lengua|pt}} ==
+{{pron-graf|leng=pt}}
+
+=== Etimología ===
+{{etimología|leng=pt|roa-ptg|despojar|despojar}}, y este del castellano antiguo {{l+|osp|despojar|glosa=despojar}}<ref name="Aulete">{{Aulete}}</ref>, del latín {{l+|la|despolio|dēspoliāre}}. Cognado de {{l+|pt|debulhar}}.
+
+=== {{verbo transitivo|pt}} ===
+;1: {{plm}} ({{l|es|privar}}).
+{{sinónimo|leng=pt|desvalijar|privar|roubar}}.
+
+=== Conjugación ===
+{{pt.v.conj.ar|despoj}}
+
+== Referencias y notas ==
+<references />
+
+[[chr:despojar]]
+[[en:despojar]]
+[[fi:despojar]]
+[[fr:despojar]]
+[[io:despojar]]
+[[ko:despojar]]
+[[li:despojar]]
+[[mg:despojar]]
+[[nl:despojar]]
+[[pl:despojar]]
+[[pt:despojar]]
+[[zh:despojar]]
+

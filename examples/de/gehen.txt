@@ -1,0 +1,671 @@
+{{Wort der Woche|20|2007}}
+{{Siehe auch|[[Gehen]]}}
+== gehen ({{Sprache|Deutsch}}) ==
+=== {{Wortart|Verb|Deutsch}}, {{unreg.}}, ''standardsprachlich'' {{intrans.}} ===
+
+{{Deutsch Verb Übersicht
+|Präsens_ich=gehe
+|Präsens_du=gehst
+|Präsens_er, sie, es=geht
+|Präteritum_ich=ging
+|Partizip II=gegangen
+|Konjunktiv II_ich=ginge
+|Imperativ Singular=geh
+|Imperativ Singular*=gehe
+|Imperativ Plural=geht
+|Hilfsverb=sein
+|Bild=Blender3D NormalWalkCycle.gif|mini|1|Animation einer ''gehenden'' Person
+}}
+
+{{Worttrennung}}
+:ge·hen, {{Prät.}} ging, {{Part.}} ge·gan·gen
+
+{{Aussprache}}
+:{{IPA}} {{Lautschrift|ˈɡeːən}}, ''österreichisch auch:'' {{Lautschrift|ˈɡeːn}}<ref>{{Lit-Muhr: Österreichisches Aussprachewörterbuch|A=1}}, Seite 212.</ref>, {{Prät.}} {{Lautschrift|ɡɪŋ}}, {{Part.}} {{Lautschrift|ɡəˈɡaŋən}}
+:{{Hörbeispiele}} {{Audio|Bar-gehen.ogg|spr=by}} {{Audio|De-gehen.ogg}}, {{Prät.}} {{Audio|De-ging.ogg|ging}}, {{Part.}} {{Audio|De-gegangen.ogg|gegangen}}
+:{{Reime}} {{Reim|eːən|Deutsch}}
+
+{{Bedeutungen}}
+*{{K|intrans.}}
+:[1] sich [[schreiten]]d, schrittweise fortbewegen
+::[a] in eine veränderte Lebenssituation eintreten
+:[2] einen Ort oder eine Zusammenkunft verlassen
+:[3] ''mit einem abhängigen Infinitiv eines Verbs:'' einen anderen Ort aufsuchen, um dort die mit dem anderen Verb beschriebene Handlung auszuführen
+:[4] funktionieren / funktionsfähig sein
+:[5] mit einer Vorrichtung als Subjekt:'' die diesem eigene, charakteristische Aktion ausführen
+:[6] viel gekauft werden
+:[7a] sich räumlich erstrecken
+:[7b] irgendwohin führen
+:[8] [bereits] im Gange sein, ''(abgeschlossene Vorgänge:)'' dauern
+:[9] (der [[Teig]] beim Backen): sich in der Ruhephase beim Gärprozess befinden, aufgehen, gären
+:[10] akzeptabel sein, erlaubt sein, einen Rahmen einhalten
+:[11] funktionieren, machbar sein
+:[12] [[Aussage]] treffen über das [[Wohlbefinden]] oder den [[Gesundheitszustand]]
+:[13] (Computer) ''auf etwas gehen'': den [[Mauszeiger]] auf etwas bewegen und ggf. [[anklicken]] oder [[öffnen]]
+:[14] ''etwas geht auf jemanden'': (kurz für:) Etwas geht auf jemandes Rechnung.
+:[15] eine Beschäftigung oder Stelle aufgeben, kündigen
+:[16] mit Ortsergänzung: sich (durch eine Menge oder einen Körper) wellenartig fortpflanzen
+:[16b] Spezialisierung mit ''Ruck''
+:[17] (planmäßig) abfahren, ablegen, abfliegen
+:[18] eine partnerschaftliche Beziehung beenden (Spezialisierung von [2])
+:[19] mit einer bestimmten Bekleidung oder Ausstattung herumlaufen oder an die Öffentlichkeit oder zu einem Zielort gehen
+:[20] irgendwo hineinpassen oder hindurchgehen (häufig negativ)
+:[21] einen (mehr oder weniger) definierten oder vorgeschriebenen Verlauf haben (oft als Frage: wie geht das (nochmal) ...?)
+:[22] ein persönliches Geschmacksurteil abgeben zu etwas (Variante von [11])
+:[23] ''reflexiv, sich gehen lassen:'' undiszipliniertes Verhalten zeigen, unbeherrscht sein
+*{{K|trans.}}
+:[24] ''in Berichten über Dritte (beschönigend, scherzhaft oder schadenfroh):'' jemanden gegen seinen Willen aus dem Amt oder vom Arbeitsplatz entfernen – oft so, dass es wie ein freiwilliger Abgang aussieht {{QS Bedeutungen|unbelegt}}
+
+{{Herkunft}}
+:mittelhochdeutsch ''gān,'', ''gēn'', althochdeutsch ''gān,'', ''gēn'', germanisch *''gæ-'' „gehen“, belegt seit dem 8. Jahrhundert<ref>{{Lit-Kluge: Etymologisches Wörterbuch|A=24}}, Stichwort: „gehen“, Seite 339.</ref>
+
+{{Anmerkung|zur Worthistorie}}
+:früherer Imperativ Plural: gehet! <ref>{{Ref-Grimm}}</ref>
+
+{{Synonyme}}
+:[2] [[abhauen]], [[abmarschieren]], [[aufbrechen]], [[weggehen]]
+:[4] [[funktionieren]], [[intakt]] sein, [[laufen]]
+:[6] sich gut [[verkaufen]] lassen, ein [[Renner]] sein
+:[7a] [[erstrecken|sich erstrecken]], [[ausdehnen|sich ausdehnen]]
+:[8] [[passieren]], [[andauern]], [[dauern]]
+:[13, 16, 17] [[bewegen]]
+:[15] [[aufgeben]], [[kündigen]]
+:[17] [[ablegen]], [[fahren]] ([[abfahren]]), [[fliegen]] ([[abfliegen]])
+:[22] [[gefallen]], [[mögen]]
+:[24] [[absetzen]], [[feuern]], [[hinauswerfen]], [[kündigen]], [[rauswerfen]]
+
+{{Sinnverwandte Wörter}}
+:[1] [[laufen]]
+
+{{Gegenwörter}}
+:[1] [[stehen]]; [[rennen]], [[schleichen]]; [[fahren]]
+:[2] [[kommen]]; [[bleiben]], [[verweilen]]
+:[4] [[kaputt]] sein
+:[5] [[unmöglich]] sein
+:[6] ein [[Ladenhüter]] sein
+:[23] sich [[zusammennehmen]], sich [[beherrschen]]
+
+{{Oberbegriffe}}
+:[1] sich [[fortbewegen]]
+:[4] [[einsatzfähig]] sein
+:[7a] [[existieren]]
+:[8] [[geschehen]]
+:[9] [[gären]]
+
+{{Unterbegriffe}}
+:[1] [[abhauen]], [[aufbrechen]], [[balancieren]], [[beeilen]], [[bummeln]], [[eilen]], [[erklimmen]], [[flanieren]], [[flippsen]], [[fortbewegen]], [[gleiten]], [[hasten]], [[herbeikommen]], [[hickeln]], [[hinken]], [[hinunterklettern]], [[hinunterkommen]], [[hinuntersteigen]], [[hochklettern]], [[hochsteigen]], [[hoppeln]], [[hopsen]], [[humpeln]], [[hüpfen]], [[huschen]], [[kriechen]], [[kommen]], [[latschen]], [[marschieren]], [[nordic walken]], [[runterklettern]], [[rutschen]], [[schleichen]], [[schlendern]], [[schlittern]], [[schlurfen]], [[schreiten]], [[schwanken]], [[spazieren]], [[springen]], [[stampfen]], [[stapfen]], [[stöckeln]], [[stolzieren]], [[stolpern]], [[tänzeln]], [[tanzen]], [[taumeln]], [[tippeln]], [[trampeln]], [[trippeln]], [[trödeln]], [[überwinden]], [[walken]], [[wandeln]], [[wandern]], [[waten]], [[watscheln]], [[weggehen]]
+
+{{Beispiele}}
+:[1] „Ich bin der Meinung, dass alles besser gehen würde, wenn man mehr ''ginge&nbsp;...''“ (Johann Gottfried Seume)
+:[1] Ich ''gehe'' über die Straße.
+:[1a] Ich ''gehe'' nächste Woche für einige Monate nach London.
+:[2] Als Maria kam, war Peter bereits ''gegangen.''
+:[3] Ich ''gehe'' mich waschen.
+:[3] Ich ''gehe'' einkaufen.
+:[3] Ich ''gehe'' arbeiten.
+:[4] Die Uhr ''geht'' nicht.
+:[5] Ich hörte unten die Tür ''gehen.'' Dann ''ging'' das Telefon.
+:[6] Der dritte Band der Memoiren von Effenberg ''geht'' nicht mehr so gut.
+:[7a] Die Hauptstraße ''geht'' bis zum Bahnhof.
+:[7a] Unser Garten ''geht'' bis zu den Bäumen da hinten.
+:[7b] Der Weg ''geht'' zur nächsten Telefonzelle.
+:[7b] Die Preise ''gingen'' kräftig nach oben.
+:[8] Der Streit ''geht'' (so)(schon) seit Jahren.
+:[8] Die Vorstellung ''ging'' bis Mitternacht.
+:[9] Der Teig muss noch ''gehen.''
+:[10] Man kann in der Bücherei keine laute Musik spielen; das ''geht'' doch nicht.
+:[11] „Ich bin der Meinung, dass alles besser ''gehen'' würde, wenn man mehr ginge&nbsp;...“ (Johann Gottfried Seume)
+:[11] Kannst du am Freitag kommen? Ja, das ''geht.''
+:[12] Wie ''geht'' es dir? Gut.
+:[12] Lass es dir gut ''gehen.''
+:[13] Erst ''gehst'' du auf „Öffnen“ und dann klickst du auf „OK“.
+:[14] Die Speisen ''gehen'' heute auf mich, die Getränke zahlt ihr bitte selbst.
+:[15] Es wurden keine Leute entlassen, ein paar sind freiwillig ''gegangen.''
+:[16] Ein Rauschen ''ging'' durch den Blätterwald. Eine Bewegung ''ging'' durch die Reihen der Zuschauer. Ein Aufschrei ''ging'' durch die Menge. Die Meldung ''ging'' durch alle Zeitungen. Ein Zittern ''ging'' durch seinen Körper. Eine Erschütterung ''ging'' durch das Schiff. Ein Raunen ''ging'' durch die Zuhörer.
+:[16b] Durch Deutschland muss ein Ruck ''gehen.'' Hier sollte ein Ruck durch die Schullandschaft ''gehen.'' Beim Anblick der vielen Fans ''ging'' ein Ruck durch die Mannschaft.
+:[17] Wann ''geht'' der nächste Zug nach Berlin? Heute ''geht'' leider kein Flug mehr nach Ägypten. ''Geht'' heute noch eine Fähre?
+:[18] Er will ''gehen.'' Sie ist ''gegangen.''
+:[19] Der ''geht'' doch glatt in Badeschlappen auf die Straße. Sie ''geht'' nur noch in Samt und Seide. Du kannst doch nicht in diesen Jeans zum Vorstellungsgespräch ''gehen.'' Ich würde bei diesem Wetter nicht ohne Schirm ''gehen.''
+:[20] Der Schrank ''geht'' nicht durch die Tür. Es ''gehen'' nicht acht Leute in diesen Aufzug. ''Geht'' das nicht in deinen Kopf?
+:[21] Wie ''geht'' nochmal der Text von dem Lied? Kannst du mir nochmal zeigen, wie das mit den Favoriten im Internet Explorer ''geht?'' Ganz falsch, der Witz ''geht'' so: Kommt'n Zebra in die Apotheke ...
+:[22] Wie war der Film? - ''Geht'' so. / ''Ging'' so einigermaßen. / ''Geht.''
+:[22] Ich hoffe, das ''geht,'' das mit diesen Schuhen zu dem Rock. / Ist der Rock zu kurz? - Nein, das ''geht.''
+:[23] Deine Geschwister haben sich nicht so ''gehen'' lassen.
+:[24] Er ist nicht gegangen, er ist ''gegangen'' worden.
+
+{{Redewendungen}}
+:''[[alles unter sich gehen lassen]]'' - seine Ausscheidungfunktionen nicht mehr kontrollieren
+:''[[als jemand gehen]]'' - sich im Karneval als jemand verkleiden: ich gehe dieses Jahr als Rumpelstilzchen
+:''[[als REIHENFOLGEWORT durchs Ziel gehen]]'' - als erster / dritter / nächster / letzter ... durchs Ziel gehen
+:''[[ah geh]]'' - (süddt.) Ausruf der Verwunderung, Überraschung, Zurückweisung, Aufmunterung; Einleitung einer Aufforderung: ah geh, dös / des passt scho
+:''[[am Stock gehen]]'' - sich mühsam vorwärts bewegen; meist übertragen: jemandem / einer Gruppe / einem Unternehmen geht es gesundheitlich, seelisch, wirtschaftlich sehr schlecht: seitdem der letzte Trainer weg ist, geht der Verein personell am Stock
+:''[[an / bei etwas dran längs gehen (mit WERKZEUG)]]'' - eine Ausbesserungs- oder Pflegearbeit an etwas machen: an der Hecke muss du aber noch mal mit der Heckenschere dran längs gehen, das is noch nich ordentlich
+:''[[an Bord gehen (Boot, Flugzeug, Schiff, Fähre)]]'' - die Passagiere gingen um 23 Uhr an Bord
+:''[[an den Start gehen]]'' - zu einem Rennen antreten
+:''[[an die Arbeit gehen]]'' - sich an die Arbeit machen, die Arbeit aufnehmen
+:''[[an die Börse gehen (mit)]]'' - das Unternehmen ging noch vor der Bankenkrise an die Börse [Börsengang]; die Händler gingen mit einer Reihe windiger Papiere an die Börse
+:''[[an die Decke gehen]]'' - einen Wutanfall haben
+:''[[an die (frische) Luft gehen]]'' - nach draußen gehen, um Luft zu tanken: ich glaub, ich muss mal für ein paar Schritte an die Luft gehen
+:''[[an etwas gehen]]'' - {{ugs.}} etwas unerlaubterweise mit der Hand berühren oder so anfassen, dass es nachher auffallen könnte: Ist jemand an die Weihnachtsplätzchen gegangen? Warst du an meine Schreibtisch-Schublade gegangen?
+:''[[an etwas gehen]]'' - einen Vorrat angreifen: um die Operation zu finanzieren, musste sie an ihre Altersrücklagen gehen
+:''[[an etwas zugrunde gehen]]'' - 1 an etwas sterben 2 etwas nicht verwinden können
+:''[[an jemanden gehen]]'' - 1 den Zuschlag erhalten, jemandem zufallen, etwas gewinnen, auf jemanden übergehen: das Erbe geht zur Hälfte an seine Ehefrau; der Auftrag ging an eine auswärtige Firma; die Runde geht an dich (beim Kartenspiel); diese fünf Punkte gehen an das Team aus Wiesbaden, die Ratspräsidentschaft der EU ging turnusmäßig an Irland
+:''[[an jemandes Adresse gehen]]'' - 2 an jemanden gerichtet sein: ich sage, und das geht jetzt sehr wohl an Sie / an Ihre Adresse, da wurde schlichtweg Mist gebaut
+:''[[an Land gehen]]'' - das Schiff / Boot verlassen
+:''[[ans Eingemachte gehen]]'' - ernst werden, die Substanz berühren, riskant sein (ursprünglich: den Not-Vorrat angreifen)
+:''[[ans Limit gehen]]'' - die letzten Reserven aufbrauchen
+:''[[ans Netz gehen 1 (Kraftwerk, Reaktor)]]'' - die Stromproduktion aufnehmen 2 an ein informationstechnisches Netzwerk angeschlossen werden (und dort Leistungen anbieten): unsere neue Internet-Plattform geht nächste Woche ans Netz
+:''[[ans Telefon gehen]]'' - ein Gespräch annehmen
+:''[[anschaffen gehen]]'' - Geld mit Prostitution verdienen
+:''[[Arm in Arm gehen]]'' - untergehakt gehen
+:''[[auf Anschaffe gehen]]'' - sein Geld mit Prostitution verdienen
+:''[[auf Abstand (zu jemandem) gehen]]'' - 1 körperlich Abstand halten: gleich könnte die Batterie explodieren, geht bitte auf Abstand; 2 sich (sozial) distanzieren, (näheren) Kontakt vermeiden: nach ihrem Karrieresprung ging er zu ihr auf Abstand
+:''[[auf Brautschau gehen]]'' - sich eine Frau zum Heiraten suchen
+:''[[auf dem Zahnfleisch gehen]]'' - jemandem die letzten Kräfte abverlangen: das Baby schreit nachts viel, und die Eltern gehen auf dem Zahnfleisch
+:''[[auf den Strich gehen]]'' - sich prostituieren, um Geld zu verdienen
+:''[[auf DETERMINANT KÖRPERTEIL / Psyche gehen]]'' – jemanden körperlich oder seelisch belasten: das Medikament wollte er nicht mehr nehmen, weil es 'voll auf die Psyche geht', wie er meinte; Mountainbiken auf grobem Schotter geht mächtig auf die Handgelenke; Umzugsarbeiten, gehen immer auf die Knochen
+:''[[auf die Barrikaden gehen (für, gegen etwas / jemanden)]]'' - protestieren; sich in körperlichen Auseinandersetzungen politisch engagieren
+:''[[auf die Hüften gehen]]'' - Hüftspeck verursachen. iss nicht so viel von dem süßen Zeug, das geht alles auf die Hüften
+:''[[auf die Jagd gehen (nach etwas)]]'' - eine sehr engagierte Suche nach etwas beginnen
+:''[[auf die Palme gehen]]'' - sich (hemmungslos) aufregen: er geht bei jeder Kleinigkeit auf die Palme
+:''[[auf die ZEHNERZAHLWORT gehen]]'' - er geht nächstes Jahr auf die fünfzig
+:''[[auf die Straße gehen (mit etwas)]]'' - protestieren, demonstrieren für / gegen
+:''[[auf die Toilette gehen]]'' -
+:''[[auf die Walz gehen]]'' - die Wanderjahre als Handwerksgeselle absolvieren
+:''[[auf Distanz (zu jemandem) gehen]]'' - körperlich oder sozial Abstand halten
+:''[[auf Freiersfüßen gehen]]'' - sich nach einer Frau zum Heiraten umsehen
+:''[[auf geht's!]]'' - gehen wir los, brechen wir auf, lass uns jetzt anfangen
+:''[[auf große Fahrt gehen]]'' - eine große Reise antreten
+:''[[auf jemanden gehen]]'' - jemand kommt für etwas auf, bezahlt für etwas: die Getränke gehen auf mich
+:''[[auf jemandes Kappe gehen]]'' - sich für etwas verantwortlich erklären, für etwas verantwortlich sein: dass diese Info rausgegangen ist, geht voll auf meine Kappe
+:''[[auf jemandes Konto gehen]]'' - von jemandem oder etwas verursacht worden sein
+:''[[auf jemandes Kosten gehen]]'' - durch etwas finanziell oder emotional belastet werden: der Witz war nicht schlecht, aber der ging voll auf meine Kosten
+:''[[auf jemandes Rechnung gehen]]'' - jemand bezahlt für etwas, jemand steht für etwas gerade: das geht hier alles auf meine Rechnung
+:''[[auf keine Kuhhaut gehen]]'' - ursprünglich: zu umfänglich für einen umfassenden Bericht sein; meist als empörter Ausruf: Das geht auf keine Kuhhaut! = Da hört sich doch alles auf!
+:''[[auf Konfrontationskurs gehen]]'' - die (offene) Auseinandersetzung riskieren
+:''[[auf / über / unter MAßANGABE gehen]]'' - eine regelbare Einstellung oder Position ansteuern: das U-Boot ging auf 500 m; die Boeing ging auf über 9000 Fuß; wir gehen jetzt unter 50 Hertz; geh mal auf 240 Watt; geh doch einfach auf Autopilot
+:''[[auf Leben und Tod gehen]]'' - jemandes Leben steht auf dem Spiel: der Kampf ging auf Leben und Tod
+:''[[auf Montage gehen]]'' - an einer (weit entfernten) auswärtigen Arbeitsstelle eingesetzt sein
+:''[[auf Nummer sicher gehen]]'' - kein Risiko eingehen
+:''[[auf NÄHERE.BEZEICHNUNG-fang gehen]]'' - (etwas oder) jemanden mit teils übervorteilender Absicht 'einzufangen' suchen: auf Bauernfang / Beutefang / Dummenfang / Kundenfang / Männerfang / Stimmenfang / Touristenfang / Wählerfang gehen
+:''[[auf (die / eine) NÄHERE.BEZEICHNUNG-jagd gehen]]'' - etwas oder jemanden zu erbeuten oder unschädlich zu machen suchen: auf (die) Aufholjagd / Bilderjagd / Dummenjagd / Kommunistenjagd / Kundenjagd / Männerjagd / Piratenjagd / Prämienjagd / Punktejagd / Schnäppchenjagd / Stimmenjagd / Terroristenjagd / Titeljagd / Torejagd / Touristenjagd / Quotenjagd / Verbrecherjagd / Verfolgungsjagd / Wählerjagd ... gehen
+:''[[auf (die / eine) NÄHERE.BEZEICHNUNG-tour gehen]]'' - einen Zug über mehrere Stationen machen, um 'etwas zu erleben': auf (die / eine) Anmachtour / Aufrisstour / Bergtour / Besichtigungstour / Bootstour / Bustour / Deutschlandtour / Diebestour / Einkaufstour / Entdeckungstour / Erkundungstour / Fahrradtour / Klettertour / Kneipentour / Radtour / Sauftour / Shoppingtour / Sightseeing-Tour / Wahlkampftour / Zechtour ... gehen
+:''[[auf Reisen gehen]]'' - verreisen
+:''[[auf sein Zimmer gehen]]'' - sich in sein Zimmer zurückziehen (aus einer sozialen Situation heraus; oft als Aufforderung): du gehst jetzt sofort auf dein Zimmer!
+:''[[auf Sendung gehen]]'' - den Sendebetrieb aufnehmen (Sender); ausgestrahlt werden (Sendung, Programm): die ARD ging 1954 erstmals auf Sendung
+:''[[auf Tauchstation gehen]]'' - untertauchen, nicht mehr erreichbar sein
+:''[[auf Tournee gehen (mit etwas)]]'' - Die Band ging mit des Songs ihrer neuen CD auf Europatournee.
+:''[[auf Trallafitti gehen]]'' - auf Vergnügungstour gehen, sich amüsieren
+:''[[auf Tuchfühlung gehen (mit)]]'' - engen Kontakt haben mit, sich stark annähern
+:''[[auf und ab gehen]]'' - immer denselben Weg hin- und hergehen
+:''[[auf Wanderschaft gehen]]'' - 1 einen Wanderurlaub machen 2 seinen festen Wohnsitz aufgeben und durch die Welt ziehen 3 ironisch für 'von Hand zu Hand gehen und nicht mehr auffindbar sein': meine Kaffeetasse ist wohl wieder auf Wanderschaft gegangen
+:''[[aufs Ganze gehen]]'' - alles riskieren
+:''[[aufs Klo gehen]]'' - der Kleine kann schon ganz alleine aufs Klo gehen
+:''[[aus dem Haus gehen]]'' - das Haus verlassen, auf die Straße gehen: seit dem Sturz ist er nicht mehr aus dem Haus gegangen
+:''[[aus dem Leim gehen]]'' - (durch Gebrauch) kaputt gehen (Möbel, Bücher...)
+:''[[aus dem Weg gehen]]'' - Platz machen, den Weg freigeben: gehen Sie aus dem Weg!
+:''[[aus den Fugen gehen]]'' - den innersten Zusammenhalt verlieren und dadurch zerstört werden (Welt, politisches System, jemandes Leben), in Einzelteile auseinanderfliegen, im Chaos enden
+:''[[aus der Form gehen]]'' – (unförmig) dick werden
+:''[[aus sich heraus gehen]]'' - Hemmungen verlieren, spontan oder übermütig reagieren und sich dabei zeigen: sogar wenn er getrunken hat, kann er kaum aus sich heraus gehen
+:''[[baden gehen (mit etwas)]]'' - scheitern, Misserfolg haben: mit seinem Buchprojekt ist er gründlich baden gegangen; das Projekt ist baden gegangen
+:''[[bankrott gehen]]'' - (mit einem Unternehmen) ruiniert sein
+:''[[bei jemandem ein- und ausgehen]]'' - häufig besuchen
+:''[[bei jemandem noch in die Lehre gehen (können)]]'' - übertragen: sich von jemandem noch viel abgucken, von jemandem noch viel lernen können: bei dem könnte sogar ich noch in die Lehre gehen, auch wenn ich Meister bin
+:''[[bei Rot über die Ampel / Straße gehen]]'' - eine rote (Fußgänger-) Ampel ignorieren
+:''[[bergab gehen (es … mit etwas / jemandem)]]'' – sich (gesundheitlich) verschlechtern: nach der letzten OP ging es mit ihr immer weiter bergab; von nun an geht's bergab (Hildegard Knef); mit der deutschen Wirtschaft ging es immer weiter bergab
+:''[[bis an die Grenze (der eigenen Leistungsfähigkeit) gehen]]'' -
+:''[[bis zum Äußersten gehen]]'' - ein ungewöhnlich hohes Risiko eingehen
+:''[[dahin gehen, dass]] (Vorschlag, Meinung, Vorstellungen …)'' - vorschlagen, meinen, sich vorstellen, dass: ihr Wunsch / die Idee ging dahin, dass die Männer die Hausarbeit in Zukunft selbst machen sollten
+:''[[dahin gehen, wohin selbst der König zu Fuß hingeht]]'' - ironisch und verhüllend für 'auf die Toilette gehen': wohin willst du? - dahin, wo selbst der König zu Fuß hingeht
+:''[[den Bach hinunter / runter gehen]]'' - scheitern, zunichte werden: nach dem Platzen der Immobilienblase gingen alle seine schönen Pläne den Bach runter
+:''[[den Weg allen Fleisches gehen]]'' - letztendlich sterben und vergehen
+:''[[den Weg alles Irdischen gehen]]'' - am Ende entsorgt werden
+:''[[den Weg des geringsten Widerstandes gehen]]'' - Konfrontationen vermeiden, Streit aus dem Weg gehen
+:''[[drunter und drüber gehen]]'' 1 es herrscht großes Durcheinander: nach diesen Beschuldigungen ging es in der Klasse eine Weile drunter und drüber; 2 speziell: es herrscht sexuelle Freizügigkeit: bei denen in der WG geht alles drunter und drüber
+:''[[durch die Hölle gehen]]'' - größte Schwierigkeiten erfahren, größte Widerstände überwinden müssen
+:''[[durch alle Instanzen gehen (Klage, Rechtssache)]]'' – den Rechtsweg voll ausschöpfen: der Rechtsstreit ging durch alle Instanzen
+:''[[durch alle / viele ... MEDIEN gehen]]'' - öffentlich verbreitet werden: die Geschichte ging durch alle Zeitungen; das ging durch alle Fernsehkanäle; die Nachricht ging auch durch etliche Blogs
+:''[[durch alle / sämtliche ... ORTSERGÄNZUNG gehen]]'' - vollständig durchdringen; komplett absuchen: das Geschrei ging durchs ganze Haus (war überall zu hören); vor dem Abschließen ging er nochmal durch sämtliche Räume; er war durch alle Ordner gegangen, um die fehlende Rechnung doch noch zu finden; der Einbrecher ging durch alle Schränke
+:''[[durch die Decke gehen (Preise, Kosten, Aktienkurse)]]'' - "explodieren", ungewöhnlich schnell und hoch ansteigen: der Weizenpreis geht derzeit aufgrund des verknappten Angebots durch die Decke
+:''[[durch eine harte Schule gegangen sein]]'' - eine strenge und entbehrungsreiche Schul- oder Ausbildungszeit (erfolgreich) hinter sich gebracht haben: er kämpfte sich von ganz unten hoch und war dabei durch eine harte Schule gegangen
+:''[[durch Mark und Bein gehen]]'' - durchdringend, nicht zu überhören sein: das Alarmsignal des Brandmelders geht durch Mark und Bein
+:''[[durch Mark und Pfennig gehen]]'' - ironische Variante von 'durch Mark und Bein gehen'
+:''[[durch viele Hände gehen / gegangen sein]]'' - von vielen angefasst (und bearbeitet) werden, häufig den Besitzer wechseln (und dabei an Wert verlieren): dieses Dokument / Gemälde ist schon durch viele Hände gegangen
+:''[[durcheinander gehen]]'' - chaotisch sein: in diesem Text geht einiges durcheinander
+:''[[durchs Feuer / Fegefeuer gehen (mit / bei etwas)]]'' - eine Krise erleben; eine sehr schwierige Aufgabe trotz innerer Widerstände bewältigen
+:''[[eigene Wege gehen]]'' - eine individuelle (und ungewöhnliche) Lösung anvisieren
+:''[[ein bisschen / etwas frische Luft schnappen gehen]]'' -
+:''[[ein und aus gehen]] (bei jemandem, in einem Haus)'' - häufig besuchen: er geht dort ein und aus, als wenn er dort wohnte
+:''[[eine Welle der Empörung / Entrüstung geht durchs Land / durch die Presse / durch die Blogosphäre]]'' – es kommt zu einer allgemeinen / breiten Empörung
+:''[[einen gehen lassen]]'' - {{ugs.}} furzen, pupsen
+:''[[einen Schritt in die richtige Richtung gehen]]'' - etwas unternehmen, das als hilfreich gesehen wird
+:''[[einen Schritt nach vorne gehen]]'' - etwas unternehmen, das in einer Sache weiter führt
+:''[[einen Schritt zu weit gehen]]'' - sich zu weit vorwagen; etwas tun, das einem nicht zugestanden wird: mit deinem Verbesserungsvorschlag bist du einen Schritt zu weit gegangen
+:''[[einen schweren Gang gehen]]'' - etwas tun (müssen), das viel innerliche Kraft kostet
+:''[[einen Umweg gehen]]'' - nicht auf dem direkten Weg ans Ziel kommen: da sind wir aber jetzt einen Riesenumweg gegangen!
+:''[[einen Weg zu Ende gehen]]'' – die letzte Konsequenz von etwas tragen: jeder Mensch muss seinen Weg zu Ende gehen
+:''[[einer Sache auf den Grund gehen]]'' - etwas gründlich erforschen, nicht locker lassen
+:''[[einer Sache verlustig gehen]]'' - bei dem Brand ging der Baron auch seiner Bibliothek verlustig; heute meist: jemandem geht etwas verlustig, oder: etwas geht verlustig
+:''[[entzwei gehen]]'' - zerbrechen, in Einzelteile auseinanderfallen
+:''[[es geht das Gerücht / die Sage]]'' - man erzählt etwas weiter, folgende Geschichte wird überliefert
+:''[[es geht nichts über etwas / jemanden]]'' - es geht nichts über gute Freunde
+:''[[es geht ORTSERGÄNZUNG.WOHIN]]'' - wohin geht's dieses Jahr in Urlaub? wo geht es hier zum Bahnhof? zur Tankstelle geht's irgendwo da hinten rechts ab; wo geht's hier rein? es geht immer nur geradeaus, bis es nicht mehr weitergeht; los, Jungs, jetzt geht's ab nach draußen!
+:''[[es geht gegen, auf UNGEFÄHRE.ZEITANGABE]]'' - sich zeitlich annähern, näher kommen: es ging schon gegen Mitternacht, als...; zum Glück geht's jetzt aufs Wochenende
+:''[[es geht um Leben und Tod]]'' – 1 ein Leben steht auf dem Spiel 2 (übertragen) es handelt sich um eine Sache von höchster Wichtigkeit
+:''[[es ist / war Zeit, ins Bett zu gehen]]'' -
+:''[[es sich gut gehen lassen]]'' - das Leben genießen
+:''[[etwas auf und ab gehen]]'' - den Gang / Flur / die Straße auf und ab gehen
+:''[[etwas mit sich gehen lassen]]'' – stehlen: er ließ drei Uhren mit sich gehen
+:''[[flöten gehen]]'' - verloren / kaputt gehen; bei der letzten Umzugs-Aktion sind mir drei schöne Kakteen flöten gegangen
+:''[[frische Luft schnappen gehen]]'' – ans Freie gehen, um durchzuatmen: ich geh mal kurz raus frische Luft schnappen
+:''[[für jemanden bis ans Ende der Welt gehen]]'' – (meist würde-Konjunktiv) alles für jemanden tun: für diese Frau würde ich bis ans Ende der Welt gehen
+:''[[für jemanden durchs Feuer gehen]]'' - für jemanden eine große Gefahr auf sich nehmen
+:''[[für kleine Mädchen gehen]]'' - scherzhaft für: auf die Toilette gehen: ich muss mal eben für kleine Mädchen gehen
+:''[[für kleine Königstiger gehen]]'' - scherzhaft für: auf die Toilette gehen: ich geh mal eben schnell für kleine Königstiger
+:''[[geht doch!]]'' - Kommentar zu einer widerstrebend abgegebenen oder für unmöglich gehaltenen Leistung: Nu gibt der Oma mal das schöne Händchen und sag guten Tag ... na siehste, geht doch!
+:''[[geht's noch?]]'' - (ironisch) ist wirklich alles in Ordnung mit Ihnen?
+:''[[gegangen werden]]'' - entlassen werden
+:''[[gegen jemanden gehen]]'' - gegen jemanden gerichtet sein: das geht jetzt nicht gegen dich, aber hätte man das nicht schon längst reklamieren können?
+:''[[gegen jemandes Ehre / Ehrauffassung / Ehrvorstellungen gehen]]'' – jemandes Ehre verletzen
+:[[gegen jemandes Prinzipien / Überzeugung(en) gehen]]'' - verstoßen gegen: ein Verhältnis kam für ihn nicht in Frage, das ging gegen seine Prinzipien
+:''[[getrennte Wege gehen]]'' - kein gemeinsames Projekt mehr verfolgen: die beiden gingen nach ihrer Firmenpleite getrennte Wege
+:''[[glatt gehen]]'' – (reibungslos) klappen: mit der Gepäckaufgabe ging alles glatt
+:''[[gut gehen]]'' - klappen, funktionieren: woll'n mal hoffen, dass das gut geht; das ist ja grade noch mal gut gegangen
+:''[[Hand in Hand gehen]]'' - eingespielt sein, reibungslos funktionieren
+:''[[(hart) an die Grenze gehen (bei jemandem / für jemanden)]]'' - der Film geht an die Grenze des Realisierbaren; das geht für mich hart an die Grenze des Erträglichen
+:''[[hart auf hart gehen (es)]]'' - ernsthafte, teilweise streitige, sich verschärfende Auseinandersetzungen führen: mit diesem Betriebsrat ist nicht zu spaßen, da geht es hart auf hart
+:''[[hier rein und da raus gehen]] (mit Gesten an Ohren)'' - nicht zuhören, nicht interessieren, auf Durchzug geschaltet haben: Ich hab ihm das schon oft gesagt, aber das geht hier rein und da raus.
+:''[[hin und her gehen]]'' – hin und her laufen, auf und ab gehen: er geht jede Nacht stundenlang in seinem Zimmer hin und her
+:''[[hin und her gehen (es)]]'' - in dem Streit ging es hin und her
+:''[[hops gehen]]'' – 1 kaputt gehen, zerstört werden: als er die Boxen zuschalten wollte, gingen das Netzteil hops; 2 derb für sterben
+:''[[im Gänsemarsch gehen]]'' - in einer Reihe hintereinander laufen
+:''[[in BEKLEIDUNG gehen]]'' - (über längere Zeit) eine bestimmte Ausstattung tragen: in Lack und Leder / in Samt und Seide / in Sack und Asche gehen
+:''[[in Betrieb gehen]]'' – den Betrieb aufnehmen: die Rettungsleitstelle geht nächstes Wochenende wieder in Betrieb
+:''[[in Deckung gehen (vor etwas / jemandem)]]'' - Schutz suchen, vor allem bei einem Angriff mit Schusswaffen; übertragen: sich in einer Auseinandersetzung keinem weiteren Angriff aussetzen
+:''[[in den Arsch gehen]]'' - kaputt gehen
+:''[[in den Keller gehen (Zahlenwerte)]]'' – tief nach unten gehen, absacken, 'abstürzen': die Kurse / Ratings / Preise / Quoten / Verkaufszahlen / seine Leistungen / Noten / Leukozytenwerte gingen in den Keller; ihr Puls / Blutdruck / ihre Atemfrequenz / Herzfrequenz ging in den Keller,
+:''[[in den (sicheren) Tod gehen]]'' - bewusst den Tod suchen oder wissen, dass man sterben wird
+:''[[in den Untergrund gehen]]'' - abtauchen, seine bürgerliche Existenz aufgeben
+:''[[in den Widerstand gehen]]'' - sich einer politischen Widerstandsbewegung anschließen
+:''[[in den / die KÖRPERTEIL gehen]]'' - den Körperteil belasten, anstrengen: das viele Über-Kopf-Arbeiten bei Malerarbeiten geht sehr in die Arme
+:''[[in die Beine gehen]]'' - zum Mitschwingen oder Tanzen animieren: die Musik geht voll in die Beine
+:''[[in die Binsen gehen]]'' - entzweigehen, kaputt gehen, scheitern
+:''[[in die Berufung gehen]]'' - ein Urteil vor der nächsten gerichtlichen Instanz anfechten
+:''[[in die Breite gehen]]'' - 1 ausführlich werden: der Roman geht bei den Landschaftsbeschreibungen sehr in die Breite 2 (Person) an Gewicht zunehmen: Nach der Pensionierung ging er sehr in die Breite.
+:''[[in die Brüche gehen]]'' - kaputt gehen (übertragen): nach 20 Jahren ist ihre Ehe in die Brüche gegangen
+:''[[in die Brombeeren gehen]]'' - zum Brombeeren-Pflücken dahin gehen, wo viele Brombeeren wild wachsen
+:''[[in die Ferien / Sommerpause (Parlament) / Gerichtsferien (Richter) / Winterruhe gehen]]'' - nicht mehr arbeiten, den normalen Betrieb vorübergehend einstellen, pausieren
+:''[[in die Eisen gehen (/steigen)]]'' - (voll) in die Bremse gehen, eine Vollbremsung machen
+:''[[in die Heia gehen]]'' - (Kindersprache): zu Bett gehen
+:''[[in die Hocke gehen]]'' - hockende Körperhaltung einnehmen
+:''[[in die Höhe gehen (Preis, Preise, Kurs ...)]]'' - steigen: der Preis für Kakao war im letzten Herbst stark in die Höhe gegangen
+:''[[in die Hose gehen]]'' - daneben gehen, scheitern
+:''[[in (die) Insolvenz gehen]]'' - seine Zahlungsunfähigkeit erklären
+:''[[in die Irre gehen]]'' - sich verirren / sich irren
+:''[[in die Kirche gehen]]'' - die heilige Messe / Sonntagsmesse besuchen
+:''[[in die Knie gehen]]'' - sich nicht auf den Beinen halten können, zusammensacken
+:''[[in die Kurve gehen (Fahrzeug, Fahrer)]]'' – in eine Kurve hineinfahren: das Motorrad ging mit 120 in die Kurve
+:''[[in die Luft gehen]]'' - 1 explodieren; 2 wütend werden
+:''[[in die Offensive gehen]]'' - angreifen, als erster aktiv werden
+:''[[in die Pilze gehen]]'' - zum Pilze-Sammeln dahin gehen, wo viele Pilze wachsen ([http://www.gutefrage.net/frage/warum-sagt-man-in-die-pilze-gehen gutefrage])
+:''[[in die Vollen gehen]]'' - sich keine Hemmungen auferlegen, 'alles geben'
+:''[[in die ZAHLWORT gehen]]'' - sich belaufen auf: die Schäden gehen in die Millionen / Tausende
+:''[[in die REIHENFOLGEWORT Runde gehen]]'' - das Rennen geht in die vorletzte Runde; die Tarifverhandlungen gehen heute in die entscheidende Runde
+:''[[in die Tiefe gehen]]'' - (gedanklich oder gefühlsmäßig) nicht an der Oberfläche bleiben: das Gespräch ging sehr in die Tiefe
+:''[[in die Zielgerade gehen]]'' - es nicht mehr weit bis zum Ziel haben
+:''[[in Druck gehen]]'' - zum Druck freigegeben sein und gedruckt werden
+:''[[in Erfüllung gehen (Wünsche, ein Traum)]]'' - Wirklichkeit werden, sich realisieren
+:''[[in eine / die PERSONENVEREINIGUNG gehen]]'' - eintreten, Mitglied werden: in die Gewerkschaft gehen, in die CSU gehen, in einen Kegelverein gehen
+:''[[in eine Richtung gehen]]'' - übertragen: meine Vorstellungen gehen in eine ganz andere Richtung; seine Pläne gehen weit in die Zukunft
+:''[[in Führung gehen]]'' - bei einem noch offenen Spiel oder Rennen die Führung übernehmen: in der vorletzten Runde ging der Läufer aus Kenia in Führung
+:''[[in Konfrontation gehen mit jemandem]]'' - jemanden verbal angreifen
+:''[[in Konkurs gehen]]'' - (aktiv) Konkurs anmelden; durch Zahlungsunfähigkeit in ein Konkursverfahren geraten
+:''[[in Ordnung gehen]]'' - okay sein, nichts dagegen haben: dann kommst du später, das geht schon in Ordnung
+:''[[in Rente / Pension / den Vorruhestand gehen]]'' - aus dem aktiven Berufsleben ausscheiden; insbesondere: vorzeitig in Rente gehen
+:''[[(in) Richtung ORTSANGABE gehen]]'' - (in) Richtung Bahnhof / Stadtmitte gehen
+:''[[in Satz gehen (Druckerzeugnis)]]'' – an ein Layout-Unternehmen zur Gestaltung und Seitenmontage übergeben werden: nach endloser Lektorierung konnte das Buch endlich in Satz gehen
+:''[[in Serie gehen]]'' - die Serienproduktion von etwas aufnehmen
+:''[[in sich gehen]]'' - nachdenken
+:''[[in Stellung gehen]]'' - (militärisch) sich auf einen Angriff vorbereiten
+:''[[in Stellung gehen (bei jemandem)]]'' - als Hausangestellte arbeiten
+:''[[in Stücke gehen]]'' - explodieren, in einzelne Teile zerbrechen
+:''[[in Urlaub gehen]]'' - einen Urlaub beginnen: ich gehe Freitag für drei Wochen in Urlaub
+:''[[ins Auge gehen]]'' - einen empfindlichen und in der Auswirkung großen Schaden hervorrufen: da wäre ich vorsichtig, das könnte leicht ins Auge gehen
+:''[[ins Ausland gehen]]'' - 1 seinen Lebensmittelpunkt ins Ausland verlagern; 2 den Produktionsstandort von Betriebsstätten verlagern (typische Erweiterung: mit etwas, z.B. mit der Teilefertigung)
+:''[[ins Bett gehen]]'' – sich schlafen legen: Leute, ich geh ins Bett, macht nicht mehr so lange!
+:''[[ins Detail / in die Details gehen]]'' - sich in Einzelheiten verlieren: ich würde an dieser Stelle nicht zu sehr ins Detail gehen; auf (viele) Einzelheiten umfangreich eingehen: das geht jetzt wirklich zu sehr in die Details
+:''[[ins Geld gehen (richtig, mächtig...)]]'' - (viel) Geld kosten: der Umbau geht echt ins Geld
+:''[[ins Internet gehen]]'' – 1 eine Internetverbindung herstellen: geh doch einfach ins Internet, da kriegst du die Info sofort; 2 einen Internetauftritt (mit einer Homepage) starten: das findest du bei uns auf der Homepage, wir sind letzte Woche ins Internet gegangen
+:''[[ins Kloster gehen]]'' - in das Klosterleben eintreten
+:''[[ins Land gehen]]'' - (Zeit) verstreichen: die Jahre / Wochen und Monate gingen ins Land
+:''[[ins Leere gehen]]'' - kein Ziel finden, nutzlos sein, nicht beachtet werden: alle seine Verbesserungsvorschläge gingen ins Leere
+:''[[ins Uferlose gehen]]'' - kein Maß und kein Ziel kennen, unkontrolliert überhand nehmen, kein Ende abzusehen sein: der Kapitalbedarf zur Bankenrettung geht ins Uferlose
+:''[[ins Wasser gehen]]'' - sich ertränken
+:''[[jemandem am Arsch vorbei gehen]]'' - jemanden herzlich wenig interessieren, jemandem absolut gleichgültig sein (oft als Behauptung)
+:''[[jemandem an den Kragen gehen (es)]]'' - jemand wird für etwas belangt: jetzt geht's ihm an den Kragen
+:''[[jemandem an die Hand gehen]]'' - jemanden durch Handreichungen unterstützen, jemandem helfen
+:''[[jemandem an die Nieren gehen]]'' - jemanden seelisch sehr belasten, jemandem sehr zu schaffen machen: die Krankheit ihres Großvaters geht ihr sehr an die Nieren
+:''[[jemandem an die Substanz gehen]]'' - die letzten Reserven von jemandem angreifen, jemanden sehr stark fordern
+:''[[jemandem an die Wäsche gehen]]'' - {{ugs.}} jemanden mit sexuellen Absichten körperlich berühren
+:''[[jemandem an ORTSERGÄNZUNG.KÖRPERTEIL gehen]]'' - (ohne Einwilligung) anfassen (sexueller Übergriff oder Angriff): er ging ihr an die Brust / die Bluse / die Gurgel / den Po / zwischen die Beine
+:''[[jemandem ans Gemüt gehen]]'' - jemanden innerlich bewegen
+:''[[jemandem ans Herz gehen]]'' - jemanden emotional berühren
+:''[[jemandem auf den Geist gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf den Keks gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf den Leim gehen]]'' - auf jemanden hereinfallen
+:''[[jemandem auf den Sack gehen]]'' - ''[[derb]]:'' jemanden nerven
+:''[[jemandem auf den Senkel gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf den Zeiger gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf den Zwirbel gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf den Zwirn gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf den Wecker gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf die Eier gehen]]'' - ''[[derb]]:'' jemanden nerven
+:''[[jemandem auf die Nerven gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf die Nüsse gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf die Schraube gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem auf die Zwiebel gehen]]'' - {{ugs.}} jemanden nerven
+:''[[jemandem aus dem Licht gehen]]'' (meist als Aufforderung) – den Weg zwischen Sprecher und Lichtquelle frei machen: so kann ich nicht arbeiten, geh mir aus dem Licht!
+:''[[jemandem aus dem Weg gehen]]'' - vermeiden, mit jemandem Kontakt zu haben
+:''[[jemandem aus der Latüchte gehen]]'' (umgangssprachlich, meist als Aufforderung) – den Weg zwischen Sprecher und Lichtquelle (oder Fotokamera, Bildschirm usw.) frei machen: gehen Sie mal aus der Latüchte, oder wollen Sie mit Ihrem Hintern mit aufs Bild?
+:''[[jemandem aus der Sonne gehen]]'' (meist als Aufforderung) – den Weg zwischen Sprecher und Lichtquelle frei machen: geh mir aus der Sonne, sonst seh ich nix; "Geh mir ein wenig aus der Sonne." (Diogenes zu Alexander dem Großen nach Plutarch)
+:''[[jemandem bis KÖRPERTEIL gehen]]'' - eine bestimmte Körperhöhe erreichen: er geht mir bis zur Brust / Nasenspitze / bis zu den Schultern; analog: der Mantel ging (ihm) bis zu den Knöcheln; der Rock ging kaum über die Knie
+:''[[jemandem durch den Kopf gehen]]'' - jemand denkt über etwas (immer wieder oder beiläufig) nach
+:''[[jemandem durch die Lappen gehen]]'' - verlieren, entgehen, verpassen, entwischen: leider ist mir die Vase bei ebay durch die Lappen gegangen
+:''[[jemandem durch Mark und Bein gehen]]'' - jemanden alles andere als teilnahmslos lassen, einen stark ablehnenden Reflex bei jemandem auslösen
+:''[[jemandem durch und durch gehen]]'' - jemanden innerlich bis hin zu körperlichen Reaktionen (Zittern) berühren, oft ironisch
+:''[[jemandem gegen den Strich gehen]]'' - jemandem nicht gefallen, jemandem nicht (in den Kram) passen
+:''[[jemandem gehen die Augen über]]'' - jemand kann kaum glauben, was er sieht, ist fassungslos, überwältigt
+:''[[jemandem gehen die Nerven durch]]'' - jemand verliert die Nerven, die Selbstkontrolle
+:''[[jemandem gehen die Pferde durch]]'' - jemand verliert die Kontrolle über sich, jemand reagiert übertrieben und ohne 'Impulskontrolle'
+:''[[jemandem geht der Arsch auf Grundeis]]'' - ''derb'' jemand hat große Angst in einer kritischen Situation
+:''[[jemandem geht der Arsch mit Grundeis]]'' - ''derb'' jemand hat große Angst in einer kritischen Situation
+:''[[jemandem geht die Düse (eins zu hundert / tausend)]]'' – jemand hat große Angst
+:''[[jemandem geht die Muffe (eins zu tausend)]]'' – jemand hat große Angst
+:''[[jemandem geht etwas ähnlich]]'' – jemand macht vergleichbare Erfahrungen: mir ging es bei der neuen Stelle ähnlich (wie dir)
+:''[[jemandem geht etwas verlustig]]'' - altertümelnd für 'jemand verliert etwas'
+:''[[jemandem im Gehen die Schuhe besohlen können]]'' - jemand bewegt sich sehr langsam
+:''[[jemandem in die Falle gehen]]'' – von jemandem gefangen, überführt, betrogen werden
+:''[[jemandem ins Garn gehen]]'' - auf jemanden hereinfallen
+:''[[jemandem ins Netz gehen]]'' - gefangen werden, überführt werden: bei der Überprüfung der Fabrikhalle ist der Polizei ein dicker Fisch ins Netz gegangen
+:''[[jemandem / sich wohin ORTSERGÄNZUNG.KÖRPERTEIL gehen]]'' - überstreichen, fahren durch, anfassen: er ging dem Kleinen ein paarmal durchs Haar (erweiterbar: mit dem Kamm / der Bürste); jemandem / sich mit dem Waschlappen einmal durchs Gesicht gehen
+:''[[jemandem nahe gehen]]'' - jemand nimmt sich etwas sehr zu Herzen, jemand wird emotional stark angerührt: der Selbstmord der Mitschülerin ging allen sehr nahe
+:''[[jemandem MODALERGÄNZUNG gehen (mit)]]'' - in einer bestimmten seelischen, körperlichen oder gesundheitlichen Verfassung sein: mir geht's gut / prima / prächtig / glänzend / nicht so gut / wieder schlechter / ziemlich schlecht; geht dir das auch manchmal so?; ihm ging es richtig dreckig; heute geht's mir echt nicht so dolle; also mir geht's super mit der neuen Wohnung; das geht mir ähnlich; der Claudi geht's jetzt endlich besser; uns geht's ja noch gold (W. Kempowski); wie geht's uns heute? (Krankenhaus); wie geht's?; wie geht es Ihnen?
+:''[[jemandem MODALERGÄNZUNG von der Hand gehen]]'' - die Arbeit ging ihr leicht / flott / schnell / gut / nicht von der Hand
+:''[[jemandem MODALERGÄNZUNG von der Zunge gehen]]'' - sogar diese tschechischen Zungenbrecher gehen ihr leicht / flüssig / fließend / glatt von der Zunge
+:''[[jemandem nahe gehen]]'' - jemand nimmt sich etwas sehr zu Herzen, jemand wird emotional stark bewegt: der Selbstmord der Mitschülerin ging allen sehr nahe
+:''[[jemandem nicht aus dem Kopf gehen]]'' - immer wieder an etwas denken oder sich etwas vorstellen müssen
+:''[[jemandem nicht aus dem Sinn gehen]]'' - zwanghaft an etwas denken oder sich etwas vorstellen müssen
+:''[[jemandem nicht in den Kopf gehen (wollen)]]'' - jemand will oder kann etwas nicht verstehen
+:''[[jemandem nicht schnell genug gehen]]'' - jemand wird ungeduldig: Das geht mir hier alles nicht schnell genug.
+:''[[jemandem nicht von der Pelle gehen]]'' - (vor allem Kinder:) sich wie eine Klette an jemanden hängen und ihm dadurch lästig werden
+:''[[jemandem nicht von der Seite gehen]]'' - sich ständig in der Nähe von jemandem aufhalten
+:''[[jemandem (sehr) zu Herzen gehen]]'' - jemanden innerlich (stark) berühren, jemanden aufwühlen
+:''[[jemandem zu schnell / langsam gehen]]'' - variierbar: jemandem (viel) zu schnell / langsam / flott / hopplahopp gehen: Das geht mir hier alles viel zu schnell.
+:''[[jemandem über alles gehen]]'' – jemandem am wichtigsten sein: Korrektheit und Zuverlässigkeit gehen ihm über alles
+:''[[jemandem unter die Haut gehen]]'' - jemanden nicht kalt lassen, jemanden mitfühlen lassen
+:''[[jemandem um den Bart gehen]]'' - jemandem schmeicheln, jemanden hofieren
+:''[[jemandem um etwas gehen]]'' - für jemanden wichtig sein, jemandes Herzensangelegenheit sein: es geht mir hier nicht ums Geld, sondern um die Sache
+:''[[jemandem vor etwas gehen]]'' – jemandem wichtiger sein, mehr Wert legen auf: ihm geht Qualität vor Quantität
+:''[[jemandem wider die Natur gehen]]'' – jemandem heftig widerstreben, von jemandem als unnatürlich empfunden werden
+:''[[jemandem zu weit gehen]]'' - jemand steigt aus, will nicht mehr mithalten oder etwas mit-tragen: dein Vorschlag geht mir entschieden zu weit
+:''[[jemandem zur Hand gehen]]'' - jemanden durch Handreichungen unterstützen, jemandem helfen
+:''[[jemanden gehen lassen / jemanden gehenlassen]]'' – jemanden nicht weiter behelligen, ihn in Ruhe lassen: nach einem dreistündigen Verhör ließ die Polizei ihn gehen
+:''[[jemanden lieber gehen als kommen sehen]]'' - froh sein, mit jemandem so wenig wie möglich zu tun zu haben
+:''[[kaputt gehen]]'' - zerbrechen, funktionsunfähig werden: gestern ist mir die neue Brille kaputt gegangen
+:''[[klar gehen]]'' - 1 Einverständnis signalisieren: okay, geht klar, Alter, mach ma; 2 klappen: die Übergabe ging klar / mit der Übergabe ging alles klar, keine Probleme
+:''[[kommen und gehen]]'' - lakonische Feststellung zu Vorgängen, die von außen nicht zu beeinflussen sind: die Mode kommt und geht; analog: er kommt und geht, wie es ihm passt
+:''[[Kommen und Gehen]]'' - es herrschte / war ein ständiges Kommen und Gehen
+:''[[mit einem / dem Hund Gassi gehen]]'' - den Hund ausführen
+:''[[mit dem Kopf durch die Wand gehen]]'' - massive Widerstände überwinden (wollen) und sich dabei selbst schaden
+:''[[mit den Hühnern zu Bett / schlafen gehen]]'' - früh am Tag schlafen gehen: er geht mit den Hühnern zu Bett und steht beim ersten Hahnenschrei auf
+:''[[mit der Mode gehen]]'' - die Konventionen der Mode beachten
+:''[[mit der Zeit gehen]]'' - sich anpassen; tun, was die Umwelt erwartet
+:''[[mit etwas / einer Information an die Öffentlichkeit gehen]]'' - etwas öffentlich anprangern bzw. enthüllen
+:''[[mit etwas hausieren gehen]]'' - 1 (Ursprungsbedeutung) eine Ware per Haustürverkauf abzusetzen versuchen; 2 an viele Leute, ob sie es hören wollen oder nicht, bestimmte Informationen weitergeben
+:''[[mit etwas / jemandem ins Rennen (um etwas) gehen]]'' - in einen (vor allem sportlichen oder wirtschaftlichen) Wettbewerb eintreten, sich einer Konkurrenz stellen, um einen ausgelobten Preis kämpfen
+:''[[mit etwas schwanger gehen]]'' - sich mit einem Gedanken tragen, über etwas nachdenken, etwas ausbrüten
+:''[[mit jemandem bis ans Ende der Welt gehen]]'' – (meist würde-Konjunktiv) sein Leben mit jemandem teilen (wollen), immer zu jemandem halten (wollen): mit dieser Frau würde ich bis ans Ende der Welt gehen
+:''[[mit jemandem durch dick und dünn gehen]]'' - mit jemandem alle Höhen und Tiefen einer Beziehung durchstehen
+:''[[mit jemandem ein Stück / ein paar Schritte gehen]]'' - sollen wir ein Stück gehen?
+:''[[mit jemandem / etwas konform gehen (in einer Sache)]]'' - einer Meinung sein, unterstützen: ich gehe in dieser Angelegenheit mit dir völlig konform
+:''[[mit jemandem gehen]]'' - mit jemandem liiert sein
+:''[[mit jemandem geht es zu Ende]]'' – jemand liegt im Sterben
+:''[[mit jemandem (MODALADVERB) ins Gericht gehen]]'' - verurteilen, abkanzeln, missbilligen: die Filmrezensenten gingen mit diesem Streifen (hart / streng / scharf ...) ins Gericht
+:''[[mit jemandem in die Kiste / ins Bett gehen]]'' - mit jemandem schlafen / eine sexuelle Beziehung haben
+:''[[mit jemandem zu Rate gehen / zurate gehen]]'' – sich mit jemandem beraten
+:''[[mit leeren Händen (wieder) gehen]]'' - unverrichteter Dinge wieder abziehen, kein Entgegenkommen gefunden haben
+:''[[mit offenen Augen durch die Welt gehen]]'' - neugierig sein, für Neues empfänglich sein
+:''[[mit sich zu Rate gehen / mit sich zurate gehen]]'' - veraltet: über etwas nachdenken
+:''[[MODALERGÄNZUNG gehen (Uhr)]]'' – Aussage über die Richtigkeit der Zeitanzeige: meine Uhr geht richtig / nicht richtig / falsch / korrekt / auf die Sekunde genau (siehe auch: nachgehen, vorgehen)
+:''[[MODALERGÄNZUNG / ZEITDAUERERGÄNZUNG über die Bühne gehen]]'' - 1 an einem Aufführungsort aufgeführt werden 2 (geplante Aktionen) in einer bestimmten Weise verlaufen; häufige Modalergänzungen: reibungslos / sang- und klanglos / glatt / fix / routiniert / ohne Probleme / erfolgreich / zügig / schneller als erwartet / in (nur) ZAHLWORT Minuten / ohne Proteste / friedlich / ohne Krawalle / wie geplant / geräuschlos / friedlich
+:''[[MODALERGÄNZUNG vonstattengehen]]'' - auf eine bestimmte Weise geschehen / abgewickelt werden: es ging alles sehr routiniert vonstatten; ich weiß auch nicht, wie das vonstattengehen soll
+:''[[nach dem Mond gehen (Uhr, Messgerät)]]'' - die falsche Uhrzeit / einen falschen Wert anzeigen, falsch gestellt / nicht richtig geeicht sein: deine Uhr / das Thermometer geht nach dem Mond
+:''[[nach etwas / jemandem gehen]]'' - etwas glauben, sich an etwas orientieren: nach dieser Uhr kannst du nicht gehen; man kann nicht ohne weiteres nach dem gehen, was die Zeugen sagen; das Spiel geht nach folgenden Regeln: ...
+:''[[(nach etwas / jemandem) auf die Jagd gehen]]'' - 1 zu erjagen / erbeuten versuchen 2 angestrengt suchen
+:''[[(nach etwas / jemandem) auf die Suche gehen]]'' - eine Suchaktion starten
+:''[[nach Hause gehen]]'' - 1 (einen Ort verlassen und) seine eigene Wohnung aufsuchen 2 (mit etwas) aufgeben, nicht weiter kämpfen, ein Ergebnis akzeptieren
+:''[[nach jemandem gehen]]'' - jemand bestimmt, was oder wie etwas geschehen soll: wenn es nach mir ginge, könnten wir die ganze Geschichte abblasen; es kann nicht immer alles nur nach dir gehen
+:''[[nach jemandes Kopf gehen (müssen)]]'' - so ablaufen, wie jemand sich das vorstellt: wenn nicht alles nach ihrem Kopf geht, macht sie komplett dicht
+:''[[nach jemandes Nase gehen]]'' - so laufen, wie jemand anderes es will: in diesem Laden muss alles nach Picos Nase gehen, sonst gibt's hier echt Stress
+:''[[nach vorne gehen]]'' - 1 sich vor eine Klasse, auf eine Bühne stellen 2 Innovationen starten 3 in die Zukunft blicken, 'weiterkommen' wollen
+:''[[nach Wunsch gehen (alles)]]'' – verlaufen, wie jemand es sich wünscht: im Hotel ging alles nach Wunsch
+:''[[neue Wege gehen]]'' - etwas Neues und Unbekanntes ausprobieren, etwas wagen, innovativ sein: mit diesem Produktionsverfahren ging das Unternehmen neue Wege
+:''[[nicht ohne KLEIDUNGSSTÜCK/ACCESSOIRE (aus dem Haus) gehen]]'' - nicht ohne Hut / Handschuhe / Schal / Schirm / ... (aus dem Haus) gehen
+:''[[nichts geht (jemandem) über etwas / jemanden]]'' - nichts geht (mir) doch über eine gute Erziehung!
+:''[[nichts geht mehr]]'' - Aufforderung beim Roulette, nichts mehr zu setzen; übertragen: alle Möglichkeiten sind erschöpft
+:''[[online gehen]]'' – Kontakt zum/übers Internet herstellen: kannst du mit deinem Handy online gehen?
+:''[[ORTSERGÄNZUNG.WO in Stellung gehen]]'' - eine Arbeit als Hausangestellte annehmen bei jemandem oder an einem Ort
+:''[[ORTSERGÄNZUNG.WO längsseits gehen]]'' - mit der Längsseite anlegen (und festmachen): der Australier wollte mit seiner Jacht bei mir längsseits gehen
+:''[[ORTSERGÄNZUNG.WO vor Anker gehen]]'' - ankern; übertragen: sich niederlassen, nicht weiter suchen
+:''[[ORTSERGÄNZUNG.WOHER gehen]]'' – (nicht) herauszubekommen sein: der Nagel geht nicht aus der Wand; der Schlüssel ging nicht wieder aus dem Schloss; mit diesem kleinen Kniff geht der Kuchen ohne Probleme aus der Form
+:''[[ORTSERGÄNZUNG.WOHIN gehen]]'' - einen neuen Lebensabschnitt beginnen, seinem Leben eine neue Richtung geben: ins Ausland gehen, zum Fernsehen gehen (dort arbeiten), für ein Jahr in den Entwicklungsdienst gehen, ganz aus Berlin weggehen, in den Schuldienst gehen, zur Polizei gehen (in den Polizeidienst eintreten), in den Widerstand gehen, in den Untergrund gehen, zu Karstadt gehen (dorthin wechseln), in die Politik gehen, ins Kloster gehen, an die Uni gehen, zum Film/Theater... gehen, zum Militär gehen, zur See gehen...
+:''[[ORTSERGÄNZUNG.WOHIN gehen]]'' - für ein Ziel bestimmt sein, befördert werden: diese ganze Post geht direkt nach Teneriffa; der Transport geht in die USA; das Schiff geht nach Hongkong; unsere Produkte gehen in alle Welt
+:''[[ORTSERGÄNZUNG.WOHIN gehen]]'' - in eine bestimmte Richtung zeigen, dahin orientiert sein: die Wohnzimmerfenster gehen zur Straße; der Balkon geht aufs Meer / nach hinten raus / auf einen Hinterhof / zum Strand / nach Osten ...
+:''[[ORTSERGÄNZUNG.WOHIN gehen]]'' – irgendwo(hin) treffen, einschlagen, hindurchgehen 1 (Fußball): der Ball /Schuss ging ins Netz / ins Tor / ins Toraus / ins Seitenaus / dem Torwart durch die Beine / über die Latte / an den rechten Seitenpfosten / knapp am Pfosten vorbei / daneben / vorbei 2 (Kugel / Schuss einer Feuerwaffe)
+:''[[ORTSERGÄNZUNG.WOHIN gehen (Reise, Fahrt …)]]'' – irgendwohin führen: wohin geht die Reise?; der Ausflug ging zum Badesee; auch bildlich: kein Mensch weiß bei unserem System der Altersversorgung, wohin die Reise geht
+:''[[pleite gehen]]'' - alles Geld verlieren, zahlungsunfähig werden
+:''[[schief gehen]]'' - {{ugs.}} misslingen: wird schon schief gehen = (ironisch) das wird schon klappen, nur Mut!
+:''[[schlafen gehen]]'' - sich für die Nachtruhe zu Bett legen
+:''[[schnell gehen müssen (es)]]'' - bei ihm muss immer alles ganz besonders schnell gehen
+:''[[schneller gehen (es)]]'' - geht das nicht ein bisschen schneller hier an der Kasse?
+:''[[seinen eigenen Weg gehen]]'' – sich nicht an anderen orientieren
+:''[[seinen (gewohnten/alten) Gang gehen]]'' - normal verlaufen, Zeit vergehen, indem etwas geschieht: die Geschäfte gingen ihren (gewohnten) Gang
+:''[[seinen Weg gehen]]'' - seinen Weg in der Gesellschaft machen und da seinen Platz finden: du wirst sicher deinen Weg gehen, mit dem Abi steht dir ja die ganze Welt offen
+:''[[seiner Wege gehen]]'' - sich auf seinem Weg nicht ablenken lassen; an dem, was andere tun, nicht interessiert scheinen; sein eigenes Ding durchziehen
+:''[[seines Weg(e)s gehen]]'' - sich auf seinem Weg nicht ablenken lassen (ohne nach rechts und links zu gucken)
+:''[[sich etwas durch den Kopf gehen lassen]]'' - über etwas nachdenken, etwas erwägen
+:''[[sich gehen lassen / sich gehenlassen]]'' - sich [[vernachlässigen]], seine Pflichten [[schleifen]] lassen
+:''[[sich gehen lassen / sich gehenlassen]]'' - die Beherrschung verlieren: er ließ sich soweit gehen, sogar seine Angestellten zu beleidigen
+:''[[sich zum Gehen wenden]]'' - sich anschicken, zu gehen, sich in Richtung Ausgang bewegen
+:''[[sicher gehen]]'' - vorsichtig handeln, kein Risiko eingehen, sicherstellen: ich wollte sicher gehen, dass der Brief auch wirklich ankommt, und hab ihn per Einschreiben mit Rückschein geschickt
+:''[[sonst geht's jemandem aber gut]]'' - ironischer Zweifel an der Zurechnungsfähigkeit: wie, du willst die Wandfarbe mit dem Mixer anrühren? Sonst geht's dir aber gut, oder?
+:''[[stempeln gehen]]'' - (veraltend) von Arbeitslosenunterstützung leben
+:''[[stiften gehen]]'' - sich absetzen, flüchten, weglaufen
+:''[[tata / teita gehen]]'' - (Muttersprache) spazieren gehen: na kleiner Mann, willst du mit der Mama teita gehen?
+:''[[tiefer gehen]]'' – 1 eine tiefere Flughöhe einnehmen: der Pilot versuchte, tiefer zu gehen 2 tiefer eindringen: ich kann mit dem Bohrer nicht noch tiefer gehen, da ist irgendwo ne Wasserleitung 3 fallen, absacken: die Kurse in Asien könnten durchaus noch tiefer gehen 3 nicht an der Oberfläche bleiben: ich mag Filme, die tiefer gehen; die seelische Verletzung ging bei ihr tiefer
+:''[[tot gehen]]'' – umgangssprachlich / kindersprachlich für sterben, verenden: Die Wohnung wurde ausgeräuchert, aber ein paar Flöhe sind nicht tot gegangen
+:''[[über Bord gehen]]'' - von einem Schiff / Boot ins Wasser fallen
+:''[[über den Jordan gehen]]'' - ''[[euphemistisch]] für:'' sterben; auch: kaputt gehen
+:''[[über den Ladentisch / die Ladentheke gehen (mit Quantifizierung)]]'' - verkauft werden: die CD ist schon in den ersten drei Tagen nach ihrer Auslieferung mindestens 100.000 mal über den Ladentisch gegangen
+:''[[über die Wupper gehen]]'' - (regionale Abwandlung von ''über den Jordan gehen''): ''[[euphemistisch]] für:'' sterben; auch: [[kaputt gehen]]
+:''[[über die Straße gehen]]'' - die Straße überqueren
+:''[[über jemandes Begriffe / Begriffsvermögen gehen]]'' – für jemanden nicht zu begreifen sein
+:''[[über jemandes Horizont gehen]]'' - etwas nicht verstehen können, etwas nicht fassen können
+:''[[über jemandes Hutschnur gehen]]'' – jemand ärgert sich über etwas, etwas ist jemandem zu viel, etwas passte jemandem nicht: das geht mir jetzt über die Hutschnur!
+:''[[über jemandes Kräfte / Kraft gehen]]'' - etwas nicht mehr durch- oder aushalten, etwas nicht schaffen: er ist selbst gebrechlich, sie jeden Tag im Krankenhaus zu besuchen geht über seine Kraft
+:''[[über jemandes Verstand / Verständnis gehen]]'' - völliges Unverständnis haben für etwas: wie kannst du ihm nur weiter nachlaufen, das geht über meinen Verstand
+:''[[über Leichen gehen]]'' - keine Rücksicht nehmen, absolut brutal vorgehen: vor dem neuen Abteilungsleiter würde ich mich in Acht nehmen, der soll über Leichen gehen nach allem, was man hört
+:''[[über Tisch und Bänke gehen]]'' - undiszipliniert bis völlig unkontrolliert herumtoben, sich wie rasend gebärden: in dieser Klasse kann der Lehrer nicht mal für zwei Minuten aus dem Raum gehen, die Kinder gehen sofort über Tisch und Bänke
+:''[[über ZAHLWORT Runden gehen]]'' - der Kampf / das Rennen ging über sieben Runden
+:''[[um die Ecke gehen]]'' - um die Ecke biegen: Nudeln finden Sie, wenn Sie da vorne am Regalende einmal um die Ecke gehen
+:''[[um die Welt gehen]]'' - das Lied / die Nachricht ging um die (ganze) Welt
+:''[[um die Wurst gehen (es)]]'' - eine große Anstrengung wert sein: jetzt geht's um die Wurst, da legt euch mal richtig ins Zeug
+:''[[um etwas gehen (es)]]'' - 1 sich handeln um, Thema sein: worum geht's? 2 jemandem wichtig sein; geht's wieder mal um das Taschengeld? ; dir geht's doch immer nur um das Eine! 3 auf dem Spiel stehen: es ging um eine beträchtliche Summe
+:''[[ums Ganze gehen (es)]]'' - sich um die letzte Chance handeln, um alles oder nichts gehen: Leute, im nächsten Spiel geht es ums Ganze, ich hoffe, das ist euch klar!
+:''[[ums Prinzip gehen]]'' – die Beachtung von Regeln einfordern: es geht mir (hierbei nur) ums Prinzip
+:''[[unter die Decke gehen]]'' - explodieren, einen Wutanfall haben
+:''[[unter die Gürtellinie gehen]]'' - ein unfairer / unzulässiger Schlag sein, vor allem übertragen: als du ihm vor allen Leuten gesagt hast, dass er vielleicht das Sorgerecht für seine Kinder nicht bekommt, das ging voll unter die Gürtellinie
+:''[[unter eine SOZIALE.GRUPPE gehen]]'' - sich einer Gruppe zugesellen, sich auf ihre Seite schlagen: unter die Marathonläufer / Vegetarier / Ahnenforscher / Blogger ... gehen; bist du jetzt etwa unter die Alkis gegangen?
+:''[[VERB.INFINITIV gehen]]'' - jemanden von irgendwo abholen / angeln / / baden / betteln / einkaufen / einen trinken / frische Luft schnappen / hausieren / joggen / Klinken putzen / schlafen / schwimmen / spazieren / Skifahren / Tennis spielen / tanzen / trainieren / walken ... gehen
+:''[[verloren gehen / verlorengehen]]'' - bei dem Gedränge sind mir die Handschuhe verloren gegangen
+:''[[verlustig gehen]]'' - altertümelnde Variante von 'verloren gehen'
+:''[[verschütt gehen]]'' - regional für 'abhanden kommen'
+:''[[von Bord gehen (Boot, Flugzeug, Schiff, Fähre)]]'' - der Kapitän ist noch nicht von Bord gegangen
+:''[[von dannen gehen]]'' - (altertümelnd) weggehen: er ging von dannen und weinte bitterlich
+:''[[von Hand zu Hand gehen]]'' - immer wieder den Besitzer wechseln, weitergereicht werden
+:''[[von Mund zu Mund gehen]]'' - sich (schnell) verbreiten (Nachricht)
+:''[[von uns gehen]]'' - euphemistisch für: sterben
+:''[[vor die Hunde gehen]]'' - einen Niedergang erleben, zugrunde gehen
+:''[[wählen gehen]]'' - seine Stimme bei einer Wahl abgeben
+:''[[weiter gehen]]'' - 1 sich nach einer Pause oder Stockung fortsetzen: es geht weiter 2 über etwas hinaus gehen, den Einsatz erhöhen: ich würde sogar noch einen Schritt weiter gehen und das als Betrug bezeichnen 3 nicht stehen bleiben: bitte weitergehen, hier gibt es nichts zu sehen
+:''[[wie auf Eiern gehen]]'' - (über)vorsichtig gehen
+:''[[wie ein / der Storch im Salat gehen]]'' - 1 steifbeinig oder unbeholfen herumstaksen; 2 die Füße beim Gehen (hoch heben und) sehr vorsichtig aufsetzen
+:''[[wie gehts, wie stehts?]]'' - humorvoll gemeinte Variante von 'wie geht's?'
+:''[[wo jemand geht und steht]]'' - überall (wo jemand sich aufhält); in jeder Situation, wo jemand dabei ist
+:''[[zu Bett gehen]]'' - sich schlafen legen
+:''[[zu Boden gehen]]'' - stürzen, hinfallen (insbesondere beim Boxkampf)
+:''[[zu Bruch gehen]]'' - zerbrechen: beim Umzug ist ihre schöne chinesische Vase zu Bruch gegangen
+:''[[zu Ende gehen]]'' - 1 (Vorrat) sich erschöpfen: der Reis geht zu Ende, wir müssen mal neuen kaufen; 2 enden, schließen: das Treffen der Minister ging mit einer gemeinsamen Erklärung zu Ende
+:''[[zu Ende gehen mit jemandem (es)]]'' - mit der alten Dame geht es langsam zu Ende
+:''[[zu Fuß gehen]]'' - nach einem feuchtfröhlichen Abend sollte man lieber das Auto stehen lassen und zu Fuß gehen
+:''[[zu Herzen gehen]]'' - emotional berühren (wahrscheinlich eine Ellipse zu [[jemandem zu Herzen gehen]]): ihr Vortrag ging zu Herzen
+:''[[zu jemandes Lasten gehen]]'' - jemanden finanziell oder anderweitig belasten
+:''[[zu weit gehen]]'' - eine Grenze verletzen: damit bist du eindeutig zu weit gegangen
+:''[[zu Werke gehen (mit / bei etwas)]]'' - meist mit MODALERGÄNZUNG: behutsam, vorsichtig, umständlich, geschickt zu Werke gehen; ich weiß noch nicht, wie ich mit diesem Projekt zu Werke gehen soll
+:''[[zum Arzt gehen (mit etwas)]]'' - eine Arztpraxis aufsuchen, um sich dort behandeln zu lassen: damit ist nicht zu spaßen, ich würde damit zum Arzt gehen
+:''[[zum einen Ohr hinein/rein und zum anderen wieder hinaus/raus gehen]]'' - nicht zuhören, nicht ernst nehmen, sich etwas nicht merken
+:''[[zum Lachen in den Keller gehen]]'' - humorlos und stur sein
+:''[[zur Neige gehen]]'' - sich aufbrauchen
+:''[[zur Polizei gehen (mit einer Sache)]]'' - Anzeige erstatten: du musst damit zur Polizei gehen
+:''[[zur Sache gehen (es, oft mit MODALERGÄNZUNG)]]'' - ernst werden: nach den Grundstücksauseinandersetzungen ging es mit dem Bau der neuen Wohnanlage voll zur Sache; morgen wird es in der Gerichtsverhandlung hart zur Sache gehen
+:''[[zur Schule gehen]]'' - regelmäßig die Schule besuchen: ihr Ältester geht kaum noch zur Schule, er hat praktisch abgebrochen
+:''[[zur Wahl gehen]]'' - seine Stimme bei einer Wahl abgeben
+
+{{Sprichwörter}}
+:[[der Krug geht so lange zum Brunnen, bis er bricht]]
+:[[der Student geht so lange zur Mensa, bis er bricht]] (Studi-Spruch)
+:[[Freunde in der Not gehen tausend / hundert auf ein Lot]] - erst in echter Notsituation zeigt sich wahre Freundschaft
+:[[geh mit Gott, aber geh!]] - ironische Aufforderung, den Sprecher in Ruhe zu lassen und wegzugehen
+:[[Liebe geht durch den Magen]] -
+:[[Der Mohr hat seine Schuldigkeit getan, der Mohr kann gehen.]] - Kommentar zu: jemand wird nicht mehr gebraucht, jemand fühlt sich überflüssig
+:[[Wenn der Berg nicht zum Propheten kommt, muss der Prophet (wohl) zum Berg gehen.]] - man muss das tun, was möglich ist
+
+{{Charakteristische Wortkombinationen}}
+:[1] {{Audio|De-zur Kirche gehen.ogg|->}} zur [[Kirche]] ''gehen''
+:[[um etwas gehen]], worum geht es?, es geht um folgendes
+
+{{Wortbildungen}}
+:[[abgehen]], [[abwärts gehen]], [[angehen]], [[aufgehen]], [[aufwärts gehen]], [[ausgehen]], [[auseinandergehen]], [[bankrott gehen]], [[begehen]], [[dabei gehen]], [[danebengehen]], [[darangehen]], [[dazwischengehen]], [[draufgehen]], [[durchgehen]], [[durcheinandergehen]], [[eingehen]], [[einhergehen]], [[emporgehen]], [[entgehen]], [[entgegengehen]], [[entlanggehen]], [[entzweigehen]], (sich) [[ergehen]], [[fehlgehen]], [[fortgehen]], [[fremdgehen]], ''(Sport),'' [[gut gehen]], [[heimgehen]], [[hergehen]], [[herangehen]], [[herausgehen]], [[herumgehen]], [[heruntergehen]], [[herübergehen]], [[hervorgehen]], [[hinabgehen]], [[hinaufgehen]], [[hinausgehen]], [[hineingehen]], [[hingehen]], [[hintergehen]], [[hinübergehen]], [[hinweggehen]], [[hinuntergehen]], [[hochgehen]], [[irregehen]], [[kaputtgehen]], [[klargehen]], [[langgehen]], [[längsgehen]], [[losgehen]], [[mitgehen]], [[nachgehen]], [[nahegehen]], [[niedergehen]], [[pleite gehen]], [[rangehen]], [[raufgehen]], [[rausgehen]], [[reingehen]], [[rübergehen]], [[rumgehen]], [[runtergehen]], [[schiefgehen]], [[spazieren gehen]], [[tot gehen]], [[übergehen]], [[umgehen]], [[untergehen]], [[vergehen]], [[verloren gehen]] ([[verlorengehen]]), [[vonstattengehen]], [[vorgehen]], [[vorangehen]], [[vorausgehen]], [[vorbeigehen]], [[vorübergehen]], [[weggehen]], [[weitergehen]], [[zergehen]], [[zugehen]], [[zugrundegehen]], [[zurückgehen]], [[zusammengehen]]
+:[[Gang]], [[Gehen]], [[Geher]], [[Gehfehler]], [[Gehgips]], [[Gehhilfe]], [[Gehminute]], [[Gehrock]], [[Gehschule]], [[Gehsteig]], [[Gehstock]], [[Gehtraining]], [[Gehübung]], [[Gehversuch]], [[Gehwagen]], [[Gehweg]]
+:[[gehbehindert]], [[gehbereit]], [[gehfertig]]
+
+==== Übersetzungen ====
+{{Ü-Tabelle|Ü-links=
+*{{sq}}: [1] {{Ü|sq|shkon}}
+*{{hy}}: [1] {{Üt|hy|գնալ|gnel}}
+*{{eu}}: [1] {{Ü|eu|joan}}
+*{{my}}: [1] {{Üt|my|pergi|}}
+*{{bg}}: [1] {{Üt|bg|ходя|chodja}}; [1]; {{Üt|bg|вървя|vărvja}}; [2] {{Üt|bg|отида|otida}}
+*{{zh}}: [1] {{Üt|zh|走|zǒu}}
+*{{en}}: [1] {{Ü|en|walk}}, [1–3, 7, 13] {{Ü|en|go}}; [2] {{Ü|en|leave}}; [4] {{Ü|en|work}}, be {{Ü|en|operable}}; [6] {{Ü|en|sell}}; [7] {{Ü|en|extend}}, {{Ü|en|reach}}; [8] {{Ü|en|last}}, {{Ü|en|go on}}; [9] {{Ü|en|prove}}; [10] be {{Ü|en|tolerable}}; [11] be {{Ü|en|practicable}}; [12] {{Ü|en|do}}; [14] {{Ü|en|be on}} someone
+*{{eo}}: [1] {{Ü|eo|iri}}; [2] {{Ü|eo|foriri}}; [4] {{Ü|eo|funkcii}}; [9] {{Ü|eo|fermenti}}; [13] {{Ü|eo|farti}}
+*{{fi}}: [1] {{Ü|fi|mennä}}, {{Ü|fi|kävellä}}
+*{{fr}}: [1, 3] {{Ü|fr|aller}}, [2] {{Ü|fr|partir}}, [4, 6] {{Ü|fr|marcher}}
+*{{id}}: [1] {{Ü|id|pergi}}
+*{{is}}: [1] {{Ü|is|ganga}}; [17] {{Ü|is|fara}}
+*{{it}}: [1] {{Ü|it|camminare}}; {{Ü|it|andare}}; [2] {{Ü|it|andarsene}}; [3] {{Ü|it|ricominciare}}; [4, 5] {{Ü|it|funzionare}}, {{Ü|it|marciare}}; [6] {{Ü|it|marciare}}; [7] {{Ü|it|ditatarsi}}; [8] {{Ü|it|durare}}; [9] {{Ü|it|lievitare}}; [10] {{Ü|it|essere accettabile}}; [11] {{Ü|it|essere fattibile}}; [12] {{Ü|it|rivestire}}; [13] {{Ü|it|andare}}; [14] {{Ü|it|infigarsi}} ([[Jugendsprache]])
+*{{ja}}: [1] {{Üt|ja|歩く|あるく, aruku}}, {{Üt|ja|歩む|あゆむ, ayumu}}, [1, 1a] {{Üt|ja|行く|いく, iku}} [1a] {{Üt|ja|行く|ゆく, yuku}}
+*{{ca}}: [1] {{Ü|ca|anar}}, {{Ü|ca|caminar}} (wandern); [2] {{Ü|ca|anar-se}}, {{Ü|ca|sortir}}, {{Ü|ca|marxar}}, [4] {{Ü|ca|funcionar}}, {{Ü|ca|marxar}}, {{Ü|ca|anar}}
+*{{ko}}: [1, 4] {{Üt|ko|가다|gada}}
+*{{crh}}: [1, 2] {{Ü|crh|ketmek}}
+*{{la}}: [1] {{Ü|la|ire}}
+*{{lv}}: [1] {{Ü|lv|iet}}
+*{{lb}}: [1] {{Ü|lb|goen}}
+*{{nl}}: [1, 4, 6, 7] {{Ü|nl|lopen}}, [2, 3, 5, 10] {{Ü|nl|gaan}}, [9] {{Ü|nl|rijzen}}
+*{{no}}: [1–4] {{Ü|no|gå}}
+*{{hsb}}: [1] {{Ü|hsb|hić}}, {{Ü|hsb|chodźić}}
+*{{oc}}: [1] {{Ü|oc|anar}}, [2] {{Ü|oc|sortir}}, {{Ü|oc|gésser}} ([[aranesisch]])
+*{{ps|DMG}}: [1] {{Üxx4|ps|تلل|d=…|DMG=0}}<ref>{{Literatur | Autor=Akram Malakzay; unter Mitwirkung von David Neil MacKenzie | Titel=Grosses Wörterbuch Deutsch–Paschto | Verlag=Helmut Buske Verlag | Ort=Hamburg | Jahr=2009 (Lexicographia orientalis ; Band 6, {{ISSN|0940-2985}}) | ISBN=978-3-87548-516-5 }}, Stichwort »gehen«, Seite 251.</ref><ref>{{Literatur | Autor=Mohammed Arif | Titel=Dreisprachiges Wörterbuch | TitelErg=Deutsch – Dari (Persisch) – Paschtu | Verlag=Selbstverlag | Ort=Bonn | Jahr=[2010] | ISBN=978-3-00-031296-0 }}, Stichwort »gehen«, Seite 365.</ref>
+*{{pl}}: [1, 3, 11, 12] {{Ü|pl|iść}}, [1] {{Ü|pl|chodzić}}; [2] {{Ü|pl|odchodzić}}, {{Ü|pl|odejść}}; [4] {{Ü|pl|działać}}; [7] {{Ü|pl|rozciągać}}; [8] {{Ü|pl|trwać}}; [9] {{Ü|pl|fermentować}}; [10] {{Ü|pl|może być}} (kann sein), {{Ü|pl|możliwe}}, {{Ü|pl|zezwalać}}
+|Ü-rechts=
+*{{pt}}: [1] {{Ü|pt|andar}}; [1–3, 7, 12, 13] {{Ü|pt|ir}}; [4, 11] {{Ü|pt|funcionar}}; [8] {{Ü|pt|durar}}; [10] {{Ü|pt|ser aceitável}}; [14] {{Ü|pt|ser à conta de}}
+*{{ro}}: [1] {{Ü|ro|a merge}} {{f}}
+*{{ru}}: [1, 3] {{Üt|ru|идти|idtí}}/{{Üt|ru|пойти|pojtí}}, {{Üt|ru|ходить|chodít'}}, {{Üt|ru|отправляться|otpravljat'sja}}/{{Üt|ru|отправиться|otprávit'sja}}; [2] {{Üt|ru|уходить|uchodít'}}/{{Üt|ru|уйти|ujtí}}; [4] {{Üt|ru|действовать|déjstvovat'}}, {{Üt|ru|идти|idtí}} (Uhr); [6] {{Üt|ru|ладиться|ládit'sja}}, {{Üt|ru|идти|idtí}} (Geschäft); [7a] {{Üt|ru|простираться|prostirát'sja}}; [7a, 7b] {{Üt|ru|идти|idtí}}; [8] {{Üt|ru|идти|idtí}}, {{Üt|ru|продолжаться|prodolžát'sja}}; [9] {{Üt|ru|подниматься|podnimát'sja}}/{{Üt|ru|подняться|podnjat'sja}}, {{Üt|ru|бродить|brodít'}}/{{Üt|ru|забродить|zabrodít'}}; [10, 21, 22] {{Üt|ru|идти|idtí}}/{{Üt|ru|пойти|pojtí}}, {{Üt|ru|сойти|sojtí}}, {{Üt|ru|годиться|godít'sja}}; [11] {{Üt|ru|быть возможным|byt' vozmóžnym}}; [12] {{Üt|ru|идти|idtí}}; [13] {{Üt|ru|заходить|zachodít'}}/{{Üt|ru|зайти|zajtí}}, {{Üt|ru|переходить|perechodít'}}/{{Üt|ru|перейти|perejtí}}; [14] {{Üt|ru|идти|idtí}}, {{Üt|ru|переходить|perechodít'}}/{{Üt|ru|перейти|perejtí}}, {{Üt|ru|отходить|otchodít'}}/{{Üt|ru|отойти|otojtí}}; [15] {{Üt|ru|уходить|uchodít'}}/{{Üt|ru|уйти|ujtí}}; [16] {{Üt|ru|проходить|prochodít'}}/{{Üt|ru|пройти|projtí}}; [17] {{Üt|ru|идти|idtí}}, {{Üt|ru|уходить|uchodít'}}/{{Üt|ru|уйти|ujtí}}, {{Üt|ru|отправляться|otpravljat'sja}}/{{Üt|ru|отправиться|otprávit'sja}}; [18] {{Üt|ru|уходить|uchodít'}}/{{Üt|ru|уйти|ujtí}}; [19] {{Üt|ru|ходить|chodít'}}, {{Üt|ru|выходить|vychodít'}}; [20] {{Üt|ru|входить|vchodít'}}/{{Üt|ru|войти|vojtí}}, {{Üt|ru|влезать|vlezát'}}/{{Üt|ru|влезть|vlezt'}}, {{Üt|ru|помещаться|pomeŝát'sja}}/{{Üt|ru|поместиться|pomestít'sja}}
+*{{sv}}: [1–4] {{Ü|sv|gå}}; [5] ''Tür:'' {{Ü|sv|öppnas}}, {{Ü|sv|stängas}}, ''Telefon:'' {{Ü|sv|ringa}}; [6, 7] {{Ü|sv|gå}}; [7] {{Ü|sv|sträcka sig}}; [8] {{Ü|sv|pågå}}; [9] {{Ü|sv|jäsa}}; [10] {{Ü|sv|gå}}, {{Ü|sv|passa sig}}; [11] {{Ü|sv|gå}}; [12] {{Ü|sv|stå till}}; [13] {{Ü|sv|gå}}; [14] {{Ü|sv|stå för}}
+*{{es}}: [1–5, 7, 8, 12, 13] {{Ü|es|ir}}, [1] {{Ü|es|caminar}}, [2] {{Ü|es|retirarse}}, [4] {{Ü|es|funcionar}}, [1, 4, 14] {{Ü|es|andar}}
+*{{sux}}: [1, 2] {{Üt|sux|𒁺|ĝen}}
+*{{cs}}: [1, 3, 4, 10, 11] {{Ü|cs|jít}}, [1, 3, 4] {{Ü|cs|chodit}}, [12] {{Ü|cs|dařit se}}
+*{{tr}}: [1] {{Ü|tr|yürümek}}, [2, 3] {{Ü|tr|gitmek}} [4, 5] {{Ü|tr|işlemek}}, {{Ü|tr|çalışmak}}
+*{{hu}}: [1] {{Ü|hu|jár}}, [2] {{Ü|hu|megy}}
+*{{vec}}: [1] {{Ü|vec|ndar}}, {{Ü|vec|caminar}}
+|Dialekttabelle=
+{{überarbeiten|alle Angaben sollten überprüft und belegt werden, [[Benutzer:Caligari|Caligari]] [[Benutzer_Diskussion:Caligari|<span style="font-family: 'Arial Unicode MS', sans-serif;"><span class="ipa" style="padding: 0 1px; text-decoration: none;"><sup>Ɔ</sup>ɐ<sup>ƀïи</sup>Ϡ<sub>Ⴕ</sub></span></span>]] 15:42, 23. Jul. 2015 (MESZ)|Deutsch}}
+*Alemanisch: [?] „'''Gö''' ma do ane“; [Schweizerdeutsch/Mundart] „'''Gangsch''' e mol“; [?] „Huam '''go'''“
+**Schwäbisch: [1] laufe, [2] gau, geha (h ist hier ein j also gleitlaut), in der Vergangenheit : gângâ
+***Ostschwäbisch: gănga / gâ, gâo, gâu, gô / gee, gea, géia - i găng / gâo, gâu / gee - du gâsch, gôsch / geesch - mir/dia găngat / gănt / geat - (Vergangenheit) gănga
+|D-rechts=
+*Bairisch: geh, gea
+*Berlinerisch: jeen
+*Tirolerisch: gean, gian (mit der zusätzlichen Verwendung als Hilfsverb; vgl. en. Going-to future)
+*Erzgebirgisch: [1–14] gii(n) (Präsens: gii, gist, gitt, gii(n), giit, gii(n), Partizip: gonge)
+*Niedersächsisch: [1, 2, 4, 6, 7, 8] [[gahn]]
+*Ripuarisch: [?] jonn
+}}
+
+{{Referenzen}}
+:[1] {{Wikipedia|Gehen}}
+:[1-7b, 9, 11, 12, 19, 21-23] {{Ref-Grimm}}
+:[1-3, 7b,12, 17, 20] {{Ref-DWDS}}
+:[1–22] {{Ref-Duden}}
+:[(2, 4, 6, 8-12, 20, 21)] {{Ref-Canoo}}
+:[*] {{Ref-UniLeipzig}}
+
+{{Quellen}}
+
+{{Ähnlichkeiten 1|[[gähnen]], [[geben]], [[Gehren]], [[gegen]], [[Gelen]], [[Genen]], [[geren]], [[Rehen]], [[sehen]], [[Wehen]], [[wehen]], [[Zehen]]}}
+
+[[az:gehen]]
+[[br:gehen]]
+[[chr:gehen]]
+[[cs:gehen]]
+[[da:gehen]]
+[[el:gehen]]
+[[en:gehen]]
+[[eo:gehen]]
+[[es:gehen]]
+[[et:gehen]]
+[[eu:gehen]]
+[[fi:gehen]]
+[[fj:gehen]]
+[[fo:gehen]]
+[[fr:gehen]]
+[[fy:gehen]]
+[[hr:gehen]]
+[[hu:gehen]]
+[[hy:gehen]]
+[[id:gehen]]
+[[io:gehen]]
+[[it:gehen]]
+[[ja:gehen]]
+[[ka:gehen]]
+[[ko:gehen]]
+[[ku:gehen]]
+[[la:gehen]]
+[[lb:gehen]]
+[[li:gehen]]
+[[lt:gehen]]
+[[lv:gehen]]
+[[mg:gehen]]
+[[nds:gehen]]
+[[nl:gehen]]
+[[no:gehen]]
+[[oc:gehen]]
+[[pl:gehen]]
+[[pt:gehen]]
+[[ru:gehen]]
+[[sv:gehen]]
+[[th:gehen]]
+[[tr:gehen]]
+[[vec:gehen]]
+[[zh:gehen]]
+
