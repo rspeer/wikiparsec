@@ -134,5 +134,6 @@ AnnotatedString versions of some of the operators above:
 >
 > aPossiblyEmpty :: Parser AnnotatedString -> Parser AnnotatedString
 > aPossiblyEmpty combinator = option A.empty combinator
-
-
+>
+> liftAnnotate :: Parser ByteString -> Parser AnnotatedString
+> liftAnnotate combinator = A.fromBytes <$> combinator 

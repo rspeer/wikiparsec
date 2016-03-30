@@ -23,6 +23,7 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Data.Maybe
 > import Data.Aeson (ToJSON, toJSON, toEncoding, (.=), encode, object, pairs)
 > import Data.LanguageNames
+> import Text.Language.Normalize (normalizeBytes)
 
 Data types
 ----------
@@ -79,7 +80,8 @@ JSON representation as the string representation of a WiktionaryTerm.
 > filterMaybeValues [] = []
 >
 > simpleTerm language text = WiktionaryTerm {
->   text=text, language=Just language, sense=Nothing, pos=Nothing, etym=Nothing
+>   text=(normalizeBytes language text),
+>   language=Just language, sense=Nothing, pos=Nothing, etym=Nothing
 >   }
 
 A WiktionaryRel expresses a relationship between terms that we can extract
@@ -118,13 +120,13 @@ Working with annotations:
 >     Nothing    -> False
 >
 > linkableAnnotation :: Annotation -> Bool
-> linkableAnnotation = assocContains "page"
+> linkableAnnotation annot = getDefault "" "page" annot /= ""
 >
 > linkableAnnotations :: AnnotatedString -> [Annotation]
 > linkableAnnotations astring = filter linkableAnnotation (A.annotations astring)
 >
 > linkAnnotation :: Annotation -> Bool
-> linkAnnotation a = (getDefault "link" "rel" a) == "link"
+> linkAnnotation annot = linkableAnnotation annot && (getDefault "link" "rel" annot) == "link"
 >
 > linkAnnotations :: AnnotatedString -> [Annotation]
 > linkAnnotations astring = filter linkAnnotation (A.annotations astring)
@@ -134,13 +136,15 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 (TODO: explain why languages get complicated here)
 
 > annotationToTerm :: Language -> Annotation -> WiktionaryTerm
-> annotationToTerm thisLang annot = WiktionaryTerm {
->   text=(get "page" annot),
->   language=(annotationLanguage thisLang annot),
->   pos=(lookup "pos" annot),
->   sense=(lookup "sense" annot),
->   etym=(lookup "etym" annot)
->   }
+> annotationToTerm thisLang annot =
+>   let maybeLanguage = (annotationLanguage thisLang annot) in
+>     WiktionaryTerm {
+>       text=(normalizeBytes (fromMaybe "und" maybeLanguage) (get "page" annot)),
+>       language=maybeLanguage,
+>       pos=(lookup "pos" annot),
+>       sense=(lookup "sense" annot),
+>       etym=(lookup "etym" annot)
+>     }
 >
 > annotationLanguage :: Language -> Annotation -> Maybe Language
 > annotationLanguage thisLang annot =

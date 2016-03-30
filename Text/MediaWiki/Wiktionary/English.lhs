@@ -441,7 +441,8 @@ Putting it all together
 > enTemplates "t"         = handleTranslationTemplate
 > enTemplates "t+"        = handleTranslationTemplate
 > enTemplates "t-"        = handleTranslationTemplate
-> enTemplates "tø"        = handleTranslationTemplate
+> -- "t\195\184" is "tø" written as a bytestring
+> enTemplates "t\195\184" = handleTranslationTemplate
 > -- ignore the more uncertain translation templates, t-check and t+check
 >
 > enTemplates "form of"             = handleAbstractFormTemplate
