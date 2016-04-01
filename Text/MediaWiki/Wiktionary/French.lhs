@@ -92,7 +92,7 @@ Parsing the definition section:
 >   -- Skip miscellaneous lines at the start of the section: try to parse
 >   -- each line as pDefinitionList, and if that fails, parse one line,
 >   -- throw it out, and parse the rest recursively.
->   pDefinitionList <|> 
+>   pDefinitionList <|>
 >   (newLine >> pDefinitionSection) <|>
 >   (wikiTextLine noTemplates >> newLine >> pDefinitionSection)
 >
@@ -892,6 +892,16 @@ a section named for its first argument.
 >     Just lang -> A.annotate [[("pos", get "1" template), ("etym", getDefault "1" "num" template)]] "POS"
 >     Nothing   -> A.annotate [] (get "1" template)
 
+Language sections start with a {{langue}} template that usually just contains
+the BCP 47 language code, which is what we want.
+
+> handleLanguageCodeTemplate :: Template -> AnnotatedString
+> handleLanguageCodeTemplate template =
+>   case (get "1" template) of
+>     -- French labels their translingual entries "conv", for "convention".
+>     -- We want to label them with the BCP 47 code "mul".
+>     "conv" -> A.fromBytes "mul"
+>     x      -> A.fromBytes x
 
 Links
 -----
@@ -924,7 +934,7 @@ Putting it all together
 
 > frTemplates :: TemplateProc
 > frTemplates "S"      = handleSectionTemplate
-> frTemplates "langue" = useArg "1"
+> frTemplates "langue" = handleLanguageCodeTemplate
 > frTemplates "term"   = handleMiscContextTemplate
 > frTemplates "lien"   = handleLinkTemplate
 > frTemplates "lien m" = handleLinkTemplate
