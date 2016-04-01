@@ -86,17 +86,23 @@ from the text of a definition:
 Parsing the definition section:
 
 > enParseDefinition :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
+>
 > enParseDefinition thisTerm text =
->   let defs = parseOrDefault [] pDefinitionSection text in
->     concat (map (definitionToRels "en" thisTerm) defs)
+>   case parseOnly pDefinitionSection text of
+>     Left err   -> error (show text)
+>     Right defs -> concat (map (definitionToRels "en" thisTerm) defs)
 >
 > pDefinitionSection :: Parser [(ByteString, AnnotatedString)]
-> pDefinitionSection = do
->   -- Skip miscellaneous lines at the start of the section, including
->   -- the template that looks like {{en-noun}} or whatever
->   optionalTextChoices [templateText enTemplates, newLine]
->   defList <- orderedList enTemplates "#"
->   return (extractNumberedDefs defList)
+> pDefinitionSection =
+>   -- Skip miscellaneous lines at the start of the section: try to parse
+>   -- each line as pDefinitionList, and if that fails, parse one line,
+>   -- throw it out, and parse the rest recursively.
+>   pDefinitionList <|> 
+>   (newLine >> pDefinitionSection) <|>
+>   (wikiTextLine noTemplates >> newLine >> pDefinitionSection)
+>
+> pDefinitionList :: Parser [(ByteString, AnnotatedString)]
+> pDefinitionList = extractNumberedDefs <$> orderedList enTemplates "#"
 
 
 The translation section

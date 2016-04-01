@@ -3,12 +3,13 @@
 > module Text.MediaWiki.ParseTools where
 > import qualified Text.MediaWiki.AnnotatedString as A
 > import qualified Data.ByteString.Char8 as Char8
-> import qualified Data.ByteString.Char8 as Char8
 > import Data.ByteString (ByteString)
 > import Text.MediaWiki.AnnotatedString (AnnotatedString)
 > import Prelude hiding (takeWhile)
 > import Data.Attoparsec.ByteString.Char8
 > import Data.Attoparsec.Combinator
+> import Data.Text (Text)
+> import Data.Text.Encoding (encodeUtf8)
 > import Control.Applicative ((<|>), (<$>), pure, empty)
 
 
@@ -26,6 +27,22 @@ and use the empty string as its value:
 
 > nop :: Parser ByteString
 > nop = return ""
+
+
+Unicode coercion
+================
+
+We're using OverloadedStrings a lot to use Haskell string literals as
+ByteStrings. The problem is, this mechanism doesn't actually use the UTF-8
+bytes of the literal. It reads the characters and takes them all mod 256.
+That's awful.
+
+The Text type is read correctly as Unicode, it's just not as nice to use with
+Wikiparsec. So here's a short alias for `encodeUtf8`, so we can run it on
+string literals that are coerced into Text, converting them to ByteStrings.
+
+> utf8 :: Text -> ByteString
+> utf8 = encodeUtf8
 
 
 Common parsing functions

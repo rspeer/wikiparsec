@@ -136,7 +136,7 @@ the end of input.
 > endOfLine = (endOfInput >> nop) <|> newLine <?> "end of line"
 
 Now we can define some spans of text that handle errors, and allow line breaks
-where appropriate
+where appropriate.
 
 > messyText :: Parser ByteString
 > messyText            = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces, newLine] <?> "plain text"

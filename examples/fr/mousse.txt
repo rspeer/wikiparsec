@@ -1,0 +1,291 @@
+{{voir|moussé|Moussé}}
+
+== {{langue|fr}} ==
+=== {{S|étymologie}} ===
+: (Nom commun 1) Provient probablement à la fois du {{étyl|frk|fr}} {{recons|mosa}} (issu du néerlandais ''[[mos]]'') (« '''mousse''' », la plante, sens 1.1) latinisé en ''[[mossa]]'', et du latin ''[[mulsa]]'' (« [[hydromel]] »), qui aurait été utilisé pour désigner la plante métaphoriquement.
+: (Nom commun 2) Emprunté soit à l’{{étyl|es|fr|mot=mozo|sens=[[garçonnet]], [[jeune]] [[homme]] puis [[apprenti]] [[marin]]}} soit au {{étyl|ca|fr|mot=mosso|sens=jeune homme puis apprenti marin}}, lui-même emprunté à l’{{es}} ''[[mozo]]''. Le mot ''mozo'' vient du latin ''[[muttiu]]'' (« [[émoussé]] »), à cause du fait que l’on [[raser|rasait]] la [[tête]] des garçonnets et des jeunes gens.
+: (Nom commun 3) Du {{étyl|gaul|fr}} {{recons|mudia}} (« excrément », « souillure ») soit du breton ''mous'' (« tas d’ordures »), ou ''[[mouez]]'' (« puanteur »).
+: (Adjectif) Du {{étyl|la|fr|mot=mutius|sens=tronqué}} qui dérive du radical ''[[utt-]]'' (« [[motte]] »).
+
+=== {{S|nom|fr|num=1}} ===
+{{fr-rég|mus}}
+[[File:Mos.jpg|thumb|180px|De la '''mousse'''. (1)]]
+[[File:Cappuccino with foam.jpg|thumb|180px|La '''mousse''' d’un cappucino. (2)]]
+[[File:Pierlala bier.JPG|thumb|150px|Une '''mousse'''. (4)]]
+'''mousse''' {{pron|mus|fr}} {{f}}
+# {{plantes|fr}} [[plante|Plante]] [[rase]] des [[lieu]]x [[humide]]s.
+#* ''En 1873, le bryologue {{pc|RENAUD}} publiait, en collaboration avec D. {{pc|LALOY}}, un excellent Catalogue des plantes phanérogames et des '''Mousses''' observées jusqu’à cette époque dans le département de la Haute-Saône ''[…] {{source|{{w|Gustave Malcuit}}, ''Contributions à l’étude phytosociologique des Vosges méridionales saônoises, les associations végétales de la vallée de La Lanterne'', thèse de doctorat, Société d’édition du Nord, 1929, p. 2}}
+# {{métaphore|fr}} [[amas|Amas]] [[serré]] de [[bulle]]s qui se [[forment|forme]] à la [[surface]] d’un [[liquide]].
+#* ''Un cantinier qui se rase sur l’accotement, sa glace pendue à un cerisier, attend avec nervosité, la figure débordant de '''mousse''', que nous ayons fini de faire trembler la route.'' {{source|{{w|Jean Giraudoux}}, ''Retour d’Alsace - Août 1914'', 1916}}
+# {{cuisine|nocat=1}} {{par ext}} [[dessert|Dessert]], [[plein]] de bulles, [[en général]] au [[chocolat]].
+#* ''Sorbet, gâteau au chocolat, tarte au pommes, crème caramel, '''mousse''' au chocolat. Je vous récite la litanie mais il n'y a qu'un dessert qui compte : nos îles flottantes.'' {{source|Paul Emond, ''Les îles flottantes : théâtre'', Éditions Lansman, 2005, p.51}}
+# {{physique|fr}} Catalyseur
+#* ''De la '''mousse''' de platine dans les pots d'échapppement''
+# {{méton|fr}} {{familier|fr}} [[bière|Bière]].
+#* ''« Une bonne '''mousse''' bien fraîche, sans faux-col » est un oxymore.''
+
+==== {{S|synonymes}} ====
+: ''Amas de bulles'' (2) :
+* [[écume]]
+: ''Bière'' (4) :
+* [[bière]]
+
+==== {{S|dérivés}} ====
+{{(}}
+* [[moussage]]
+* [[moussant]]
+* [[mousser]]
+* [[mousseux]]
+* [[moussier]]
+* [[moussoir]]
+* [[moussu]]
+{{)}}
+
+==== {{S|traductions}} ====
+{{trad-début|Plante rase des lieux humides}}
+* {{T|conv}} : {{trad+|conv|Bryophyta}}
+* {{T|de}} : {{trad+|de|Moos}}
+* {{T|en}} : {{trad+|en|moss}}
+* {{T|boi}} : {{trad--|boi|š’epš}}
+* {{T|br}} : {{trad+|br|man}}, {{trad-|br|kinvi}}
+* {{T|ca}} : {{trad-|ca|molsa}}, {{trad-|ca|briòfit}}
+* {{T|co}} : {{trad-|co|murzu|m}}
+* {{T|da}} : {{trad+|da|mos|n}}
+* {{T|es}} : {{trad+|es|musgo}}
+* {{T|eo}} : {{trad-|eo|musko}}
+* {{T|fi}} : {{trad+|fi|sammal}}
+* {{T|hoi}} : {{trad--|hoi|tthʼotl}}
+* {{T|io}} : {{trad+|io|musko}}
+* {{T|id}} : {{trad+|id|lumut}}
+* {{T|kk}} : {{trad-|kk|мүк|tr=mük}}
+* {{T|nl}} : {{trad+|nl|mos}}
+* {{T|oc}} : {{trad+|oc|mossa}}, {{trad+|oc|mofa}}
+* {{T|fa}} : {{trad+|fa|خزه}}
+* {{T|pl}} : {{trad+|pl|mech}}
+* {{T|ro}} : {{trad+|ro|mușchi}}
+* {{T|se}} : {{trad--|se|sámil}}
+{{trad-fin}}
+
+{{trad-début|Amas serré de bulles}}
+* {{T|de}} : {{trad+|de|Schaum}}
+* {{T|en}} : {{trad+|en|foam}}, {{trad+|en|suds}}
+* {{T|ar}} : {{trad-|ar|الحزازيات|p}}
+* {{T|bgb}} : {{trad--|bgb|buraʼ}}
+* {{T|br}} : {{trad+|br|spoum}}
+* {{T|cjs}} : {{trad--|cjs|кӧбӱк}}
+* {{T|co}} : {{trad-|co|sciuma|f}}
+* {{T|da}} : {{trad-|da|skum|n}}
+* {{T|es}} : {{trad+|es|espuma}}
+* {{T|eo}} : {{trad+|eo|ŝaŭmo}}
+* {{T|io}} : {{trad+|io|spumo}}
+* {{T|id}} : {{trad+|id|busa}}, {{trad+|id|buih}}, {{trad+|id|ruap}}
+* {{T|kk}} : {{trad-|kk|көбік}}
+* {{T|nl}} : {{trad+|nl|schuim}}
+* {{T|fra-nor}} : {{trad--|fra-nor|bröe}}
+* {{T|fa}} : {{trad+|fa|کف}}
+* {{T|pl}} : {{trad+|pl|piana}}, {{trad+|pl|pianka}}
+* {{T|pt}} : {{trad-|pt|colarinho|m}}, {{trad+|pt|espuma|f}}
+* {{T|ro}} : {{trad+|ro|spumă}}
+{{trad-fin}}
+
+{{trad-début|Dessert plein de bulles}}
+* {{T|de}} : {{trad-|de|Mousse}}
+* {{T|en}} : {{trad+|en|mousse}}
+* {{T|ca}} : {{trad-|ca|mousse}}, {{trad-|ca|escuma}}
+* {{T|co}} : {{trad-|co|spuma|f}}
+* {{T|da}} : {{trad+|da|mousse|c}}
+* {{T|es}} : {{trad+|es|mousse}}, {{trad+|es|espuma}}
+* {{T|it}} : {{trad+|it|schiuma}}
+* {{T|nl}} : {{trad+|nl|mousse}}
+* {{T|pl}} : {{trad+|pl|mus}}
+* {{T|ro}} : {{trad-|ro|friscă}}
+{{trad-fin}}
+
+=== {{S|nom|fr|num=2}} ===
+{{fr-rég|mus}}
+'''mousse''' {{pron|mus|fr}} {{m}}
+[[File:Cabin boy ou mousse 1799.jpg|thumb|150px|Un '''mousse.''' (1)]]
+# Jeune [[marin]].
+#* ''Les '''mousses''', en raison de leur gymnastique particulière, ont aussi les bras et les muscles pectoraux très-gros.'' {{source|J. Déhès, ''[[s:Essai sur l’amélioration des races chevalines de la France|Essai sur l’amélioration des races chevalines de la France]]'', 1868}} {{?||fr}}
+#* ''Jean Donnard allait répondre, quand les sept marins et le '''mousse''', qui formaient le reste de son équipage, apparurent sur la cale, portant leurs capotes de toile cirée et leurs paniers d’osier.'' {{source|{{w|Octave Mirbeau}}, ''Les eaux muettes''}}
+#* ''Les '''mousses''' sont souvent les ''souffre-douleur'' de l'équipage. Tel maître a l'habitude de soulever, longtemps, par les deux oreilles un moussaillon terrifié ; un '''mousse''' est attaché plusieurs heures par les pieds et les mains au grand mât […].'' {{source|{{w|Étienne Dupont}}, ''Le vieux Saint-Malo - Les Corsaires chez eux'', p.75, éd. Honoré Champion, 1925}}
+
+==== {{S|synonymes}} ====
+* [[matelot]]
+
+==== {{S|dérivés}} ====
+* [[moussaillon]]
+
+==== {{S|traductions}} ====
+{{trad-début}}
+* {{T|de}} : {{trad+|de|Schiffsjunge}}
+* {{T|en}} : {{trad+|en|cabin boy}}, {{trad+|en|matey}} (''familier'')
+* {{T|br}} : {{trad+|br|mous}}
+* {{T|da}} : {{trad-|da|skibsdreng|c}}
+* {{T|eo}} : {{trad-|eo|ŝipknabo}}
+* {{T|it}} : {{trad+|it|mozzo}}
+* {{T|pl}} : {{trad-|pl|chłopiec okrętowy}}
+{{trad-fin}}
+
+=== {{S|nom|fr|num=3}} ===
+{{fr-rég|mus}}
+'''mousse''' {{pron|mus|fr}} {{m}}
+# {{vieilli|fr}} {{argot|fr}} [[excrément|Excrément]].
+
+==== {{S|dérivés}} ====
+* [[mouscaille]]
+
+=== {{S|adjectif|fr}} ===
+{{fr-rég|mus}}
+'''mousse''' {{pron|mus|fr}} {{mf}}
+# {{vieilli|fr}} Qui est [[émoussé]], qui a perdu son [[tranchant]], en parlant d’une [[lame]].
+#* ''Pour compléter la nomenclature exacte de nos articles de voyage, je noterai une pharmacie portative contenant des ciseaux à lames '''mousses''', des attelles pour fracture, une pièce de ruban en fil écru, des bandes et compresses, du sparadrap [...].'' {{source|{{w|Jules Verne}}, ''[[s:Voyage au centre de la Terre/Chapitre 11|Voyage au centre de la Terre]]'', ch. 11, 1867}}
+
+==== {{S|synonymes}} ====
+* [[émoussé]]
+
+==== {{S|dérivés}} ====
+* [[émousse]]
+* [[émoussé]]
+* [[émousser]]
+
+==== {{S|traductions}} ====
+{{trad-début}}
+* {{T|de}} : {{trad+|de|stumpf}}
+* {{T|en}} : {{trad+|en|blunt}}
+* {{T|da}} : {{trad-|da|sløv}}, {{trad-|da|stump}}
+* {{T|es}} : {{trad+|es|embotado}}, {{trad+|es|obtuso}}
+* {{T|eo}} : {{trad-|eo|malakra}}
+* {{T|fo}} : {{trad-|fo|óhvassur}}
+* {{T|fi}} : {{trad+|fi|tylppä}}, {{trad+|fi|tylsä}}
+* {{T|fy}} : {{trad-|fy|stomp}}
+* {{T|hu}} : {{trad+|hu|tompa}}
+* {{T|io}} : {{trad+|io|moso}}
+* {{T|it}} : {{trad+|it|smussato}}, {{trad+|it|spuntato}}
+* {{T|nl}} : {{trad+|nl|bot}}, {{trad+|nl|stomp}}
+* {{T|no}} : {{trad-|no|butt}}, {{trad-|no|sløv}}, {{trad+|no|stump}}
+* {{T|pap}} : {{trad--|pap|bòt}}, {{trad--|pap|stòmpi}}
+* {{T|pl}} : {{trad+|pl|tępy}}
+* {{T|pt}} : {{trad+|pt|cego}}, {{trad+|pt|embotado}}, {{trad+|pt|obtuso}}
+* {{T|ro}} : {{trad+|ro|tocit}}
+* {{T|ru}} : {{trad+|ru|тупой}}
+* {{T|srn}} : {{trad--|srn|dede}}
+* {{T|sv}} : {{trad+|sv|ovass}}
+* {{T|cs}} : {{trad+|cs|tupý}}
+* {{T|tr}} : {{trad-|tr|yassi}}
+{{trad-fin}}
+
+=== {{S|verbe|fr|flexion}} ===
+{{fr-verbe-flexion|mousser|ind.p.1s=oui|ind.p.3s=oui|sub.p.1s=oui|sub.p.3s=oui|imp.p.2s=oui}}
+'''mousse''' {{pron|mus|fr}}
+# ''Première personne du singulier du présent de l’indicatif de'' [[mousser]].
+# ''Troisième personne du singulier du présent de l’indicatif de'' [[mousser]].
+# ''Première personne du singulier du présent du subjonctif de'' [[mousser]].
+# ''Troisième personne du singulier du présent du subjonctif de'' [[mousser]].
+# ''Deuxième personne du singulier de l’impératif de'' [[mousser]].
+
+=== {{S|prononciation}} ===
+* {{écouter|lang=fr|France|mus|audio=Fr-mousse.ogg}}
+
+=== {{S|voir aussi}} ===
+* {{Annexe|Boissons en français}}
+* {{WP|Bryophyta|Mousse (botanique)}}
+* {{WP|Mousse (physique)}}
+* {{WP|Mousse (cuisine)}}
+* {{WP|Mousse (marine)}}
+
+=== {{S|références}} ===
+* {{R:TLFi}}
+
+[[Catégorie:Mousses en français]]
+[[Catégorie:Lexique en français de la navigation]]
+[[Catégorie:Alcools en français]]
+[[Catégorie:Noms multigenres en français]]
+
+== {{langue|fro}} ==
+=== {{S|étymologie}} ===
+: Voir ''{{lien|mousse|fr}}'' (« émoussé »).
+
+=== {{S|adjectif|fro}} ===
+'''mousse''' {{pron||fro}} {{mf}}
+# [[émoussé|Émoussé]].
+#* ''petites pointes '''mousses'''.''
+# [[inerte|Inerte]], sans force.
+#* ''un '''mousse''' remede.''
+# [[bas|Bas]].
+#* ''a voix '''mousse'''.''
+
+==== {{S|variantes}} ====
+* {{lien|mosse|fro}}
+
+==== {{S|synonymes}} ====
+* {{lien|moussé|fro}}
+
+==== {{S|dérivés}} ====
+* {{lien|mousser|fro}}
+
+==== {{S|dérivés autres langues}} ====
+* {{L|fr}} : {{lien|mousse|fr}}
+
+=== {{S|nom|fro}} ===
+'''mousse''' {{pron||fro}} {{f}}
+# {{variante de|moge|fro}}.
+
+=== {{S|références}} ===
+* {{R:Godefroy}}
+
+== {{langue|en}} ==
+=== {{S|étymologie}} ===
+: {{ébauche-étym|en}}
+
+=== {{S|nom|en}} ===
+'''mousse''' {{pron|muːs|en}} ({{p}} : '''mousses''')
+# [[mousse#fr-nom-1|Mousse]] en tant que crème de [[cuisine]].
+# [[mousse#fr-nom-1|Mousse]] pour fixer les cheveux.
+
+== {{langue|fi}} ==
+=== {{S|étymologie}} ===
+: Du {{étyl|fr|fi}}.
+
+=== {{S|nom|fi}} ===
+'''mousse'''
+# {{cuisine|fi}} [[mousse#fr|Mousse]].
+#* ''Suklaa'''mousse'''.''
+#*: Mousse au chocolat.
+
+=== {{S|prononciation}} ===
+; Pas de prononciation établie
+* Habituelle : {{pron|mou̯.sːe|fi}}
+* À la française : {{pron|mu.sːe|fi}} ou {{pron|mu.sːi|fi}}
+
+==== {{S|vocabulaire}} ====
+* [[muusi]]
+
+[[chr:mousse]]
+[[cs:mousse]]
+[[cy:mousse]]
+[[da:mousse]]
+[[el:mousse]]
+[[en:mousse]]
+[[es:mousse]]
+[[et:mousse]]
+[[fi:mousse]]
+[[hu:mousse]]
+[[io:mousse]]
+[[ko:mousse]]
+[[ku:mousse]]
+[[lv:mousse]]
+[[mg:mousse]]
+[[my:mousse]]
+[[nl:mousse]]
+[[no:mousse]]
+[[pl:mousse]]
+[[ru:mousse]]
+[[scn:mousse]]
+[[sv:mousse]]
+[[th:mousse]]
+[[tr:mousse]]
+[[vi:mousse]]
+[[wa:mousse]]
+[[zh:mousse]]
+

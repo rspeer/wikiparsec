@@ -1,5 +1,7 @@
 Next steps:
 
-- check for Unicode literals
+- handle ;heading:item syntax
 - normalize the names of inflections
 - deal with language names better
+- false parallelism in "noTemplates" and "enTemplates"
+- Recognize inflections in French

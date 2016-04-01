@@ -1,0 +1,174 @@
+{{voir|plaque-bière}}
+
+== {{langue|fr}} ==
+=== {{S|étymologie}} ===
+: De ''[[plat-de-bierre]]'', cité en 1755 par le botaniste, agronome et physicien français {{nom w pc|Henri Louis|Duhamel du Monceau}}, provenant peut-être de ''plat de [[bièvre]]'' (« nourriture du castor »){{R|DuMonceau}}.
+
+=== {{S|nom|fr}} ===
+{{fr-rég|plak.bjɛʁ}}
+'''plaquebière''' {{pron|plak.bjɛʁ|fr}} {{f}}
+[[Image:Rubus chamaemorus close-up.JPG|vignette|Une '''plaquebière''' (définition 1).]]
+[[File:Reife moltebeeren.JPG|vignette|Des '''plaquebières'''. (définition 2)]]
+# {{plantes|fr}} Petite [[plante]] [[vivace]], typique des [[tourbière]]s des pays [[nordique]]s, de nom scientifique ''[[Rubus chamaemorus]]''{{R|MMPND}}.
+#* ''Le blason représente un plant de '''plaquebière''', ou mûre arctique, plante répandue dans la région.'' {{source|Wikipédia, article ''{{w||Nesseby}}'', 2010}}
+#* ''Des sommets couverts de la toundra alpine, où les '''plaquebières''' ambrées brillent parmi les conifères nains.'' {{source|Raoul {{pc|Blanchard}}, ''Mélanges géographiques canadiens offerts'', Institut de géographie, Université Laval, 1959, page 464}}
+# {{métonymie|fr}} Le [[fruit]] de cette plante, d’abord rouge puis jaune d’or à maturité, utilisé pour les [[confiture]]s et dont on fait une [[liqueur#fr|liqueur]].
+#* ''Un extrait de '''plaquebières'''.''
+#* ''On travaillait au jardin, on allait aux '''plaquebières''', on cueillait des coques et du homard sur les grèves.'' {{source|Louis {{pc|Haché}}, ''Tourbes jersiaises'', Éditions d’Acadie, 1980}}
+#* ''La '''plaquebière''' ressemble à une framboise orangée, tandis que l’aronie est une baie rouge ou noire.'' {{source|Carole {{pc|Minker}}, ''Myrtille et autres fruits rouges : Un concentré de bienfaits pour votre santé'', Eyrolles, 2011, page 15}}
+
+==== {{S|variantes orthographiques}} ====
+* [[plaque-bière]]
+===={{S|hyperonymes}}====
+;''plante''
+*[[rosacées]]
+;''fruit''
+*[[baie]] {{populaire|nocat}}
+*[[fruit charnu]] {{botanique|nocat}}
+*[[fruit composé]] {{botanique|nocat}}
+
+==== {{S|synonymes}} ====
+{{(}}
+* [[baie polaire]]
+* [[blackbière]]{{R|Naud}}
+* [[chicouté]] {{Québec|nocat=1}}
+* [[chicoutai]]{{R|foodlexicon}} {{Québec|nocat=1}}
+* [[faux mûrier]]{{R|foodlexicon}}
+* [[framboise jaune]]{{R|foodlexicon}}
+* [[moréale]]
+* [[mûre arctique]]
+* [[mûre des marais]]{{R|foodlexicon}}
+* [[mûrier nain]]{{R|foodlexicon}}
+* [[plate-bière]]{{R|Naud}}
+* [[ronce des tourbières]]
+* [[ronce petit-mûrier]]
+{{)}}
+
+==== {{S|vocabulaire}} ====
+{{voir thésaurus|fr|cueillette|framboise}}
+
+==== {{S|traductions}} ====
+{{trad-début|La plante et le fruit (sauf mention contraire)}}
+* {{T|aht}} : {{trad--|aht|nkaał}}
+* {{T|ale}} : ''dialecte de l’Est'' : {{trad--|ale|aqamdax̂}}, {{trad--|ale|haamachiiyax̂}}, {{trad--|ale|muluuskax̂}}
+* {{T|alr}} : {{trad--|alr|rəttərət}}
+* {{T|de}} : {{trad+|de|Moltebeere}}, {{trad-|de|Multebeere}}
+* {{T|ems}} : {{trad--|ems|aqagwik}}
+* {{T|en}} : {{trad+|en|cloudberry}}, {{trad+|en|bakeapple}} (''Canada atlantique'')
+* {{T|ba}} : {{trad--|ba|һаз еләге}}
+* {{T|be}} : {{trad-|be|марошка|R=maroška}}
+* {{T|krl}} : {{trad--|krl|muuroi}}, {{trad--|krl|lakka}}, {{trad--|krl|hillo}}, {{trad--|krl|ĺupoi}}
+* {{T|ca}} : {{trad-|ca|móra vermella}}
+* {{T|zh}} : {{trad-|zh|云莓|tradi=雲莓|tr=yúnméi}}, {{trad-|zh|兴安悬钩子|tradi=興安懸鈎子|tr=xìng’ān xuángōuzi}}
+* {{T|chp}} : {{trad--|chp|nądlári}}
+* {{T|conv}} : ''{{trad+|conv|Rubus chamaemorus}}'' (L.)
+* {{T|ko}} : {{trad-|ko|호로 딸기|tr=horo ttalgi}}
+* {{T|crl}} : {{trad--|crl|ᔑᑯᑖᐤᐦ|R=[[shikutaauh#crl|shikutaauh]]}}
+* {{T|crj}} : {{trad--|crj|ᔑᑯᑌᐤᐦ|R=[[shikuteuh#crj|shikuteuh]]}}
+* {{T|hr}} : {{trad-|hr|močvarna jagoda}}
+* {{T|da}} : {{trad-|da|multebær}}
+* {{T|ing}} : {{trad--|ing|dandhiʼon}}
+* {{T|tfn}} : ''dialectes iliamna, inland et upper inlet'' : {{trad--|tfn|nqutlʼ}} ; ''dialecte outer inlet'' : {{trad--|tfn|nqitlʼ}} ; ''dialecte upper inlet'' : {{trad--|tfn|nquł}}
+* {{T|dtd}} : {{trad--|dtd|qawey}}
+* {{T|dlg}} : {{trad--|dlg|морооско}}
+* {{T|enh}} : {{trad--|enh|морaгa}}
+* {{T|enf}} : {{trad--|enf|моргa}}
+* {{T|myv}} : {{trad--|myv|морошка}}
+* {{T|xsl}} : {{trad--|xsl|tsʼuekáá}}
+* {{T|es}} : {{trad-|es|mora de los pantanos}}
+* {{T|eo}} : {{trad-|eo|kamemoro}}
+* {{T|et}} : {{trad-|et|rabamurakas}}
+* {{T|eve}} : {{trad--|eve|еннгамта}}
+* {{T|eve}} : ''dialecte de Sakkyryr'' : {{trad--|eve|иннгэмтэ}} ; ''dialecte de Youkaghir'' : {{trad--|eve|имнгонто}}
+* {{T|evn}} : {{trad--|evn|мороӊо}}, {{trad--|evn|инӊамукта}}
+* {{T|eya}} : {{trad--|eya|tsʼax̣łqa·tl’}}
+* {{T|fi}} : {{trad+|fi|lakka}}, {{trad+|fi|hilla}}, {{trad+|fi|muurain}}
+* {{T|fit}} : {{trad--|fit|hilla}}, {{trad--|fit|lyömänä}}
+* {{T|dgr}} : {{trad--|dgr|nǫdlàa}}
+* {{T|gd}} : {{trad-|gd|oighreag}} (plante), {{trad-|gd|dearc-oighreig}} (fruit)
+* {{T|ga}} : {{trad-|ga|eireag}}, {{trad-|ga|eithreog shléibbe}}
+* {{T|cy}} : {{trad-|cy|mwyaren y Berwyn}}
+* {{T|el}} : {{trad-|el|βάτος το χαμαίμορο|R=vátos to chamaímoro}}
+* {{T|gwi}} : {{trad--|gwi|nakal}}
+* {{T|hai}} : ''dialecte de Kaigani'' : {{trad--|hai|ḵʼaawtsʼaláangaa}} ; ''dialecte de Massett'' : {{trad--|hai|ḵʼaàw tsʼalaangaa}} ; ''dialecte de Skitegate'' : {{trad--|hai|ḵʼaax̱u tsʼalaangg̱a}}
+* {{T|haa}} : {{trad--|haa|nihbàʼ}}
+* {{T|tau}} : {{trad--|tau|dankàał}}, {{trad--|tau|dankaał}}
+* {{T|hsb}} : {{trad-|hsb|žołty ćernjowc}}
+* {{T|hoi}} : {{trad--|hoi|qotl}}
+* {{T|hu}} : {{trad-|hu|törpemálna}}, {{trad-|hu|lápi málna}}
+* {{T|sah}} : {{trad--|sah|ыт тиҥилэҕэ}}
+* {{T|ikt}} : {{trad--|ikt|aqpik}}
+* {{T|iu}} : {{trad-|iu|ᐊᖅᐱᒃ|R=[[aqpik]]}}
+* {{T|ik}} : {{trad--|ik|aqpik}}
+* {{T|is}} : {{trad-|is|múltuber}}
+* {{T|it}} : {{trad-|it|camemoro}}
+* {{T|itl}} : {{trad--|itl|снэʼн}}
+* {{T|ja}} : {{trad-|ja|ホロムイイチゴ|tr=horomuiichigo}}
+* {{T|kl}} : {{trad-|kl|uluusiit}}
+* {{T|kkz}} : {{trad--|kkz|chénéstlēge}}
+* {{T|ket}} : {{trad--|ket|ъмыльта}}
+* {{T|kca}} : ''dialecte de Chyrychkar'' : {{trad--|kca|мурәх}} ; ''dialecte de Kazym'' : {{trad--|kca|мөрәх}} ; ''dialecte de Sourgout'' : {{trad--|kca|мө̌рәӊк}}, {{trad--|kca|қаӊқи}} ; ''dialecte de Vakh'' : {{trad--|kca|морәқ}}
+* {{T|kuu}} : {{trad--|kuu|nikotłʼ}}
+* {{T|kv}} : {{trad--|kv|мырпом}}
+* {{T|koy}} : {{trad--|koy|kkotl}}
+* {{T|fkv}} : {{trad--|fkv|hilla}}
+* {{T|lv}} : {{trad+|lv|lācene}}
+* {{T|lt}} : {{trad-|lt|paprastoji tekšė}}
+* {{T|liv}} : {{trad--|liv|kurgmōŗa}}
+* {{T|gv}} : {{trad-|gv|dress ny moaneeyn}}, {{trad-|gv|smeyr ny moaneeyn}}
+* {{T|mns}} : {{trad--|mns|морых}}
+* {{T|mdf}} : {{trad--|mdf|морошка}}
+* {{T|moe}} : {{trad--|moe|shikuteu}}
+* {{T|nsk}} : {{trad--|nsk|sikutaawaahtikw}} (plante), {{trad--|nsk|ᓯᑯᑕᐤ|R=[[sikutaaw]]}} (fruit)
+* {{T|nl}} : {{trad+|nl|kruipbraam}}
+* {{T|yrk}} : {{trad--|yrk|мăрăӈгă}}, {{trad--|yrk|мaрaka}}
+* {{T|nio}} : {{trad--|nio|мурыӈга}}
+* {{T|no}} : {{trad-|no|molte}}, {{trad-|no|multe}}
+* {{T|olo}} : {{trad--|olo|muurʼoi}}
+* {{T|os}} : {{trad--|os|цъымарайы мæнæргъы}}
+* {{T|ude}} : {{trad--|ude|иӈамукта}}
+* {{T|fa}} : {{trad-|fa|تمشک قطبی}}
+* {{T|pl}} : {{trad+|pl|moroszka}}, {{trad-|pl|malina moroszka}}
+* {{T|crx}} : {{trad--|crx|tsʼunulhtsʼus}}
+* {{T|pt}} : {{trad-|pt|amora-branca-silvestre}}, {{trad-|pt|amora-ártica}}
+* {{T|ru}} : {{trad+|ru|морошка|R=moroshka}}
+* {{T|smj}} : {{trad--|smj|láttak}}
+* {{T|sje}} : {{trad--|sje|láddak}}
+* {{T|sjt}} : {{trad--|sjt|лī̮mɛn̜}}
+* {{T|smn}} : {{trad--|smn|lyeme}}
+* {{T|se}} : {{trad--|se|luomi}}
+* {{T|sma}} : {{trad--|sma|laadtege}}, {{trad--|sma|laaddeh}}
+* {{T|sju}} : {{trad--|sju|laaddaga}}
+* {{T|sms}} : {{trad--|sms|lue´m}}
+* {{T|sco}} : {{trad--|sco|noop}}, {{trad--|sco|averan}}
+* {{T|sk}} : {{trad-|sk|ostružina moruška}}
+* {{T|sv}} : {{trad+|sv|hjortron}} ; ''dialecte jamtska'' : {{trad-|sv|mylta}}
+* {{T|tcb}} : {{trad--|tcb|nkáatl}}
+* {{T|tt}} : {{trad-|tt|саз җиләге}}
+* {{T|cs}} : {{trad-|cs|ostružiník moruška}}
+* {{T|ckt}} : {{trad--|ckt|рыттылгын}}
+* {{T|tli}} : {{trad--|tli|néx̱ʼw}}
+* {{T|tsi}} : {{trad--|tsi|golk’a}}
+* {{T|ttm}} : {{trad--|ttm|näntlät}}
+* {{T|uk}} : {{trad-|uk|морошка|R=moroshka}}
+* {{T|vep}} : {{trad--|vep|murikaine}}, {{trad--|vep|murašk}}
+* {{T|yux}} : ''dialecte de la taïga '' : {{trad--|yux|мальдьэ}}
+* {{T|ykg}} : {{trad--|ykg|ньоронбуриэ}}
+* {{T|yug}} : {{trad--|yug|lʌmpaχ}}
+* {{T|esu}} : ''dialecte Chevak :'' {{trad--|esu|aqevyik}}, ''dialecte de Nunivak'' : {{trad--|esu|atsar}}
+* {{T|ess}} : {{trad--|ess|ahkavasik}}
+{{trad-fin}}
+
+=== {{S|voir aussi}} ===
+* {{WP|Plaquebière}}
+
+=== {{S|références}} ===
+[[Catégorie:Fruits en français]]
+{{Article de valeur}}
+
+{{clé de tri|plaquebiere}}
+
+[[fi:plaquebière]]
+[[sk:plaquebière]]
+[[sv:plaquebière]]
+

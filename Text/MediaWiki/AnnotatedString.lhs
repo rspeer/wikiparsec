@@ -44,6 +44,9 @@ ByteString) and a list of Annotations for it.
 > fromBytes :: ByteString -> AnnotatedString
 > fromBytes = annotate []
 >
+> singleAnnotation :: Annotation -> AnnotatedString
+> singleAnnotation annot = annotate [annot] ""
+>
 > empty :: AnnotatedString
 > empty = fromBytes ""
 >
