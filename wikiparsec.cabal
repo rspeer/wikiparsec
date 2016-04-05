@@ -33,7 +33,8 @@ Library
                        stringsearch,
                        hexpat ==0.20.*,
                        containers,
-                       aeson
+                       aeson,
+                       split
 
 Executable wiki2text
   ghc-options:
@@ -52,7 +53,8 @@ Executable wiki2text
                        stringsearch,
                        hexpat ==0.20.*,
                        containers,
-                       aeson
+                       aeson,
+                       split
 
 Executable wiktionary-parser
   ghc-options:
@@ -71,5 +73,6 @@ Executable wiktionary-parser
                        stringsearch,
                        hexpat ==0.20.*,
                        containers,
-                       aeson
+                       aeson,
+                       split
 

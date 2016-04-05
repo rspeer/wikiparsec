@@ -84,7 +84,7 @@ Parsing the definition section:
 > frParseDefinition :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
 > frParseDefinition thisTerm text =
 >   case parseOnly pDefinitionSection text of
->     Left err   -> error (show text)
+>     Left err   -> []
 >     Right defs -> concat (map (definitionToRels "fr" thisTerm) defs)
 >
 > pDefinitionSection :: Parser [(ByteString, AnnotatedString)]
@@ -106,7 +106,7 @@ The translation section
 > frParseTranslations :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
 > frParseTranslations thisTerm text =
 >   case parseOnly (pTranslationSection thisTerm) text of
->     Left err -> error (show text)
+>     Left err -> []
 >     Right val -> val
 >
 > pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryRel]
@@ -168,7 +168,7 @@ Relation sections
 > pRelationSection :: ByteString -> WiktionaryTerm -> Parser [WiktionaryRel]
 > pRelationSection rel thisTerm = map (assignRel rel)
 >                                 <$> concat
->                                 <$> map (entryToRels thisTerm)
+>                                 <$> map (entryToRels "fr" thisTerm)
 >                                 <$> extractTextLines
 >                                 <$> bulletList frTemplates "*"
 
