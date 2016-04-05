@@ -119,7 +119,7 @@ The translation section
 >   let senseTerm = thisTerm {sense=maybeSense}
 >   items <- pTranslationList
 >   optionalTextChoices [newLine]
->   return (map (annotationToRel senseTerm) (filter translationsOnly items))
+>   return (map (annotationToRel "fr" senseTerm) (filter translationsOnly items))
 >
 > translationsOnly :: Annotation -> Bool
 > translationsOnly annot = (get "rel" annot) == "translation"

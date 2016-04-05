@@ -12,7 +12,6 @@ unknownCode name =
   Char8.concat [
     UTF8.fromString "und-x-",
     Char8.intercalate (UTF8.fromString "-") $ Char8.split ' ' name]
-    
 
 lookupLanguage :: ByteString -> ByteString -> ByteString
 lookupLanguage lang name =

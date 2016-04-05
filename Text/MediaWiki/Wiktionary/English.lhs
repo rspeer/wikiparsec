@@ -78,18 +78,13 @@ Choosing an appropriate section parser
 The part-of-speech/definition section
 -------------------------------------
 
-First, make a specific version of the function that extracts relationships
-from the text of a definition:
-
-> enDefinitionToRels = definitionToRels "en"
-
 Parsing the definition section:
 
 > enParseDefinition :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
 >
 > enParseDefinition thisTerm text =
 >   case parseOnly pDefinitionSection text of
->     Left err   -> error (show text)
+>     Left err   -> []
 >     Right defs -> concat (map (definitionToRels "en" thisTerm) defs)
 >
 > pDefinitionSection :: Parser [(ByteString, AnnotatedString)]
@@ -97,7 +92,7 @@ Parsing the definition section:
 >   -- Skip miscellaneous lines at the start of the section: try to parse
 >   -- each line as pDefinitionList, and if that fails, parse one line,
 >   -- throw it out, and parse the rest recursively.
->   pDefinitionList <|> 
+>   pDefinitionList <|>
 >   (newLine >> pDefinitionSection) <|>
 >   (wikiTextLine noTemplates >> newLine >> pDefinitionSection)
 >
@@ -121,7 +116,7 @@ The translation section
 >   let senseTerm = thisTerm {sense=maybeSense}
 >   items <- concat <$> many1 pTranslationColumn
 >   optionalTextChoices [newLine]
->   return (map (annotationToRel senseTerm) (filter translationsOnly items))
+>   return (map (annotationToRel "en" senseTerm) (filter translationsOnly items))
 >
 > translationsOnly :: Annotation -> Bool
 > translationsOnly annot = (get "rel" annot) == "translation"
@@ -181,7 +176,7 @@ Relation sections
 > pRelationSection :: ByteString -> WiktionaryTerm -> Parser [WiktionaryRel]
 > pRelationSection rel thisTerm = map (assignRel rel)
 >                                 <$> concat
->                                 <$> map (entryToRels thisTerm)
+>                                 <$> map (entryToRels "en" thisTerm)
 >                                 <$> extractTextLines
 >                                 <$> bulletList enTemplates "*"
 
