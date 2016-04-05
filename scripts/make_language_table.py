@@ -12,11 +12,16 @@ header = """
 module Data.LanguageNames where
 import qualified Data.Map as Map
 import Data.ByteString (ByteString)
-import Data.ByteString.UTF8 (fromString)
+import qualified Data.ByteString.UTF8 as UTF8
 
 lookupLanguage :: ByteString -> ByteString -> ByteString
-lookupLanguage lang name = Map.findWithDefault name (lang, name) languageNames
+lookupLanguage lang name =
+  let sname = UTF8.toString name
+      slang = UTF8.toString lang
+  in UTF8.fromString $
+     Map.findWithDefault sname (slang, sname) languageNames
 
+languageNames :: Map.Map (String, String) String
 languageNames = Map.fromList [
 """.strip()
 
@@ -26,11 +31,12 @@ def main():
         used_names = set()
         names = langcodes.DB.query("select subtag, name from language_name where language=? order by name, entry_order", namelang)
         for code, name in names:
+            assert (',' not in name), name
             if name not in used_names:
                 used_names.add(name)
-                print('  ((fromString "%s", fromString "%s"), fromString "%s"),' % (namelang, name, code))
+                print('  (("%s", "%s"), "%s"),' % (namelang, name, code))
     # fake entry to finish the list
-    print('  ((fromString "", fromString ""), fromString "und")]')
+    print('  (("", ""), "und")]')
 
 
 if __name__ == '__main__':
