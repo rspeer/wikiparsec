@@ -1,10 +1,7 @@
-> {-# LANGUAGE OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 > module Text.Language.Normalize where
-> import Data.ByteString (ByteString)
-> import Data.Text.Encoding (encodeUtf8, decodeUtf8)
+> import WikiPrelude
 > import Data.Text.ICU.Normalize (normalize, NormalizationMode(..))
-> import qualified Data.Text as T
-> import Data.Text (Text)
 
 Wiktionary has some automatic translations that it applies in language-tagged
 links. You can write a link in some fully-explicit dictionary form
@@ -27,7 +24,7 @@ to work with a Unicode representation, so the first thing we do is decode the
 bytes into a Text value.
 
 > normalizeBytes :: ByteString -> ByteString -> ByteString
-> normalizeBytes lang = encodeUtf8 . (normalizeText lang) . decodeUtf8
+> normalizeBytes lang = encodeUtf8 . (normalizeText (decodeUtf8 lang)) . decodeUtf8
 
 We apply a sequence of steps to the text:
 
@@ -47,7 +44,7 @@ We apply a sequence of steps to the text:
 
 - Recompose the characters into NFC form.
 
-> normalizeText :: ByteString -> Text -> Text
+> normalizeText :: Text -> Text -> Text
 > normalizeText lang =
 >   if (elem lang diacriticDroppingLanguages)
 >     then (normalize NFC) . filterDiacritics . filterMarks . (normalize NFD) . replaceAlifWasla
@@ -76,7 +73,7 @@ version of `e`.
 There don't seem to be any languages that use carons as dictionary markings
 that should be removed, so we simply always leave carons as is.
 
-> diacriticDroppingLanguages :: [ByteString]
+> diacriticDroppingLanguages :: [Text]
 > diacriticDroppingLanguages = [
 >   "ab", "be", "bg", "ce", "cu", "el", "ka", "la", "lt",
 >   "mk", "ny", "os", "ru", "sh", "sl", "so", "tg", "uk",
@@ -86,7 +83,7 @@ that should be removed, so we simply always leave carons as is.
 >   "unm", "xfa", "xmk"]
 >
 > filterDiacritics :: Text -> Text
-> filterDiacritics = (T.filter (not . isDiacritic)) . fixCyrillicVowels
+> filterDiacritics = (filter (not . isDiacritic)) . fixCyrillicVowels
 >
 > isDiacritic :: Char -> Bool
 > isDiacritic c =
@@ -104,10 +101,10 @@ To prevent Cyrillic vowels from being modified by this procedure, we
 re-compose them first.
 
 > fixCyrillicVowels =
->   (T.replace "Й" "Й") .
->   (T.replace "й" "й") .
->   (T.replace "Ё" "Ё") .
->   (T.replace "ё" "ё")
+>   (replace "Й" "Й") .
+>   (replace "й" "й") .
+>   (replace "Ё" "Ё") .
+>   (replace "ё" "ё")
 
 We define "marks" to be notation that should always be removed, particularly
 those used in dictionary entries of Semitic languages.
@@ -131,10 +128,10 @@ those used in dictionary entries of Semitic languages.
 >     c == '·'
 >
 > filterMarks :: Text -> Text
-> filterMarks = T.filter (not . isMark)
+> filterMarks = filter (not . isMark)
 >
 > replaceAlifWasla :: Text -> Text
-> replaceAlifWasla = T.replace "ٱ" "ا"
+> replaceAlifWasla = replace "ٱ" "ا"
 >
 
 Things we haven't dealt with:
