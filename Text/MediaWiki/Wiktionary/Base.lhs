@@ -21,7 +21,7 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Control.Monad
 > import Data.List (intersect)
 > import Data.Maybe
-> import Data.Aeson (ToJSON, toJSON, toEncoding, (.=), encode, object, pairs)
+> import Data.Aeson (ToJSON, toJSON, (.=), encode, object)
 > import Data.LanguageNames
 > import Text.Language.Normalize (normalizeBytes)
 
