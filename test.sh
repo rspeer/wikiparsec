@@ -8,5 +8,5 @@
 
 for file in tests/*.hs
 do
-    runhaskell $file
+    stack runghc $file
 done
