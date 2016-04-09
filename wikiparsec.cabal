@@ -16,7 +16,7 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 Library
-  exposed-modules:     Text.MediaWiki.SplitUtils,
+  exposed-modules:     Text.MediaWiki.SplitUtils, Text.Language.Normalize,
                        Data.LanguageNames, WikiPrelude, Data.LanguageType
   other-modules:       Data.LanguageNamesData
   build-depends:       HUnit,

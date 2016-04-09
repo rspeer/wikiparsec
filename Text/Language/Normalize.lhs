@@ -16,16 +16,6 @@ MediaWiki's implementation is part of its "Module:languages" Lua code. The
 configuration for all languages with two-letter language codes can be seen
 at: https://en.wiktionary.org/wiki/Module:languages/data2.
 
-The function that will be used by our Wiktionary parser is `normalizeBytes`,
-which applies the appropriate transformations for a language to a ByteString
-representing an entry name. The parser works with ByteStrings because they're
-faster and because comparing UTF-8 sequences still works fine, but here we need
-to work with a Unicode representation, so the first thing we do is decode the
-bytes into a Text value.
-
-> normalizeBytes :: ByteString -> ByteString -> ByteString
-> normalizeBytes lang = encodeUtf8 . (normalizeText (decodeUtf8 lang)) . decodeUtf8
-
 We apply a sequence of steps to the text:
 
 - Replace U+671 ARABIC LETTER ALEF WASLA with U+617 ARABIC LETTER ALEF
@@ -44,7 +34,7 @@ We apply a sequence of steps to the text:
 
 - Recompose the characters into NFC form.
 
-> normalizeText :: Text -> Text -> Text
+> normalizeText :: Language -> Text -> Text
 > normalizeText lang =
 >   if (elem lang diacriticDroppingLanguages)
 >     then (normalize NFC) . filterDiacritics . filterMarks . (normalize NFD) . replaceAlifWasla
@@ -73,7 +63,7 @@ version of `e`.
 There don't seem to be any languages that use carons as dictionary markings
 that should be removed, so we simply always leave carons as is.
 
-> diacriticDroppingLanguages :: [Text]
+> diacriticDroppingLanguages :: [Language]
 > diacriticDroppingLanguages = [
 >   "ab", "be", "bg", "ce", "cu", "el", "ka", "la", "lt",
 >   "mk", "ny", "os", "ru", "sh", "sl", "so", "tg", "uk",
