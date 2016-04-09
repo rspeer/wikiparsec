@@ -19,22 +19,21 @@ Library
   exposed-modules:     Text.MediaWiki.SplitUtils, Text.MediaWiki.ParseTools,
                        Text.MediaWiki.Sections, Text.MediaWiki.XML, Text.MediaWiki.HTML,
                        Data.LanguageNames
-  -- other-modules:
+  other-modules:       Text.MediaWiki.AList, Text.MediaWiki.AnnotatedString, Data.LanguageNamesData
   build-depends:       HUnit,
                        base,
-                       bytestring,
+                       classy-prelude ==0.12.*,
                        utf8-string,
-                       text ==1.2.*,
+                       stringsearch,
                        text-icu ==0.7.*,
+                       split,
+                       text, bytestring, containers,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
-                       stringsearch,
                        hexpat ==0.20.*,
-                       containers,
-                       aeson,
-                       split
+                       aeson
 
 Executable wiki2text
   ghc-options:
@@ -42,19 +41,18 @@ Executable wiki2text
     -O2
   main-is:             cmd/Wiki2Text.lhs
   build-depends:       base,
-                       bytestring,
+                       classy-prelude ==0.12.*,
                        utf8-string,
-                       text ==1.2.*,
+                       stringsearch,
                        text-icu ==0.7.*,
+                       split,
+                       text, bytestring, containers,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
-                       stringsearch,
                        hexpat ==0.20.*,
-                       containers,
-                       aeson,
-                       split
+                       aeson
 
 Executable wiktionary-parser
   ghc-options:
@@ -62,17 +60,16 @@ Executable wiktionary-parser
     -O2
   main-is:             cmd/WiktionaryParser.lhs
   build-depends:       base,
-                       bytestring,
+                       classy-prelude ==0.12.*,
                        utf8-string,
-                       text ==1.2.*,
+                       stringsearch,
                        text-icu ==0.7.*,
+                       split,
+                       text, bytestring, containers,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        tagsoup,
                        fast-tagsoup-utf8-only,
-                       stringsearch,
                        hexpat ==0.20.*,
-                       containers,
-                       aeson,
-                       split
+                       aeson
 
