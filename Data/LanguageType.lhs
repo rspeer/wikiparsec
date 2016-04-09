@@ -3,9 +3,12 @@
 > import ClassyPrelude
 > import Data.Aeson (ToJSON, toJSON)
 
-Define a Language type that we can keep separate from other strings. This
-makes our type signatures clearer, and it's implemented with `newtype`,
-so it should have no run-time cost.
+Define a Language type that we can keep separate from other strings. A
+Language contains nothing but a Text of its language code, such as "en",
+but it's a different type.
+
+This makes our type signatures clearer, and it's implemented with `newtype`, so
+it should have no run-time cost.
 
 > newtype Language = Language Text deriving (Show, Eq, Ord)
 > fromLanguage :: Language -> Text

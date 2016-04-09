@@ -16,10 +16,9 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 Library
-  exposed-modules:     Text.MediaWiki.SplitUtils, Text.MediaWiki.ParseTools,
-                       Text.MediaWiki.Sections, Text.MediaWiki.XML, Text.MediaWiki.HTML,
+  exposed-modules:     Text.MediaWiki.SplitUtils,
                        Data.LanguageNames, WikiPrelude, Data.LanguageType
-  other-modules:       Text.MediaWiki.AList, Text.MediaWiki.AnnotatedString, Data.LanguageNamesData
+  other-modules:       Data.LanguageNamesData
   build-depends:       HUnit,
                        base,
                        classy-prelude ==0.12.*,
@@ -35,41 +34,41 @@ Library
                        hexpat ==0.20.*,
                        aeson
 
-Executable wiki2text
-  ghc-options:
-    -threaded
-    -O2
-  main-is:             cmd/Wiki2Text.lhs
-  build-depends:       base,
-                       classy-prelude ==0.12.*,
-                       utf8-string,
-                       stringsearch,
-                       text-icu ==0.7.*,
-                       split,
-                       text, bytestring, containers,
-                       attoparsec ==0.13.*,
-                       parsec ==3.1.*,
-                       tagsoup,
-                       fast-tagsoup-utf8-only,
-                       hexpat ==0.20.*,
-                       aeson
-
-Executable wiktionary-parser
-  ghc-options:
-    -threaded
-    -O2
-  main-is:             cmd/WiktionaryParser.lhs
-  build-depends:       base,
-                       classy-prelude ==0.12.*,
-                       utf8-string,
-                       stringsearch,
-                       text-icu ==0.7.*,
-                       split,
-                       text, bytestring, containers,
-                       attoparsec ==0.13.*,
-                       parsec ==3.1.*,
-                       tagsoup,
-                       fast-tagsoup-utf8-only,
-                       hexpat ==0.20.*,
-                       aeson
-
+-- Executable wiki2text
+--   ghc-options:
+--     -threaded
+--     -O2
+--   main-is:             cmd/Wiki2Text.lhs
+--   build-depends:       base,
+--                        classy-prelude ==0.12.*,
+--                        utf8-string,
+--                        stringsearch,
+--                        text-icu ==0.7.*,
+--                        split,
+--                        text, bytestring, containers,
+--                        attoparsec ==0.13.*,
+--                        parsec ==3.1.*,
+--                        tagsoup,
+--                        fast-tagsoup-utf8-only,
+--                        hexpat ==0.20.*,
+--                        aeson
+-- 
+-- Executable wiktionary-parser
+--   ghc-options:
+--     -threaded
+--     -O2
+--   main-is:             cmd/WiktionaryParser.lhs
+--   build-depends:       base,
+--                        classy-prelude ==0.12.*,
+--                        utf8-string,
+--                        stringsearch,
+--                        text-icu ==0.7.*,
+--                        split,
+--                        text, bytestring, containers,
+--                        attoparsec ==0.13.*,
+--                        parsec ==3.1.*,
+--                        tagsoup,
+--                        fast-tagsoup-utf8-only,
+--                        hexpat ==0.20.*,
+--                        aeson
+-- 
