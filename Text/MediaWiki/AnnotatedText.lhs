@@ -1,5 +1,6 @@
 > {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}
 > module Text.MediaWiki.AnnotatedText where
+> import WikiPrelude
 
 Text can be marked up with things such as internal links. During parsing,
 we will want to keep track of the annotations on text, without having to
