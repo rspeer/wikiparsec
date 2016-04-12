@@ -17,7 +17,7 @@ cabal-version:       >=1.8
 
 Library
   exposed-modules:     Text.MediaWiki.SplitUtils, Text.Language.Normalize,
-                       Text.MediaWiki.AnnotatedText,
+                       Text.MediaWiki.AnnotatedText, Text.MediaWiki.Templates,
                        Data.LanguageNames, Data.LanguageType,
                        WikiPrelude
   other-modules:       Data.LanguageNamesData
