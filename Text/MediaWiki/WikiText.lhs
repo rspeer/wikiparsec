@@ -1,4 +1,4 @@
-> {-# LANGUAGE NoMonomorphismRestriction, OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}
 
 Setup
 =====
@@ -7,23 +7,14 @@ To parse the mess that is Wiktionary, we make use of Attoparsec, a
 well-regarded parser-combinator library for Haskell.
 
 > module Text.MediaWiki.WikiText where
-> import qualified Data.ByteString.Char8 as Char8
-> import qualified Data.ByteString.UTF8 as UTF8
-> import qualified Data.ByteString as BS
-> import Data.ByteString (ByteString)
-> import qualified Text.MediaWiki.AnnotatedString as A
-> import Text.MediaWiki.AnnotatedString (AnnotatedString(..), Annotation, transformA)
-> import Text.MediaWiki.AList (get)
-> import Data.Attoparsec.ByteString.Char8 hiding (endOfLine)
+> import WikiPrelude
+> import Data.Attoparsec.Text hiding (endOfLine)
 > import Data.Attoparsec.Combinator
-> import Debug.Trace (trace)
-> import Control.Applicative ((<|>), (<$>), (*>), (<*))
-> import Control.Monad (when)
 
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
-> import Text.MediaWiki.SplitUtils (splitFirst, splitLast, strictReplace)
+> import Text.MediaWiki.SplitUtils (splitFirst, splitLast)
 
 Some common shorthand for defining parse rules:
 
@@ -33,8 +24,11 @@ Some common shorthand for defining parse rules:
 
 Handling templates:
 
-> import Text.MediaWiki.Templates (TemplateProc, noTemplates, evalTemplate)
+> import Text.MediaWiki.Templates (TemplateProc, ignoreTemplates, evalTemplate)
 
+Marking up text:
+
+> import Text.MediaWiki.AnnotatedText
 
 Spans of text
 =============

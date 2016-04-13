@@ -1,4 +1,4 @@
-> {-# LANGUAGE NoImplicitPrelude, FlexibleContexts #-}
+> {-# LANGUAGE NoImplicitPrelude, FlexibleContexts, ConstraintKinds #-}
 
 The WikiPrelude is a small extension of the ClassyPrelude, designed to
 include some more types and functions that we'll need throughout the parser.
@@ -7,7 +7,9 @@ Here's what we're exporting from the module:
 
 > module WikiPrelude (
 >   module ClassyPrelude,
+>   module Data.String.Conversions,
 >   module Data.LanguageType,
+>   Joinable,
 >   replace,
 >   get, getPrioritized
 >   ) where
@@ -15,9 +17,10 @@ Here's what we're exporting from the module:
 And now we either import or define all those things.
 
 > import ClassyPrelude
+> import Data.String.Conversions hiding ((<>))
 > import Data.LanguageType
 > import qualified Data.Text as T
-> 
+>
 > replace = T.replace
 
 While it seems popular in Haskell to baffle the uninitiated with
@@ -29,10 +32,11 @@ something that you can do an associative operation to (like adding or
 concatenating), and the operation has an identity (like 0 or []).
 
 Practically, when we use `Monoid`, it's to say "this thing is a sequence of
-some kind and we know how to concatenate it". So let's alias `Monoid` to
-`Joinable`. ("Concatenatable" is a bit too hard to spell.)
+some kind, like a string or a list, and we know how to concatenate it". So
+let's alias `Monoid` to `Joinable`. ("Concatenatable" is a bit too hard to
+spell.)
 
-> class (Monoid a) => Joinable a
+> type Joinable a = Monoid a
 
 In many situations we have a mapping whose values are Joinables. This lets us
 write the convenient `get` function, which looks up a key in the mapping, or

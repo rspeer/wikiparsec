@@ -1,48 +1,29 @@
-> {-# LANGUAGE RankNTypes, NoMonomorphismRestriction, OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}
 
 > module Text.MediaWiki.ParseTools where
-> import qualified Text.MediaWiki.AnnotatedString as A
-> import qualified Data.ByteString.Char8 as Char8
-> import Data.ByteString (ByteString)
-> import Text.MediaWiki.AnnotatedString (AnnotatedString)
-> import Prelude hiding (takeWhile)
-> import Data.Attoparsec.ByteString.Char8
+> import WikiPrelude hiding (takeWhile)
+> import Text.MediaWiki.AnnotatedText
+> import Data.Attoparsec.Text
 > import Data.Attoparsec.Combinator
-> import Data.Text (Text)
-> import Data.Text.Encoding (encodeUtf8)
-> import Control.Applicative ((<|>), (<$>), pure, empty)
 
 
 Sensible names for things
 =========================
 
-Let's rename the functions that add a byte to the start or end of a
-ByteString, for people who don't keep a copy of SICP under their pillow:
+Let's rename the functions that add a character to the start or end of a
+sequence, for people who don't keep a copy of SICP under their pillow:
 
-> prependChar = Char8.cons
-> appendChar = Char8.snoc
+> prependChar :: (Joinable a) => Char -> Text -> Text
+> prependChar = cons
+>
+> appendChar :: Text -> Char -> Text
+> appendChar = snoc
 
 As part of many expressions, we need a quick way to discard what we matched
-and use the empty string as its value:
+and return nothing, such as a Text parser that returns the empty text:
 
-> nop :: Parser ByteString
-> nop = return ""
-
-
-Unicode coercion
-================
-
-We're using OverloadedStrings a lot to use Haskell string literals as
-ByteStrings. The problem is, this mechanism doesn't actually use the UTF-8
-bytes of the literal. It reads the characters and takes them all mod 256.
-That's awful.
-
-The Text type is read correctly as Unicode, it's just not as nice to use with
-Wikiparsec. So here's a short alias for `encodeUtf8`, so we can run it on
-string literals that are coerced into Text, converting them to ByteStrings.
-
-> utf8 :: Text -> ByteString
-> utf8 = encodeUtf8
+> nop :: (Joinable a) => Parser a
+> nop = return mempty
 
 
 Common parsing functions
@@ -52,16 +33,16 @@ A lot of spans of Wikitext are mostly defined by what they're not. The
 `textWithout` rule matches and returns a sequence of 1 or more characters that
 are not in the given string.
 
-> takeTill1 :: (Char -> Bool) -> Parser ByteString
+> takeTill1 :: (Char -> Bool) -> Parser Text
 > takeTill1 pred = do
 >   c    <- satisfy (not . pred)
 >   rest <- takeTill pred
->   return (Char8.cons c rest)
+>   return (cons c rest)
 >
-> textWithout :: [Char] -> Parser ByteString
+> textWithout :: [Char] -> Parser Text
 > textWithout chars = takeTill1 (inClass chars)
 >
-> textWith :: [Char] -> Parser ByteString
+> textWith :: [Char] -> Parser Text
 > textWith chars = takeWhile1 (inClass chars)
 >
 > skipChars :: [Char] -> Parser ()
@@ -76,43 +57,29 @@ To make this easier, we'll define `textChoices`, which takes a list of
 expressions we're allowed to parse, tries all of them in that priority order,
 and concatenates together their results.
 
-> optionalTextChoices :: [Parser ByteString] -> Parser ByteString
+> optionalTextChoices :: (Joinable a) => [Parser a] -> Parser a
 > optionalTextChoices options = concatMany (choice options)
 >
-> textChoices :: [Parser ByteString] -> Parser ByteString
+> textChoices :: (Joinable a) => [Parser a] -> Parser a
 > textChoices options = concatMany1 (choice options)
 >
-> concatMany :: Parser ByteString -> Parser ByteString
+> concatMany :: (Joinable a) => Parser a -> Parser a
 > concatMany combinator = do
 >   parts <- many' combinator
->   return (Char8.concat parts)
+>   return (concat parts)
 >
-> concatMany1 :: Parser ByteString -> Parser ByteString
+> concatMany1 :: (Joinable a) => Parser a -> Parser a
 > concatMany1 combinator = do
 >   parts <- many1 combinator
->   return (Char8.concat parts)
+>   return (concat parts)
 
 Most of the expressions we write will match at least one character, allowing
 us to repeat them without allowing repeated matches of the empty string.
 However, there are cases where the empty string is a valid value for a
 sub-expression. In those cases, we wrap the sub-expression in `possiblyEmpty`.
 
-> possiblyEmpty :: Parser ByteString -> Parser ByteString
-> possiblyEmpty combinator = option "" combinator
-
-Sometimes a token starts some special environment that will consume everything
-until an ending token. An example would be HTML comments, which consume
-everything between `<!--` and `-->`.
-
-We need to output something besides an error in the case where the ending token
-never appears, though. What we choose to do is to consume everything up to the
-end of the input, and return what we consumed.
-
-> delimitedSpan :: ByteString -> ByteString -> Parser ByteString
-> delimitedSpan open close = do
->   string open
->   chars <- manyTill anyChar (string close <|> (endOfInput >> nop))
->   return (Char8.pack chars)
+> possiblyEmpty :: (Joinable a) => Parser a -> Parser a
+> possiblyEmpty combinator = option mempty combinator
 
 A limited version of Parsec's `notFollowedBy`:
 
@@ -123,34 +90,39 @@ A limited version of Parsec's `notFollowedBy`:
 >     Nothing -> return ()
 >     Just c' -> if (c == c') then empty else return ()
 
-Another function missing in Attoparsec:
+Another function missing in Attoparsec. `optionMaybe` takes a parser for `a`
+that might fail, and turns it into a parser that always succeeds and returns a
+`Maybe a`.
 
 > optionMaybe :: Parser a -> Parser (Maybe a)
 > optionMaybe p = Just <$> p <|> pure Nothing
 
 A function that turns a parser into a pure function:
 
-> parseOrDefault :: a -> Parser a -> ByteString -> a
+> parseOrDefault :: a -> Parser a -> Text -> a
 > parseOrDefault def parser input =
 >   case parseOnly parser input of
 >     Left err -> def
 >     Right x  -> x
 
-Expressions for AnnotatedStrings
-================================
+Sometimes a token starts some special environment that will consume everything
+until an ending token. An example would be HTML comments, which consume
+everything between `<!--` and `-->`.
 
-AnnotatedString versions of some of the operators above:
+We need to output something besides an error in the case where the ending token
+never appears, though. What we choose to do is to consume everything up to the
+end of the input, and return what we consumed.
 
-> aTextChoices :: [Parser AnnotatedString] -> Parser AnnotatedString
-> aTextChoices options = aConcatMany (choice options)
->
-> aConcatMany :: Parser AnnotatedString -> Parser AnnotatedString
-> aConcatMany combinator = do
->   parts <- many1 combinator
->   return (A.concat parts)
->
-> aPossiblyEmpty :: Parser AnnotatedString -> Parser AnnotatedString
-> aPossiblyEmpty combinator = option A.empty combinator
->
-> liftAnnotate :: Parser ByteString -> Parser AnnotatedString
-> liftAnnotate combinator = A.fromBytes <$> combinator 
+> delimitedSpan :: Text -> Text -> Parser Text
+> delimitedSpan open close = do
+>   string open
+>   chars <- manyTill anyChar (string close <|> (endOfInput >> nop))
+>   return (pack chars)
+
+Expressions for AnnotatedTexts
+==============================
+
+Getting AnnotatedText from a parser that produces Text:
+
+> liftAnnotate :: Parser Text -> Parser AnnotatedText
+> liftAnnotate combinator = annotFromText <$> combinator

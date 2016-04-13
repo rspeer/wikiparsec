@@ -24,6 +24,7 @@ Library
   build-depends:       HUnit,
                        base,
                        classy-prelude ==0.12.*,
+                       string-conversions ==0.4.*,
                        utf8-string,
                        stringsearch,
                        text-icu ==0.7.*,

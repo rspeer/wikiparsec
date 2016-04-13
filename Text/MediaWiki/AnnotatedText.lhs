@@ -40,13 +40,16 @@ Text) and a list of Annotations for it.
 > annotFromText :: Text -> AnnotatedText
 > annotFromText = annotate []
 >
+> annotFromBytes :: ByteString -> AnnotatedText
+> annotFromBytes = annotFromText . decodeUtf8
+>
 > singleAnnotation :: Annotation -> AnnotatedText
 > singleAnnotation annot = annotate [annot] ""
 
-An AnnotatedText is Joinable, meaning it has an empty value and can be
-concatenated:
+An AnnotatedText is a Monoid, which we'd rather call "Joinable", but the
+limitations of Haskell prevent us from putting methods on an alias:
 
-> instance Joinable AnnotatedText where
+> instance Monoid AnnotatedText where
 >   mempty  = annotFromText ""
 >   mappend (AnnotatedText a1 t1) (AnnotatedText a2 t2)
 >     = AnnotatedText (a1 ++ a2) (t1 ++ t2)
