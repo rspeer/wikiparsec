@@ -20,7 +20,7 @@ Some common shorthand for defining parse rules:
 
 > import Text.MediaWiki.ParseTools (nop, appendChar, textWith, textWithout,
 >   skipChars, textChoices, concatMany, notFollowedByChar, possiblyEmpty,
->   delimitedSpan, aPossiblyEmpty, aTextChoices, optionMaybe)
+>   delimitedSpan)
 
 Handling templates:
 
@@ -55,8 +55,8 @@ level of syntax and we want to ignore them anyway.
 We'll just post-process the parse result to remove the sequences of
 apostrophes, by chaining it through the `discardSpans` function.
 
-> discardSpans :: ByteString -> ByteString
-> discardSpans = (strictReplace "''" "") . (strictReplace "'''" "")
+> discardSpans :: Text -> Text
+> discardSpans = (replace "''" "") . (replace "'''" "")
 
 What we count as plain text has to depend on what environment we're in, such as
 whether we're currently parsing a link or a template.
@@ -94,22 +94,22 @@ We don't handle single opening brackets here because those often introduce
 external links. Instead, if the external link parser fails to parse a link,
 it'll just return the bracket as is.
 
-> looseBracket :: Parser ByteString
+> looseBracket :: Parser Text
 > looseBracket = oneButNotTwoOf "]}" <|> looseOpeningBrace
 >
-> looseOpeningBrace :: Parser ByteString
+> looseOpeningBrace :: Parser Text
 > looseOpeningBrace = do
 >   char '{'
 >   notFollowedByChar '{'
 >   notFollowedByChar '|'
 >   return "{"
 >
-> oneButNotTwoOf :: [Char] -> Parser ByteString
+> oneButNotTwoOf :: [Char] -> Parser Text
 > oneButNotTwoOf chars = try (
 >   do
 >     c <- satisfy (inClass chars)
 >     notFollowedByChar c
->     return (Char8.singleton c)
+>     return (singleton c)
 >   )
 >
 > extraneousCloseBrackets = string "]]" <?> "junk closing brackets"
@@ -123,16 +123,16 @@ We define `newLine` here to match the line break (I don't think we need to
 handle `\r` when our input comes from XML), and `endOfLine` to also include
 the end of input.
 
-> newLine :: Parser ByteString
+> newLine :: Parser Text
 > newLine = string "\n"
 >
-> endOfLine :: Parser ByteString
+> endOfLine :: Parser Text
 > endOfLine = (endOfInput >> nop) <|> newLine <?> "end of line"
 
 Now we can define some spans of text that handle errors, and allow line breaks
 where appropriate.
 
-> messyText :: Parser ByteString
+> messyText :: Parser Text
 > messyText            = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces, newLine] <?> "plain text"
 > messyTextLine        = textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces]          <?> "line of plain text"
 > messyTextInLink      = textChoices [plainTextInLink, looseBracket, extraneousCloseBraces, newLine]                    <?> "plain text inside link"
@@ -146,7 +146,7 @@ miscellaneous text. When we encounter a template, we have to turn it into an
 AnnotatedText value and then a plain ByteString value, which the `templateText`
 rule does.
 
-> wikiTextLine :: TemplateProc -> Parser ByteString
+> wikiTextLine :: TemplateProc -> Parser Text
 > wikiTextLine tproc        = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]       <?> "line of wikitext"
 > wikiTextInLink tproc      = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                <?> "wikitext inside link"
 > wikiTextAtEndOfLink tproc = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]<?> "wikitext at end of link"
@@ -171,7 +171,7 @@ the same as if it weren't a link, so we can disregard that case.
 
 The following rules extract the text of an external link.
 
-> externalLinkText :: Parser ByteString
+> externalLinkText :: Parser Text
 > externalLinkText = do
 >   char '['
 >   externalLinkMatch <|> return "["
@@ -197,22 +197,22 @@ When parsing internal links, we return just their label. However, other
 details of the link are added to the LinkState.
 
      In:    [[word]]
-     Out:   AnnotatedString [[("page", "word")]] "word"
+     Out:   AnnotatedText [mapFromList [("page", "word")]] "word"
 
      In:    [[word|this word]]
-     Out:   AnnotatedString [[("page", "word")]] "this word"
+     Out:   AnnotatedText [mapFromList [("page", "word")]] "this word"
 
      In:    [[word#English]]
-     Out:   AnnotatedString [[("page", "word"), ("section", "English")]] "word"
+     Out:   AnnotatedText [mapFromList [("page", "word"), ("section", "English")]] "word"
 
      In:    [[w:en:Word]]
-     Out:   AnnotatedString [[("namespace", "w:en"), ("page", "word")]] "Word"
+     Out:   AnnotatedText [mapFromList [("namespace", "w:en"), ("page", "word")]] "Word"
 
      In:    [[Category:English nouns]]
-     Out:   AnnotatedString [[("namespace", "Category"), ("page", "English nouns")]] "English nouns"
+     Out:   AnnotatedText [mapFromList [("namespace", "Category"), ("page", "English nouns")]] "English nouns"
 
 
-> internalLink :: TemplateProc -> Parser AnnotatedString
+> internalLink :: TemplateProc -> Parser AnnotatedText
 > internalLink tproc = do
 >   string "[["
 >   target <- plainTextInLink
@@ -226,8 +226,8 @@ details of the link are added to the LinkState.
 >        string "]]"
 >        return annotated
 >
-> internalLinkText :: TemplateProc -> Parser ByteString
-> internalLinkText tproc = A.unannotate <$> (internalLink tproc)
+> internalLinkText :: TemplateProc -> Parser Text
+> internalLinkText tproc = getText <$> internalLink tproc
 
 There are complicated syntaxes on MediaWiki that look like internal links,
 particularly the Image: or File: syntax, which can have multiple
@@ -247,19 +247,19 @@ the text we want to extract is:
 
     Ainola, Sibelius's home from 1904 until his death
 
-> alternateText :: TemplateProc -> Parser ByteString
+> alternateText :: TemplateProc -> Parser Text
 > alternateText tproc = do
 >   char '|'
 >   text <- wikiTextAtEndOfLink tproc
 >   return (extractLinkText text)
 >
-> extractLinkText :: ByteString -> ByteString
+> extractLinkText :: Text -> Text
 > extractLinkText text =
->   let parts      = Char8.split '|' text
->       noEquals t = not (BS.isInfixOf "=" t)
+>   let parts      = splitOn '|' text
+>       noEquals t = not (isInfixOf "=" t)
 >   in last ([""] ++ parts ++ (filter noEquals parts))
 >
-> parseLink :: ByteString -> Annotation
+> parseLink :: Text -> Annotation
 > parseLink target =
 >   A.makeLink namespace page section
 >   where
@@ -267,12 +267,12 @@ the text we want to extract is:
 >     (page, section) = splitFirst "#" local
 
 `annotatedWikiText` parses text that may or may not contain links or templates,
-and returns it in an AnnotatedString data structure.
+and returns it in an AnnotatedText data structure.
 
-> annotatedWikiText :: TemplateProc -> Parser AnnotatedString
-> annotatedWikiText tproc = A.concat <$> many1 (annotatedWikiTextPiece tproc)
+> annotatedWikiText :: TemplateProc -> Parser AnnotatedText
+> annotatedWikiText tproc = concat <$> many1 (annotatedWikiTextPiece tproc)
 > annotatedWikiTextPiece tproc = internalLink tproc <|> templateValue tproc <|> simpleWikiTextPiece
-> simpleWikiTextPiece = A.fromBytes <$> choice [wikiTable, externalLinkText, messyTextLine]
+> simpleWikiTextPiece = fromText <$> choice [wikiTable, externalLinkText, messyTextLine]
 
 
 Lists
@@ -281,8 +281,8 @@ Lists
 Here's a hierarchical data type for describing the contents of lists, which
 semantically can contain other lists.
 
-> data ListItem = Item AnnotatedString
->               | ListHeading AnnotatedString
+> data ListItem = Item AnnotatedText
+>               | ListHeading AnnotatedText
 >               | BulletList [ListItem]
 >               | OrderedList [ListItem]
 >               | IndentedList [ListItem]
@@ -290,52 +290,52 @@ semantically can contain other lists.
 
 Sometimes we just want the text that the list contains. `extractTextLines`
 returns the texts of the list items (whatever kind of items they are) as
-a list of AnnotatedStrings.
+a list of AnnotatedTexts.
 
-> extractTextLines :: ListItem -> [AnnotatedString]
+> extractTextLines :: ListItem -> [AnnotatedText]
 > extractTextLines (Item t) = [t]
 > extractTextLines (ListHeading t) = [t]
 > extractTextLines (BulletList items) = extractTextLinesFromList items
 > extractTextLines (OrderedList items) = extractTextLinesFromList items
 > extractTextLines (IndentedList items) = extractTextLinesFromList items
 >
-> extractTextLinesFromList :: [ListItem] -> [AnnotatedString]
+> extractTextLinesFromList :: [ListItem] -> [AnnotatedText]
 > extractTextLinesFromList items = concat (map extractTextLines items)
 
 `extractText` concatenates the result of `extractTextLines` into a single
-AnnotatedString, with the list item texts separated by line breaks.
+AnnotatedText, with the list item texts separated by line breaks.
 
-> extractText :: ListItem -> AnnotatedString
-> extractText = A.unlines . extractTextLines
+> extractText :: ListItem -> AnnotatedText
+> extractText = unlines . extractTextLines
 
 In some cases (such as Wiktionary definition lists), we want to extract only
 the texts from the top level of a list, not from the sublists.
 
-> extractTopLevel :: ListItem -> [AnnotatedString]
+> extractTopLevel :: ListItem -> [AnnotatedText]
 > extractTopLevel (Item item) = [item]
 > extractTopLevel (ListHeading item) = []
 > extractTopLevel (BulletList items) = extractTopLevelFromList items
 > extractTopLevel (OrderedList items) = extractTopLevelFromList items
 > extractTopLevel (IndentedList items) = extractTopLevelFromList items
 >
-> extractTopLevelFromList :: [ListItem] -> [AnnotatedString]
+> extractTopLevelFromList :: [ListItem] -> [AnnotatedText]
 > extractTopLevelFromList items = concat (map extractItemsFromList items)
 >
-> extractItemsFromList :: ListItem -> [AnnotatedString]
+> extractItemsFromList :: ListItem -> [AnnotatedText]
 > extractItemsFromList (Item item) = [item]
 > extractItemsFromList _ = []
 
 And here are the rules for parsing lists:
 
-> listItems :: TemplateProc -> ByteString -> Parser [ListItem]
+> listItems :: TemplateProc -> Text -> Parser [ListItem]
 > listItems tproc marker = do
 >   lookAhead (string marker)
 >   many1 (listItem tproc marker)
 >
-> listItem :: TemplateProc -> ByteString -> Parser ListItem
+> listItem :: TemplateProc -> Text -> Parser ListItem
 > listItem tproc marker = subList tproc marker <|> singleListItem tproc marker
 
-> subList :: TemplateProc -> ByteString -> Parser ListItem
+> subList :: TemplateProc -> Text -> Parser ListItem
 > subList tproc marker = bulletList tproc (appendChar marker '*')
 >                    <|> orderedList tproc (appendChar marker '#')
 >                    <|> indentedList tproc (appendChar marker ':')
@@ -344,16 +344,16 @@ And here are the rules for parsing lists:
 > anyList :: TemplateProc -> Parser ListItem
 > anyList tproc = subList tproc ""
 >
-> anyListText :: TemplateProc -> Parser AnnotatedString
+> anyListText :: TemplateProc -> Parser AnnotatedText
 > anyListText tproc = extractText <$> anyList tproc <?> "list"
 >
-> listHeading :: TemplateProc -> ByteString -> Parser ListItem
+> listHeading :: TemplateProc -> Text -> Parser ListItem
 > listHeading tproc marker = ListHeading <$> listItemContent tproc marker
 >
-> singleListItem :: TemplateProc -> ByteString -> Parser ListItem
+> singleListItem :: TemplateProc -> Text -> Parser ListItem
 > singleListItem tproc marker = Item <$> listItemContent tproc marker
 >
-> listItemContent :: TemplateProc -> ByteString -> Parser AnnotatedString
+> listItemContent :: TemplateProc -> Text -> Parser AnnotatedText
 > listItemContent tproc marker = do
 >   string marker
 >   optionalSameLineSpaces
@@ -397,11 +397,11 @@ standardized form as a mapping from argument names to values.
 > template :: TemplateProc -> Parser Annotation
 > template tproc = string "{{" >> (templateArgs tproc 0)
 >
-> templateValue :: TemplateProc -> Parser AnnotatedString
+> templateValue :: TemplateProc -> Parser AnnotatedText
 > templateValue tproc = (evalTemplate tproc) <$> template tproc
 >
-> templateText :: TemplateProc -> Parser ByteString
-> templateText tproc = A.unannotate <$> templateValue tproc
+> templateText :: TemplateProc -> Parser Text
+> templateText tproc = getText <$> templateValue tproc
 
 A point that might be confusing: the following parsers take a TemplateProc as
 their first argument not because they'll be using it to evaluate this template
@@ -415,13 +415,13 @@ have to be evaluated.
 >     Just name -> namedArg tproc name offset
 >     Nothing -> positionalArg tproc offset
 >
-> templateArgName :: Parser ByteString
+> templateArgName :: Parser Text
 > templateArgName = do
 >   name <- plainTextInArg
 >   string "="
 >   return name
 >
-> namedArg :: TemplateProc -> ByteString -> Int -> Parser Annotation
+> namedArg :: TemplateProc -> Text -> Int -> Parser Annotation
 > namedArg tproc name offset = do
 >   value <- possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc offset
@@ -431,7 +431,7 @@ have to be evaluated.
 > positionalArg tproc offset = do
 >   value <- possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc (offset + 1)
->   let name = (intToString offset) in return ((name,value):rest)
+>   let name = (intToText offset) in return ((name,value):rest)
 >
 > templateRest :: TemplateProc -> Int -> Parser Annotation
 > templateRest tproc offset = endOfTemplate <|> (string "|" >> templateArgs tproc offset)
@@ -439,8 +439,8 @@ have to be evaluated.
 > endOfTemplate :: Parser Annotation
 > endOfTemplate = string "}}" >> return []
 >
-> intToString :: Int -> ByteString
-> intToString = UTF8.fromString . show
+> intToText :: Int -> Text
+> intToText = pack . show
 
 We can simplify some of this parsing in the case where we are looking for a
 *particular* template. We start by expecting two left braces and the name
@@ -449,9 +449,9 @@ of the template, then parse the rest of the template as usual.
 We set the template name as arg 0, as it would be if we were using the more
 general rule for parsing template expressions.
 
-> specificTemplate :: TemplateProc -> ByteString -> Parser Annotation
+> specificTemplate :: TemplateProc -> Text -> Parser Annotation
 > specificTemplate tproc name = do
->   string (BS.append "{{" name)
+>   string (append "{{" name)
 >   parsed <- templateRest tproc 1
 >   return (("0",name):parsed)
 
@@ -462,10 +462,10 @@ Tables
 Tables have complex formatting, and thus far we're just going to be skipping
 them.
 
-> wikiTable :: Parser ByteString
+> wikiTable :: Parser Text
 > wikiTable = wikiTableComplete
 >
-> wikiTableComplete :: Parser ByteString
+> wikiTableComplete :: Parser Text
 > wikiTableComplete = delimitedSpan "{|" "|}" >> nop
 
 
@@ -476,18 +476,18 @@ These functions are designed to take in entire sections of wikitext
 (which have already been split by the parser in `Sections.lhs`) and return
 the plain text that they contain.
 
-> sectionAnnotated :: TemplateProc -> Parser AnnotatedString
-> sectionAnnotated tproc = transformA squishBlankLines <$> aPossiblyEmpty (aTextChoices [anyListText tproc, annotatedWikiText tproc, A.fromBytes <$> newLine]) <?> "section content"
+> sectionAnnotated :: TemplateProc -> Parser AnnotatedText
+> sectionAnnotated tproc = transformA squishBlankLines <$> possiblyEmpty (textChoices [anyListText tproc, annotatedWikiText tproc, fromText <$> newLine]) <?> "section content"
 
-> sectionText :: TemplateProc -> Parser ByteString
+> sectionText :: TemplateProc -> Parser Text
 > sectionText tproc = A.unannotate <$> sectionAnnotated tproc
 >
-> squishBlankLines :: ByteString -> ByteString
-> squishBlankLines s = Char8.unlines (filter isMeaningfulLine (Char8.lines s))
+> squishBlankLines :: Text -> Text
+> squishBlankLines s = unlines (filter isMeaningfulLine (lines s))
 >
-> isMeaningfulLine :: ByteString -> Bool
-> isMeaningfulLine s = (BS.length s) > 0 && Char8.head s /= '|' && Char8.head s /= '!' && not (isDirective s)
-> isDirective s = (Char8.isPrefixOf "__" s) && (Char8.isSuffixOf "__" s)
+> isMeaningfulLine :: Text -> Bool
+> isMeaningfulLine s = (length s) > 0 && not (isPrefixOf "|" s) && not (isPrefixOf "!" s) && not (isDirective s)
+> isDirective s = (isPrefixOf "__" s) && (isSuffixOf "__" s)
 
 
 Entry points
@@ -496,29 +496,29 @@ Entry points
 Here's a function to be run at the IO level, which takes in Wikitext,
 outputs its plain text, and returns nothing.
 
-> outputPlainText :: ByteString -> IO ()
+> outputPlainText :: Text -> IO ()
 > outputPlainText input =
 >    case parseOnly (sectionText noTemplates <* endOfInput) input of
 >     Left err -> showError input err
->     Right x -> Char8.putStrLn x
+>     Right x -> putStrLn x
 >
-> inspectBytes :: ByteString -> IO ()
-> inspectBytes input =
+> inspectText :: Text -> IO ()
+> inspectText input =
 >   case parseOnly (sectionAnnotated noTemplates <* endOfInput) input of
 >     Left err -> showError input err
->     Right (AnnotatedString links text) -> do
->       Char8.putStrLn text
+>     Right (AnnotatedText links text) -> do
+>       putStrLn text
 >       print links
 >
 > inspectString :: String -> IO ()
-> inspectString input = inspectBytes $ UTF8.fromString input
+> inspectString input = inspectText $ pack input
 
 Showing informative errors:
 
-> showError :: ByteString -> String -> IO ()
+> showError :: Text -> String -> IO ()
 > showError str err = do
 >   putStrLn "********"
 >   putStr "parse error:"
 >   print err
->   Char8.putStrLn str
+>   putStrLn str
 >   putStrLn "********"
