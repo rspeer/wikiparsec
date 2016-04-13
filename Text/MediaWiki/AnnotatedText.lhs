@@ -43,10 +43,10 @@ Text) and a list of Annotations for it.
 > singleAnnotation :: Annotation -> AnnotatedText
 > singleAnnotation annot = annotate [annot] ""
 
-An AnnotatedText is a Monoid, meaning it has an empty value and can be
+An AnnotatedText is Joinable, meaning it has an empty value and can be
 concatenated:
 
-> instance Monoid AnnotatedText where
+> instance Joinable AnnotatedText where
 >   mempty  = annotFromText ""
 >   mappend (AnnotatedText a1 t1) (AnnotatedText a2 t2)
 >     = AnnotatedText (a1 ++ a2) (t1 ++ t2)
