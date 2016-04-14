@@ -17,6 +17,7 @@ for internal links.
 
 > makeLink :: Text -> Text -> Text -> Annotation
 > makeLink namespace page section = mapFromList [
+>   ("rel", "link"),
 >   ("namespace", namespace),
 >   ("page", page),
 >   ("section", section)]

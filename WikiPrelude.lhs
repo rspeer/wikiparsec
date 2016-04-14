@@ -48,7 +48,7 @@ Monads and monoids, oversimplified
 
 A [classic joke][] about Haskell defines these terms: "A monad is a monoid in
 the category of endofunctors, what's the problem?"
-    
+
 [classic joke]: http://james-iry.blogspot.com/2009/05/brief-incomplete-and-mostly-wrong.html
 
 It's funny because it's true. Mathematically true, apparently. And it's also
@@ -138,22 +138,36 @@ Here's what we're exporting from the module:
 >   module ClassyPrelude,
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
->   replace, splitOn,
+>   replace, splitOn, stripSpaces,
 >   get, getPrioritized
 >   ) where
 
-And now we either import or define all those things.
+Some of these exports are just re-exporting things we can import:
 
 > import ClassyPrelude
 > import Data.String.Conversions hiding ((<>))
 > import Data.LanguageType
 > import qualified Data.Text as T
 
+Text operations
+---------------
+
 `replace` and `splitOn` are functions that apply to Text that for some reason
 didn't make it into the ClassyPrelude.
 
 > replace = T.replace
 > splitOn = T.splitOn
+
+Another kind of standard thing we need to do is trim spaces from the start and
+end of a string:
+
+> stripSpaces :: Text -> Text
+> stripSpaces = reverse . stripSpacesFront . reverse . stripSpacesFront
+> stripSpacesFront = dropWhile (== ' ')
+
+
+Mapping operations
+------------------
 
 In many situations we have a mapping whose values are sequences. This lets us
 write the convenient `get` function, which looks up a key in the mapping, or
@@ -171,3 +185,4 @@ in priority order. It returns the empty value only if it finds none of them.
 > getPrioritized :: (IsMap map, Monoid (MapValue map)) => [ContainerKey map] -> map -> MapValue map
 > getPrioritized (key:rest) map = findWithDefault (getPrioritized rest map) key map
 > getPrioritized [] map         = mempty
+

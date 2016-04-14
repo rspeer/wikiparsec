@@ -46,10 +46,6 @@ Reading lines
 This is a kind of lexer for the section parser. We sort the lines of the page
 into two types: headings and non-headings.
 
-> stripSpaces :: Text -> Text
-> stripSpaces = reverse . stripSpacesFront . reverse . stripSpacesFront
-> stripSpacesFront = dropWhile (== ' ')
-
 > readLines :: Text -> [TextLine]
 > readLines text = map parseTextLine (lines text)
 >
