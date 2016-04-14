@@ -16,11 +16,6 @@ This module is responsible for handling the HTML.
 > skippedSpan tag = tag == "math" || tag == "code" || tag == "ref" ||
 >                   tag == "gallery" || tag == "hiero" || tag == "timeline"
 >
-> slashedAttrs :: [(ByteString,ByteString)] -> Bool
-> slashedAttrs ((name,value):rest) = slashed name || slashed value || slashedAttrs rest
-> slashedAttrs [] = False
-> slashed = isSuffixOf "/"
->
 > extractFromTags :: [Tag ByteString] -> [ByteString]
 > extractFromTags ((TagOpen tag attrs):rest) =
 >   if (skippedSpan tag && not (slashedAttrs attrs))
@@ -37,5 +32,10 @@ This module is responsible for handling the HTML.
 >     else skipUntilClose target rest
 > skipUntilClose target (_:rest) = skipUntilClose target rest
 > skipUntilClose target [] = []
+>
+> slashedAttrs :: [(ByteString,ByteString)] -> Bool
+> slashedAttrs ((name,value):rest) = slashed name || slashed value || slashedAttrs rest
+> slashedAttrs [] = False
+> slashed = isSuffixOf "/"
 
 
