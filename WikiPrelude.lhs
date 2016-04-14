@@ -9,7 +9,7 @@ Here's what we're exporting from the module:
 >   module ClassyPrelude,
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
->   replace,
+>   replace, splitOn,
 >   get, getPrioritized
 >   ) where
 
@@ -21,6 +21,7 @@ And now we either import or define all those things.
 > import qualified Data.Text as T
 >
 > replace = T.replace
+> splitOn = T.splitOn
 
 In many situations we have a mapping whose values are sequences. This lets us
 write the convenient `get` function, which looks up a key in the mapping, or

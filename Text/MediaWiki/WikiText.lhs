@@ -7,7 +7,7 @@ To parse the mess that is Wiktionary, we make use of Attoparsec, a
 well-regarded parser-combinator library for Haskell.
 
 > module Text.MediaWiki.WikiText where
-> import WikiPrelude
+> import WikiPrelude hiding (try)
 > import Data.Attoparsec.Text hiding (endOfLine)
 > import Data.Attoparsec.Combinator
 
@@ -20,11 +20,12 @@ Some common shorthand for defining parse rules:
 
 > import Text.MediaWiki.ParseTools (nop, appendChar, textWith, textWithout,
 >   skipChars, textChoices, concatMany, notFollowedByChar, possiblyEmpty,
->   delimitedSpan)
+>   delimitedSpan, optionMaybe)
 
 Handling templates:
 
-> import Text.MediaWiki.Templates (TemplateProc, ignoreTemplates, evalTemplate)
+> import Text.MediaWiki.Templates (Template, TemplateProc, ignoreTemplates,
+>   evalTemplate)
 
 Marking up text:
 
@@ -214,8 +215,8 @@ details of the link are added to the LinkState.
 >   let {
 >     link      = parseLink target;
 >     annotated = case maybeText of
->                   Just text -> A.annotate [link] text
->                   Nothing   -> A.annotate [link] (get "page" link)
+>                   Just text -> annotate [link] text
+>                   Nothing   -> annotate [link] (get "page" link)
 >   } in do
 >        string "]]"
 >        return annotated
@@ -249,13 +250,20 @@ the text we want to extract is:
 >
 > extractLinkText :: Text -> Text
 > extractLinkText text =
->   let parts      = splitOn '|' text
+>   -- Get the part of a link that's most likely to be its displayed text.
+>   -- If there are many parts to choose from, prefer the ones without
+>   -- equals signs (which may be image metadata, for example).
+>   let parts      = splitOn "|" text
 >       noEquals t = not (isInfixOf "=" t)
->   in last ([""] ++ parts ++ (filter noEquals parts))
+>       priority   = parts <> (filter noEquals parts)
+>   -- We use MinLen functions to convince the type system that there will
+>   -- be a "last" element. We know there is one because, even if our priority
+>   -- order is empty, we stick "" on the front as a last resort.
+>   in last (mlcons "" (toMinLenZero priority))
 >
 > parseLink :: Text -> Annotation
 > parseLink target =
->   A.makeLink namespace page section
+>   makeLink namespace page section
 >   where
 >     (namespace, local) = splitLast ":" target
 >     (page, section) = splitFirst "#" local
@@ -266,7 +274,7 @@ and returns it in an AnnotatedText data structure.
 > annotatedWikiText :: TemplateProc -> Parser AnnotatedText
 > annotatedWikiText tproc = concat <$> many1 (annotatedWikiTextPiece tproc)
 > annotatedWikiTextPiece tproc = internalLink tproc <|> templateValue tproc <|> simpleWikiTextPiece
-> simpleWikiTextPiece = fromText <$> choice [wikiTable, externalLinkText, messyTextLine]
+> simpleWikiTextPiece = annotFromText <$> choice [wikiTable, externalLinkText, messyTextLine]
 
 
 Lists
@@ -300,7 +308,7 @@ a list of AnnotatedTexts.
 AnnotatedText, with the list item texts separated by line breaks.
 
 > extractText :: ListItem -> AnnotatedText
-> extractText = unlines . extractTextLines
+> extractText = joinAnnotatedLines . extractTextLines
 
 In some cases (such as Wiktionary definition lists), we want to extract only
 the texts from the top level of a list, not from the sublists.
@@ -388,7 +396,7 @@ Wiktionary.
 Here, we define the basic syntax of templates, and return their contents in a
 standardized form as a mapping from argument names to values.
 
-> template :: TemplateProc -> Parser Annotation
+> template :: TemplateProc -> Parser Template
 > template tproc = string "{{" >> (templateArgs tproc 0)
 >
 > templateValue :: TemplateProc -> Parser AnnotatedText
@@ -402,7 +410,7 @@ their first argument not because they'll be using it to evaluate this template
 we're parsing, but because the template might contain nested templates that
 have to be evaluated.
 
-> templateArgs :: TemplateProc -> Int -> Parser Annotation
+> templateArgs :: TemplateProc -> Int -> Parser Template
 > templateArgs tproc offset = do
 >   nameMaybe <- optionMaybe (try templateArgName)
 >   case nameMaybe of
@@ -415,23 +423,24 @@ have to be evaluated.
 >   string "="
 >   return name
 >
-> namedArg :: TemplateProc -> Text -> Int -> Parser Annotation
+> namedArg :: TemplateProc -> Text -> Int -> Parser Template
 > namedArg tproc name offset = do
 >   value <- possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc offset
->   return ((name,value):rest)
+>   return (insertMap name value rest)
 >
-> positionalArg :: TemplateProc -> Int -> Parser Annotation
+> positionalArg :: TemplateProc -> Int -> Parser Template
 > positionalArg tproc offset = do
 >   value <- possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc (offset + 1)
->   let name = (intToText offset) in return ((name,value):rest)
+>   let name = (intToText offset) in
+>     return (insertMap name value rest)
 >
-> templateRest :: TemplateProc -> Int -> Parser Annotation
+> templateRest :: TemplateProc -> Int -> Parser Template
 > templateRest tproc offset = endOfTemplate <|> (string "|" >> templateArgs tproc offset)
 >
-> endOfTemplate :: Parser Annotation
-> endOfTemplate = string "}}" >> return []
+> endOfTemplate :: Parser Template
+> endOfTemplate = string "}}" >> return mempty
 >
 > intToText :: Int -> Text
 > intToText = pack . show
@@ -443,9 +452,9 @@ of the template, then parse the rest of the template as usual.
 We set the template name as arg 0, as it would be if we were using the more
 general rule for parsing template expressions.
 
-> specificTemplate :: TemplateProc -> Text -> Parser Annotation
+> specificTemplate :: TemplateProc -> Text -> Parser Template
 > specificTemplate tproc name = do
->   string (append "{{" name)
+>   string (mappend "{{" name)
 >   parsed <- templateRest tproc 1
 >   return (("0",name):parsed)
 
@@ -471,10 +480,12 @@ These functions are designed to take in entire sections of wikitext
 the plain text that they contain.
 
 > sectionAnnotated :: TemplateProc -> Parser AnnotatedText
-> sectionAnnotated tproc = transformA squishBlankLines <$> possiblyEmpty (textChoices [anyListText tproc, annotatedWikiText tproc, fromText <$> newLine]) <?> "section content"
-
+> sectionAnnotated tproc =
+>   transformA squishBlankLines <$>
+>     possiblyEmpty (textChoices [anyListText tproc, annotatedWikiText tproc, annotFromText <$> newLine]) <?> "section content"
+>
 > sectionText :: TemplateProc -> Parser Text
-> sectionText tproc = A.unannotate <$> sectionAnnotated tproc
+> sectionText tproc = getText <$> sectionAnnotated tproc
 >
 > squishBlankLines :: Text -> Text
 > squishBlankLines s = unlines (filter isMeaningfulLine (lines s))
@@ -492,13 +503,13 @@ outputs its plain text, and returns nothing.
 
 > outputPlainText :: Text -> IO ()
 > outputPlainText input =
->    case parseOnly (sectionText noTemplates <* endOfInput) input of
+>    case parseOnly (sectionText ignoreTemplates <* endOfInput) input of
 >     Left err -> showError input err
 >     Right x -> putStrLn x
 >
 > inspectText :: Text -> IO ()
 > inspectText input =
->   case parseOnly (sectionAnnotated noTemplates <* endOfInput) input of
+>   case parseOnly (sectionAnnotated ignoreTemplates <* endOfInput) input of
 >     Left err -> showError input err
 >     Right (AnnotatedText links text) -> do
 >       putStrLn text

@@ -1,17 +1,16 @@
-> {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
 
 After parsing the XML of a MediaWiki entry, the result then needs to be
 decoded as (potentially very sloppy) HTML, the contents of which are Wikitext.
 This module is responsible for handling the HTML.
 
 > module Text.MediaWiki.HTML where
-> import Data.ByteString (ByteString)
-> import qualified Data.ByteString.Char8 as Char8
+> import WikiPrelude
 > import Text.HTML.TagSoup hiding (parseTags, renderTags)
 > import Text.HTML.TagSoup.Fast.Utf8Only
 
-> extractWikiTextFromHTML :: ByteString -> ByteString
-> extractWikiTextFromHTML = Char8.concat . extractFromTags . parseTags
+> extractWikiTextFromHTML :: ByteString -> Text
+> extractWikiTextFromHTML = decodeUtf8 . mconcat . extractFromTags . parseTags
 
 > skippedSpan :: ByteString -> Bool
 > skippedSpan tag = tag == "math" || tag == "code" || tag == "ref" ||
@@ -20,7 +19,7 @@ This module is responsible for handling the HTML.
 > slashedAttrs :: [(ByteString,ByteString)] -> Bool
 > slashedAttrs ((name,value):rest) = slashed name || slashed value || slashedAttrs rest
 > slashedAttrs [] = False
-> slashed = Char8.isSuffixOf "/"
+> slashed = isSuffixOf "/"
 >
 > extractFromTags :: [Tag ByteString] -> [ByteString]
 > extractFromTags ((TagOpen tag attrs):rest) =

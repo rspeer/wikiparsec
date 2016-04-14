@@ -13,7 +13,7 @@ Sensible names for things
 Let's rename the functions that add a character to the start or end of a
 sequence, for people who don't keep a copy of SICP under their pillow:
 
-> prependChar :: (Monoid a) => Char -> Text -> Text
+> prependChar :: Char -> Text -> Text
 > prependChar = cons
 >
 > appendChar :: Text -> Char -> Text
