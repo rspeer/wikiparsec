@@ -6,7 +6,6 @@ Text.Wiki.MediaWiki.
 
 > module Text.MediaWiki.XML where
 > import WikiPrelude
-> import qualified Data.ByteString.Lazy as BSL
 
 XML and text decoding:
 
@@ -19,23 +18,27 @@ The HTML processor that we'll run on the output:
 Data types
 ==========
 
+When we extract sub-tags of the page, we'll represent them as an association
+list from ByteStrings to ByteStrings. (An association list, which is just a
+list of pairs, will work fine as a mapping here because the mapping is small:
+it will only ever contain 4 elements.)
+
+> type ByteStringAssoc = [(ByteString, ByteString)]
+>
+> justLookup :: ByteString -> ByteStringAssoc -> ByteString
+> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (show key))) (lookup key aList)
+
+Once we've found the subtags, then we'll wrap them up as a record called
+WikiPage, making sure to decode the values as Text.
+
 > data WikiPage = WikiPage {
 >   pageNamespace :: Text,
 >   pageTitle :: Text,
 >   pageText :: Text,
 >   pageRedirect :: Maybe Text
 > } deriving (Show, Eq)
-
-An AList is an association list, that type that shows up in functional
-languages, where you map x to y by just putting together a bunch of (x,y)
-tuples. Here, in particular, we're mapping text names to text values.
-
-> type AList = [(ByteString, ByteString)]
 >
-> justLookup :: ByteString -> AList -> ByteString
-> justLookup key aList = fromMaybe (error ("Missing tag: " ++ (show key))) (lookup key aList)
-
-> makeWikiPage :: AList -> WikiPage
+> makeWikiPage :: ByteStringAssoc -> WikiPage
 > makeWikiPage subtags = WikiPage {
 >    pageNamespace = decodeUtf8 (justLookup "ns" subtags),
 >    pageTitle = decodeUtf8 (justLookup "title" subtags),
@@ -46,24 +49,29 @@ tuples. Here, in particular, we're mapping text names to text values.
 Top level
 =========
 
-> processMediaWikiDump :: String -> (WikiPage -> IO ()) -> IO ()
-> processMediaWikiDump filename sink = do
->   contents <- BSL.readFile filename
->   let events = SAX.parse SAX.defaultParseOptions contents
+> processMediaWikiContent :: LByteString -> (WikiPage -> IO ()) -> IO ()
+> processMediaWikiContent content sink = do
+>   let events = SAX.parse SAX.defaultParseOptions content
 >   mapM_ sink (findPageTags events)
 >
-> processMediaWikiStdin :: (WikiPage -> IO ()) -> IO ()
-> processMediaWikiStdin sink = do
->   contents <- BSL.getContents
->   let events = SAX.parse SAX.defaultParseOptions contents
->   mapM_ sink (findPageTags events)
+> processMediaWikiDump :: FilePath -> (WikiPage -> IO ()) -> IO ()
+> processMediaWikiDump filename sink = do
+>   content <- readFile filename
+>   processMediaWikiContent content sink
+>
+> processMediaWikiStream :: Handle -> (WikiPage -> IO ()) -> IO ()
+> processMediaWikiStream source sink = do
+>   content <- hGetContents source
+>   processMediaWikiContent content sink
+>
+> processMediaWikiStdin = processMediaWikiStream stdin
 
 Parsing some XML
 ================
 
 > findPageTags = handleEventStream [] []
 
-> handleEventStream :: AList -> [ByteString] -> [SAX.SAXEvent ByteString ByteString] -> [WikiPage]
+> handleEventStream :: ByteStringAssoc -> [ByteString] -> [SAX.SAXEvent ByteString ByteString] -> [WikiPage]
 > handleEventStream subtags chunks [] = []
 > handleEventStream subtags chunks ((SAX.StartElement "page" attrs):rest) = handleEventStream [] [] rest
 > handleEventStream subtags chunks ((SAX.StartElement "redirect" attrs):rest) =
@@ -73,3 +81,6 @@ Parsing some XML
 > handleEventStream subtags chunks ((SAX.EndElement "page"):rest) = ((makeWikiPage subtags):(handleEventStream [] [] rest))
 > handleEventStream subtags chunks ((SAX.EndElement elt):rest) = handleEventStream ((elt, mconcat (reverse chunks)):subtags) [] rest
 > handleEventStream subtags chunks ((SAX.CharacterData t):rest) = handleEventStream subtags (t:chunks) rest
+> handleEventStream subtags chunks ((SAX.FailDocument (SAX.XMLParseError err loc)):rest) =
+>   error ("XML parse error: " ++ err ++ " at " ++ (show loc))
+> handleEventStream subtags chunks (misc:rest) = error ("Can't handle element: " ++ show misc)
