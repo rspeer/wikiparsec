@@ -55,7 +55,7 @@ Library
 --                        fast-tagsoup-utf8-only,
 --                        hexpat ==0.20.*,
 --                        aeson
--- 
+--
 -- Executable wiktionary-parser
 --   ghc-options:
 --     -threaded
@@ -74,4 +74,4 @@ Library
 --                        fast-tagsoup-utf8-only,
 --                        hexpat ==0.20.*,
 --                        aeson
--- 
+--

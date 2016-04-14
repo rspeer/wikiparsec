@@ -13,7 +13,7 @@ Sensible names for things
 Let's rename the functions that add a character to the start or end of a
 sequence, for people who don't keep a copy of SICP under their pillow:
 
-> prependChar :: (Joinable a) => Char -> Text -> Text
+> prependChar :: (Monoid a) => Char -> Text -> Text
 > prependChar = cons
 >
 > appendChar :: Text -> Char -> Text
@@ -22,7 +22,7 @@ sequence, for people who don't keep a copy of SICP under their pillow:
 As part of many expressions, we need a quick way to discard what we matched
 and return nothing, such as a Text parser that returns the empty text:
 
-> nop :: (Joinable a) => Parser a
+> nop :: (Monoid a) => Parser a
 > nop = return mempty
 
 
@@ -57,18 +57,18 @@ To make this easier, we'll define `textChoices`, which takes a list of
 expressions we're allowed to parse, tries all of them in that priority order,
 and concatenates together their results.
 
-> optionalTextChoices :: (Joinable a) => [Parser a] -> Parser a
+> optionalTextChoices :: (Monoid a) => [Parser a] -> Parser a
 > optionalTextChoices options = concatMany (choice options)
 >
-> textChoices :: (Joinable a) => [Parser a] -> Parser a
+> textChoices :: (Monoid a) => [Parser a] -> Parser a
 > textChoices options = concatMany1 (choice options)
 >
-> concatMany :: (Joinable a) => Parser a -> Parser a
+> concatMany :: (Monoid a) => Parser a -> Parser a
 > concatMany combinator = do
 >   parts <- many' combinator
 >   return (concat parts)
 >
-> concatMany1 :: (Joinable a) => Parser a -> Parser a
+> concatMany1 :: (Monoid a) => Parser a -> Parser a
 > concatMany1 combinator = do
 >   parts <- many1 combinator
 >   return (concat parts)
@@ -78,7 +78,7 @@ us to repeat them without allowing repeated matches of the empty string.
 However, there are cases where the empty string is a valid value for a
 sub-expression. In those cases, we wrap the sub-expression in `possiblyEmpty`.
 
-> possiblyEmpty :: (Joinable a) => Parser a -> Parser a
+> possiblyEmpty :: (Monoid a) => Parser a -> Parser a
 > possiblyEmpty combinator = option mempty combinator
 
 A limited version of Parsec's `notFollowedBy`:

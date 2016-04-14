@@ -61,13 +61,7 @@ apostrophes, by chaining it through the `discardSpans` function.
 What we count as plain text has to depend on what environment we're in, such as
 whether we're currently parsing a link or a template.
 
-The `<$>` operator, also known as "liftM", seems to be the preferred Haskell
-way to apply a plain function to the output of a monadic computation, such as a
-successful parse. Here, it "lifts" the `discardSpans` function, of type
-`ByteString -> ByteString`, into a function that transforms a parse result:
-that is, a function of type `Parser ByteString -> Parser ByteString`.
-
-> plainText :: Parser ByteString
+> plainText :: Parser Text
 > plainText           = discardSpans <$> textWithout "[]{}\n"
 > plainTextInTemplate = discardSpans <$> textWithout "[]{}|\n"
 > plainTextInArg      = discardSpans <$> textWithout "[]{}|=\n"
@@ -143,7 +137,7 @@ where appropriate.
 Wikitext in general is either some big special environment like a list or a
 table -- which we'll handle elsewhere -- or it's made of links, templates, and
 miscellaneous text. When we encounter a template, we have to turn it into an
-AnnotatedText value and then a plain ByteString value, which the `templateText`
+AnnotatedText value and then a plain Text value, which the `templateText`
 rule does.
 
 > wikiTextLine :: TemplateProc -> Parser Text

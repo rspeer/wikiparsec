@@ -46,8 +46,7 @@ Text) and a list of Annotations for it.
 > singleAnnotation :: Annotation -> AnnotatedText
 > singleAnnotation annot = annotate [annot] ""
 
-An AnnotatedText is a Monoid, which we'd rather call "Joinable", but the
-limitations of Haskell prevent us from putting methods on an alias:
+An AnnotatedText is a Monoid, meaning that it can be concatenated:
 
 > instance Monoid AnnotatedText where
 >   mempty  = annotFromText ""
