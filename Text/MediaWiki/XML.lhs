@@ -1,14 +1,12 @@
-> {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
 
 The purpose of this module is to extract Wikitext data from a MediaWiki XML
 dump. This module won't parse the Wikitext itself; that's a job for
 Text.Wiki.MediaWiki.
 
 > module Text.MediaWiki.XML where
+> import WikiPrelude
 > import qualified Data.ByteString.Lazy as BSL
-> import qualified Data.ByteString as BS
-> import Data.ByteString (ByteString)
-> import Data.Maybe
 
 XML and text decoding:
 
@@ -22,10 +20,10 @@ Data types
 ==========
 
 > data WikiPage = WikiPage {
->   pageNamespace :: ByteString,
->   pageTitle :: ByteString,
->   pageText :: ByteString,
->   pageRedirect :: Maybe ByteString
+>   pageNamespace :: Text,
+>   pageTitle :: Text,
+>   pageText :: Text,
+>   pageRedirect :: Maybe Text
 > } deriving (Show, Eq)
 
 An AList is an association list, that type that shows up in functional
@@ -39,10 +37,10 @@ tuples. Here, in particular, we're mapping text names to text values.
 
 > makeWikiPage :: AList -> WikiPage
 > makeWikiPage subtags = WikiPage {
->    pageNamespace = (justLookup "ns" subtags),
->    pageTitle = (justLookup "title" subtags),
+>    pageNamespace = decodeUtf8 (justLookup "ns" subtags),
+>    pageTitle = decodeUtf8 (justLookup "title" subtags),
 >    pageText = extractWikiTextFromHTML (justLookup "text" subtags),
->    pageRedirect = lookup "redirect" subtags
+>    pageRedirect = decodeUtf8 <$> lookup "redirect" subtags
 > }
 
 Top level
@@ -73,5 +71,5 @@ Parsing some XML
 >   in handleEventStream (("redirect",title):subtags) [] rest
 > handleEventStream subtags chunks ((SAX.StartElement elt attrs):rest) = handleEventStream subtags [] rest
 > handleEventStream subtags chunks ((SAX.EndElement "page"):rest) = ((makeWikiPage subtags):(handleEventStream [] [] rest))
-> handleEventStream subtags chunks ((SAX.EndElement elt):rest) = handleEventStream ((elt, BS.concat (reverse chunks)):subtags) [] rest
+> handleEventStream subtags chunks ((SAX.EndElement elt):rest) = handleEventStream ((elt, mconcat (reverse chunks)):subtags) [] rest
 > handleEventStream subtags chunks ((SAX.CharacterData t):rest) = handleEventStream subtags (t:chunks) rest
