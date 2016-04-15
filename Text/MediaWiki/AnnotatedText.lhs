@@ -12,11 +12,20 @@ represent these using a Map.
 
 > type Annotation = Map Text Text
 
+`annotationFromList` builds an Annotation, much like `mapFromList`, but also
+avoids putting unnecessary empty values into the map.
+
+> annotationFromList :: [(Text, Text)] -> Annotation
+> annotationFromList pairs = mapFromList (filter filterEmpty pairs)
+>
+> filterEmpty :: (Text, Text) -> Bool
+> filterEmpty (a, b) = b /= ""
+
 `makeLink` is a constant that can be used as a template for making Annotations
 for internal links.
 
 > makeLink :: Text -> Text -> Text -> Annotation
-> makeLink namespace page section = mapFromList [
+> makeLink namespace page section = annotationFromList [
 >   ("rel", "link"),
 >   ("namespace", namespace),
 >   ("page", page),
@@ -44,8 +53,8 @@ Text) and a list of Annotations for it.
 > annotFromBytes :: ByteString -> AnnotatedText
 > annotFromBytes = annotFromText . decodeUtf8
 >
-> singleAnnotation :: Annotation -> AnnotatedText
-> singleAnnotation annot = annotate [annot] ""
+> singleAnnotation :: Text -> Text -> AnnotatedText
+> singleAnnotation key val = annotate [singletonMap key val] ""
 
 An AnnotatedText is a Monoid, meaning that it can be concatenated:
 

@@ -1,131 +1,145 @@
-> {-# LANGUAGE OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 > module Text.MediaWiki.Wiktionary.English where
+> import WikiPrelude
 > import Text.MediaWiki.Templates
-> import qualified Text.MediaWiki.AnnotatedString as A
-> import Text.MediaWiki.AList (get, filterEmpty, lookupOne, getOne, ByteAssoc)
-> import Text.MediaWiki.AnnotatedString (AnnotatedString, Annotation)
+> import Text.MediaWiki.AnnotatedText
 > import Text.MediaWiki.SplitUtils
 > import Text.MediaWiki.ParseTools
-> import Text.MediaWiki.WikiText
 > import Text.MediaWiki.Sections
+> import Text.MediaWiki.WikiText
 > import Text.MediaWiki.Wiktionary.Base
-> import Data.ByteString (ByteString)
-> import qualified Data.ByteString.Char8 as Char8
-> import qualified Data.ByteString.Lazy.Char8 as LChar8
 > import qualified Data.Aeson as Ae
-> import Data.Attoparsec.ByteString.Char8
+> import Data.Attoparsec.Text
 > import Data.LanguageNames
-> import Control.Applicative ((<|>), (<$>), (*>), (<*))
-> import Control.Monad
 
 
 Parsing sections
 ================
 
-> enHandlePage :: ByteString -> ByteString -> [WiktionaryRel]
+> enHandlePage :: Text -> Text -> [WiktionaryFact]
 > enHandlePage title text =
 >   let sections = parsePageIntoSections text in
->     concat (map (enDispatchSection title) sections)
+>     concat (map (enParseSection title) sections)
 >
-> enHandleFile :: String -> String -> IO ()
+> enHandleFile :: Text -> FilePath -> IO ()
 > enHandleFile title filename = do
->   contents <- Char8.readFile filename
->   mapM_ (LChar8.putStrLn . Ae.encode) (enHandlePage (Char8.pack title) contents)
+>   contents <- (readFile filename) :: IO Text
+>   mapM_ (println . Ae.encode) (enHandlePage title contents)
+
 
 Choosing an appropriate section parser
 --------------------------------------
 
-> fakeRel :: ByteString -> ByteString -> WiktionaryRel
-> fakeRel s1 s2 = makeRel "debug" (simpleTerm "en" s1) (simpleTerm "en" s2)
->
-> enDispatchSection :: ByteString -> WikiSection -> [WiktionaryRel]
-> enDispatchSection title (WikiSection {headings=headings, content=content}) =
->   if (length headings) < 3
->     then []
->     else let {
->       language = lookupLanguage "en" (headings !! 1);
->       subheads = drop 2 headings;
->       maybePos = enFindPartOfSpeech subheads;
->       etymNumber = enFindEtymologyNumber subheads;
->       sectionType = enGetSectionType (last subheads)
->     } in case maybePos of
->       Just pos -> enParseSection language title pos etymNumber sectionType content
->       Nothing  -> []
->
-> enParseSection :: Language -> ByteString -> ByteString -> ByteString -> ByteString -> ByteString -> [WiktionaryRel]
-> enParseSection language title pos etymNumber sectionType content =
->   let {
->     thisTerm = WiktionaryTerm { text=title, language=Just language, etym=Just etymNumber, pos=Just pos, sense=Nothing }
->   } in enParseSectionContent sectionType thisTerm content
->
-> enParseSectionContent :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
-> enParseSectionContent "POS" = enParseDefinition
-> enParseSectionContent "Translations" = enParseTranslations
-> enParseSectionContent "Synonyms" = enParseRelation "synonym"
-> enParseSectionContent "Antonyms" = enParseRelation "antonym"
-> enParseSectionContent "Hyponyms" = enParseRelation "hyponym"
-> enParseSectionContent "Hypernyms" = enParseRelation "hypernym"
-> enParseSectionContent "Meronyms" = enParseRelation "meronym"
-> enParseSectionContent "Holonyms" = enParseRelation "holonym"
-> enParseSectionContent "Troponyms" = enParseRelation "troponym"
-> enParseSectionContent "Coordinate terms" = enParseRelation "coordinate"
-> enParseSectionContent "Derived terms" = enParseRelation "derived"
-> enParseSectionContent "Related terms" = enParseRelation "related"
-> enParseSectionContent "See also" = enParseRelation "related"
-> enParseSectionContent x = const (const [])
+`enParseSection` takes in a title and a WikiSection structure, builds
+a WiktionaryTerm structure for the term we're defining, and passes it on to
+a function that will extract WiktionaryFacts.
+
+> enParseSection :: Text -> WikiSection -> [WiktionaryFact]
+> enParseSection title (WikiSection {headings=headings, content=content}) =
+>   -- The first two headings are the meaningless level-1 heading and the
+>   -- language heading. If those aren't there, bail out.
+>   case uncons (drop 1 headings) of
+>     Nothing -> []
+>     -- langHeading will contain the level-2 heading (for the language),
+>     -- and subheads will contain levels 3 and later. Now we need to look
+>     -- through the subheads for details about the term we're parsing
+>     -- and what kind of section to parse.
+>     Just (langHeading, subheads) ->
+>       let language    = lookupLanguage "en" langHeading
+>           maybePos    = findPartOfSpeech subheads
+>           etymNumber  = findEtymologyNumber subheads
+>           sectionType = getSectionType subheads
+>       in case maybePos of
+>         -- If there's no heading we recognize as a part of speech, then
+>         -- this is a section we don't want to parse. (This may change if
+>         -- we decide to parse etymology sections.)
+>         Nothing  -> []
+>         Just pos ->
+>           -- Build the WiktionaryTerm object and pass it on to the
+>           -- section parser.
+>           let thisTerm = WiktionaryTerm {
+>             wtText=title,
+>             wtLanguage=Just language,
+>             wtEtym=Just etymNumber,
+>             wtPos=Just pos,
+>             wtSense=Nothing
+>             } in chooseSectionParser sectionType thisTerm content
+
+`chooseSectionParser` selects a particular function for making WiktionaryFacts,
+based on the type of section we're parsing.
+
+> chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> chooseSectionParser "POS" = parseDefinition
+> chooseSectionParser "Translations" = parseTranslations
+> chooseSectionParser "Synonyms" = parseRelation "synonym"
+> chooseSectionParser "Antonyms" = parseRelation "antonym"
+> chooseSectionParser "Hyponyms" = parseRelation "hyponym"
+> chooseSectionParser "Hypernyms" = parseRelation "hypernym"
+> chooseSectionParser "Meronyms" = parseRelation "meronym"
+> chooseSectionParser "Holonyms" = parseRelation "holonym"
+> chooseSectionParser "Troponyms" = parseRelation "troponym"
+> chooseSectionParser "Coordinate terms" = parseRelation "coordinate"
+> chooseSectionParser "Derived terms" = parseRelation "derived"
+> chooseSectionParser "Related terms" = parseRelation "related"
+> chooseSectionParser "See also" = parseRelation "related"
+> chooseSectionParser x = const (const [])
 
 
 The part-of-speech/definition section
 -------------------------------------
 
-Parsing the definition section:
+The section that's labeled something like "Noun" contains definitions of the
+given term in English, as a numbered list.
 
-> enParseDefinition :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
->
-> enParseDefinition thisTerm text =
->   case parseOnly pDefinitionSection text of
->     Left err   -> []
->     Right defs -> concat (map (definitionToRels "en" thisTerm) defs)
->
-> pDefinitionSection :: Parser [(ByteString, AnnotatedString)]
+Here, we parse the Wikitext for the numbered list, then pass its entries
+on to `definitionToFacts`. If there's a parse error, we return nothing for
+this section.
+
+> parseDefinition :: WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseDefinition thisTerm text =
+>   let defs = parseOrDefault [] pDefinitionSection text in
+>     concat (map (definitionToFacts "en" thisTerm) defs)
+
+Skip miscellaneous lines at the start of the section: try to parse each line as
+pDefinitionList, and if that fails, parse one line, throw it out, and
+recursively run this parser to parse the rest.
+
+> pDefinitionSection :: Parser [LabeledDef]
 > pDefinitionSection =
->   -- Skip miscellaneous lines at the start of the section: try to parse
->   -- each line as pDefinitionList, and if that fails, parse one line,
->   -- throw it out, and parse the rest recursively.
 >   pDefinitionList <|>
 >   (newLine >> pDefinitionSection) <|>
->   (wikiTextLine noTemplates >> newLine >> pDefinitionSection)
+>   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection)
 >
-> pDefinitionList :: Parser [(ByteString, AnnotatedString)]
+> pDefinitionList :: Parser [LabeledDef]
 > pDefinitionList = extractNumberedDefs <$> orderedList enTemplates "#"
 
 
 The translation section
 -----------------------
 
-> enParseTranslations :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
-> enParseTranslations thisTerm text = parseOrDefault [] (pTranslationSection thisTerm) text
+> parseTranslations :: WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseTranslations thisTerm text = parseOrDefault [] (pTranslationSection thisTerm) text
 >
-> pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryRel]
+> pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationSection thisTerm = concat <$> many1 (pTranslationGroup thisTerm)
 >
-> pTranslationGroup :: WiktionaryTerm -> Parser [WiktionaryRel]
+> pTranslationGroup :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationGroup thisTerm = do
 >   optionalTextChoices [newLine]
 >   maybeSense <- pTranslationTopTemplate
->   let senseTerm = thisTerm {sense=maybeSense}
+>   let senseTerm = thisTerm {wtSense=maybeSense}
 >   items <- concat <$> many1 pTranslationColumn
 >   optionalTextChoices [newLine]
->   return (map (annotationToRel "en" senseTerm) (filter translationsOnly items))
+>   return (map (annotationToFact "en" senseTerm) (filter translationsOnly items))
 >
 > translationsOnly :: Annotation -> Bool
 > translationsOnly annot = (get "rel" annot) == "translation"
 
 The `pTranslationTopTemplate` rule parses the template that starts a
 translation section, which may or may not be labeled with a word sense. It
-returns a Maybe ByteString that contains the word sense if present.
+returns a Maybe Text that contains the word sense if present.
 
-> pTranslationTopTemplate :: Parser (Maybe ByteString)
+> pTranslationTopTemplate :: Parser (Maybe Text)
 > pTranslationTopTemplate = pTransTop <|> pCheckTransTop
 >
 > pTransTop = do
@@ -155,13 +169,13 @@ chained procedures, which of course occur from right to left:
     multiple kinds of translations for the same language, for example.
     `extractTopLevel` turns these items into a flat list.
 
-  - `extractTopLevel` gave us a list of AnnotatedStrings. We want just their
+  - `extractTopLevel` gave us a list of AnnotatedTexts. We want just their
     annotations, representing everything we want to know about the
-    translations, in one big list. So we `A.concat` all the AnnotatedStrings
+    translations, in one big list. So we `A.concat` all the AnnotatedTexts
     together, and then take the combined list of annotations from that.
 
 > pTranslationItem :: Parser [Annotation]
-> pTranslationItem = A.annotations <$> A.concat <$> extractTopLevel <$> listItem enTemplates "*"
+> pTranslationItem = getAnnotations <$> mconcat <$> extractTopLevel <$> listItem enTemplates "*"
 >
 > pTranslationBlankLine :: Parser [Annotation]
 > pTranslationBlankLine = newLine >> return []
@@ -170,13 +184,13 @@ chained procedures, which of course occur from right to left:
 Relation sections
 -----------------
 
-> enParseRelation :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
-> enParseRelation rel thisTerm text = parseOrDefault [] (pRelationSection rel thisTerm) text
+> parseRelation :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseRelation rel thisTerm text = parseOrDefault [] (pRelationSection rel thisTerm) text
 >
-> pRelationSection :: ByteString -> WiktionaryTerm -> Parser [WiktionaryRel]
+> pRelationSection :: Text -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pRelationSection rel thisTerm = map (assignRel rel)
 >                                 <$> concat
->                                 <$> map (entryToRels "en" thisTerm)
+>                                 <$> map (entryToFacts "en" thisTerm)
 >                                 <$> extractTextLines
 >                                 <$> bulletList enTemplates "*"
 
@@ -191,8 +205,8 @@ We skip entries in the sub-lists called 'Symbols and characters', 'Han
 characters and language-specific varieties', and 'Lojban-specific parts of
 speech'.
 
-> partsOfSpeech :: [ByteString]
-> partsOfSpeech = [
+> partsOfSpeech :: HashSet Text
+> partsOfSpeech = setFromList [
 >   "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
 >   "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
 >   "Interjection", "Noun", "Numeral", "Participle", "Particle",
@@ -202,24 +216,27 @@ speech'.
 >   "Symbol"
 >   ]
 >
-> enFindPartOfSpeech :: [ByteString] -> Maybe ByteString
-> enFindPartOfSpeech = findHeading partsOfSpeech
+> findPartOfSpeech :: [Text] -> Maybe Text
+> findPartOfSpeech = findHeading partsOfSpeech
 >
-> enFindEtymologyNumber :: [ByteString] -> ByteString
-> enFindEtymologyNumber headings =
+> findEtymologyNumber :: [Text] -> Text
+> findEtymologyNumber headings =
 >   case findPrefixedHeading "Etymology " headings of
 >     Just x -> x
 >     Nothing -> "1"
 
 Generalizing the type of a heading:
 
-> enGetSectionType :: ByteString -> ByteString
-> enGetSectionType heading =
->   if elem heading partsOfSpeech
->     then "POS"
->     else if Char8.isPrefixOf "Etymology " heading
->       then "Etymology"
->       else heading
+> getSectionType :: [Text] -> Text
+> getSectionType headings =
+>   case (lastMay headings) of
+>     Nothing -> "Language"
+>     Just heading ->
+>       if elem heading partsOfSpeech
+>         then "POS"
+>         else if isPrefixOf "Etymology " heading
+>           then "Etymology"
+>           else heading
 
 
 Evaluating templates
@@ -236,8 +253,8 @@ The following labels are basically just part of the syntax of an entry, and
 we'd like to skip them. We also include the empty string here, corresponding
 to template arguments that aren't there.
 
-> ignoredLabels :: [ByteString]
-> ignoredLabels = [
+> syntacticLabels :: HashSet Text
+> syntacticLabels = setFromList [
 >   "", "and", "&", "or", "_", "now", "except", "except in", "outside",
 >   "especially", "chiefly", "mainly", "mostly", "particularly", "primarily",
 >   "excluding", "extremely", "frequently", "including", "literally",
@@ -248,8 +265,8 @@ to template arguments that aren't there.
 These labels provide grammatical (not semantic) information. We'll keep them
 separate in case we ever want to output them:
 
-> grammarLabels :: [ByteString]
-> grammarLabels = [ "abbreviation", "acronym", "active", "active voice",
+> grammarLabels :: HashSet Text
+> grammarLabels = setFromList [ "abbreviation", "acronym", "active", "active voice",
 >   "in the active", "ambitransitive", "archaic-verb-form", "attributive",
 >   "attributively", "auxiliary", "by ellipsis", "by extension", "causative",
 >   "collectively", "comparable", "copulative", "copular", "countable",
@@ -266,22 +283,27 @@ separate in case we ever want to output them:
 >   "no plural", "transitive", "uncountable", "usually plural",
 >   "usually in the plural", "usually in plural", "mass noun", "a mass noun"]
 
-> handleLabelTemplate :: Template -> AnnotatedString
+Combine these together into a set of all labels we want to ignore.
+
+> ignoredLabels :: HashSet Text
+> ignoredLabels = syntacticLabels <> grammarLabels
+
+> handleLabelTemplate :: Template -> AnnotatedText
 > handleLabelTemplate template =
->   let {
->     entries     = map (\arg -> get arg template) ["2", "3", "4", "5"];
->     goodEntries = filter (\val -> not (elem val ignoredLabels || elem val grammarLabels)) entries;
->     annotations = map enLabelAnnotation goodEntries
->   } in A.annotate annotations ""
+>   let entries     = map (\arg -> get arg template) ["2", "3", "4", "5"]
+>       goodEntries = filter (\val -> not (elem val ignoredLabels)) entries
+>       annotations = map labelToAnnotation goodEntries
+>   in annotate annotations (asText "")
 >
-> enLabelAnnotation :: ByteString -> Annotation
-> enLabelAnnotation label = [("rel", "context"), ("language", "en"), ("page", label)]
+> labelToAnnotation :: Text -> Annotation
+> labelToAnnotation label = mapFromList [("rel", "context"), ("language", "en"), ("page", label)]
 
 Qualifiers are similar to labels, but take just a single argument.
 
+> handleQualifierTemplate :: Template -> AnnotatedText
 > handleQualifierTemplate template =
->   let label = get "1" template
->   in  A.annotate [enLabelAnnotation label] ""
+>   let label = get "1" template in
+>     annotate [labelToAnnotation label] ""
 
 Sense IDs
 ---------
@@ -292,124 +314,111 @@ information, mapping the sense number to the sense.
 We'll make a "senseID" annotation that we pass on to the definition parser in
 Wiktionary.Base.
 
-> handleSenseIDTemplate :: Template -> AnnotatedString
-> handleSenseIDTemplate template = A.annotate [[("senseID", get "2" template)]] ""
+> handleSenseIDTemplate :: Template -> AnnotatedText
+> handleSenseIDTemplate template = singleAnnotation "senseID" (get "2" template)
 >
-> handleSenseTemplate :: Template -> AnnotatedString
-> handleSenseTemplate template = A.annotate [[("senseID", get "1" template)]] ""
+> handleSenseTemplate :: Template -> AnnotatedText
+> handleSenseTemplate template = singleAnnotation "senseID" (get "1" template)
 
 
 Links
 -----
 
-> handleLinkTemplate :: Template -> AnnotatedString
-> handleLinkTemplate template =
->   let text  = (getOne ["3", "2"] template)
->       annot = filterEmpty $
->         [("language", (get "1" template)),
->          ("page", (get "2" template)),
->          ("gloss", (getOne ["4", "gloss"] template)),
->          ("pos", (get "pos" template))]
->   in (A.annotate [annot] text)
-
+> handleLinkTemplate :: Template -> AnnotatedText
+> handleLinkTemplate t = buildA $ do
+>   adapt "language" arg1 t
+>   adapt "page" arg2 t
+>   adapt "gloss" ["4", "gloss"] t
+>   adapt "pos" ["pos"] t
+>   visible ["3", "2"] t
 
 Translations
 ------------
 
-> handleTranslationTemplate :: Template -> AnnotatedString
-> handleTranslationTemplate template =
->   let annot = [("rel", "translation"),
->                ("language", (get "1" template)),
->                ("page", (get "2" template))]
->       text  = getOne ["alt", "2"] template
->   in A.annotate [annot] text
+> handleTranslationTemplate :: Template -> AnnotatedText
+> handleTranslationTemplate t = buildA $ do
+>   put "rel" "translation"
+>   adapt "language" arg1 t
+>   adapt "page" arg2 t
+>   visible ["alt", "2"] t
 
 
 Form-of templates
 -----------------
 
-> pageName :: ByteString -> ByteString
-> pageName name = fst (splitFirst "#" name)
-
-> handleAbstractFormTemplate :: Template -> AnnotatedString
-> handleAbstractFormTemplate template =
->   let annot = filterEmpty $
->         [("rel", Char8.append "form/" (get "1" template)),
->          ("language", (get "lang" template)),
->          ("page", pageName (get "2" template)),
->          ("form", (get "1" template))]
->   in A.annotate [annot] ""
+> handleAbstractFormTemplate :: Template -> AnnotatedText
+> handleAbstractFormTemplate t = buildA $ do
+>   put "rel" ("form/" <> (get "1" t))
+>   adapt "form" arg1 t
+>   adapt "page" arg2 t
+>   adapt "language" ["lang"] t
+>   invisible
 >
-> handleFormTemplate :: ByteString -> Template -> AnnotatedString
-> handleFormTemplate form template =
->   let annot = filterEmpty $
->         [("rel", Char8.append "form/" form),
->          ("language", (get "lang" template)),
->          ("page", pageName (get "1" template)),
->          ("form", form)]
->   in A.annotate [annot] ""
+> handleFormTemplate :: Text -> Template -> AnnotatedText
+> handleFormTemplate form t = buildA $ do
+>   put "rel" ("form/" <> form)
+>   put "form" form
+>   adapt "page" arg1 t
+>   adapt "language" ["lang"] t
+>   invisible
 >
-> handleInflectionTemplate :: Template -> AnnotatedString
-> handleInflectionTemplate template =
->   let forms = filter (/= "") [get n template | n <- ["3","4","5","6","7","8","9"]]
->       formStr = Char8.intercalate "+" forms
->       annot = filterEmpty $
->         [("rel", Char8.append "form/" formStr),
->          ("language", (get "lang" template)),
->          ("page", pageName (get "1" template))]
->   in A.annotate [annot] ""
+> handleInflectionTemplate :: Template -> AnnotatedText
+> handleInflectionTemplate t =
+>   let forms = getAll ["3","4","5","6","7","8","9"] t
+>       formStr = intercalate "+" forms
+>   in buildA $ do
+>       put "rel" ("form/" <> formStr)
+>       adapt "language" ["lang"] t
+>       adapt "page" arg1 t
+>       invisible
 >
-> handleSpecificFormsTemplate :: Language -> [ByteString] -> Template -> AnnotatedString
-> handleSpecificFormsTemplate language forms template =
->   let annotations = [[("rel", Char8.append "form/" form),
->                       ("language", language),
->                       ("page", pageName (get "1" template))] | form <- forms]
->   in A.annotate annotations ""
+> handleSpecificFormsTemplate :: Language -> [Text] -> Template -> AnnotatedText
+> handleSpecificFormsTemplate language forms t =
+>   let annotations = [annotationFromList 
+>                       [("rel", "form/" <> form),
+>                        ("language", fromLanguage language),
+>                        ("page", pageName (get "1" t))] | form <- forms]
+>   in annotate annotations ""
 >
-> handleSpanishVerbTemplate :: Template -> AnnotatedString
-> handleSpanishVerbTemplate template =
->   let forms = filter (/= "") [getOne keys template | keys <-
->                                [["pers", "person"],
->                                 ["num", "number"],
->                                 ["tense"],
->                                 ["mood"],
->                                 ["gen", "gender"]]]
->       formal = case (get "formal" template) of
+> handleSpanishVerbTemplate :: Template -> AnnotatedText
+> handleSpanishVerbTemplate t =
+>   let forms = getAll ["pers", "person", "num", "number", "tense", "mood", "gen", "gender"] t
+>       formal = case (get "formal" t) of
 >                  "y"   -> ["formal"]
 >                  "yes" -> ["formal"]
 >                  "n"   -> ["informal"]
 >                  "no"  -> ["informal"]
 >                  _     -> []
->       formStr = Char8.intercalate "+" (formal ++ forms)
->       annot =
->         [("rel", Char8.append "form/" formStr),
->          ("language", "es"),
->          ("page", pageName (getOne ["1", "inf", "verb", "infinitive"] template))]
->   in A.annotate [annot] ""
+>       formStr = intercalate "+" (formal <> forms)
+>   in buildA $ do
+>       put "rel" ("form/" <> formStr)
+>       put "language" "es"
+>       adapt "page" ["1", "inf", "verb", "infinitive"] t
+>       invisible
 >
-> handleSpanishCompoundTemplate template =
->   let forms = filter (/= "") [get key template | key <- ["mood", "person"]]
->       formStr = Char8.intercalate "+" ("compound":forms)
->       annot =
->         [("rel", Char8.append "form/" formStr),
->          ("language", "es"),
->          ("page", pageName (getOne ["3", "1"] template))]
->   in A.annotate [annot] ""
+> handleSpanishCompoundTemplate t =
+>   let forms = getAll ["mood", "person"] t
+>       formStr = intercalate "+" ("compound":forms)
+>   in buildA $ do
+>       put "rel" ("form/" <> formStr)
+>       put "language" "es"
+>       adapt "page" ["3", "1"] t
+>       invisible
 
 There are many templates named "xx-verb form of", and they tend to work in
 similar ways: several arguments to the template are symbols for various kinds
 of inflections, and we just want to join these symbols together. We just need
 to know which language it is, and which template arguments to look up.
 
-> handleLanguageFormTemplate :: Language -> [ByteString] -> Template -> AnnotatedString
-> handleLanguageFormTemplate language formKeys template =
->   let forms = filter (/= "") [get key template | key <- formKeys]
->       formStr = Char8.intercalate "+" forms
->       annot =
->         [("rel", Char8.append "form/" formStr),
->          ("language", language),
->          ("page", pageName (get "1" template))]
->   in A.annotate [annot] ""
+> handleLanguageFormTemplate :: Language -> [Text] -> Template -> AnnotatedText
+> handleLanguageFormTemplate language formKeys t =
+>   let forms = getAll formKeys t
+>       formStr = intercalate "+" forms
+>   in buildA $ do
+>     put "rel" ("form/" <> formStr)
+>     put "language" (fromLanguage language)
+>     adapt "page" arg1 t
+>     invisible
 
 We need to handle:
 

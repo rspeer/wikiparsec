@@ -26,22 +26,23 @@ kind of parsing, and found that they amounted to:
   pretending to be Haskell
 - Awful spaghetti hacks
 
-There are already Wikitext parsers that are awful spaghetti hacks, and I can't build
-on those. (The reference implementation -- MediaWiki itself -- would be a great example.)
-So the next best choice is Haskell.
+There are already Wikitext parsers that are awful spaghetti hacks, and I can't
+build on those. (The reference implementation -- MediaWiki itself -- would be a
+great example, but so are the various Java-based parsers I've seen.) So the
+next best choice is Haskell.
 
 If you're a Haskell programmer reading this, I hope you appreciate the code,
 but you might find the documentation a bit hand-holdy. You're not quite the
 audience of the documentation. I'm writing it more for other people I work with
 who may end up wanting to look at the code. People who are probably familiar
 with functional programming in general, but not the specific details of
-Haskell. Given that I found myself unexpectedly using Haskell, I want to
-overcome its reputation and make it comprehensible.
+Haskell. Given that I found myself using Haskell, I want to overcome its
+reputation and make it comprehensible.
 
 And if nobody else, another audience I'm writing for is my future self. I can
 imagine a year from now, coming back to this code, saying "what the hell was I
-thinking with all these monoids", and wanting to start over, unless I write
-some documentation that explains what I was thinking.
+thinking with all these monads", and wanting to start over, unless I write some
+documentation that explains what I was thinking.
 
 Monads and monoids, oversimplified
 ----------------------------------
@@ -51,11 +52,11 @@ the category of endofunctors, what's the problem?"
 
 [classic joke]: http://james-iry.blogspot.com/2009/05/brief-incomplete-and-mostly-wrong.html
 
-It's funny because it's true. Mathematically true, apparently. And it's also
-true that Haskell works best when you embrace its poorly-named mathematical
-abstractions, and monads and monoids are the ones that are going to come up in
-this code. But in actual Haskell code, the full generality of the mathematical
-abstraction usually doesn't matter; it's all about how you use it.
+It's funny because it's true. Haskell works best when you embrace its
+poorly-named mathematical abstractions, and monads and monoids are the ones
+that are going to come up in this code. But in actual Haskell code, the full
+generality of the mathematical abstraction usually doesn't matter; it's all
+about how you use it.
 
 So let's oversimplify what these things are, the way we oversimplify other
 mathematical concepts like "matrix" when programming.
@@ -70,17 +71,14 @@ concatenation.
 
 (A mathematician might say I'm overlooking some monoids that are a big deal,
 like addition of integers. But in Haskell code, you wouldn't *use* a monoid to
-add integers. You'd use good old `+` for that. So monoids are for things you
-need to concatenate.)
+add integers. You'd use good old `+` for that. Monoids are for things you need
+to concatenate.)
 
 When I'm willing to call all these sequencey things Monoids, then instead of
 having to use awkwardly-namespaced functions for dealing with all these types
 separately (like `T.append` for text, versus `BS.append` for bytestrings), I
 can use `mappend` to append whatever monoidy things I have, and `mempty` to
 get an empty one.
-
-At one point I tried to call them `Joinable` instead of `Monoid`, and the
-compiler fought back against this heresy, so `Monoid` it is.
 
 By the way, Haskell programmers show their apprecation for functions they find
 really important by giving them infix operators. So `mappend list1 list2` is
@@ -90,9 +88,10 @@ Monads are stateful things you can do
 -------------------------------------
 
 A **monad** is a way to do stateful things in sequence. The advantage of using
-a monad is that it keeps track of the state for you. Without monads, you might
-have to write functions that take in `(actualInput, state)` and return
-`(actualOutput, newState)`, which would be repetitive and error-prone.
+a monad is that it keeps track of the state for you while you just return a
+result. Without monads, you might have to write functions that take in
+`(actualInput, state)` and return `(actualOutput, newState)`, which would be
+repetitive and error-prone.
 
 In Haskell, doing any sort of I/O requires an IO monad: your code is changing
 the state of what it's read from and written to the rest of the system.
@@ -114,7 +113,7 @@ parses some input and then returns some Text.
 This looks like Markdown, where's the Haskell?
 ----------------------------------------------
 
-One thing I do love about Haskell is the Literate Haskell (`.lhs`) format. The
+One thing I love about Haskell is the Literate Haskell (`.lhs`) format. The
 Haskell compiler can interpret it without any pre-processing, and it encourages
 documentation as the rule and code as the exception.
 
@@ -138,8 +137,10 @@ Here's what we're exporting from the module:
 >   module ClassyPrelude,
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
+>   module Control.Monad.Writer,
 >   replace, splitOn, stripSpaces,
->   get, getPrioritized
+>   get, getAll, getPrioritized, put,
+>   println
 >   ) where
 
 Some of these exports are just re-exporting things we can import:
@@ -147,6 +148,7 @@ Some of these exports are just re-exporting things we can import:
 > import ClassyPrelude
 > import Data.String.Conversions hiding ((<>))
 > import Data.LanguageType
+> import Control.Monad.Writer (Writer, writer, pass, runWriter, execWriter)
 > import qualified Data.Text as T
 
 Text operations
@@ -165,6 +167,10 @@ end of a string:
 > stripSpaces = reverse . stripSpacesFront . reverse . stripSpacesFront
 > stripSpacesFront = dropWhile (== ' ')
 
+Writing any sort of text to stdout:
+
+> println :: (IOData a) => a -> IO ()
+> println = hPutStrLn stdout
 
 Mapping operations
 ------------------
@@ -185,4 +191,12 @@ in priority order. It returns the empty value only if it finds none of them.
 > getPrioritized :: (IsMap map, Monoid (MapValue map)) => [ContainerKey map] -> map -> MapValue map
 > getPrioritized (key:rest) map = findWithDefault (getPrioritized rest map) key map
 > getPrioritized [] map         = mempty
+
+> getAll :: (IsMap m, Monoid (MapValue m)) => [ContainerKey m] -> m -> [MapValue m]
+> getAll keys m = catMaybes (map (\key -> lookup key m) keys)
+
+Building a map with monad syntax:
+
+> put :: (IsMap map) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
+> put key value = writer (value, singletonMap key value)
 

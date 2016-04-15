@@ -32,6 +32,14 @@ redecoded = (decode (encode fact1)) :: Maybe Value
 atLiteral :: AnnotatedText
 atLiteral = "literal"
 
+annoWriter = writeA $ do
+  put "1" "one"
+  put "2" "two"
+  return "test"
+
+annoWriter2 = writeA $ do
+  return "literal"
+
 tests = test [
     "show term" ~: (show termRussian) ~?= "{\"text\":\"остынуть\",\"language\":\"ru\"}",
     "replace relation" ~: assignRel "distrusts" fact1 ~?= WiktionaryFact "distrusts" termRussian termEnglish,
@@ -53,7 +61,8 @@ tests = test [
 
     "find prefixed heading 1" ~: findPrefixedHeading "Etymology" ["top", "English"] ~?= Nothing,
     "find prefixed heading 2" ~: findPrefixedHeading "Etymology" ["top", "English", "Etymology"] ~?= Just "",
-    "find prefixed heading 3" ~: findPrefixedHeading "Etymology" ["top", "English", "Etymology 1", "Noun"] ~?= Just " 1"
+    "find prefixed heading 3" ~: findPrefixedHeading "Etymology" ["top", "English", "Etymology 1", "Noun"] ~?= Just " 1",
+    "annotated text from writer" ~: annoWriter ~?= annotate [annotationFromList [("1","one"),("2","two")]] "test"
     ]
 
 main :: IO ()

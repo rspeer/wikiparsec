@@ -7,7 +7,9 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import WikiPrelude hiding (takeWhile)
 > import Text.MediaWiki.WikiText
 > import Text.MediaWiki.ParseTools
+> import Text.MediaWiki.SplitUtils
 > import Text.MediaWiki.AnnotatedText
+> import Text.MediaWiki.Templates
 > import Data.Attoparsec.Text
 > import Data.Attoparsec.Combinator
 > import Data.Aeson (ToJSON, toJSON, (.=), encode, object)
@@ -63,6 +65,12 @@ JSON representation as the string representation of a WiktionaryTerm.
 >   wtText=(normalizeText language text),
 >   wtLanguage=Just language, wtSense=Nothing, wtPos=Nothing, wtEtym=Nothing
 >   }
+>
+> termPos :: Language -> Text -> Text -> WiktionaryTerm
+> termPos language text pos = (simpleTerm language text) {wtPos=Just pos}
+> 
+> termSense :: Language -> Text -> Text -> Text -> WiktionaryTerm
+> termSense language text pos sense = (simpleTerm language text) {wtPos=Just pos, wtSense=Just sense}
 
 A WiktionaryFact expresses a relationship between terms that we can extract
 from a page.
@@ -105,12 +113,15 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 > annotationToTerm thisLang annot =
 >   let maybeLanguage = (annotationLanguage thisLang annot) in
 >     WiktionaryTerm {
->       wtText=(normalizeText (fromMaybe "und" maybeLanguage) (get "page" annot)),
+>       wtText=(normalizeText (fromMaybe "und" maybeLanguage) (pageName (get "page" annot))),
 >       wtLanguage=maybeLanguage,
 >       wtPos=(lookup "pos" annot),
 >       wtSense=(lookup "sense" annot),
 >       wtEtym=(lookup "etym" annot)
 >     }
+>
+> pageName :: Text -> Text
+> pageName name = fst (splitFirst "#" name)
 >
 > annotationLanguage :: Language -> Annotation -> Maybe Language
 > annotationLanguage thisLang annot =
@@ -232,8 +243,10 @@ Parsing the language of definitions
 Looking up sections
 -------------------
 
-> findHeading :: [Text] -> [Text] -> Maybe Text
-> findHeading choices headings = headMay (intersectLists choices headings)
+> findHeading :: HashSet Text -> [Text] -> Maybe Text
+> findHeading choices headings =
+>   let filtered = filter (\x -> elem x choices) headings
+>   in headMay filtered
 >
 > findPrefixedHeading :: Text -> [Text] -> Maybe Text
 > findPrefixedHeading prefix headings =
@@ -244,3 +257,33 @@ Looking up sections
 > intersectLists :: (Eq a) => [a] -> [a] -> [a]
 > intersectLists list1 list2 = filter (\x -> elem x list1) list2
 
+
+Transforming templates
+----------------------
+
+Many of the template functions we define will involve converting a Template
+value into an AnnotatedText. To get some convenient `do` syntax for this, we
+use `put`, a function defined in `WikiPrelude` that uses a Writer monad.
+
+Repeatedly running `put` will build up a Map, and in the end it returns a
+value. Here, the value it returns will be the Text, and the Map will become
+an Annotation on that text.
+
+> buildA :: Writer Annotation Text -> AnnotatedText
+> buildA m =
+>   let (text, anno) = runWriter m in
+>     annotate [anno] text
+>
+> adapt :: Text -> [Text] -> Template -> Writer Annotation Text
+> adapt keyTarget keySources = (put keyTarget) . (getPrioritized keySources)
+>
+> visible :: [Text] -> Template -> Writer Annotation Text
+> visible keySources = return . (getPrioritized keySources)
+>
+> invisible :: Writer Annotation Text
+> invisible = return ""
+>
+> arg1, arg2, arg3 :: [Text]
+> arg1 = ["1"]
+> arg2 = ["2"]
+> arg3 = ["3"]

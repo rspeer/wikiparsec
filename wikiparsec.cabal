@@ -19,6 +19,7 @@ Library
   exposed-modules:     Text.MediaWiki.SplitUtils, Text.Language.Normalize,
                        Text.MediaWiki.AnnotatedText, Text.MediaWiki.Templates,
                        Text.MediaWiki.WikiText, Text.MediaWiki.HTML,
+                       Text.MediaWiki.Wiktionary.Base,
                        Data.LanguageNames, Data.LanguageType,
                        WikiPrelude
   other-modules:       Data.LanguageNamesData
@@ -33,6 +34,7 @@ Library
                        text, bytestring, containers,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
+                       mtl,
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
@@ -53,6 +55,7 @@ Executable wiki2text
                        text, bytestring, containers,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
+                       mtl,
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
