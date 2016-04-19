@@ -197,6 +197,9 @@ in priority order. It returns the empty value only if it finds none of them.
 
 Building a map with monad syntax:
 
-> put :: (IsMap map) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
-> put key value = writer (value, singletonMap key value)
+> put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
+> put key value =
+>   if (value == mempty)
+>     then writer (value, mempty)
+>     else writer (value, singletonMap key value)
 
