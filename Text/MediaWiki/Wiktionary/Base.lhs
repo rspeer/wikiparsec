@@ -88,13 +88,15 @@ JSON representation as the string representation of a WiktionaryTerm.
 > moveSecondMaybe (first, Nothing)     = Nothing
 >
 > term :: [Text] -> WiktionaryTerm
-> term items = WiktionaryTerm {
->   wtText = fromMaybe (error "term is empty") (index items 0),
->   wtLanguage = toLanguage <$> (index items 1),
->   wtPos = nonEmpty (index items 2),
->   wtEtym = nonEmpty (index items 3),
->   wtSense = nonEmpty (index items 4)
->   }
+> term items =
+>   let language = toLanguage (fromMaybe "und" (index items 1)) in
+>     WiktionaryTerm {
+>       wtText = normalizeText language (fromMaybe (error "term is empty") (index items 0)),
+>       wtLanguage = toLanguage <$> (index items 1),
+>       wtPos = nonEmpty (index items 2),
+>       wtEtym = nonEmpty (index items 3),
+>       wtSense = nonEmpty (index items 4)
+>       }
 >
 > simpleTerm :: Language -> Text -> WiktionaryTerm
 > simpleTerm language text = term [text, fromLanguage language]

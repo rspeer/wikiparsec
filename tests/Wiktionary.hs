@@ -41,7 +41,7 @@ annoWriter2 = buildA $ do
   return "literal"
 
 tests = test [
-    "show term" ~: (show termRussian) ~?= "{\"text\":\"остынуть\",\"language\":\"ru\"}",
+    "show term" ~: (show termRussian) ~?= "(term [\"остынуть\",\"ru\"])",
     "replace relation" ~: assignRel "distrusts" fact1 ~?= WiktionaryFact "distrusts" termRussian termEnglish,
     "JSON decodes properly" ~: assert (isJust redecoded),
     "JSON fact matches" ~: decode (encode fact1) ~?= factJSONValue,
