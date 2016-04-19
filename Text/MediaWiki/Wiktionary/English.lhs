@@ -7,6 +7,7 @@
 > import Text.MediaWiki.ParseTools
 > import Text.MediaWiki.Sections
 > import Text.MediaWiki.WikiText
+> import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 > import Text.MediaWiki.Wiktionary.Base
 > import qualified Data.Aeson as Ae
 > import Data.Attoparsec.Text
@@ -23,8 +24,9 @@ Parsing sections
 >
 > enHandleFile :: Text -> FilePath -> IO ()
 > enHandleFile title filename = do
->   contents <- (readFile filename) :: IO Text
->   mapM_ (println . Ae.encode) (enHandlePage title contents)
+>   contents <- (readFile filename) :: IO ByteString
+>   let fromHTML = extractWikiTextFromHTML contents
+>   mapM_ (println . Ae.encode) (enHandlePage title fromHTML)
 
 
 Choosing an appropriate section parser
@@ -374,7 +376,7 @@ Form-of templates
 >
 > handleSpecificFormsTemplate :: Language -> [Text] -> Template -> AnnotatedText
 > handleSpecificFormsTemplate language forms t =
->   let annotations = [annotationFromList 
+>   let annotations = [annotationFromList
 >                       [("rel", "form/" <> form),
 >                        ("language", fromLanguage language),
 >                        ("page", pageName (get "1" t))] | form <- forms]
