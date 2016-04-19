@@ -1,128 +1,181 @@
 > {-# LANGUAGE OverloadedStrings #-}
-> module Text.MediaWiki.Wiktionary.French where
+
+Export only the top-level, namespaced functions.
+
+> module Text.MediaWiki.Wiktionary.French
+>   (frParseWiktionary, frParseDefinition, frTemplates) where
+> import WikiPrelude
 > import Text.MediaWiki.Templates
-> import qualified Text.MediaWiki.AnnotatedString as A
-> import Text.MediaWiki.AList (get, filterEmpty, lookupOne, getOne, getDefault, ByteAssoc)
-> import Text.MediaWiki.AnnotatedString (AnnotatedString, Annotation)
+> import Text.MediaWiki.AnnotatedText
 > import Text.MediaWiki.SplitUtils
 > import Text.MediaWiki.ParseTools
-> import Text.MediaWiki.WikiText
 > import Text.MediaWiki.Sections
+> import Text.MediaWiki.WikiText
 > import Text.MediaWiki.Wiktionary.Base
-> import Data.ByteString (ByteString)
-> import qualified Data.ByteString.Char8 as Char8
-> import qualified Data.ByteString.Lazy.Char8 as LChar8
-> import qualified Data.Aeson as Ae
-> import Data.Attoparsec.ByteString.Char8
+> import Data.Attoparsec.Text
 > import Data.LanguageNames
-> import Control.Applicative ((<|>), (<$>), (*>), (<*))
-> import Control.Monad
+
+
+Parsing entire pages
+====================
+
+This function can be passed as an argument to `handleFile` in
+Text.MediaWiki.Wiktionary.Base.
+
+> frParseWiktionary :: Text -> Text -> [WiktionaryFact]
+> frParseWiktionary title text =
+>   let sections = parsePageIntoSections text in
+>     concat (map (frParseSection title) sections)
+
+
+Finding headings
+================
+
+Unlike the English Wiktionary, the French Wiktionary frequently uses templates
+within headings. `evalHeading` will read a heading as WikiText, returning an
+AnnotatedText object.
+
+> evalHeading :: Text -> AnnotatedText
+> evalHeading heading =
+>   case parseOnly (annotatedWikiText frTemplates) heading of
+>     Left err      -> error err
+>     Right atext   -> atext
+
+The section type is whatever text was returned when we parsed the section
+template. (See the Templates section.)
+
+> getSectionType :: [AnnotatedText] -> Text
+> getSectionType headings =
+>   case lastMay headings of
+>     Nothing -> error "Empty list of headings"
+>     Just thisHead -> getText thisHead
+
+The `partOfSpeechMap` maps French terms for parts of speech (as they appear in
+templates) to the simple set of POS symbols used in WordNet or ConceptNet.
+
+> partOfSpeechMap :: Text -> Text
+> partOfSpeechMap pos
+>   | isPrefixOf "adj" pos = "a"
+>   | isPrefixOf "adv" pos = "r"
+>   | isPrefixOf "nom" pos = "n"
+>   | isPrefixOf "pronom" pos = "n"
+>   | isPrefixOf "verb" pos = "v"
+>   | otherwise = "_"
+
+Figure out what term we're talking about from the values of the templates
+in the section headings:
+
+> getTerm :: Text -> [AnnotatedText] -> Maybe WiktionaryTerm
+> getTerm title headingValues =
+>   if (length headingValues) < 3 || getTextInList 2 headingValues /= Just "POS"
+>     then Nothing
+>     else
+>       let language = getTextInList 1 headingValues
+>           pos      = getAnnotationInList 2 "pos" headingValues
+>           etym     = getAnnotationInList 2 "etym" headingValues
+>       in Just (term [title, language, pos, etym, sense])
+>
+> getTextInList :: Int -> [AnnotatedText] -> Maybe Text
+> getTextInList idx atexts = getText <$> index atexts idx
+>
+> getAnnotationInList :: Int -> Text -> [AnnotatedText] -> Maybe Text
+> getAnnotationInList idx key atexts =
+>   -- use the Maybe monad to return Nothing for any missing index
+>   index atexts idx >>= \atext -> lookup key (mconcat (getAnnotations atext))
+
 
 
 Parsing sections
 ================
 
-> frHandlePage :: ByteString -> ByteString -> [WiktionaryRel]
-> frHandlePage title text =
->   let sections = parsePageIntoSections text in
->     concat (map (frDispatchSection title) sections)
->
-> frHandleFile :: String -> String -> IO ()
-> frHandleFile title filename = do
->   contents <- Char8.readFile filename
->   mapM_ (LChar8.putStrLn . Ae.encode) (frHandlePage (Char8.pack title) contents)
-
 Choosing an appropriate section parser
 --------------------------------------
 
-> fakeRel :: ByteString -> ByteString -> WiktionaryRel
-> fakeRel s1 s2 = makeRel "debug" (simpleTerm "fr" s1) (simpleTerm "fr" s2)
->
-> frDispatchSection :: ByteString -> WikiSection -> [WiktionaryRel]
-> frDispatchSection title (WikiSection {headings=headings, content=content}) =
+`frParseSection` takes in a title and a WikiSection structure, builds
+a WiktionaryTerm structure for the term we're defining, and passes it on to
+a function that will extract WiktionaryFacts.
+
+> frParseSection :: Text -> WikiSection -> [WiktionaryFact]
+> frParseSection title (WikiSection {headings=headings, content=content}) =
 >   let evalHeadings = map evalHeading headings in
->     case frGetTerm title evalHeadings of
+>     case getTerm title evalHeadings of
 >       Nothing   -> []
 >       Just term ->
->         let sectionType = frGetSectionType evalHeadings in
->           frParseSectionContent sectionType term content
+>         let sectionType = getSectionType evalHeadings in
+>           chooseSectionParser sectionType term content
 >
-> frParseSectionContent :: ByteString -> WiktionaryTerm -> ByteString -> [WiktionaryRel]
-> frParseSectionContent label
->   | label == "POS"                = frParseDefinition
->   | label == "traductions"        = frParseTranslations
->   | label == "synonymes"          = frParseRelation "synonym"
->   | label == "quasi-synonymes"    = frParseRelation "quasi-synonym"
->   | label == "antonymes"          = frParseRelation "antonym"
->   | label == "hyponymes"          = frParseRelation "hyponym"
->   | label == "hyperonymes"        = frParseRelation "hypernym"
->   | label == (utf8 "méronymes")   = frParseRelation "meronym"
->   | label == "holonymes"          = frParseRelation "holonym"
->   | label == "troponymes"         = frParseRelation "troponym"
->   | label == "augmentatifs"       = frParseRelation "augmentative"
->   | label == "diminutifs"         = frParseRelation "diminutive"
->   | label == (utf8 "apparentés")  = frParseRelation "related"
->   | label == (utf8 "dérivés")     = frParseRelation "derived"
->   | label == (utf8 "dérivés autres langues") = frParseRelation "derived"
->   | label == "drv-int"            = frParseRelation "derived"
->   | label == "variantes"          = frParseRelation "variant"
->   | label == "variantes orthographiques" = frParseRelation "variant"
->   | label == "var-ortho"          = frParseRelation "variant"
->   | otherwise                     = const (const [])
+> chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> chooseSectionParser "POS"             = frParseDefinition
+> chooseSectionParser "traductions"     = parseTranslations
+> chooseSectionParser "synonymes"       = parseRelation "synonym"
+> chooseSectionParser "quasi-synonymes" = parseRelation "quasi-synonym"
+> chooseSectionParser "antonymes"       = parseRelation "antonym"
+> chooseSectionParser "hyponymes"       = parseRelation "hyponym"
+> chooseSectionParser "hyperonymes"     = parseRelation "hypernym"
+> chooseSectionParser "méronymes"       = parseRelation "meronym"
+> chooseSectionParser "holonymes"       = parseRelation "holonym"
+> chooseSectionParser "troponymes"      = parseRelation "troponym"
+> chooseSectionParser "augmentatifs"    = parseRelation "augmentative"
+> chooseSectionParser "diminutifs"      = parseRelation "diminutive"
+> chooseSectionParser "apparentés"      = parseRelation "related"
+> chooseSectionParser "derivés"         = parseRelation "derived"
+> chooseSectionParser "derivés autres langues" = parseRelation "derived"
+> chooseSectionParser "drv-int"         = parseRelation "derived"
+> chooseSectionParser "variantes"       = parseRelation "variant"
+> chooseSectionParser "variantes orthographiques" = parseRelation "variant"
+> chooseSectionParser "var-ortho"       = parseRelation "variant"
+> chooseSectionParser _                 = const (const [])
 
 
 The part-of-speech/definition section
 -------------------------------------
 
-First, make a specific version of the function that extracts relationships
-from the text of a definition:
-
-> frDefinitionToRels = definitionToRels "fr"
-
 Parsing the definition section:
 
-> frParseDefinition :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
+> frParseDefinition :: WiktionaryTerm -> Text -> [WiktionaryFact]
 > frParseDefinition thisTerm text =
 >   case parseOnly pDefinitionSection text of
 >     Left err   -> []
 >     Right defs -> concat (map (definitionToRels "fr" thisTerm) defs)
 >
-> pDefinitionSection :: Parser [(ByteString, AnnotatedString)]
+> pDefinitionSection :: Parser [LabeledDef]
 > pDefinitionSection =
 >   -- Skip miscellaneous lines at the start of the section: try to parse
 >   -- each line as pDefinitionList, and if that fails, parse one line,
 >   -- throw it out, and parse the rest recursively.
 >   pDefinitionList <|>
 >   (newLine >> pDefinitionSection) <|>
->   (wikiTextLine noTemplates >> newLine >> pDefinitionSection)
+>   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection)
 >
-> pDefinitionList :: Parser [(ByteString, AnnotatedString)]
+> pDefinitionList :: Parser [LabeledDef]
 > pDefinitionList = extractNumberedDefs <$> orderedList frTemplates "#"
+
+FIXME: this sure looks a lot like the English version
 
 
 The translation section
 -----------------------
 
-> frParseTranslations :: WiktionaryTerm -> ByteString -> [WiktionaryRel]
-> frParseTranslations thisTerm text =
+> parseTranslations :: WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseTranslations thisTerm text =
 >   case parseOnly (pTranslationSection thisTerm) text of
 >     Left err -> []
 >     Right val -> val
 >
-> pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryRel]
+> pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationSection thisTerm = concat <$> many1 (pTranslationGroup thisTerm)
 >
-> pTranslationGroup :: WiktionaryTerm -> Parser [WiktionaryRel]
+> pTranslationGroup :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationGroup thisTerm = do
 >   optionalTextChoices [newLine]
 >   maybeSense <- pTransTop
 >   let senseTerm = thisTerm {sense=maybeSense}
 >   items <- pTranslationList
 >   optionalTextChoices [newLine]
->   return (map (annotationToRel "fr" senseTerm) (filter translationsOnly items))
+>   return (map (annotationToFact "fr" senseTerm) (filter translationsOnly items))
 >
 > translationsOnly :: Annotation -> Bool
-> translationsOnly annot = (get "rel" annot) == "translation"
+> translationsOnly annot = lookup "rel" annot == Just "translation"
 
 The `pTranslationTopTemplate` rule parses the template that starts a
 translation section, which may or may not be labeled with a word sense. It
@@ -823,58 +876,6 @@ Other relevant labels from https://fr.wiktionary.org/wiki/Catégorie:Modèles_de
 >   A.singleAnnotation [("rel", "context"), ("language", "fr"), ("page", get "1" template)]
 
 
-Finding headings
-================
-
-> partOfSpeechMap :: ByteString -> ByteString
-> partOfSpeechMap pos
->   | Char8.isPrefixOf "adj" pos = "a"
->   | Char8.isPrefixOf "adv" pos = "r"
->   | Char8.isPrefixOf "nom" pos = "n"
->   | Char8.isPrefixOf "pronom" pos = "n"
->   | Char8.isPrefixOf "verb" pos = "v"
->   | otherwise = "_"
-
-Generalizing the type of a heading:
-
-> frGetSectionType :: [Annotation] -> ByteString
-> frGetSectionType headings =
->   let thisHead    = last headings
->       headingText = get "text" thisHead
->   in if (length headings) == 3
->        then (if headingText == "POS" then "POS" else "?")
->        else headingText
-
-Figure out what term we're talking about from the values of the templates
-in the section headings:
-
-> frGetTerm :: ByteString -> [Annotation] -> Maybe WiktionaryTerm
-> frGetTerm title headingValues =
->   if (length headingValues) < 3 || get "text" (headingValues !! 2) /= "POS"
->     then Nothing
->     else
->       let language = get "text" (headingValues !! 1)
->           pos      = get "pos" (headingValues !! 2)
->           etym     = get "etym" (headingValues !! 2)
->       in Just (WiktionaryTerm { text=title, language=Just language, etym=Just etym, pos=Just pos, sense=Nothing })
-
-Instead of using an AnnotatedString with many possible annotations, we'll
-represent a heading as a single annotation (a single mapping from bytestrings
-to bytestrings). To preserve the information, we add one more key, "text", to
-the annotation.
-
-> evalHeading :: ByteString -> Annotation
-> evalHeading heading =
->   case parseOnly (annotatedWikiText frTemplates) heading of
->     Left err      -> error err
->     Right astring ->
->       let text  = A.unannotate astring
->           annos = A.annotations astring
->           anno  = if annos == [] then [] else (annos !! 0)
->       in ("text", text):anno
->
-
-
 Evaluating templates
 ====================
 
@@ -882,14 +883,13 @@ Section headings
 ----------------
 
 Handle the {{S}} template that starts many sections. If it has a second
-argument, it's probably a part-of-speech template (we'll also check that it
-occurs at the right level of the section hierarchy). Otherwise, it introduces
-a section named for its first argument.
+argument, it's probably a part-of-speech template. Otherwise, it introduces a
+section named for its first argument.
 
-> handleSectionTemplate :: Template -> AnnotatedString
+> handleSectionTemplate :: Template -> AnnotatedText
 > handleSectionTemplate template =
 >   case (lookup "2" template) of
->     Just lang -> A.annotate [[("pos", get "1" template), ("etym", getDefault "1" "num" template)]] "POS"
+>     Just lang -> annotate [annotFromList [("language", lang), ("pos", get "1" template), ("etym", getDefault "1" "num" template)]] "POS"
 >     Nothing   -> A.annotate [] (get "1" template)
 
 Language sections start with a {{langue}} template that usually just contains
