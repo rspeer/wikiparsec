@@ -16,13 +16,16 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 Library
-  exposed-modules:     Text.MediaWiki.SplitUtils, Text.Language.Normalize,
-                       Text.MediaWiki.AnnotatedText, Text.MediaWiki.Templates,
-                       Text.MediaWiki.WikiText, Text.MediaWiki.HTML,
+  exposed-modules:     Text.Language.Normalize,
+                       Text.MediaWiki.WikiText,
                        Text.MediaWiki.Wiktionary.Base,
-                       Data.LanguageNames, Data.LanguageType,
+                       Text.MediaWiki.Wiktionary.English,
                        WikiPrelude
-  other-modules:       Data.LanguageNamesData
+  other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
+                       Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.MediaWiki.Templates, Text.MediaWiki.Sections,
+                       Text.MediaWiki.HTML,
+                       Data.LanguageType, Data.LanguageNames
   build-depends:       HUnit,
                        base,
                        classy-prelude ==0.12.*,
@@ -32,6 +35,7 @@ Library
                        text-icu ==0.7.*,
                        split,
                        text, bytestring, containers,
+                       unicode-show,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        mtl,
@@ -45,6 +49,13 @@ Executable wiki2text
     -threaded
     -O2
   main-is:             cmd/Wiki2Text.lhs
+  other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
+                       Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.MediaWiki.Templates, Text.MediaWiki.Sections,
+                       Text.MediaWiki.HTML, Text.MediaWiki.XML,
+                       Data.LanguageType, Data.LanguageNames,
+                       Text.MediaWiki.WikiText,
+                       WikiPrelude
   build-depends:       base,
                        classy-prelude ==0.12.*,
                        string-conversions ==0.4.*,
@@ -53,6 +64,7 @@ Executable wiki2text
                        text-icu ==0.7.*,
                        split,
                        text, bytestring, containers,
+                       unicode-show,
                        attoparsec ==0.13.*,
                        parsec ==3.1.*,
                        mtl,

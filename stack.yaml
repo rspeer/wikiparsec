@@ -13,6 +13,7 @@ packages:
 extra-deps:
 - fast-tagsoup-utf8-only-1.0.5
 - text-1.2.2.1
+- unicode-show-0.1.0.2
 
 # Override default flag values for local packages and extra-deps
 flags: {}

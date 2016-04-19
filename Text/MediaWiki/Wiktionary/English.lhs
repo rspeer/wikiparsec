@@ -1,5 +1,9 @@
 > {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
-> module Text.MediaWiki.Wiktionary.English where
+
+Export only the top-level, namespaced functions.
+
+> module Text.MediaWiki.Wiktionary.English
+>   (enParseWiktionary, enParseDefinition, enTemplates) where
 > import WikiPrelude
 > import Text.MediaWiki.Templates
 > import Text.MediaWiki.AnnotatedText
@@ -7,27 +11,25 @@
 > import Text.MediaWiki.ParseTools
 > import Text.MediaWiki.Sections
 > import Text.MediaWiki.WikiText
-> import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 > import Text.MediaWiki.Wiktionary.Base
-> import qualified Data.Aeson as Ae
 > import Data.Attoparsec.Text
 > import Data.LanguageNames
 
 
-Parsing sections
-================
+Parsing entire pages
+====================
 
-> enHandlePage :: Text -> Text -> [WiktionaryFact]
-> enHandlePage title text =
+This function can be passed as an argument to `handleFile` in
+Text.MediaWiki.Wiktionary.Base.
+
+> enParseWiktionary :: Text -> Text -> [WiktionaryFact]
+> enParseWiktionary title text =
 >   let sections = parsePageIntoSections text in
 >     concat (map (enParseSection title) sections)
->
-> enHandleFile :: Text -> FilePath -> IO ()
-> enHandleFile title filename = do
->   contents <- (readFile filename) :: IO ByteString
->   let fromHTML = extractWikiTextFromHTML contents
->   mapM_ (println . Ae.encode) (enHandlePage title fromHTML)
 
+
+Parsing sections
+================
 
 Choosing an appropriate section parser
 --------------------------------------
@@ -71,7 +73,7 @@ a function that will extract WiktionaryFacts.
 based on the type of section we're parsing.
 
 > chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
-> chooseSectionParser "POS" = parseDefinition
+> chooseSectionParser "POS" = enParseDefinition
 > chooseSectionParser "Translations" = parseTranslations
 > chooseSectionParser "Synonyms" = parseRelation "synonym"
 > chooseSectionParser "Antonyms" = parseRelation "antonym"
@@ -97,8 +99,8 @@ Here, we parse the Wikitext for the numbered list, then pass its entries
 on to `definitionToFacts`. If there's a parse error, we return nothing for
 this section.
 
-> parseDefinition :: WiktionaryTerm -> Text -> [WiktionaryFact]
-> parseDefinition thisTerm text =
+> enParseDefinition :: WiktionaryTerm -> Text -> [WiktionaryFact]
+> enParseDefinition thisTerm text =
 >   let defs = parseOrDefault [] pDefinitionSection text in
 >     concat (map (definitionToFacts "en" thisTerm) defs)
 
@@ -290,10 +292,17 @@ Combine these together into a set of all labels we want to ignore.
 > ignoredLabels :: HashSet Text
 > ignoredLabels = syntacticLabels <> grammarLabels
 
+Some entries contain labels that look like `~ par`. They come out exactly this
+way in the entry. I don't even know what it's supposed to mean, so let's leave
+out these labels.
+
+> ignoreLabel :: Text -> Bool
+> ignoreLabel label = (elem label ignoredLabels) || (isPrefixOf "~" label)
+
 > handleLabelTemplate :: Template -> AnnotatedText
 > handleLabelTemplate template =
 >   let entries     = map (\arg -> get arg template) ["2", "3", "4", "5"]
->       goodEntries = filter (\val -> not (elem val ignoredLabels)) entries
+>       goodEntries = filter (not . ignoreLabel) entries
 >       annotations = map labelToAnnotation goodEntries
 >   in annotate annotations (asText "")
 >

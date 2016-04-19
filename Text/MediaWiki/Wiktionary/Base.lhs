@@ -4,7 +4,7 @@ This file defines how to parse Wiktionary entries, as a layer above the basic
 handling of wiki syntax in `Wikitext.lhs`.
 
 > module Text.MediaWiki.Wiktionary.Base where
-> import WikiPrelude hiding (takeWhile)
+> import WikiPrelude
 > import Text.MediaWiki.WikiText
 > import Text.MediaWiki.ParseTools
 > import Text.MediaWiki.SplitUtils
@@ -16,6 +16,23 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Data.LanguageNames
 > import Data.LanguageType
 > import Text.Language.Normalize (normalizeText)
+> import Text.MediaWiki.HTML (extractWikiTextFromHTML)
+> import Text.Show.Unicode
+
+Handling entire pages
+---------------------
+
+> handleFile :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
+> handleFile languageParser title filename = do
+>   contents <- (readFile filename) :: IO ByteString
+>   let fromHTML = extractWikiTextFromHTML contents
+>   mapM_ (println . show) (languageParser title fromHTML)
+>
+> handleFileJSON :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
+> handleFileJSON languageParser title filename = do
+>   contents <- (readFile filename) :: IO ByteString
+>   let fromHTML = extractWikiTextFromHTML contents
+>   mapM_ (println . encode) (languageParser title fromHTML)
 
 Data types
 ----------
@@ -47,30 +64,47 @@ JSON representation as the string representation of a WiktionaryTerm.
 >   toJSON term =
 >     let maybePairs = [("text", Just (wtText term)),
 >                       ("language", fromLanguage <$> (wtLanguage term)),
->                       ("etym", wtEtym term),
 >                       ("pos", wtPos term),
+>                       ("etym", wtEtym term),
 >                       ("sense", wtSense term)]
 >         existingPairs = mapMaybe moveSecondMaybe maybePairs
 >     in object [key .= value | (key, value) <- existingPairs]
 >
 > instance Show WiktionaryTerm where
->   show term = cs (encode term)
+>   show term =
+>     let items = [Just (wtText term),
+>                  fromLanguage <$> (wtLanguage term),
+>                  wtPos term,
+>                  wtEtym term,
+>                  wtSense term]
+>         showList = ushow (squishMaybes items)
+>     in cs ("(term " <> showList <> ")")
+>
+> squishMaybes :: [Maybe Text] -> [Text]
+> squishMaybes list = reverse $ map (fromMaybe "") $ listDropWhile isNothing $ reverse list
 >
 > moveSecondMaybe :: (a, Maybe b) -> Maybe (a, b)
 > moveSecondMaybe (first, Just second) = Just (first, second)
 > moveSecondMaybe (first, Nothing)     = Nothing
 >
-> simpleTerm :: Language -> Text -> WiktionaryTerm
-> simpleTerm language text = WiktionaryTerm {
->   wtText=(normalizeText language text),
->   wtLanguage=Just language, wtSense=Nothing, wtPos=Nothing, wtEtym=Nothing
+> term :: [Text] -> WiktionaryTerm
+> term items = WiktionaryTerm {
+>   wtText = fromMaybe (error "term is empty") (index items 0),
+>   wtLanguage = toLanguage <$> (index items 1),
+>   wtPos = nonEmpty (index items 2),
+>   wtEtym = nonEmpty (index items 3),
+>   wtSense = nonEmpty (index items 4)
 >   }
 >
+> simpleTerm :: Language -> Text -> WiktionaryTerm
+> simpleTerm language text = term [text, fromLanguage language]
+>
 > termPos :: Language -> Text -> Text -> WiktionaryTerm
-> termPos language text pos = (simpleTerm language text) {wtPos=Just pos}
-> 
-> termSense :: Language -> Text -> Text -> Text -> WiktionaryTerm
-> termSense language text pos sense = (simpleTerm language text) {wtPos=Just pos, wtSense=Just sense}
+> termPos language text pos = term [text, fromLanguage language, pos]
+>
+> termSense :: Language -> Text -> Text -> Text -> Text -> WiktionaryTerm
+> termSense language text pos etym sense = term [text, fromLanguage language, pos, etym, sense]
+>
 
 A WiktionaryFact expresses a relationship between terms that we can extract
 from a page.
@@ -116,8 +150,8 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 >       wtText=(normalizeText (fromMaybe "und" maybeLanguage) (pageName (get "page" annot))),
 >       wtLanguage=maybeLanguage,
 >       wtPos=(lookup "pos" annot),
->       wtSense=(lookup "sense" annot),
->       wtEtym=(lookup "etym" annot)
+>       wtEtym=(lookup "etym" annot),
+>       wtSense=(lookup "sense" annot)
 >     }
 >
 > pageName :: Text -> Text

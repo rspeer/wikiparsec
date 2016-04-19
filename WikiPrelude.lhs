@@ -139,13 +139,15 @@ Here's what we're exporting from the module:
 >   module Data.LanguageType,
 >   module Control.Monad.Writer,
 >   replace, splitOn, stripSpaces,
->   get, getAll, getPrioritized, put,
+>   listTakeWhile, listDropWhile,
+>   get, getAll, getPrioritized, put, nonEmpty,
 >   println
 >   ) where
 
 Some of these exports are just re-exporting things we can import:
 
-> import ClassyPrelude
+> import ClassyPrelude hiding (takeWhile)
+> import qualified ClassyPrelude as P
 > import Data.String.Conversions hiding ((<>))
 > import Data.LanguageType
 > import Control.Monad.Writer (Writer, writer, pass, runWriter, execWriter)
@@ -171,6 +173,21 @@ Writing any sort of text to stdout:
 
 > println :: (IOData a) => a -> IO ()
 > println = hPutStrLn stdout
+
+
+List operations
+---------------
+
+The name `takeWhile` has conflicting definitions in ClassyPrelude and
+Attoparsec, so we need to rename the ClassyPrelude one.
+
+> listTakeWhile :: (a -> Bool) -> [a] -> [a]
+> listTakeWhile = P.takeWhile
+>
+> listDropWhile :: (a -> Bool) -> [a] -> [a]
+> listDropWhile = P.dropWhile
+
+
 
 Mapping operations
 ------------------
@@ -202,4 +219,12 @@ Building a map with monad syntax:
 >   if (value == mempty)
 >     then writer (value, mempty)
 >     else writer (value, singletonMap key value)
+
+Undoing our default empty sequence by turning empty sequences into Nothing:
+
+> nonEmpty :: (Monoid a, Eq a) => Maybe a -> Maybe a
+> nonEmpty val =
+>   case val of
+>     Just something -> if (something == mempty) then Nothing else val
+>     Nothing -> Nothing
 

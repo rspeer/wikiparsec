@@ -21,9 +21,6 @@ tests = test [
     "getAnnotations empty" ~: getAnnotations mempty ~?= [],
     "getAnnotations literal" ~: getAnnotations atLiteral ~?= [],
 
-    "join text and annotation" ~:
-      atLiteral ++ singleAnnotation linkTest ~?= annotate [linkTest] "literal",
-
     ("concat 0" ~:
       let a :: [AnnotatedText]
           a = []
