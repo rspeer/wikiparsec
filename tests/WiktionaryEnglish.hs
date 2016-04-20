@@ -261,7 +261,7 @@ compareLists name input output =
   [(name <> ": item " <> (show i)) ~: (index input i) ~?= (index output i) | i <- [0..(length input)]]
 
 defnTests = [
-    testExtract (enParseDefinition (termPos "en" "test" "Noun"))
+    testExtract (parseDefinitions "en" enTemplates (termPos "en" "test" "Noun"))
                 "# {{senseid|en|first}} definition 1\n# {{senseid|en|second}} definition 2\n# definition 3"
                 [WiktionaryFact "definition" (termSense "en" "test" "Noun" "" "first") (simpleTerm "en" "definition 1"),
                  WiktionaryFact "definition" (termSense "en" "test" "Noun" "" "second") (simpleTerm "en" "definition 2"),

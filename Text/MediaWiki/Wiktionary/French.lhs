@@ -84,7 +84,6 @@ in the section headings:
 >   index atexts idx >>= \atext -> lookup key (mconcat (getAnnotations atext))
 
 
-
 Parsing sections
 ================
 
@@ -105,7 +104,7 @@ a function that will extract WiktionaryFacts.
 >           chooseSectionParser sectionType term content
 >
 > chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
-> chooseSectionParser "POS"             = frParseDefinition
+> chooseSectionParser "POS"             = parseDefinitions "fr" frTemplates
 > chooseSectionParser "traductions"     = parseTranslations
 > chooseSectionParser "synonymes"       = parseRelation "synonym"
 > chooseSectionParser "quasi-synonymes" = parseRelation "quasi-synonym"
@@ -125,32 +124,6 @@ a function that will extract WiktionaryFacts.
 > chooseSectionParser "variantes orthographiques" = parseRelation "variant"
 > chooseSectionParser "var-ortho"       = parseRelation "variant"
 > chooseSectionParser _                 = const (const [])
-
-
-The part-of-speech/definition section
--------------------------------------
-
-Parsing the definition section:
-
-> frParseDefinition :: WiktionaryTerm -> Text -> [WiktionaryFact]
-> frParseDefinition thisTerm text =
->   case parseOnly pDefinitionSection text of
->     Left err   -> []
->     Right defs -> concat (map (definitionToRels "fr" thisTerm) defs)
->
-> pDefinitionSection :: Parser [LabeledDef]
-> pDefinitionSection =
->   -- Skip miscellaneous lines at the start of the section: try to parse
->   -- each line as pDefinitionList, and if that fails, parse one line,
->   -- throw it out, and parse the rest recursively.
->   pDefinitionList <|>
->   (newLine >> pDefinitionSection) <|>
->   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection)
->
-> pDefinitionList :: Parser [LabeledDef]
-> pDefinitionList = extractNumberedDefs <$> orderedList frTemplates "#"
-
-FIXME: this sure looks a lot like the English version
 
 
 The translation section
@@ -182,7 +155,7 @@ translation section, which may or may not be labeled with a word sense. It
 returns a Maybe ByteString that contains the word sense if present.
 
 > pTransTop = do
->   template <- specificTemplate frTemplates (utf8 "trad-début")
+>   template <- specificTemplate frTemplates "trad-début"
 >   newLine
 >   return (lookup "1" template)
 

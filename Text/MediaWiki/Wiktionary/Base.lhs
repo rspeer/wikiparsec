@@ -193,11 +193,38 @@ We might have an annotation assigning a sense ID to this text:
 > findSenseIDInList [] = Nothing
 
 
-Definition lists
-----------------
+Definition sections
+-------------------
 
-Reading a numbered list of definitions, and associating the definitions with
-their numbers (which will become strings such as "def.1.1"):
+Definition sections in many languages of Wiktionary take the form of a numbered
+list. For example, the English dictionary has sections labeled with a part of
+speech, such as "Noun", whose contents are a numbered list of English definitions
+of the word.
+
+Here, we parse the Wikitext for the numbered list, then pass its entries
+on to `definitionToFacts`. If there's a parse error, we return nothing for
+this section.
+
+> parseDefinitions :: Language -> TemplateProc -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseDefinitions language tproc thisTerm text =
+>   let defs = parseOrDefault [] (pDefinitionSection tproc) text in
+>     concat (map (definitionToFacts language thisTerm) defs)
+
+Skip miscellaneous lines at the start of the section: try to parse each line as
+pDefinitionList, and if that fails, parse one line, throw it out, and
+recursively run this parser to parse the rest.
+
+> pDefinitionSection :: TemplateProc -> Parser [LabeledDef]
+> pDefinitionSection tproc =
+>   pDefinitionList tproc <|>
+>   (newLine >> pDefinitionSection tproc) <|>
+>   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection tproc)
+>
+> pDefinitionList :: TemplateProc -> Parser [LabeledDef]
+> pDefinitionList tproc = extractNumberedDefs <$> orderedList tproc "#"
+
+To distinguish different definitions, we associate them with an automatically
+generated ID such as "def.1.1".
 
 TODO give an example because this is all confusing
 
@@ -218,7 +245,7 @@ TODO give an example because this is all confusing
 >     _:rest                     -> extractNumberedIter prefix counter rest
 >     []                         -> []
 
-Converting definitions to relations:
+Converting definitions to facts:
 
 > definitionToFacts :: Language -> WiktionaryTerm -> LabeledDef -> [WiktionaryFact]
 > definitionToFacts language thisTerm defPair =
@@ -274,6 +301,82 @@ Parsing the language of definitions
 > pDefAnything = do
 >   text <- takeWhile (const True)
 >   return [text]
+
+
+The translation section
+-----------------------
+
+Most of the work involved in parsing translation sections is fundamentally
+the same between different languages. However, details are different between
+languages, most notably the names of the templates involved.
+
+If we passed in all these details as arguments to `parseTranslations`, the type
+of `parseTranslations` and its helper functions would be horrifying. Instead,
+we'll group them together into a TranslationSectionInfo struct.
+
+> data TranslationSectionInfo = TranslationSectionInfo {
+>   tsLanguage :: Language,             -- the language to be parsed
+>   tsTemplateProc :: TemplateProc,     -- the template procedure to use
+>   tsStartRule :: Parser (Maybe Text), -- a parser for the start of a translation list
+>   tsIgnoreRule :: Parser (),          -- a parser for lines to ignore
+>   tsEndRule :: Parser ()              -- a parser for the end of a translation list
+> }
+>
+>
+> parseTranslations :: TranslationSectionInfo -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseTranslations tsInfo thisTerm text =
+>   parseOrDefault [] (pTranslationSection tsInfo thisTerm) text
+>
+> pTranslationSection :: TranslationSectionInfo -> WiktionaryTerm -> Parser [WiktionaryFact]
+> pTranslationSection tsInfo thisTerm = concat <$> many1 (pTranslationGroup tsInfo thisTerm)
+
+A translation group is a portion of the "Translations" section that all applies to the same
+word sense. It's delimited by a start template and an end template. The start template might
+return a word sense, or might return Nothing.
+
+> pTranslationGroup :: TranslationSectionInfo -> WiktionaryTerm -> Parser [WiktionaryFact]
+> pTranslationGroup tsInfo thisTerm = do
+>   optionalTextChoices [newLine]
+>   maybeSense <- tsStartRule tsInfo
+>   let senseTerm = thisTerm {wtSense=maybeSense}
+>   let language = tsLanguage tsInfo
+>   items <- pTranslationGroupBody tsInfo senseTerm
+>   tsEndRule tsInfo
+>   optionalTextChoices [newLine]
+>   return items
+
+> pTranslationGroupBody :: TranslationSectionInfo -> WiktionaryTerm -> Parser [WiktionaryFact]
+> pTranslationGroupBody tsInfo thisTerm =
+>   mconcat <$>
+>     map (extractTranslations (tsLanguage tsInfo) thisTerm) <$>
+>     mconcat <$>
+>     many1 (pTranslationItem tsInfo <|> (tsIgnoreRule tsInfo >> return []))
+>
+> extractTranslations :: Language -> WiktionaryTerm -> AnnotatedText -> [WiktionaryFact]
+> extractTranslations language thisTerm atext =
+>   let translationAnnotations = filter isTranslation (getAnnotations atext) in
+>     map (annotationToFact language thisTerm) translationAnnotations
+>
+> isTranslation :: Annotation -> Bool
+> isTranslation a = lookup "rel" a == Just "translation"
+
+The procedure for getting translations out of a bunch of bullet points involved a few
+chained procedures, which of course occur from right to left:
+
+To get translation candidates out of a bunch of bullet points, we need to find
+the items the bullet-pointed list entry contains.
+
+There may be multiple of them, because some translation entries are nested
+lists -- multiple kinds of translations for the same language, for example.
+`extractTopLevel` turns these items into a flat list.
+
+> pTranslationItem :: TranslationSectionInfo -> Parser [AnnotatedText]
+> pTranslationItem tsInfo = extractTopLevel <$> listItem (tsTemplateProc tsInfo) "*"
+
+This rule will generally be useful in writing the "ignore" parse rule:
+
+> pBlankLine :: Parser ()
+> pBlankLine = newLine >> return ()
 
 
 Looking up sections

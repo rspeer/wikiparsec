@@ -3,7 +3,7 @@
 Export only the top-level, namespaced functions.
 
 > module Text.MediaWiki.Wiktionary.English
->   (enParseWiktionary, enParseDefinition, enTemplates) where
+>   (enParseWiktionary, enTemplates) where
 > import WikiPrelude
 > import Text.MediaWiki.Templates
 > import Text.MediaWiki.AnnotatedText
@@ -73,8 +73,8 @@ a function that will extract WiktionaryFacts.
 based on the type of section we're parsing.
 
 > chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
-> chooseSectionParser "POS" = enParseDefinition
-> chooseSectionParser "Translations" = parseTranslations
+> chooseSectionParser "POS" = parseDefinitions "en" enTemplates
+> chooseSectionParser "Translations" = enParseTranslations
 > chooseSectionParser "Synonyms" = parseRelation "synonym"
 > chooseSectionParser "Antonyms" = parseRelation "antonym"
 > chooseSectionParser "Hyponyms" = parseRelation "hyponym"
@@ -89,100 +89,40 @@ based on the type of section we're parsing.
 > chooseSectionParser x = const (const [])
 
 
-The part-of-speech/definition section
--------------------------------------
-
-The section that's labeled something like "Noun" contains definitions of the
-given term in English, as a numbered list.
-
-Here, we parse the Wikitext for the numbered list, then pass its entries
-on to `definitionToFacts`. If there's a parse error, we return nothing for
-this section.
-
-> enParseDefinition :: WiktionaryTerm -> Text -> [WiktionaryFact]
-> enParseDefinition thisTerm text =
->   let defs = parseOrDefault [] pDefinitionSection text in
->     concat (map (definitionToFacts "en" thisTerm) defs)
-
-Skip miscellaneous lines at the start of the section: try to parse each line as
-pDefinitionList, and if that fails, parse one line, throw it out, and
-recursively run this parser to parse the rest.
-
-> pDefinitionSection :: Parser [LabeledDef]
-> pDefinitionSection =
->   pDefinitionList <|>
->   (newLine >> pDefinitionSection) <|>
->   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection)
->
-> pDefinitionList :: Parser [LabeledDef]
-> pDefinitionList = extractNumberedDefs <$> orderedList enTemplates "#"
-
-
 The translation section
 -----------------------
-
-> parseTranslations :: WiktionaryTerm -> Text -> [WiktionaryFact]
-> parseTranslations thisTerm text = parseOrDefault [] (pTranslationSection thisTerm) text
->
-> pTranslationSection :: WiktionaryTerm -> Parser [WiktionaryFact]
-> pTranslationSection thisTerm = concat <$> many1 (pTranslationGroup thisTerm)
->
-> pTranslationGroup :: WiktionaryTerm -> Parser [WiktionaryFact]
-> pTranslationGroup thisTerm = do
->   optionalTextChoices [newLine]
->   maybeSense <- pTranslationTopTemplate
->   let senseTerm = thisTerm {wtSense=maybeSense}
->   items <- concat <$> many1 pTranslationColumn
->   optionalTextChoices [newLine]
->   return (map (annotationToFact "en" senseTerm) (filter translationsOnly items))
->
-> translationsOnly :: Annotation -> Bool
-> translationsOnly annot = (get "rel" annot) == "translation"
 
 The `pTranslationTopTemplate` rule parses the template that starts a
 translation section, which may or may not be labeled with a word sense. It
 returns a Maybe Text that contains the word sense if present.
 
-> pTranslationTopTemplate :: Parser (Maybe Text)
-> pTranslationTopTemplate = pTransTop <|> pCheckTransTop
->
+> pTransTop :: Parser (Maybe Text)
 > pTransTop = do
 >   template <- specificTemplate enTemplates "trans-top"
 >   newLine
 >   return (lookup "1" template)
+>
+> pCheckTransTop :: Parser (Maybe Text)
 > pCheckTransTop = do
 >   specificTemplate enTemplates "checktrans-top"
 >   newLine
 >   return Nothing
-
-A column of translations (yes, this is purely a layout thing) ends with either
-{{trans-mid}}, which separates columns, or {{trans-bottom}}, which ends the section.
-The translations themselves are contained in a bulleted list.
-
-> pTranslationColumn :: Parser [Annotation]
-> pTranslationColumn = concat <$> many1 (pTranslationItem <|> pTranslationBlankLine) <* pTranslationColumnEnd
-> pTranslationColumnEnd = specificTemplate enTemplates "trans-mid" <|> specificTemplate enTemplates "trans-bottom" <* many1 newLine
-
-The procedure for getting translations out of a bunch of bullet points involved a few
-chained procedures, which of course occur from right to left:
-
-  - Parse a bullet-pointed list entry.
-
-  - Find the items the bullet-pointed list entry contains. There may be
-    multiple of them, because some translation entries are nested lists --
-    multiple kinds of translations for the same language, for example.
-    `extractTopLevel` turns these items into a flat list.
-
-  - `extractTopLevel` gave us a list of AnnotatedTexts. We want just their
-    annotations, representing everything we want to know about the
-    translations, in one big list. So we `A.concat` all the AnnotatedTexts
-    together, and then take the combined list of annotations from that.
-
-> pTranslationItem :: Parser [Annotation]
-> pTranslationItem = getAnnotations <$> mconcat <$> extractTopLevel <$> listItem enTemplates "*"
 >
-> pTranslationBlankLine :: Parser [Annotation]
-> pTranslationBlankLine = newLine >> return []
+> pTransMid :: Parser ()
+> pTransMid = specificTemplate enTemplates "trans-mid" >> return ()
+>
+> pTransBottom :: Parser ()
+> pTransBottom = specificTemplate enTemplates "trans-bottom" >> return ()
+
+Filling in the details for the general `parseTranslations` function:
+
+> enParseTranslations = parseTranslations $ TranslationSectionInfo {
+>   tsLanguage="en",
+>   tsTemplateProc=enTemplates,
+>   tsStartRule=(pTransTop <|> pCheckTransTop),
+>   tsIgnoreRule=(pTransMid <|> pBlankLine),
+>   tsEndRule=pTransBottom
+> }
 
 
 Relation sections
