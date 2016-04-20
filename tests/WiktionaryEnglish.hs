@@ -1,6 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 
--- TODO: clean up unnecessary imports
 import WikiPrelude
 import Test.HUnit
 import Text.MediaWiki.Wiktionary.Base

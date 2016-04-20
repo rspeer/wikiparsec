@@ -20,6 +20,7 @@ Library
                        Text.MediaWiki.WikiText,
                        Text.MediaWiki.Wiktionary.Base,
                        Text.MediaWiki.Wiktionary.English,
+                       Text.MediaWiki.Wiktionary.French,
                        WikiPrelude
   other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
                        Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
@@ -78,6 +79,16 @@ Executable wiktionary-parser
     -threaded
     -O2
   main-is:             cmd/WiktionaryParser.lhs
+  other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
+                       Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.MediaWiki.Templates, Text.MediaWiki.Sections,
+                       Text.MediaWiki.HTML, Text.MediaWiki.XML,
+                       Data.LanguageType, Data.LanguageNames,
+                       Text.MediaWiki.WikiText,
+                       Text.MediaWiki.Wiktionary.Base,
+                       Text.MediaWiki.Wiktionary.English,
+                       Text.MediaWiki.Wiktionary.French,
+                       WikiPrelude
   build-depends:       base,
                        classy-prelude ==0.12.*,
                        string-conversions ==0.4.*,

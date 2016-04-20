@@ -305,10 +305,16 @@ Relation sections
 > pRelationSection :: Language -> TemplateProc -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pRelationSection language tproc rel thisTerm =
 >   map (assignRel rel)
->     <$> concat
+>     <$> mconcat
 >     <$> map (entryToFacts language thisTerm)
->     <$> extractTextLines
->     <$> bulletList tproc "*"
+>     <$> mconcat
+>     <$> many (pRelationItem tproc <|> pRelationIgnored)
+>
+> pRelationItem :: TemplateProc -> Parser [AnnotatedText]
+> pRelationItem tproc = extractTopLevel <$> listItem tproc "*"
+>
+> pRelationIgnored :: Parser [AnnotatedText]
+> pRelationIgnored = wikiTextLine ignoreTemplates >> newLine >> return []
 >
 > entryToFacts :: Language -> WiktionaryTerm -> AnnotatedText -> [WiktionaryFact]
 > entryToFacts language thisTerm defText =
