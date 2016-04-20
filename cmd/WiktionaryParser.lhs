@@ -1,17 +1,13 @@
-> {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
 
+> import WikiPrelude
+> import Data.LanguageType
 > import Text.MediaWiki.XML (processMediaWikiStdin, WikiPage,
 >                            pageNamespace, pageTitle, pageText, pageRedirect)
-> import Text.MediaWiki.WikiText (outputPlainText)
-> import Text.MediaWiki.Wiktionary.Base (WiktionaryRel)
-> import Text.MediaWiki.Wiktionary.English (enHandlePage)
-> import Text.MediaWiki.Wiktionary.French (frHandlePage)
-> import Data.ByteString (ByteString)
-> import Control.Monad
-> import qualified Data.Aeson as Ae
-> import qualified Data.ByteString.Lazy.Char8 as LChar8
-> import qualified Data.ByteString.Char8 as Char8
-> import System.Environment
+> import Text.MediaWiki.Wiktionary.Base (WiktionaryFact)
+> import Text.MediaWiki.Wiktionary.English (enParseWiktionary)
+> -- import Text.MediaWiki.Wiktionary.French (frParseWiktionary)
+> import Data.Aeson (encode)
 
 Language handling
 =================
@@ -20,23 +16,24 @@ The functions for handling different language Wiktionaries are defined in
 separate modules. We take an argument that tells us which language the entries
 will be in, so we can delegate to the appropriate handler.
 
-> languageHandler :: String -> ByteString -> ByteString -> [WiktionaryRel]
-> languageHandler "en" = enHandlePage
-> languageHandler "fr" = frHandlePage
-> languageHandler _    = error "unknown language"
+> languageHandler :: Language -> Text -> Text -> [WiktionaryFact]
+> languageHandler "en"  = enParseWiktionary
+> -- languageHandler "fr"  = frParseWiktionary
+> languageHandler other = error ("unknown language: " <> (cs (fromLanguage other)))
 
 Top level
 =========
 
-> handlePage :: String -> WikiPage -> IO ()
+> handlePage :: Language -> WikiPage -> IO ()
 > handlePage language page = do
 >   when (pageNamespace page == "0" && pageRedirect page == Nothing)
->     (mapM_ (LChar8.putStrLn . Ae.encode)
+>     (mapM_ (println . encode)
 >            (languageHandler language (pageTitle page) (pageText page)))
 
 > main :: IO ()
 > main = do
 >   args <- getArgs
->   let language = args !! 0
->   processMediaWikiStdin (handlePage language)
+>   case args of
+>     (language:_) -> processMediaWikiStdin (handlePage (toLanguage language))
+>     _            -> error "Please give a language code as a command-line argument"
 
