@@ -258,14 +258,6 @@ Converting definitions to facts:
 >   in (map (makeDefinitionFact termSense language) defPieces)
 >      <> (map (annotationToFact language termSense) (linkableAnnotations defText))
 
-The simpler version for entries in a list, such as a "Synonyms" section:
-
-> entryToFacts :: Language -> WiktionaryTerm -> AnnotatedText -> [WiktionaryFact]
-> entryToFacts language thisTerm defText =
->   let defSense  = findSenseID defText
->       termSense = thisTerm {wtSense=defSense}
->   in map (annotationToFact language termSense) (plainLinkAnnotations defText)
-
 > makeDefinitionFact termSense language definition =
 >   makeFact "definition" termSense (simpleTerm language definition)
 >
@@ -301,6 +293,29 @@ Parsing the language of definitions
 > pDefAnything = do
 >   text <- takeWhile (const True)
 >   return [text]
+
+
+Relation sections
+-----------------
+
+> parseRelation :: Language -> TemplateProc -> Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseRelation language tproc rel thisTerm text =
+>   parseOrDefault [] (pRelationSection language tproc rel thisTerm) text
+>
+> pRelationSection :: Language -> TemplateProc -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
+> pRelationSection language tproc rel thisTerm =
+>   map (assignRel rel)
+>     <$> concat
+>     <$> map (entryToFacts language thisTerm)
+>     <$> extractTextLines
+>     <$> bulletList tproc "*"
+>
+> entryToFacts :: Language -> WiktionaryTerm -> AnnotatedText -> [WiktionaryFact]
+> entryToFacts language thisTerm defText =
+>   let defSense  = findSenseID defText
+>       termSense = thisTerm {wtSense=defSense}
+>   in map (annotationToFact language termSense) (plainLinkAnnotations defText)
+
 
 
 The translation section

@@ -73,24 +73,42 @@ a function that will extract WiktionaryFacts.
 based on the type of section we're parsing.
 
 > chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
-> chooseSectionParser "POS" = parseDefinitions "en" enTemplates
+> chooseSectionParser "POS" = enParseDefinitions
 > chooseSectionParser "Translations" = enParseTranslations
-> chooseSectionParser "Synonyms" = parseRelation "synonym"
-> chooseSectionParser "Antonyms" = parseRelation "antonym"
-> chooseSectionParser "Hyponyms" = parseRelation "hyponym"
-> chooseSectionParser "Hypernyms" = parseRelation "hypernym"
-> chooseSectionParser "Meronyms" = parseRelation "meronym"
-> chooseSectionParser "Holonyms" = parseRelation "holonym"
-> chooseSectionParser "Troponyms" = parseRelation "troponym"
-> chooseSectionParser "Coordinate terms" = parseRelation "coordinate"
-> chooseSectionParser "Derived terms" = parseRelation "derived"
-> chooseSectionParser "Related terms" = parseRelation "related"
-> chooseSectionParser "See also" = parseRelation "related"
+> chooseSectionParser "Synonyms" = enParseRelation "synonym"
+> chooseSectionParser "Antonyms" = enParseRelation "antonym"
+> chooseSectionParser "Hyponyms" = enParseRelation "hyponym"
+> chooseSectionParser "Hypernyms" = enParseRelation "hypernym"
+> chooseSectionParser "Meronyms" = enParseRelation "meronym"
+> chooseSectionParser "Holonyms" = enParseRelation "holonym"
+> chooseSectionParser "Troponyms" = enParseRelation "troponym"
+> chooseSectionParser "Coordinate terms" = enParseRelation "coordinate"
+> chooseSectionParser "Derived terms" = enParseRelation "derived"
+> chooseSectionParser "Related terms" = enParseRelation "related"
+> chooseSectionParser "See also" = enParseRelation "related"
 > chooseSectionParser x = const (const [])
 
 
-The translation section
------------------------
+Defining section parsers
+------------------------
+
+Most section parsers are easy to define by providing parameters to more
+general functions in `Text.MediaWiki.Wiktionary.Base`:
+
+> enParseDefinitions = parseDefinitions "en" enTemplates
+> enParseRelation = parseRelation "en" enTemplates
+
+The only section parser that will be more complicated to define is
+`enParseTranslations`, which fills in details for the general
+`parseTranslations` function:
+
+> enParseTranslations = parseTranslations $ TranslationSectionInfo {
+>   tsLanguage="en",
+>   tsTemplateProc=enTemplates,
+>   tsStartRule=(pTransTop <|> pCheckTransTop),
+>   tsIgnoreRule=(pTransMid <|> pBlankLine),
+>   tsEndRule=pTransBottom
+> }
 
 The `pTranslationTopTemplate` rule parses the template that starts a
 translation section, which may or may not be labeled with a word sense. It
@@ -113,30 +131,6 @@ returns a Maybe Text that contains the word sense if present.
 >
 > pTransBottom :: Parser ()
 > pTransBottom = specificTemplate enTemplates "trans-bottom" >> return ()
-
-Filling in the details for the general `parseTranslations` function:
-
-> enParseTranslations = parseTranslations $ TranslationSectionInfo {
->   tsLanguage="en",
->   tsTemplateProc=enTemplates,
->   tsStartRule=(pTransTop <|> pCheckTransTop),
->   tsIgnoreRule=(pTransMid <|> pBlankLine),
->   tsEndRule=pTransBottom
-> }
-
-
-Relation sections
------------------
-
-> parseRelation :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
-> parseRelation rel thisTerm text = parseOrDefault [] (pRelationSection rel thisTerm) text
->
-> pRelationSection :: Text -> WiktionaryTerm -> Parser [WiktionaryFact]
-> pRelationSection rel thisTerm = map (assignRel rel)
->                                 <$> concat
->                                 <$> map (entryToFacts "en" thisTerm)
->                                 <$> extractTextLines
->                                 <$> bulletList enTemplates "*"
 
 
 Finding headings
