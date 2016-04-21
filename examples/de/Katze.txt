@@ -1,0 +1,276 @@
+{{Wort der Woche|40|2006}}
+== Katze ({{Sprache|Deutsch}}) ==
+=== {{Wortart|Substantiv|Deutsch}}, {{f}} ===
+
+{{Deutsch Substantiv Übersicht
+|Genus=f
+|Nominativ Singular=Katze
+|Nominativ Plural=Katzen
+|Genitiv Singular=Katze
+|Genitiv Plural=Katzen
+|Dativ Singular=Katze
+|Dativ Plural=Katzen
+|Akkusativ Singular=Katze
+|Akkusativ Plural=Katzen
+|Bild 1=Cat03.jpg|mini|1|''Katze'' mit rötlichem Fell
+|Bild 2=Himalayan Persian.jpg|mini|1|langhaarige ''Katze''
+}}
+
+{{Nebenformen}}
+:[[Katz]]
+
+{{Worttrennung}}
+:Kat·ze, {{Pl.}} Kat·zen
+
+{{Aussprache}}
+:{{IPA}} {{Lautschrift|ˈkaʦə}}
+:{{Hörbeispiele}} {{Audio|De-Katze.ogg}}, {{Audio|De-at-Katze.ogg|spr=at}}
+:{{Reime}} {{Reim|aʦə|Deutsch}}
+
+{{Bedeutungen}}
+:[1] dem [[Mensch]]en [[verbunden]]es, [[anschmiegsam]]es [[Haustier]] (''Felis silvestris catus''), in zahlreichen Rassen gezüchtet
+::[a] speziell das [[Weibchen]]
+:[2] ein [[Teil]] eines [[Brückenkran]]es
+:[3] ''Plural, [[Zoologie]]:'' eine [[Familie]] (Félidae) der [[Raubtier]]e
+
+{{Herkunft}}
+:seit dem 9. Jahrhundert belegt; [[althochdeutsch]] ''kazza'' f., ''kazzo'' m., aus [[lateinisch]] ''catta'' (Martial, um 75 n. Chr.) entlehnt, von einer nordafrikanischen Sprache übernommen, vergleiche [[nubisch]] ''kadīs'', [[berberisch]] ''kaddîska'', letzlich aus spät[[ägyptisch]]er ''čaute'' f.,<ref>Jean-Paul Savignac: ''Dictionnaire français-gaulois'', Stichwort: „chat“. Errance, Paris 2004, Seite 82.</ref> ''čaus'' m. ‚Falbkatze‘ stammt.<ref>{{Lit-Pfeifer: Etymologisches Wörterbuch|A=8}}</ref>
+
+{{Synonyme}}
+:[1] [[Hauskatze]] (''Felis catus'', ''Felis domestica''), [[Stubentiger]], [[Dachhase]], [[Mieze]], [[Miezekatze]], [[Büsi]]
+::[1a] [[Kätzin]], die Katze [[Murner]] in der [[Fabel]]
+:[2] [[Laufkatze]]
+
+{{Weibliche Wortformen}}
+:[1] [[Kätzin]]
+
+{{Männliche Wortformen}}
+:[1, 1a] [[Kater]]
+
+{{Verkleinerungsformen}}
+:[[Kätzchen]], [[Kätzlein]]
+
+{{Oberbegriffe}}
+:[1] [[Haustier]], [[Säugetier]]
+
+{{Unterbegriffe}}
+:[1] ''nach Geschlecht:'' [[Kater]], [[Kätzin]]
+:[1] ''nach Rasse:'' [[Angorakatze]], [[Heilige Birma]], [[Britisch Kurzhaar]], [[Europäisch Kurzhaar]], [[Perserkatze]], [[Siamkatze]]
+:[1] [[Schmusekatze]], [[Schmusekätzchen]]
+:[1] ''übertragen:'' [[Geldkatze]]
+:[3] [[Raubkatze]]
+:[3] ''Arten:'' [[Andenkatze]] (''Oreailurus jacobitus''), [[Angorakatze]] (''Felis maniculata angorensis''), [[Bengalkatze]] (''Prionailurus bengalensis''), [[Borneokatze]] (Catopuma badia), [[Chilenische Waldkatze]] (''Oncifelis guigna''), [[Falbkatze]] (''Felis (silvestris) libyca''), [[Fischkatze]] (''Prionailurus viverrinus''/Felis v.), [[Flachkopfkatze]] (''Prionailurus planiceps''), [[Gepard]] (Unterfamilie ''Acinonyxchinae''), (afrikanische) [[Goldkatze]] (''Profelis aurata''), [[Großkatze]] (''Pantherinae''), [[Iriomotekatze]] (''Prionailurus bengalensis iriomotensis''); (''Prionailurus iriomotensis''), [[Jaguar]] (''Panthera onca''), [[Karakal]] (''Caracal caracal''), [[Leopard]] (''Panthera pardus''), [[Löwe]] (''Panthera leo''), [[Luchs]] (''Lynx lynx'', auch: ''Felis lynx''), [[Manul]] (''Otocolobus manul''), [[Marguay]] (''Leopardus wiedii''), [[Marmorkatze]] (''Felis marmorata''), [[Nebelparder]] (''Neofelis nebulosa''), [[Ozelot]] (''Leopardus pardalis''), [[Ozelotkatze]] (''Leopardus tigrinus''), [[Pampaskatze]] (''Oncifelis colocolo''), [[Puma]] (''Puma concolor''), [[Rohrkatze]] (''Felis chaus''), [[Rostkatze]] (''Prionailurus rubiginosus''), [[Säbelzahnkatze]] (''Machairodontinae''), [[Salzkatze]] (''Oncifelis geoffroyi''), [[Sandkatze]] (''Felis margarita''), [[Schleichkatze]] (''Viverridae''), [[Schneeleopard]] (''Uncia uncia''), [[Schwarzfußkatze]] (''Felis nigripes''), [[Serval]] (''Leptailurus serval''),  [[Steppenkatze]] (''Felis ornata''), [[Tiger]] (''Panthera tigris''), [[Vankatze]], [[Wildkatze]] (''Felis silvestris'')
+
+{{Beispiele}}
+:[1] Eine ''Katze'' jagt eine Maus.
+:[1] „Doch binnen einer halben Stunde fand sich die ''Katze'' erneut vor dem Amtszimmer des Schatzmeisters ein, weitaus hungriger als vorher.“<ref>{{Literatur | Autor= Philip J. Davis | Titel= Pembrokes Katze | TitelErg= Die wundersame Geschichte über eine philosophierende Katze, ein altes mathematisches Problem und die Liebe| Verlag= Fischer Taschenbuch Verlag | Ort= Frankfurt/Main |Jahr= 1991| Seiten= 19.|ISBN= 3-596-10646-X}} Englisches Original 1988.</ref>
+:[1a] Ist das eine ''Katze'' oder ein Kater?
+:[2] Der Brückenkran mit seiner ''Katze'' steht in der Montagehalle.
+:[3] ''Katzen'' sind Jäger mit sehr guter Nachtsicht.
+
+{{Redewendungen}}
+:''[[Augen auskratzen wie eine Katze]]'' - eine gefährlich werdende (weibliche) Person
+:''[[da beißt sich die Katze in den Schwanz]]'' - ''ein Problem'' führt auf sich selbst zurück und kann deshalb nicht gelöst werden; ''ein Beweis'' ist zirkulär
+:''[[damit kann man keine Katze mehr hinter dem Ofen hervorlocken]]'' - veraltete bzw. zwecklose Methode, Sache, etc.
+:''[[der Katze die Schelle umbinden]] / [[der Katze die Schelle umhängen|umhängen]]'' - derjenige sein bzw. insgesamt der Vorgang, indem man die Gefahr eines Übergriffs, etc. bannt: nach einer Fabel
+:''[[die Katze im Sack kaufen]]'' - sich auf etwas Unwägbares einlassen
+:''[[die Katze aus dem Sack lassen]]'' - jemandem ein eigenes Geheimnis offenbaren
+:''[[flink wie eine Katze sein]]'' - besonders flink sein
+:''[[für die Katz sein]]'' - unnötig, vergeblich, umsonst sein
+:''[[mit jemandem Katz und Maus spielen]]'' - jemandem scheinbar Freiheiten lassen, nur um ihn danach umso grausamer zurechtzustutzen; jemandem mit weit überlegener Raffinesse mitspielen; an jemandem seinen Mutwillen auslassen
+:''[[Katzen und Hunde regnen]]'' - (sehr) schlechtes Wetter
+:''[[keine Katze (mehr) aus dem Haus jagen / schicken /setzen, etc.]]'' - sehr schlechtes Wetter (Variation: keinen Hund (mehr) aus dem Haus jagen / schicken /setzen, etc.)
+:''[[wie Hund und Katz' sein]]'' - im Streit liegen
+:''[[das geht ab wie Schmidts Katze]]'' - es geht sehr schnell. ''(„Schmidt“ meint den Schmied, der aus Versehen mit dem Hammer auf den Schwanz der Katze gehauen hat. Deswegen „ging“ die Katze „ab“.)''
+:''[[sieben Leben haben wie eine Katze]]'' - vieles überstehen, robust sein, nicht umzubringen sein
+:''[[wie eine Katze immer auf die eigenen Füße fallen]]'' - sich geschickt aus der Affäre ziehen
+:''[[wie eine nasse Katze schauen]]'' - überrascht sein bzw. schauen, ...
+:''[[wie eine Katze um den heißen Brei schleichen]]'' - der Sache aus dem Weg gehen, verhalten reagieren, zögern, etc.
+:''[[nach der Katze treten]]'' - die eigene Wut perfide gegenüber einem Unschuldigen auslassen
+
+{{Sprichwörter}}
+:''[[die Katze lässt das Mausen nicht]]'' - ein (angeborenes) Verhalten kommt immer wieder zum Vorschein
+:''[[Ist die Katze aus dem Haus, tanzen die Mäuse auf dem Tisch]]'' - ist die gewöhnliche Autorität abwesend, schlagen alle über die Stränge
+::''[[Ist die Katze aus dem Haus, rührt sich die Maus]]'' -
+::''[[Ist die Katze aus dem Haus, freut sich die Maus]]'' -
+:''[[Käm' eine Katze ins Morgenland, sie würde miauen, wie es hier bekannt]]''. - manche Dinge sind überall gleich
+:''[[nachts sind alle Katzen grau]]''. - ''(Motivierung: nachts sieht das menschliche Auge keine Farben)'' wo Licht fehlt, sieht oder beachtet man die (feinen) Unterschiede nicht; unter besonderen Umständen fallen die üblichen Unterscheidungen zusammen
+
+{{Charakteristische Wortkombinationen}}
+:[1] ''Katzen'' [[fauchen]], [[jagen]], [[lauern]], [[kratzen]], [[mausen]], [[mau(n)zen]], [[miauen]], [[schlecken]], (herum-/umher-)[[schleichen]], [[schmusen]], [[schnurren]]
+:[1] (die) ''Katze'' im [[Sack]], (die) ''Katze'' aus dem Sack, , wie eine ''Katze'', die ''Katze'' auf dem [[heiß]]en [[Blechdach]], wie [[Hund]] und ''Katz'', die ''Katze'' im Sack [[kaufen]], wie die ''Katze'' um den [[heiß]]en [[Brei]], die ''Katze'' aus dem Sack [[lassen]], wie die ''Katze'' auf die [[Füße]] [[fallen]], eine ''Katze'' mag zu einem König aufblicken, eine ''Katze'' mit [[Handschuhen]] [[fängt]] keine [[Mäuse]], der ''Katze'' die [[Schelle]] [[anhängen]], [[schleich]] nicht wie die ''Katze'' um den heißen Brei, eine [[braun]] [[gezeichnete]] ''Katze'', so [[nass]] wie eine [[ertränkte]] ''Katze'', eine ''Katze'' hat ein [[zäh]]es [[Leben]], leben wie Hund und ''Katze'', eine [[verbrüht]]e ''Katze'' [[fürchtet]] [[kalt]]es [[Wasser]], man muss die ''Katze'' nicht im Sack kaufen, wie Hund und ''Katze'' leben, eine ''Katze'' hat [[neun]] [[Leben]], Schmitts ''Katze'', [[Schrödingers Katze|Schrödingers ''Katze'']]
+:[1] eine [[abessinisch]]e ''Katze'', {{Audio|De-eine gefleckte Katze.ogg|->}} eine [[gefleckt]]e ''Katze,'' eine [[gestreift]]e ''Katze,'' eine [[getigerte]] ''Katze,'' eine [[schwanzlos]]e ''Katze,'' eine [[schwarz]]e ''Katze''
+:[?] [[Neunschwänzige Katze]] (=[[Peitsche]])
+
+{{Wortbildungen}}
+:[[Katzenallergie]], [[Katzenauge]], [[Katzenbaum]], <!--(Kratzbaum) das kann man dann unter Katzenbaum bzw. Kratzbaum schreiben --> [[Katzenbuckel]], [[Katzendreck]], [[Katzenfell]], [[Katzenfutter]], [[Katzengold]], [[Katzengras]], [[Katzenjammer]], [[Katzenjunges]], [[Katzenklappe]], [[Katzenklo]], [[Katzenkonzert]], [[Katzenleukose]], [[Katzenminze]],  [[Katzenmusik]], [[Katzenpfote]], [[Katzenschnupfen]], [[Katzensprung]], [[Katzentisch]], [[Katzenwäsche]]
+
+==== Übersetzungen ====
+{{Ü-Tabelle|Ü-links=
+*{{ar|DMG}}:
+**{{MHA}}: [1] {{Üxx4|ar|بس|v=بَسّ|d=bass|DMG=0}} {{m}}, {{Üxx4|ar|DMG=0|d=qiṭṭ|v=قِطّ|قط}} {{m}}, {{Üxx4|ar|DMG=0|d=hirr|v=هِرّ|هر}} {{m}}, [1a] {{Üxx4|ar|بسة|v=بَسَّة|d=bassa|DMG=0}} {{f}}, {{Üxx4|ar|DMG=0|d=qiṭṭa|v=قِطَّة|قطة}} {{f}}, {{Üxx4|ar|DMG=0|d=hirra|v=هِرَّة|هرة}} {{f}}, [3] {{Üxx4|ar|سنور|v=سِنَّوْر|d=sinnawr|DMG=0}} {{m}}
+**{{ary}}: [1] {{Üxx4|ar|DMG=0|d=qaṭṭ<ref name="Moscoso García">Nach {{Literatur | Autor=Francisco Moscoso García | Titel=Diccionario español – árabe marroquí | Verlag=Junta de Andalucía, Dirección General de Coordinación de Políticas Migratorias | Ort=Sevilla | Jahr=2005 | ISBN=84-689-2464-4 }}, Stichwort »Gato«, Seite 140.</ref>; ''mundartnah:'' qeṭṭ<ref name="DMA-ME118">Mundartnahe Umschrift nach {{Literatur | Herausgeber=Richard S. Harrell; compiled by Thomas Fox, Mohammed Abu-Talib, with the assistance of Ahmed Ben Thami, Allal Chreibi, Habiba Kanouni, Ernest Ligon, Mohammed Mekaoui | Titel=A Dictionary of Moroccan Arabic | TitelErg=Moroccan–English | Verlag=Georgetown University Press | Ort=Washington, D.C. | Jahr=1966 }}, Stichwort »''qeṭṭ''« sowie Stichwort »''qeṭṭa''«, Seite 118.</ref><ref name="DMA-EM30">Mundartnahe Umschrift nach {{Literatur | Herausgeber=Harvey Sobleman, Richard S. Harrell; compilation by Thomas Fox, Alan McAninch, Allal Chreibi, Majid Soussane, Mohamed Neheiri | Titel=A Dictionary of Moroccan Arabic | TitelErg=English–Moroccan | Verlag=Georgetown University Press | Ort=Washington, D.C. | Jahr=1963 }}, Stichwort »cat«, Seite 30.</ref>|v=قَطّ|قط}} {{m}}, {{Üxx4|ar|DMG=0|d=qiṭṭ|v=قِطّ|قط}} {{m}}<ref name="Moscoso García"/>, {{Üxx4|ar|مش|v=مَشّ|d=mašš; ''mundartnah:'' mešš<ref name="Moscoso García"/><ref name="DMA-ME88">Mundartnahe Umschrift nach {{Literatur | Herausgeber=Richard S. Harrell; compiled by Thomas Fox, Mohammed Abu-Talib, with the assistance of Ahmed Ben Thami, Allal Chreibi, Habiba Kanouni, Ernest Ligon, Mohammed Mekaoui | Titel=A Dictionary of Moroccan Arabic | TitelErg=Moroccan–English | Verlag=Georgetown University Press | Ort=Washington, D.C. | Jahr=1966 }}, Stichwort »''mešš, mošš''« sowie Stichwort »''mešša''«, Seite 88.</ref><ref name="DMA-EM30"/>|DMG=0}} {{m}} ~ {{Üxx4|ar|مش|v=مُشّ|d=mušš<ref name="Moscoso García"/>; ''mundartnah:'' mošš<ref name="DMA-ME88"/><ref name="DMA-EM30"/>|DMG=0}} {{m}}, [1a] {{Üxx4|ar|DMG=0|d=qaṭṭa<ref name="Moscoso García"/>; ''mundartnah:'' qeṭṭa<ref name="DMA-ME118"/>|v=قَطَّة|قطة}} {{f}},{{Üxx4|ar|DMG=0|d=qiṭṭa|v=قِطَّة|قطة}} {{f}}<ref name="Moscoso García"/>, {{Üxx4|ar|مشة|v=مَشَّة|d=mašša; ''mundartnah:'' mešša<ref name="DMA-ME88"/><ref name="DMA-EM30"/>|DMG=0}} {{f}}
+**{{arz}}: [1] {{Üxx4|ar|DMG=0|d=quṭṭ; ''mundartnah:'' ʾuṭṭ<ref name="DEA">Mundartnahe Umschrift nach {{Literatur | Autor=El-Said Badawi, Martin Hinds | Titel=A Dictionary of Egyptian Arabic | TitelErg=Arabic-English | Verlag=Librairie du Liban | Ort=Beirut | Jahr=1986 }}, Stichwort »{{Arab|قطّ}}« und Stichwort »{{Arab|قطّة}}«, Seite 707.</ref>|v=قُطّ|قط}} {{m}}, [1a] {{Üxx4|ar|DMG=0|d=quṭṭa; ''mundartnah:'' ʾuṭṭa<ref name="DEA"/>|v=قُطَّة|قطة}} {{f}}
+**[[w:en:Levantine Arabic|Levantinisches Arabisch]]:
+***[[w:Palästinensisch-Arabisch|Palästinensisch-Arabisch]]: [1] {{Üxx4|ar|بس|v=بِسّ|d=biss|DMG=0}} {{m}}<ref name="Bauer">Nach {{Lit-Bauer: Wörterbuch der arabischen Umgangssprache|A=2}}, Stichwort »Kater« und Stichwort »Katze« , Seite 171 sowie Anmerkungen zur Realisierung des [[w:Qaf|Qāf]] Seite ⅩⅣ.</ref>, {{Üxx4|ar|DMG=0|d=quṭṭ; ''mundartnah: städtisch zumeist nur:'' ʾuṭṭ, ''beduinisch sowie in Nazareth, Ostjerusalem:'' guṭṭ, ''fellachisch:'' kuṭṭ|v=قُطّ|قط}} {{m}}<ref name="Bauer"/>, [1a] {{Üxx4|ar|بسة|v=بِسَّة|d=bissa; ''mundartnah:'' bisse<ref name="Bauer"/>|DMG=0}} {{f}}, {{Üxx4|ar|DMG=0|d=quṭṭa; ''mundartnah:'' quṭṭe, ''städtisch zumeist nur:'' ʾuṭṭe, ''beduinisch sowie in Nazareth, Ostjerusalem:'' guṭṭe, ''fellachisch:'' kuṭṭe|v=قُطَّة|قطة}} {{f}}
+***[[w:Libanesisch-Arabisch|Libanesisch-Arabisch]]: [1] {{Üxx4|ar|بسين|v=بُسَيْن|d=busayn; ''mundartnah:'' bseyn<ref name="Bauer"/>|DMG=0}} {{m}}, [1a] {{Üxx4|ar|بسينة|v=بُسَيْنَة|d=busayna; ''mundartnah:'' bseyne<ref name="Bauer"/>|DMG=0}} {{f}}  
+***[[w:Syrisch-Arabisch|Syrisch-Arabisch]]: [1] {{Üxx4|ar|DMG=0|d=qaṭṭ|v=قَطّ|قط}} {{m}}<ref name="DSA">{{Literatur | Herausgeber=Karl Stowasser, Moukhtar Ani | Titel=A Dictionary of Syrian Arabic | TitelErg=English–Arabic | Verlag=Georgetown University Press | Ort=Washington, D.C. | Jahr=2004 (Georgetown classics in Arabic language and linguistics) | ISBN=1-58901-105-8 }}, Stichwort »cat«, Seite 36.</ref>, [1a] {{Üxx4|ar|DMG=0|d=qaṭṭa<ref name="DSA"/>; ''mundartnah:'' qaṭṭe ''städtisch zumeist nur:'' ʾaṭṭe, ʾaṭṭi|v=قَطَّة|قطة}} {{f}}
+**[[w:Irakisch-Arabisch|Irakisch-Arabisch]]: [1] {{Üxx4|ar|بزون|v=بَزُّون|d=bazzūn|DMG=0}} {{m}}<ref name="DIA1967-34">{{Literatur | Autor=D.R. Woodhead, Wayne Beene (Hrsg.); under the technical direction of Karl Stowasser, with the assistance of Majid Damah, Faisal Al-Khalaf, Husain Mustafa, Darrel Smith, Ronald G. Wolfe | Titel=A Dictionary of Iraqi Arabic | TitelErg=Arabic–English | Verlag=Georgetown University Press | Ort=Washington, D.C. | Jahr=1967 | ISBN=0-87840-281-0 }}, Stichwort »b-z-z-w-n, bazzuun, bazzuuna«, Seite 34.</ref><ref name="DIA2003-34">{{Literatur | Herausgeber=Beverly E. Clarity, Karl Stowasser, Ronald G. Wolfe, D.R. Woodhead, Wayne Beene | Titel=A Dictionary of Iraqi Arabic | TitelErg=English–Arabic Arabic–English | Verlag=Georgetown University Press | Ort=Washington, D.C. | Jahr=2003 | ISBN=0-87840-136-9 }}, Stichwort »b-z-z-w-n, bazzuun, bazzuuna«, Seite 34 (arabisch-englischer Teil).</ref>, [1a] {{Üxx4|ar|بزونة|v=بَزُّونَة|d=bazzūna|DMG=0}} {{f}}<ref name="DIA1967-34"/><ref name="DIA2003-34"/>
+*{{hy}} <small>([[w:Armenisches_Alphabet#Buchstaben|DIN 32706]])</small>: [1] {{Üt|hy|կատու|katow}}
+*{{az}}: [1] {{Ü|az|pişik}}
+*{{eu}}: [1] {{Ü|eu|katu}}
+*{{br}}: [1] {{Ü|br|kazh}}
+*{{bg}} <small>([[w:ISO 9|ISO 9]])</small>: [1] {{Üt|bg|котка|kótka}}
+*{{zh}}:
+**[[Hochchinesisch|Mandarin]] <small>([[w:Pinyin|Pinyin]])</small>: [1] ''traditionelle Schreibweise:'' {{Üt|zh|貓|māo}} / ''vereinfachte Schreibweise:'' {{Üt|zh|猫|māo}}
+*{{da}}: [1] {{Ü|da|kat}}
+*{{en}}: [1] {{Ü|en|cat}}; [1a] {{Ü|en|she-cat}}; [3] {{Ü|en|feline}}
+*{{eo}}: [1] {{Ü|eo|kato}}
+*{{et}}: [1] {{Ü|et|kass}}
+*{{fo}}: [1] {{Ü|fo|ketta}}
+*{{fi}}: [1] {{Ü|fi|kissa}}, [3] {{Ü|fi|kissaeläimet}} ''Pl.''
+*{{fr}}: [1] {{Ü|fr|chat}} {{m}}, [1a] {{Ü|fr|chatte}} {{f}}, [3] {{Ü|fr|félin}} {{m}},  {{Ü|fr|félidé}} {{m}}
+*{{ka}} <small>([[w:Georgisches_Alphabet#Umschrift|DIN 32707:2010-01]])</small>: [1] {{Üt|ka|კატა|kata}}
+*{{el|iU}}: [1] {{Üt|el|γάτα|gáta}}
+*{{he|CHA}}: [1, 3] {{Üxx4|he|חתול|v=חָתוּל|d=ḥāṯū́l|CHA=0}} {{m}}, [1a] {{Üxx4|he|חתולה|v=חֲתוּלָה|d=ḥ<sup>a</sup>ṯūlā́|CHA=0}} {{f}}
+*{{hi}} <small>([[w:ISO 15919|ISO 15919]])</small>: [1] {{Üt|hi|बिल्ली|billī}}
+*{{id}}: [1] {{Ü|id|kucing}}
+*{{ga}}: [1] {{Ü|ga|cat}}
+*{{is}}: [1] {{Ü|is|köttur}} {{m}}; [1a] {{Ü|is|læða}} {{f}}
+*{{it}}: [1] {{Ü|it|gatto}} {{m}}; [1a] {{Ü|it|gatta}} {{f}}
+*{{ja}} <small>([[w:Hepburn-System|Hepburn]])</small>: [1, 1a] {{Üt|ja|猫|ねこ, neko}}; ''schriftsprachlich:'' {{Üt|ja|狸奴|りど, rido}}; ''[[Anglizismus]]:'' {{Üt|ja|キャット|きゃっと, kyatto}}
+|Ü-rechts=
+*{{yi|YIVO}}: [1, 1a, 3] {{Üxx4|yi|קאַץ|d=kats|YIVO=0}} {{f}}
+*{{kk}}: [1] {{Üt|kk|мысық|mısıq}}
+*{{ca}}: [1] {{Ü|ca|gat}} {{m}}
+*{{ky}}: [1] {{Üt|ky|мышык|mışık}}
+*{{ko}}: [1] {{Üt|ko|고양이|goyangi}}
+*{{crh}}: [1] {{Ü|crh|mışıq}}
+*{{hr}}: [1] {{Ü|hr|mačka}} {{f}}
+*{{ku}}: [1] {{Üt|ku|pisîk|}}
+*{{la}}: [1] {{Ü|la|felis}}
+*{{ltg}}: [1] {{Ü|ltg|kačs}}, {{Ü|ltg|kakis}}
+*{{lv}}: [1] {{Ü|lv|kaķis}}
+*{{lt}}: [1] {{Ü|lt|katė}}
+*{{lb}}: [1] {{Ü|lb|Kaz}} {{f}}
+*{{mt}}: [1] {{Ü|mt|qattus}} {{m}}, [1a] {{Ü|mt|qattusa}} {{f}}
+*{{mi}}: [1] {{Ü|mi|puihi}}
+*{{mk}} <small>([[w:ISO 9|ISO 9]])</small>: [1] {{Üt|mk|мачка|mačka}} {{f}}
+*{{mn}} <small>([[w:ISO 9|ISO 9]])</small>: [1] {{Üt|mn|муур|muur}}
+*{{nds}}: [1–3] {{Ü|nds|Katt}}, [1] {{Ü|nds|Puus}}
+*{{nl}}: [1, 1a] {{Ü|nl|kat}} {{f}}
+*{{no}}: [1] {{Ü|no|huskatt}} {{m}}, {{Ü|no|katt}} {{m}}, {{Ü|no|katte}} {{f}}
+*{{pl}}: [1] {{Ü|pl|kot}} {{m}}; [1a] {{Ü|pl|kotka}} {{f}}
+*{{pt}}: [1] {{Ü|pt|gato}} {{m}}; [1a] {{Ü|pt|gata}} {{f}}; [2] {{Ü|pt|carrete}} {{f}}
+*{{rm}}: [1] {{Ü|rm|giat}} {{m}}; [1a] {{Ü|rm|giatta}} {{f}}
+*{{ro}}: [1] {{Ü|ro|pisică}}
+*{{ru}} <small>([[w:ISO 9|ISO 9]])</small>: [1, 1a] {{Üt|ru|кошка|koška}} {{f}}
+*{{sm}}: [1] {{Ü|sm|gose}}, {{Ü|sm|geli}}, {{Ü|sm|pusi}}
+*{{sv}}: [1] {{Ü|sv|katt}} {{u}}, [3] {{Ü|sv|kattdjur}} {{n}}
+*{{sco}}: [1] {{Ü|sco|gibbie}}
+*{{sr}}: [1] {{Üt|sr|мачка|mačka}} 
+*{{sk}}: [1, 2] {{Ü|sk|mačka}} {{f}}
+*{{sl}}: [1] {{Ü|sl|mačka}} {{f}}
+*{{wen}}:
+**{{dsb}}: [1] {{Ü|dsb|kocka}} {{f}}
+**{{hsb}}: [1] {{Ü|hsb|kóčka}} {{f}}
+*{{es}}: [1] {{Ü|es|gato}} {{m}}; [1a] {{Ü|es|gata}} {{f}}; [3] {{Ü|es|félido}} {{m}}
+*{{sw}}: [1] {{Ü|sw|paka}}
+*{{th}} <small>([[Hilfe:RTGS|RTGS]])</small>: [1] {{Üt|th|แมว|maew}}
+*{{cs}}: [1–3] {{Ü|cs|kočka}} {{f}}
+*{{cv}} <small>([[w:ISO 9|ISO 9]])</small>: [1] {{Üt|cv|кушак|kušak}}
+*{{tr}}: [1] {{Ü|tr|kedi}}
+*{{tk}}: [1] {{Ü|tk|pişik}}
+*{{ug}}: [1] {{Üxx4|ug|مۈشۈك|d=müxük|DMG=0}}
+*{{hu}}: [1] {{Ü|hu|macska}}, {{Ü|hu|cica}}
+*{{uz}}: [1] {{Ü|uz|mushuk}}
+*{{vi}}: [1] {{Ü|vi|mèo}}
+*{{cy}}: [1] {{Ü|cy|cath}} {{f}}
+*{{be}} <small>([[w:ISO 9|ISO 9]])</small>: [1, 1a] {{Üt|be|кошка|koška}} {{f}}
+|Dialekttabelle=
+{{überarbeiten|1=unbelegte Angaben belegen, [[Benutzer:Caligari|Caligari]] [[Benutzer_Diskussion:Caligari|<span style="font-family: 'Arial Unicode MS', sans-serif;"><span class="ipa" style="padding: 0 1px; text-decoration: none;"><sup>Ɔ</sup>ɐ<sup>ƀïи</sup>Ϡ<sub>Ⴕ</sub></span></span>]] 19:29, 11. Apr. 2015 (MESZ)|2=Deutsch}}
+*'''Westniederdeutsch:'''
+*'''Westmitteldeutsch:'''
+**[[Mittelfränkisch]]:
+***[[Moselfränkisch]]:
+****[[Hunsrückisch]]:
+*****Riograndenser Hunsrückisch: {{Lautschrift|kʰad̥s}}<ref>{{Lit-Altenhofen: Hunsrückisch in Rio Grande do Sul}}, Seite 170, 229, 264.</ref>
+**[[Rheinfränkisch]]:
+***{{pfl}}: [1] [[Dachhase|Dachhaas]]{{QS Herkunft|unbelegt}}
+****{{pdc}}: {{Lautschrift|kɒds}}<ref>{{Lit-Kelz: Phonologische Analyse des Pennsylvaniadeutschen}}, Seite 35.</ref>, {{Lautschrift|kɔds}}<ref>Ebenda, Seite 99.</ref>
+*'''Westoberdeutsch ([[Alemannisch]]):'''
+**Schwäbisch: [1] [[Katz]]{{QS Herkunft|unbelegt}}, [[Mull]]{{QS Herkunft|unbelegt}}
+**Schweizerdeutsch: [1] [[Chatz]]{{QS Herkunft|unbelegt}}, [[Chätzli]]{{QS Herkunft|unbelegt}}; ''mundartnah'' {{fam.|:}} [[Büsi]]
+|D-rechts=
+*'''Ostniederdeutsch:'''
+*'''Ostmitteldeutsch:'''
+**Sächsisch: [1] [[Mullemusch]]{{QS Herkunft|unbelegt}}
+*'''Ostoberdeutsch:'''
+**[[Ostfränkisch]]: [1] [[Menger]] {{Lautschrift|ˈmeŋɡəʁ}} {{m}}{{QS Herkunft|unbelegt}}, [[Mengere]] {{Lautschrift|ˈmeŋɡəʁe}} {{f}}{{QS Herkunft|unbelegt}}
+**[[Bairisch]]: [1] [[Katz]]{{QS Herkunft|unbelegt}}, [[Muschi]]{{QS Herkunft|unbelegt}}
+}}
+
+{{Referenzen}}
+:[1] {{Wikipedia}}
+:[1–3] {{Wikipedia|Katze (Begriffsklärung)}}
+:[1, 2] {{Ref-Grimm}}
+:[1] {{Ref-DWDS}}
+:[1, 3] {{Ref-Canoo}}
+:[1, 2] {{Ref-UniLeipzig}}
+:[1, 3] {{Ref-FreeDictionary}}
+:[1] Wiktionary-Verzeichnis [[Verzeichnis:Tiere|Tiere]]
+
+{{Quellen}}
+
+{{Ähnlichkeiten 1|[[Atze]], [[Glatze]], [[Kate]], [[Karzer]], [[Kitze]], [[Kotze]], [[kotze]], [[kratze]], [[Matze]], [[patze]], [[Ratze]], [[Tatze]]}}
+
+[[az:Katze]]
+[[br:Katze]]
+[[bs:Katze]]
+[[ca:Katze]]
+[[chr:Katze]]
+[[cs:Katze]]
+[[cy:Katze]]
+[[da:Katze]]
+[[el:Katze]]
+[[en:Katze]]
+[[et:Katze]]
+[[eu:Katze]]
+[[fa:Katze]]
+[[fi:Katze]]
+[[fj:Katze]]
+[[fr:Katze]]
+[[fy:Katze]]
+[[ga:Katze]]
+[[gl:Katze]]
+[[gv:Katze]]
+[[hu:Katze]]
+[[id:Katze]]
+[[io:Katze]]
+[[it:Katze]]
+[[ja:Katze]]
+[[ko:Katze]]
+[[ku:Katze]]
+[[la:Katze]]
+[[lb:Katze]]
+[[lt:Katze]]
+[[lv:Katze]]
+[[mg:Katze]]
+[[nah:Katze]]
+[[nds:Katze]]
+[[nl:Katze]]
+[[no:Katze]]
+[[pl:Katze]]
+[[pt:Katze]]
+[[ro:Katze]]
+[[ru:Katze]]
+[[sk:Katze]]
+[[sr:Katze]]
+[[sv:Katze]]
+[[tl:Katze]]
+[[tr:Katze]]
+[[ug:Katze]]
+[[uk:Katze]]
+[[vec:Katze]]
+[[zh:Katze]]
+

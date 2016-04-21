@@ -100,7 +100,7 @@ functions, defined in `Text.MediaWiki.Wiktionary.Base`:
 > enParseRelation = parseRelation $ RelationSectionInfo {
 >   rsLanguage="en",
 >   rsTemplateProc=enTemplates,
->   rsItemExtractor=extractTopLevel
+>   rsItemRule=pRelationItem
 > }
 >
 > enParseTranslations = parseTranslations $ TranslationSectionInfo {

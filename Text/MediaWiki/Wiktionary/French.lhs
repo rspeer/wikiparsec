@@ -140,7 +140,7 @@ functions, defined in `Text.MediaWiki.Wiktionary.Base`:
 > frParseRelation = parseRelation $ RelationSectionInfo {
 >   rsLanguage="fr",
 >   rsTemplateProc=frTemplates,
->   rsItemExtractor=extractTopLevel
+>   rsItemRule=pRelationItem
 > }
 >
 > frParseTranslations = parseTranslations $ TranslationSectionInfo {

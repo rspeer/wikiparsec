@@ -275,13 +275,8 @@ something to make them part of the definition above.
 >       atext'      = annotate annotations defn
 >   in (senseID, atext')
 
-`extractLabeledItem` gets fundamentally the same information as
-`extractLabeledDefItem`, but `extractLabeledDefItem` returns LabeledDefs to be
-compatible with `extractNumbered`, while `extractLabeledItem` returns
-AnnotatedTexts to be compatible with `extractTopLevel`.
-
-> extractLabeledItem :: ListItem -> [AnnotatedText]
-> extractLabeledItem item = map snd (extractLabeledDefItem item)
+> extractLabeledItems :: ListItem -> [AnnotatedText]
+> extractLabeledItems items = map snd (extractLabeledDefs items)
 
 Items in definition lists, and their corresponding entries in sections that
 describe particular relations, can have complex lists of label numbers. For
@@ -374,7 +369,7 @@ vary by language in RelationSectionInfo.
 > data RelationSectionInfo = RelationSectionInfo {
 >   rsLanguage :: Language,             -- the language to be parsed
 >   rsTemplateProc :: TemplateProc,     -- the template procedure to use
->   rsItemExtractor :: (ListItem -> [AnnotatedText])  -- what to do with items we find
+>   rsItemRule :: (TemplateProc -> Parser [AnnotatedText])  -- how to parse items
 > }
 >
 > parseRelation :: RelationSectionInfo -> Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
@@ -383,15 +378,18 @@ vary by language in RelationSectionInfo.
 >
 > pRelationSection :: RelationSectionInfo -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pRelationSection rsInfo rel thisTerm =
->   map (assignRel rel)
+>   let tproc = (rsTemplateProc rsInfo)
+>       language = rsLanguage rsInfo
+>       itemRule = rsItemRule rsInfo
+>   in map (assignRel rel)
 >     <$> mconcat
->     <$> map (entryToFacts (rsLanguage rsInfo) thisTerm)
+>     <$> map (entryToFacts language thisTerm)
 >     <$> mconcat
->     <$> many (pRelationItem rsInfo <|> pRelationIgnored)
+>     <$> many ((itemRule tproc) <|> pRelationIgnored)
 >
-> pRelationItem :: RelationSectionInfo -> Parser [AnnotatedText]
-> pRelationItem rsInfo =
->   (rsItemExtractor rsInfo) <$> listItem (rsTemplateProc rsInfo) "*"
+> pRelationItem :: TemplateProc -> Parser [AnnotatedText]
+> pRelationItem tproc =
+>   extractTopLevel <$> listItem tproc "*"
 >
 > pRelationIgnored :: Parser [AnnotatedText]
 > pRelationIgnored = wikiTextLine ignoreTemplates >> newLine >> return []

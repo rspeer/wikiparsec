@@ -70,17 +70,18 @@ a function that will extract WiktionaryFacts.
 > deParseSection title (WikiSection {headings=headings, content=content}) =
 >   case headings of
 >     (_:_:pos:trans:[]) ->
->       if trans == "Übersetzungen"
->         then (deParseTranslations term content)
->         else []
+>       let term = getHeadingTerm title (evalHeading pos) in
+>         if trans == "Übersetzungen"
+>           then (deParseTranslations term content)
+>           else []
 >     (_:_:pos:[]) ->
 >       let term = getHeadingTerm title (evalHeading pos) in
 >         deParseCombinedSection term content
 >     _ -> []
 
-> getHeadingTerm :: AnnotatedText -> WiktionaryTerm
+> getHeadingTerm :: Text -> AnnotatedText -> WiktionaryTerm
 > getHeadingTerm title annot =
->   annotationToTerm "de" (insert "page" title (mconcat (getAnnotations annot)))
+>   annotationToTerm "de" (insertMap "page" title (mconcat (getAnnotations annot)))
 
 Parsing the big section
 -----------------------
@@ -103,14 +104,21 @@ in various ways.
 >   (pRelationSubsection "Sinnverwandte Wörter" "related" term) <|>
 >   (pRelationSubsection "Synonyme" "synonym" term) <|>
 >   (pRelationSubsection "Wortbildungen" "derived" term) <|>
->   (pRelationSubsection "Verkleinerungsformen" "form/diminutive" term) <|>
->   (pRelationSubsection "Vergrößerungsformen" "form/augmentative" term) <|>
->   (pRelationSubsection "Weibliche Wortformen" "form/feminine" term) <|>
->   (pRelationSubsection "Männliche Wortformen" "form/masculine" term) <|>
+>   (pRelationSubsection "Verkleinerungsformen" "hasForm/diminutive" term) <|>
+>   (pRelationSubsection "Vergrößerungsformen" "hasForm/augmentative" term) <|>
+>   (pRelationSubsection "Weibliche Wortformen" "hasForm/feminine" term) <|>
+>   (pRelationSubsection "Männliche Wortformen" "hasForm/masculine" term) <|>
 >   -- If we don't match any of our desired section types, consume a line
 >   -- and return nothing
->   (wikiTextLine ignoreTemplates >> newLine >> return [])
->   
+>   (newLine >> return []) <|>
+>   pArbitraryLine term
+>
+> pArbitraryLine :: WiktionaryTerm -> Parser [WiktionaryFact]
+> pArbitraryLine thisTerm = do
+>   line <- templateText ignoreTemplates <|> wikiTextLine ignoreTemplates
+>   newLine
+>   return []
+>
 
 Defining quasi-section parsers
 ------------------------------
@@ -118,21 +126,29 @@ Defining quasi-section parsers
 > pDefinitionSubsection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pDefinitionSubsection term = do
 >   specificTemplate ignoreTemplates "Bedeutungen"
+>   many1 newLine
 >   defs <- pLabeledDefinitionList deTemplates
->   return (map (definitionToFacts "de" term) defs)
+>   return (mconcat (map (definitionToFacts "de" term) defs))
 
-> pRelationSubsection :: Text -> Text -> WiktionaryTerm -> [WiktionaryFact]
+> pRelationSubsection :: Text -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pRelationSubsection heading rel term = do
 >   specificTemplate ignoreTemplates heading
->   pRelationSection "de" deTemplates rel term
+>   many1 newLine
+>   pDeRelationSection rel term
 
-> deParseDefinitions = parseDefinitions "de" deTemplates
-> deParseRelation = parseRelation "de" deTemplates
+> pDeRelationSection :: Text -> WiktionaryTerm -> Parser [WiktionaryFact]
+> pDeRelationSection rel thisTerm =
+>   map (assignRel rel)
+>     <$> mconcat
+>     <$> map (entryToFacts "de" thisTerm)
+>     <$> extractLabeledItems
+>     <$> indentedList deTemplates ":"
+
 > deParseTranslations = parseTranslations $ TranslationSectionInfo {
 >   tsLanguage="de",
 >   tsTemplateProc=deTemplates,
 >   tsStartRule=pTransTop,
->   tsIgnoreRule=pTransMid <|> pBlankLine,
+>   tsIgnoreRule=pColumnDivider <|> pMiscTemplate <|> pBlankLine,
 >   tsEndRule=pTransBottom
 > }
 
@@ -141,9 +157,15 @@ translation section. If this template has an argument, it labels the word
 sense.
 
 > pTransTop :: Parser (Maybe Text)
-> pTransTop = string "{{Ü-Tabelle|Ü-links=\n" >> return Nothing
+> pTransTop = skipSpace >> string "{{Ü-Tabelle|Ü-links=\n" >> return Nothing
 >
-> pTransMid = string "|Ü-rechts=\n" >> return ()
+> pColumnDivider = do
+>   string "|"
+>   string "Ü-rechts=" <|> string "D-rechts=" <|> string "Dialekttabelle="
+>   newLine
+>   return ()
+>
+> pMiscTemplate = templateText ignoreTemplates >> newLine >> return ()
 >
 > pTransBottom :: Parser ()
 > pTransBottom = string "}}" >> return ()
@@ -175,6 +197,11 @@ Part of speech headings
 > getLanguage :: Text -> Template -> Text
 > getLanguage key map = fromLanguage $ lookupLanguage "de" $ get key map
 
+Inflected forms
+---------------
+
+> handleFormTemplate = skipTemplate
+
 
 Putting it all together
 -----------------------
@@ -191,6 +218,6 @@ Cases that need to be checked with expressions instead of plain pattern
 matches:
 
 > deTemplates x
->   | isinfixOf " Übersicht" x   = handleFormTemplate
+>   | isInfixOf " Übersicht" x   = handleFormTemplate
 >   | otherwise                  = skipTemplate
 
