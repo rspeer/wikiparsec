@@ -92,16 +92,17 @@ based on the type of section we're parsing.
 Defining section parsers
 ------------------------
 
-Most section parsers are easy to define by providing parameters to more
-general functions in `Text.MediaWiki.Wiktionary.Base`:
+Defining section parsers by filling in the missing details in more general
+functions, defined in `Text.MediaWiki.Wiktionary.Base`:
 
 > enParseDefinitions = parseDefinitions "en" enTemplates
-> enParseRelation = parseRelation "en" enTemplates
-
-The only section parser that will be more complicated to define is
-`enParseTranslations`, which fills in details for the general
-`parseTranslations` function:
-
+>
+> enParseRelation = parseRelation $ RelationSectionInfo {
+>   rsLanguage="en",
+>   rsTemplateProc=enTemplates,
+>   rsItemExtractor=extractTopLevel
+> }
+>
 > enParseTranslations = parseTranslations $ TranslationSectionInfo {
 >   tsLanguage="en",
 >   tsTemplateProc=enTemplates,

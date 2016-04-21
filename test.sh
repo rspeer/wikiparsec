@@ -8,5 +8,6 @@
 
 for file in tests/*.hs
 do
+    echo $file
     stack runghc $file
 done

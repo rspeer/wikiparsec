@@ -216,12 +216,15 @@ recursively run this parser to parse the rest.
 
 > pDefinitionSection :: TemplateProc -> Parser [LabeledDef]
 > pDefinitionSection tproc =
->   pDefinitionList tproc <|>
+>   pNumberedDefinitionList tproc <|>
 >   (newLine >> pDefinitionSection tproc) <|>
 >   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection tproc)
 >
-> pDefinitionList :: TemplateProc -> Parser [LabeledDef]
-> pDefinitionList tproc = extractNumberedDefs <$> orderedList tproc "#"
+> pNumberedDefinitionList :: TemplateProc -> Parser [LabeledDef]
+> pNumberedDefinitionList tproc = extractNumberedDefs <$> orderedList tproc "#"
+>
+> pLabeledDefinitionList :: TemplateProc -> Parser [LabeledDef]
+> pLabeledDefinitionList tproc = extractLabeledDefs <$> indentedList tproc ":"
 
 To distinguish different definitions, we associate them with an automatically
 generated ID such as "def.1.1".
@@ -234,6 +237,7 @@ TODO give an example because this is all confusing
 >
 > extractNumbered :: Text -> ListItem -> [LabeledDef]
 > extractNumbered prefix (OrderedList items) = extractNumberedIter prefix 1 items
+> extractNumbered prefix _ = error "Wrong type of list"
 >
 > extractNumberedIter :: Text -> Int -> [ListItem] -> [LabeledDef]
 > extractNumberedIter prefix counter list =
@@ -244,6 +248,73 @@ TODO give an example because this is all confusing
 >                                   ++ (extractNumberedIter prefix (counter + 1) rest)
 >     _:rest                     -> extractNumberedIter prefix counter rest
 >     []                         -> []
+
+In German and some other Wiktionaries that have followed its lead, lists have
+specifically numbered word senses instead of automatic numbering. Instead of
+starting with `#`, for example, a definition line starts with `:[1]`.
+
+We aren't going to parse sub-definitions, the ones that start with `::[a]` or
+something to make them part of the definition above.
+
+> extractLabeledDefs :: ListItem -> [LabeledDef]
+> extractLabeledDefs (IndentedList items) = mconcat (map extractLabeledDefItem items)
+> extractLabeledDefs _ = error "Wrong type of list"
+>
+> extractLabeledDefItem :: ListItem -> [LabeledDef]
+> extractLabeledDefItem (Item item) =
+>   case parseOnly pLabeledItem (getText item) of
+>     Left err -> []
+>     Right (labelList, defn) ->
+>       [adjustLabel label defn item | label <- labelList]
+> extractLabeledDefItem _ = []
+>
+> adjustLabel :: Text -> Text -> AnnotatedText -> LabeledDef
+> adjustLabel senseLabel defn atext =
+>   let senseID     = "def." <> senseLabel
+>       annotations = (singletonMap "senseID" senseID):getAnnotations atext
+>       atext'      = annotate annotations defn
+>   in (senseID, atext')
+
+`extractLabeledItem` gets fundamentally the same information as
+`extractLabeledDefItem`, but `extractLabeledDefItem` returns LabeledDefs to be
+compatible with `extractNumbered`, while `extractLabeledItem` returns
+AnnotatedTexts to be compatible with `extractTopLevel`.
+
+> extractLabeledItem :: ListItem -> [AnnotatedText]
+> extractLabeledItem item = map snd (extractLabeledDefItem item)
+
+Items in definition lists, and their corresponding entries in sections that
+describe particular relations, can have complex lists of label numbers. For
+example, the entry that translates the German word "gehen" into English looks
+like:
+
+    [1] {{Ü|en|walk}}; [1–3, 7, 13] {{Ü|en|go}}; ...
+
+Here, sense 1 of "gehen" is translated as "walk", but all of senses 1, 2, 3, 7,
+and 13 are translated as "go".
+
+> pLabeledItem :: Parser ([Text], Text)
+> pLabeledItem = do
+>   string "["
+>   labels <- pLabels
+>   string "]"
+>   skipSpace
+>   text <- takeText
+>   return (labels, text)
+>
+> pLabels :: Parser [Text]
+> pLabels = mconcat <$> sepBy1 pCommaSeparatedLabel (char ',' >> skipSpace)
+>
+> pCommaSeparatedLabel :: Parser [Text]
+> pCommaSeparatedLabel = pLabelRange <|> (pure <$> pSingleLabel)
+>
+> pSingleLabel = textWith "0123456789abcdefghij"
+>
+> pLabelRange = do
+>   startNum <- decimal
+>   textWith "-–—"
+>   endNum <- decimal
+>   return (map tshow [startNum..endNum])
 
 Converting definitions to facts:
 
@@ -268,7 +339,6 @@ Converting definitions to facts:
 >     case parseOnly pDefinitionText definition of
 >       Right results -> results
 >       Left err -> error err
-
 
 Parsing the language of definitions
 -----------------------------------
@@ -298,20 +368,30 @@ Parsing the language of definitions
 Relation sections
 -----------------
 
-> parseRelation :: Language -> TemplateProc -> Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
-> parseRelation language tproc rel thisTerm text =
->   parseOrDefault [] (pRelationSection language tproc rel thisTerm) text
+Similarly to the translation section, we group together some parameters that
+vary by language in RelationSectionInfo.
+
+> data RelationSectionInfo = RelationSectionInfo {
+>   rsLanguage :: Language,             -- the language to be parsed
+>   rsTemplateProc :: TemplateProc,     -- the template procedure to use
+>   rsItemExtractor :: (ListItem -> [AnnotatedText])  -- what to do with items we find
+> }
 >
-> pRelationSection :: Language -> TemplateProc -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
-> pRelationSection language tproc rel thisTerm =
+> parseRelation :: RelationSectionInfo -> Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
+> parseRelation rsInfo rel thisTerm text =
+>   parseOrDefault [] (pRelationSection rsInfo rel thisTerm) text
+>
+> pRelationSection :: RelationSectionInfo -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
+> pRelationSection rsInfo rel thisTerm =
 >   map (assignRel rel)
 >     <$> mconcat
->     <$> map (entryToFacts language thisTerm)
+>     <$> map (entryToFacts (rsLanguage rsInfo) thisTerm)
 >     <$> mconcat
->     <$> many (pRelationItem tproc <|> pRelationIgnored)
+>     <$> many (pRelationItem rsInfo <|> pRelationIgnored)
 >
-> pRelationItem :: TemplateProc -> Parser [AnnotatedText]
-> pRelationItem tproc = extractTopLevel <$> listItem tproc "*"
+> pRelationItem :: RelationSectionInfo -> Parser [AnnotatedText]
+> pRelationItem rsInfo =
+>   (rsItemExtractor rsInfo) <$> listItem (rsTemplateProc rsInfo) "*"
 >
 > pRelationIgnored :: Parser [AnnotatedText]
 > pRelationIgnored = wikiTextLine ignoreTemplates >> newLine >> return []

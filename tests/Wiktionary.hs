@@ -3,6 +3,7 @@
 import Test.HUnit
 import WikiPrelude hiding (assert)
 import Text.MediaWiki.AnnotatedText
+import Text.MediaWiki.WikiText
 import Text.MediaWiki.Wiktionary.Base
 import Data.Aeson (encode, decode, Value)
 
@@ -62,7 +63,15 @@ tests = test [
     "find prefixed heading 1" ~: findPrefixedHeading "Etymology" ["top", "English"] ~?= Nothing,
     "find prefixed heading 2" ~: findPrefixedHeading "Etymology" ["top", "English", "Etymology"] ~?= Just "",
     "find prefixed heading 3" ~: findPrefixedHeading "Etymology" ["top", "English", "Etymology 1", "Noun"] ~?= Just " 1",
-    "annotated text from writer" ~: annoWriter ~?= annotate [annotationFromList [("1","one"),("2","two")]] "test"
+    "annotated text from writer" ~: annoWriter ~?= annotate [annotationFromList [("1","one"),("2","two")]] "test",
+
+    "extract labeled 1" ~: extractLabeledDefs (IndentedList [(Item "[1] walk"), (Item "[1–3, 7a, 13] go")]) ~?=
+      [("def.1", annotate [singletonMap "senseID" "def.1"] "walk"),
+       ("def.1", annotate [singletonMap "senseID" "def.1"] "go"),
+       ("def.2", annotate [singletonMap "senseID" "def.2"] "go"),
+       ("def.3", annotate [singletonMap "senseID" "def.3"] "go"),
+       ("def.7a", annotate [singletonMap "senseID" "def.7a"] "go"),
+       ("def.13", annotate [singletonMap "senseID" "def.13"] "go")]
     ]
 
 main :: IO ()

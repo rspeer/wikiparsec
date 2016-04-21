@@ -132,14 +132,17 @@ a function that will extract WiktionaryFacts.
 Defining section parsers
 ------------------------
 
-Most section parsers are easy to define by providing parameters to more
-general functions in `Text.MediaWiki.Wiktionary.Base`:
+Defining section parsers by filling in the missing details in more general
+functions, defined in `Text.MediaWiki.Wiktionary.Base`:
 
 > frParseDefinitions = parseDefinitions "fr" frTemplates
-> frParseRelation = parseRelation "fr" frTemplates
-
-Filling in details of the general `parseTranslations` function:
-
+>
+> frParseRelation = parseRelation $ RelationSectionInfo {
+>   rsLanguage="fr",
+>   rsTemplateProc=frTemplates,
+>   rsItemExtractor=extractTopLevel
+> }
+>
 > frParseTranslations = parseTranslations $ TranslationSectionInfo {
 >   tsLanguage="fr",
 >   tsTemplateProc=frTemplates,
