@@ -144,31 +144,53 @@ Defining quasi-section parsers
 >     <$> extractLabeledItems
 >     <$> indentedList deTemplates ":"
 
-> deParseTranslations = parseTranslations $ TranslationSectionInfo {
->   tsLanguage="de",
->   tsTemplateProc=deTemplates,
->   tsStartRule=pTransTop,
->   tsIgnoreRule=pColumnDivider <|> pMiscTemplate <|> pBlankLine,
->   tsEndRule=pTransBottom
-> }
+Parsing the translations section
+--------------------------------
 
-The `pTranslationTopTemplate` rule parses the template that starts a
-translation section. If this template has an argument, it labels the word
-sense.
+There's a function in Wiktionary.Base called `parseTranslations` that applies
+to multiple languages, but the German translation section is too much different
+-- the word-sense information comes from inside the definitions, not from
+a table heading. So let's define it from scratch here.
 
-> pTransTop :: Parser (Maybe Text)
-> pTransTop = skipSpace >> string "{{Ü-Tabelle|Ü-links=\n" >> return Nothing
+> deParseTranslations :: WiktionaryTerm -> Text -> [WiktionaryFact]
+> deParseTranslations thisTerm text =
+>   parseOrDefault (error $ cs text) (pDeTranslationSection thisTerm) text
 >
-> pColumnDivider = do
->   string "|"
->   string "Ü-rechts=" <|> string "D-rechts=" <|> string "Dialekttabelle="
->   newLine
->   return ()
+> pDeTranslationSection :: WiktionaryTerm -> Parser [WiktionaryFact]
+> pDeTranslationSection thisTerm = do
+>   skipSpace
+>   string "{{Ü-Tabelle"
+>   items <- many ((newLine >> return [])
+>                  <|> (pSectionBoundary >> return [])
+>                  <|> (template ignoreTemplates >> return [])
+>                  <|> pDeTranslationLine thisTerm
+>                  <|> (wikiTextLine ignoreTemplates >> newLine >> return []))
+>   return (mconcat items)
+
+pSectionBoundary parses the argument names in the huge template that makes
+up the translation section.
+
+> pSectionBoundary :: Parser ()
+> pSectionBoundary = string "|" >> templateArgName >> skipSpace
+
+> pDeTranslationLine :: WiktionaryTerm -> Parser [WiktionaryFact]
+> pDeTranslationLine thisTerm = do
+>   textWith "*"
+>   annotatedWikiTextWithout ":" deTemplates
+>   string ":"
+>   skipSpace
+>   mconcat <$> sepBy (pDeTranslationItem thisTerm) "; "
 >
-> pMiscTemplate = templateText ignoreTemplates >> newLine >> return ()
->
-> pTransBottom :: Parser ()
-> pTransBottom = string "}}" >> return ()
+> pDeTranslationItem :: WiktionaryTerm -> Parser [WiktionaryFact]
+> pDeTranslationItem thisTerm = do
+>   labels <- pBracketedLabels
+>   atext <- annotatedWikiTextWithout ";" deTemplates
+>   let labelAppliers = map applyLabel labels
+>   let labeledAnnotations = labelAppliers <*> (filter isTranslation (getAnnotations atext))
+>   return (map (annotationToFact "de" thisTerm) labeledAnnotations)
+> 
+> applyLabel :: Text -> Annotation -> Annotation
+> applyLabel label anno = insertMap "senseID" ("def." <> label) anno
 
 
 Evaluating templates

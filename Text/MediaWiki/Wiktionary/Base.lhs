@@ -177,8 +177,14 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 > annotationToFact :: Language -> WiktionaryTerm -> Annotation -> WiktionaryFact
 > annotationToFact language thisTerm annot =
 >   let otherTerm = annotationToTerm language annot
+>       -- The annotation might come with a term sense (term senses can sneak
+>       -- in from many different directions). If it does, it specifies a
+>       -- sense of the word *being defined*, not the word it's connected to.
+>       termSense = case (lookup "senseID" annot) of
+>                     Nothing -> thisTerm
+>                     Just sense -> thisTerm {wtSense=Just sense}
 >       rel       = findWithDefault "link" "rel" annot
->   in makeFact rel thisTerm otherTerm
+>   in makeFact rel termSense otherTerm
 
 We might have an annotation assigning a sense ID to this text:
 
@@ -274,7 +280,7 @@ something to make them part of the definition above.
 >       annotations = (singletonMap "senseID" senseID):getAnnotations atext
 >       atext'      = annotate annotations defn
 >   in (senseID, atext')
-
+>
 > extractLabeledItems :: ListItem -> [AnnotatedText]
 > extractLabeledItems items = map snd (extractLabeledDefs items)
 
@@ -290,12 +296,16 @@ and 13 are translated as "go".
 
 > pLabeledItem :: Parser ([Text], Text)
 > pLabeledItem = do
+>   labels <- pBracketedLabels
+>   text <- takeText
+>   return (labels, text)
+>
+> pBracketedLabels = do
 >   string "["
 >   labels <- pLabels
 >   string "]"
 >   skipSpace
->   text <- takeText
->   return (labels, text)
+>   return labels
 >
 > pLabels :: Parser [Text]
 > pLabels = mconcat <$> sepBy1 pCommaSeparatedLabel (char ',' >> skipSpace)
@@ -356,7 +366,7 @@ Parsing the language of definitions
 >
 > pDefAnything :: Parser [Text]
 > pDefAnything = do
->   text <- takeWhile (const True)
+>   text <- takeText
 >   return [text]
 
 
@@ -421,7 +431,6 @@ we'll group them together into a TranslationSectionInfo struct.
 >   tsEndRule :: Parser ()              -- a parser for the end of a translation list
 > }
 >
->
 > parseTranslations :: TranslationSectionInfo -> WiktionaryTerm -> Text -> [WiktionaryFact]
 > parseTranslations tsInfo thisTerm text =
 >   parseOrDefault [] (pTranslationSection tsInfo thisTerm) text
@@ -458,9 +467,6 @@ return a word sense, or might return Nothing.
 >
 > isTranslation :: Annotation -> Bool
 > isTranslation a = lookup "rel" a == Just "translation"
-
-The procedure for getting translations out of a bunch of bullet points involved a few
-chained procedures, which of course occur from right to left:
 
 To get translation candidates out of a bunch of bullet points, we need to find
 the items the bullet-pointed list entry contains.

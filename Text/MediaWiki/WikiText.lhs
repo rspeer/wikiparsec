@@ -276,6 +276,21 @@ and returns it in an AnnotatedText data structure.
 > annotatedWikiTextPiece tproc = internalLink tproc <|> templateValue tproc <|> simpleWikiTextPiece
 > simpleWikiTextPiece = annotFromText <$> choice [wikiTable, externalLinkText, messyTextLine]
 
+Sometimes there's extra syntax going on, so we need to exclude specific
+characters from the wikitext.
+
+When this rule is used, it will consume any character except the listed ones
+when they appear in plain text. For that reason, "\n" often belongs in
+`exclude`.
+
+> annotatedWikiTextWithout :: [Char] -> TemplateProc -> Parser AnnotatedText
+> annotatedWikiTextWithout exclude tproc =
+>   mconcat <$> many (
+>     internalLink tproc
+>     <|> templateValue tproc
+>     <|> annotFromText <$> (textWithout (exclude <> "\n[]{}"))
+>     )
+
 
 Lists
 -----
