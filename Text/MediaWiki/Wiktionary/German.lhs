@@ -207,12 +207,17 @@ Translations
 ------------
 
 > handleTranslationTemplate :: Template -> AnnotatedText
-> handleTranslationTemplate t = buildA $ do
+> handleTranslationTemplate t = skipEmpty $ buildA $ do
 >   put "rel" "translation"
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
 >   visible ["3", "2"] t
-
+>
+> skipEmpty :: AnnotatedText -> AnnotatedText
+> skipEmpty atext =
+>   if (getText atext == "")
+>     then mempty
+>     else atext
 
 Part of speech headings
 -----------------------
@@ -293,7 +298,7 @@ data into account.
 > keepInflectionArg (name, value) =
 >   not (member name skippedInflectionArgs) &&
 >   not (any (\prefix -> isPrefixOf prefix name) skippedInflectionPrefixes) &&
->   value /= "—" && value /= ""
+>   value /= "—" && value /= "-" && value /= ""
 >
 > makeInflectionAnnotation :: (Text, Text) -> Annotation
 > makeInflectionAnnotation (name, value) = mapFromList [
