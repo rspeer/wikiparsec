@@ -65,7 +65,7 @@ a function that will extract WiktionaryFacts.
 >             wtText=title,
 >             wtLanguage=Just language,
 >             wtEtym=Just etymNumber,
->             wtPos=Just pos,
+>             wtPos=Just (partOfSpeechMap pos),
 >             wtSense=Nothing
 >             } in chooseSectionParser sectionType thisTerm content
 
@@ -154,6 +154,15 @@ speech'.
 >   "Suffix", "Phrase", "Proverb", "Prepositional phrase", "Acronym",
 >   "Symbol"
 >   ]
+>
+> partOfSpeechMap :: Text -> Text
+> partOfSpeechMap "Adjective"   = "a"
+> partOfSpeechMap "Adverb"      = "r"
+> partOfSpeechMap "Noun"        = "n"
+> partOfSpeechMap "Pronoun"     = "n"
+> partOfSpeechMap "Proper noun" = "n"
+> partOfSpeechMap "Verb"        = "v"
+> partOfSpeechMap _             = "_"
 >
 > findPartOfSpeech :: [Text] -> Maybe Text
 > findPartOfSpeech = findHeading partsOfSpeech
