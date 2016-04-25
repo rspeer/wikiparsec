@@ -270,8 +270,10 @@ something to make them part of the definition above.
 > extractLabeledDefItem (Item item) =
 >   case parseOnly pLabeledItem (getText item) of
 >     Left err -> []
->     Right (labelList, defn) ->
->       [adjustLabel label defn item | label <- labelList]
+>     Right (maybeLabelList, defn) ->
+>       case maybeLabelList of
+>         Just labelList -> [adjustLabel label defn item | label <- labelList]
+>         Nothing        -> [("", item)]
 > extractLabeledDefItem _ = []
 >
 > adjustLabel :: Text -> Text -> AnnotatedText -> LabeledDef
@@ -294,18 +296,21 @@ like:
 Here, sense 1 of "gehen" is translated as "walk", but all of senses 1, 2, 3, 7,
 and 13 are translated as "go".
 
-> pLabeledItem :: Parser ([Text], Text)
+> pLabeledItem :: Parser (Maybe [Text], Text)
 > pLabeledItem = do
->   labels <- pBracketedLabels
+>   labels <- pMaybeBracketedLabels
 >   text <- takeText
 >   return (labels, text)
+>
+> pMaybeBracketedLabels :: Parser (Maybe [Text])
+> pMaybeBracketedLabels = pBracketedLabels <|> return Nothing
 >
 > pBracketedLabels = do
 >   string "["
 >   labels <- pLabels
 >   string "]"
 >   skipSpace
->   return labels
+>   return (Just labels)
 >
 > pLabels :: Parser [Text]
 > pLabels = mconcat <$> sepBy1 pCommaSeparatedLabel (char ',' >> skipSpace)
@@ -328,7 +333,7 @@ Converting definitions to facts:
 >   let defText = snd defPair
 >       -- get a sense either from the SenseID annotation, or failing that,
 >       -- from the label that comes with the definition
->       defSense = mplus (findSenseID defText) (Just (fst defPair))
+>       defSense = mplus (findSenseID defText) (nonEmpty (Just (fst defPair)))
 >       termSense = thisTerm {wtSense=defSense}
 >       defPieces = splitDefinition (stripSpaces (getText defText))
 >   in (map (makeDefinitionFact termSense language) defPieces)

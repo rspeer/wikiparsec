@@ -138,7 +138,7 @@ Here's what we're exporting from the module:
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
 >   module Control.Monad.Writer,
->   replace, splitOn, stripSpaces,
+>   replace, splitOn, stripSpaces, dropAround, dropWhileEnd,
 >   listTakeWhile, listDropWhile,
 >   get, getAll, getPrioritized, put, nonEmpty,
 >   println
@@ -161,13 +161,14 @@ didn't make it into the ClassyPrelude.
 
 > replace = T.replace
 > splitOn = T.splitOn
+> dropWhileEnd = T.dropWhileEnd
+> dropAround = T.dropAround
 
 Another kind of standard thing we need to do is trim spaces from the start and
 end of a string:
 
 > stripSpaces :: Text -> Text
-> stripSpaces = reverse . stripSpacesFront . reverse . stripSpacesFront
-> stripSpacesFront = dropWhile (== ' ')
+> stripSpaces = dropAround (\c -> c == ' ' || c == '\n')
 
 Writing any sort of text to stdout:
 

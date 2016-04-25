@@ -90,7 +90,7 @@ The "Wortart" (part-of-speech) section contains sub-sections defining the word
 in various ways.
 
 > deParseCombinedSection :: WiktionaryTerm -> Text -> [WiktionaryFact]
-> deParseCombinedSection term content = parseOrDefault (error $ cs content) (pCombinedSection term) content
+> deParseCombinedSection term content = parseOrDefault [] (pCombinedSection term) content
 
 > pCombinedSection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pCombinedSection term = mconcat <$> many (pSubsection term)
@@ -108,6 +108,7 @@ in various ways.
 >   (pRelationSubsection "Vergrößerungsformen" "hasForm/augmentative" term) <|>
 >   (pRelationSubsection "Weibliche Wortformen" "hasForm/feminine" term) <|>
 >   (pRelationSubsection "Männliche Wortformen" "hasForm/masculine" term) <|>
+>   (pFactsFromTemplate term) <|>
 >   -- If we don't match any of our desired section types, consume a line
 >   -- and return nothing
 >   (newLine >> return []) <|>
@@ -122,6 +123,12 @@ in various ways.
 
 Defining quasi-section parsers
 ------------------------------
+
+> pFactsFromTemplate :: WiktionaryTerm -> Parser [WiktionaryFact]
+> pFactsFromTemplate thisTerm =
+>   map (annotationToFact "de" thisTerm)
+>     <$> getAnnotations
+>     <$> templateValue deTemplates
 
 > pDefinitionSubsection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pDefinitionSubsection term = do
@@ -154,7 +161,7 @@ a table heading. So let's define it from scratch here.
 
 > deParseTranslations :: WiktionaryTerm -> Text -> [WiktionaryFact]
 > deParseTranslations thisTerm text =
->   parseOrDefault (error $ cs text) (pDeTranslationSection thisTerm) text
+>   parseOrDefault [] (pDeTranslationSection thisTerm) text
 >
 > pDeTranslationSection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pDeTranslationSection thisTerm = do
@@ -183,12 +190,12 @@ up the translation section.
 >
 > pDeTranslationItem :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pDeTranslationItem thisTerm = do
->   labels <- pBracketedLabels
+>   labels <- fromMaybe [] <$> pBracketedLabels
 >   atext <- annotatedWikiTextWithout ";" deTemplates
 >   let labelAppliers = map applyLabel labels
 >   let labeledAnnotations = labelAppliers <*> (filter isTranslation (getAnnotations atext))
 >   return (map (annotationToFact "de" thisTerm) labeledAnnotations)
-> 
+>
 > applyLabel :: Text -> Annotation -> Annotation
 > applyLabel label anno = insertMap "senseID" ("def." <> label) anno
 
@@ -222,7 +229,77 @@ Part of speech headings
 Inflected forms
 ---------------
 
-> handleFormTemplate = skipTemplate
+Here's an example of a German inflection template:
+
+    {{Deutsch Verb Übersicht
+    |Präsens_ich=—
+    |Präsens_du=—
+    |Präsens_er, sie, es=regnet
+    |Präteritum_ich=regnete
+    |Konjunktiv II_ich=regnete
+    |Imperativ Singular=—
+    |Imperativ Plural=—
+    |Partizip II=geregnet
+    |Hilfsverb=haben
+    |unpersönlich=ja
+    }}
+
+Recognize these templates by their name. Generally, any template with
+Übersicht in its name is a table of inflections. We need to exclude
+Basque inflections here because those tables work entirely differently.
+
+> isInflectionTemplate :: Text -> Bool
+> isInflectionTemplate name =
+>   (isInfixOf "Übersicht" name) && (not (isPrefixOf "Baskisch" name))
+
+Most of the arguments describe different forms of the word. We should skip
+values that are empty or —, skip keys that aren't forms, and skip positional
+arguments.
+
+> skippedInflectionArgs :: HashSet Text
+> skippedInflectionArgs = setFromList [
+>   "weitere_konjugationen",
+>   "weitere_deklinationen",
+>   "hilfsverb", "unpersönlich", "klasse",
+>   "genus", "stamm", "wort",
+>   "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+>   ]
+
+We also want to skip all arguments starting with "Bild", which are used for
+adding pictures to the entry, and arguments that are written phonetically in
+IPA.
+
+> skippedInflectionPrefixes :: [Text]
+> skippedInflectionPrefixes = ["bild", "ipa_"]
+
+`handleInflectionTemplate` parses an inflection template, taking the above
+data into account.
+
+> handleInflectionTemplate :: Template -> AnnotatedText
+> handleInflectionTemplate t =
+>   let pairs = (filter keepInflectionArg) $ (map normalizeInflectionArg) $ mapToList t
+>       annotations = map makeInflectionAnnotation pairs
+>   in annotate annotations ""
+>
+> normalizeInflectionName :: Text -> Text
+> normalizeInflectionName text =
+>   toLower $ replace " " "_" $ dropWhileEnd (== '*') text
+>
+> normalizeInflectionArg :: (Text, Text) -> (Text, Text)
+> normalizeInflectionArg (name, value) =
+>   (normalizeInflectionName name, value)
+>
+> keepInflectionArg :: (Text, Text) -> Bool
+> keepInflectionArg (name, value) =
+>   not (member name skippedInflectionArgs) &&
+>   not (any (\prefix -> isPrefixOf prefix name) skippedInflectionPrefixes) &&
+>   value /= "—" && value /= ""
+>
+> makeInflectionAnnotation :: (Text, Text) -> Annotation
+> makeInflectionAnnotation (name, value) = mapFromList [
+>   ("rel", "hasForm/" <> name),
+>   ("form", name),
+>   ("page", value)]
 
 
 Putting it all together
@@ -235,11 +312,12 @@ Putting it all together
 > deTemplates "Üt"      = handleTranslationTemplate
 > deTemplates "Üxx4"    = handleTranslationTemplate
 > deTemplates "Üxx4?"   = handleTranslationTemplate
+> deTemplates "Arab"    = useArg "1"
 
 Cases that need to be checked with expressions instead of plain pattern
 matches:
 
 > deTemplates x
->   | isInfixOf " Übersicht" x   = handleFormTemplate
+>   | isInflectionTemplate x     = handleInflectionTemplate
 >   | otherwise                  = skipTemplate
 

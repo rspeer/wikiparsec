@@ -6,7 +6,8 @@
 >                            pageNamespace, pageTitle, pageText, pageRedirect)
 > import Text.MediaWiki.Wiktionary.Base (WiktionaryFact)
 > import Text.MediaWiki.Wiktionary.English (enParseWiktionary)
-> -- import Text.MediaWiki.Wiktionary.French (frParseWiktionary)
+> import Text.MediaWiki.Wiktionary.French (frParseWiktionary)
+> import Text.MediaWiki.Wiktionary.German (deParseWiktionary)
 > import Data.Aeson (encode)
 
 Language handling
@@ -18,7 +19,8 @@ will be in, so we can delegate to the appropriate handler.
 
 > languageHandler :: Language -> Text -> Text -> [WiktionaryFact]
 > languageHandler "en"  = enParseWiktionary
-> -- languageHandler "fr"  = frParseWiktionary
+> languageHandler "fr"  = frParseWiktionary
+> languageHandler "de"  = deParseWiktionary
 > languageHandler other = error ("unknown language: " <> (cs (fromLanguage other)))
 
 Top level

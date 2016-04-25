@@ -21,6 +21,7 @@ Library
                        Text.MediaWiki.Wiktionary.Base,
                        Text.MediaWiki.Wiktionary.English,
                        Text.MediaWiki.Wiktionary.French,
+                       Text.MediaWiki.Wiktionary.German,
                        WikiPrelude
   other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
                        Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
@@ -88,6 +89,7 @@ Executable wiktionary-parser
                        Text.MediaWiki.Wiktionary.Base,
                        Text.MediaWiki.Wiktionary.English,
                        Text.MediaWiki.Wiktionary.French,
+                       Text.MediaWiki.Wiktionary.German,
                        WikiPrelude
   build-depends:       base,
                        classy-prelude ==0.12.*,

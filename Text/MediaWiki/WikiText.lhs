@@ -434,19 +434,19 @@ have to be evaluated.
 >
 > templateArgName :: Parser Text
 > templateArgName = do
->   name <- plainTextInArg
+>   name <- stripSpaces <$> plainTextInArg
 >   string "="
 >   return name
 >
 > namedArg :: TemplateProc -> Text -> Int -> Parser Template
 > namedArg tproc name offset = do
->   value <- possiblyEmpty (wikiTextInTemplate tproc)
+>   value <- stripSpaces <$> possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc offset
 >   return (insertMap name value rest)
 >
 > positionalArg :: TemplateProc -> Int -> Parser Template
 > positionalArg tproc offset = do
->   value <- possiblyEmpty (wikiTextInTemplate tproc)
+>   value <- stripSpaces <$> possiblyEmpty (wikiTextInTemplate tproc)
 >   rest <- templateRest tproc (offset + 1)
 >   let name = (intToText offset) in
 >     return (insertMap name value rest)
