@@ -1,51 +1,24 @@
-Why this code is in Haskell
-===========================
+A custom Prelude for Wiki parsing
+=================================
 
-I've been facing the problem of how to deal with Wikitext well for a long time.
-I didn't originally expect to solve it using Haskell.
+The Haskell standard library is called the 'Prelude'. There is general
+agreement that the Prelude is not very good code and should be replaced with
+something else.  There is absolutely no agreement on what it should be replaced
+with.
 
-The thing about Haskell is that it's designed by mathematicians, and for the
-most part, it's also documented for mathematicians. Everything about the language
-encourages you to write code that's not about down-to-earth things like functions,
-strings, and lists, but instead is about functors, monoids, and monads. This gives
-Haskell code a reputation for being incomprehensible to most people.
+I built this code on an alternative Haskell standard library, the Classy
+Prelude, because it's got a good idea of how to deal with different data types
+such as Texts and ByteStrings. Instead of prefixed functions that deal with one
+data type, ClassyPrelude uses generic functions that can apply to any data type
+that does the right things.
 
-Now, sometimes a problem comes along that mathematicians, with their lofty
-abstractions, are actually much better equipped to solve than a typical
-software developer. One of those problems is parsing. Other languages struggle
-with parsing while Haskell just *nails* it.
+Instead of having to use `T.append` to append texts, and `Char8.append` to
+append ByteStrings, or whatever, we just use `append` to append things that can
+be appended. This leads to cleaner code and easier refactoring.
 
-I am not much of a mathematician. I like functional programming, but I also
-like writing straightforward understandable Python code.  But I needed to be
-able to write a powerful, extensible parser for Wikitext, and I could tell my
-Python code wasn't going to cut it. I looked at my available options for this
-kind of parsing, and found that they amounted to:
-
-- Something based on Parsec in Haskell
-- Something based on Parsec but in another programming language, imperfectly
-  pretending to be Haskell
-- Awful spaghetti hacks
-
-There are already Wikitext parsers that are awful spaghetti hacks, and I can't
-build on those. (The reference implementation -- MediaWiki itself -- would be a
-great example, but so are the various Java-based parsers I've seen.) So the
-next best choice is Haskell.
-
-If you're a Haskell programmer reading this, I hope you appreciate the code,
-but you might find the documentation a bit hand-holdy. You're not quite the
-audience of the documentation. I'm writing it more for other people I work with
-who may end up wanting to look at the code. People who are probably familiar
-with functional programming in general, but not the specific details of
-Haskell. Given that I found myself using Haskell, I want to overcome its
-reputation and make it comprehensible.
-
-And if nobody else, another audience I'm writing for is my future self. I can
-imagine a year from now, coming back to this code, saying "what the hell was I
-thinking with all these monads", and wanting to start over, unless I write some
-documentation that explains what I was thinking.
 
 Monads and monoids, oversimplified
-----------------------------------
+==================================
 
 A [classic joke][] about Haskell defines these terms: "A monad is a monoid in
 the category of endofunctors, what's the problem?"
@@ -60,6 +33,11 @@ about how you use it.
 
 So let's oversimplify what these things are, the way we oversimplify other
 mathematical concepts like "matrix" when programming.
+
+If you're a Haskell programmer reading this, you'll find this section to be old
+hat. I don't know many Haskell programmers, though. This documentation is for
+other people who come across this code and are just familiar with functional
+programming in general.
 
 Monoids are things you can concatenate
 --------------------------------------
@@ -110,19 +88,6 @@ then returns some Text. A function of type `Parser Text` is a function that
 parses some input and then returns some Text.
 
 
-This looks like Markdown, where's the Haskell?
-----------------------------------------------
-
-One thing I love about Haskell is the Literate Haskell (`.lhs`) format. The
-Haskell compiler can interpret it without any pre-processing, and it encourages
-documentation as the rule and code as the exception.
-
-Lines that start with the character `>` are code. There won't be any of that
-until I get to the header. The rest is Markdown. The documentation tool
-`pandoc` can convert this all into nicely-formatted HTML, but just reading the
-Markdown + Haskell source should do the job too.
-
-
 Here's where the actual code starts
 ===================================
 
@@ -138,7 +103,7 @@ Here's what we're exporting from the module:
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
 >   module Control.Monad.Writer,
->   replace, splitOn, stripSpaces, dropAround, dropWhileEnd,
+>   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
 >   listTakeWhile, listDropWhile,
 >   get, getAll, getPrioritized, put, nonEmpty,
 >   println
@@ -161,8 +126,9 @@ didn't make it into the ClassyPrelude.
 
 > replace = T.replace
 > splitOn = T.splitOn
-> dropWhileEnd = T.dropWhileEnd
 > dropAround = T.dropAround
+> dropWhileEnd = T.dropWhileEnd
+> toTitle = T.toTitle
 
 Another kind of standard thing we need to do is trim spaces from the start and
 end of a string:
@@ -189,7 +155,6 @@ Attoparsec, so we need to rename the ClassyPrelude one.
 > listDropWhile = P.dropWhile
 
 
-
 Mapping operations
 ------------------
 
@@ -213,14 +178,6 @@ in priority order. It returns the empty value only if it finds none of them.
 > getAll :: (IsMap m, Monoid (MapValue m)) => [ContainerKey m] -> m -> [MapValue m]
 > getAll keys m = catMaybes (map (\key -> lookup key m) keys)
 
-Building a map with monad syntax:
-
-> put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
-> put key value =
->   if (value == mempty)
->     then writer (value, mempty)
->     else writer (value, singletonMap key value)
-
 Undoing our default empty sequence by turning empty sequences into Nothing:
 
 > nonEmpty :: (Monoid a, Eq a) => Maybe a -> Maybe a
@@ -228,4 +185,16 @@ Undoing our default empty sequence by turning empty sequences into Nothing:
 >   case val of
 >     Just something -> if (something == mempty) then Nothing else val
 >     Nothing -> Nothing
+
+I found myself having to build up a map with pieces from another map often
+enough that the syntax was getting quite repetitive. So this `put` function
+turns the process of building a map into a Writer monad, allowing us to use
+`do` syntax and create a domain-specific language for building mappings.
+This syntax will be extended in `Text.MediaWiki.Wiktionary.Base`.
+
+> put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
+> put key value =
+>   if (value == mempty)
+>     then writer (value, mempty)
+>     else writer (value, singletonMap key value)
 

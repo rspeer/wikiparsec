@@ -115,13 +115,26 @@ from a page.
 >
 > instance ToJSON WiktionaryFact where
 >   toJSON (WiktionaryFact rel from to) = object ["rel" .= rel, "from" .= from, "to" .= to]
->
+
+`makeFact` or one of its derived functions should be used to create
+WiktionaryFacts.
+
+Sometimes we extract data that goes in the opposite direction form the relation
+we want: for example, instead of discovering which word `from` is a form of,
+we discover a word that is a form of it. In this case, we output a relation
+that's prefixed with an asterisk, telling `makeFact` to strip off the asterisk
+and switch the arguments.
+
 > makeFact :: Text -> WiktionaryTerm -> WiktionaryTerm -> WiktionaryFact
-> makeFact = WiktionaryFact
+> makeFact rel from to =
+>   case (uncons rel) of
+>     Just ('*', rev) -> WiktionaryFact rev to from
+>     _               -> WiktionaryFact rel from to
+>
 > makeGenericFact = makeFact "RelatedTo"
 >
 > assignRel :: Text -> WiktionaryFact -> WiktionaryFact
-> assignRel rel (WiktionaryFact _ from to) = WiktionaryFact rel from to
+> assignRel rel (WiktionaryFact _ from to) = makeFact rel from to
 
 
 Annotations
@@ -198,6 +211,15 @@ We might have an annotation assigning a sense ID to this text:
 >     Nothing -> findSenseIDInList rest
 > findSenseIDInList [] = Nothing
 
+Working with lists of headings:
+
+> getTextInList :: Int -> [AnnotatedText] -> Maybe Text
+> getTextInList idx atexts = getText <$> index atexts idx
+>
+> getAnnotationInList :: Int -> Text -> [AnnotatedText] -> Maybe Text
+> getAnnotationInList idx key atexts =
+>   -- use the Maybe monad to return Nothing for any missing index
+>   index atexts idx >>= \atext -> lookup key (mconcat (getAnnotations atext))
 
 Definition sections
 -------------------

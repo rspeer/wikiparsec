@@ -1,0 +1,235 @@
+== {{lengua|es}} ==
+{{pron-graf|fone=ˈga.to}}
+
+=== Etimología ===
+{{etimología|latín vulgar|cattus}}<ref>{{DRAE}}</ref>, del imperial {{l+|la|catta}}<ref>{{OED|cat}}</ref>, de origen incierto. La hipótesis más probable lo deriva de alguna lengua afroasiática<ref>{{etymonline|cat}}</ref><!--, del egipcio tardío {{l+|egy|čaus}}, "[[gato montés]]", del antiguo {{l+|egy|tešau}}-->. Compárese el catalán {{l+|ca|gat}}, el francés {{l+|fr|chat}}, el italiano {{l+|it|gatto}} o el portugués {{l+|pt|gato}}. Las lenguas celtas, eslavas, germánicas, helénicas y romances han adoptado casi sin excepción este término, reemplazando a los patrimoniales; el latín {{l+|la|feles}} sólo sobrevive en los derivados {{l+|es|felino}}, {{l+|es|félido}}
+
+=== {{sustantivo masculino|es}} ===
+[[Archivo:Stray calico cat near Sagami River-01.jpg|thumb|gato (1)]]
+{{inflect.es.sust.reg}}
+;1 {{mamíferos}}: (''Felis silvestris catus'' o ''F. catus'') {{plm|animal}} [[carnívoro]] de la familia de los [[felino]]s, [[domesticado]] como [[animal de compañía]] desde al menos el 3500 adC.
+{{sinónimo|minino}}
+
+;2 {{mamíferos}}: Por extensión, cualquier ejemplar de la familia de los [[félido]]s, que comprende 37 especies de [[mamífero]]s [[carnívoro]]s.
+{{sinónimo|félido|felino}}
+{{hipónimo|gato montés}}
+
+;3: {{plm|prostituta}} de alto nivel, que solo atiende un número más o menos reducido de clientes regulares.
+{{ámbito|Rioplatense}}
+{{uso|Lunfardismo}}
+
+;4: Por extensión, prostituta en general, especialmente la de cierto nivel.
+{{ámbito|Rioplatense}}
+{{uso|Lunfardismo}}
+
+;5: {{plm|cliente}} regular de una prostituta.
+{{ámbito|Rioplatense}}
+{{uso|Lunfardismo}}
+
+;6: {{plm|bisoñé}}, [[peluca]] que usan algunos hombres para disimular su [[calvicie]].
+{{ámbito|Rioplatense}}
+{{uso|Lunfardismo}}
+
+[[Archivo:Domkraft, Nordisk familjebok.png|thumb|gato (7)]]
+;7: Máquina para [[levantar]] grandes [[peso]]s a poca [[altura]].
+{{sinónimo|gato hidraúlico|cric|crique|gata}}
+[[Archivo:Tic tac toe complete-temp.svg|thumb|gato (8)]]
+;8: Juego de mesa para dos personas en que gana el primero en poner tres [[marca]]s en [[línea]], usualmente [[círculo]]s y [[cruz|cruces]], dentro de una [[cuadrícula]] de tres [[casilla]]s de ancho por tres de alto
+{{sinónimo|juego de la vieja|juego del gato|tres en raya|ta te ti|triqui|}}.
+
+;9: Nombre del símbolo [[#]], por su semejanza con el juego llamado "gato", sobre todo hablando de la [[tecla]] que lleva ese símbolo en los [[teléfono]]s.
+{{ámbito|Chile|México}}.
+{{sinónimo|almohadilla|nota=España}}.
+
+;10: {{plm|baile}} tradicional de [[Argentina]], de pareja suelta y ritmo alegre.
+{{hipónimo|gato con relaciones|gato cordobés|gato cuyano|gato patriótico}}.
+:*'''Ejemplos:'''
+::"Yo vengo de aquellos pagos / muy cerca de la frontera / donde se baila la cueca / zamba, ''gato'' y chacarera" (Óscar Palavecino, "Chacarera pa' mi Tartagal") {{referencia incompleta}}
+
+;11: Persona nacida en la ciudad de [[Madrid]], [[España]].
+
+;12: [[ladrón|Ladrones]] de poca monta (o [[ratero]]s), llamados así por su habilidad para moverse y actuar silenciosamente sin ser detectados, al igual que el animal.
+{{ámbito|Algunas provincias argentinas}}
+
+;13: {{plm|sirviente}}, en especial del servicio doméstico.
+{{ámbito|México}}
+{{uso|despectivo}}
+
+;14 {{plantas|leng=es}} (''Salix caprea'') {{plm|árbol}} [[dioico]] de la familia de las salicáceas, nativo de Eurasia, de [[hoja]]s relativamente anchas y [[flor]]es agrupadas en [[amento]]s.
+{{ámbito|Chile}}
+{{sinónimo|sauce cabruno|sauce alemán|nota2=Chile|meca de gato|nota3=Chiloé}}
+
+{{clear}}
+
+=== Locuciones ===
+{{rel-arriba|Locuciones con «gato»}}
+* [[a gatas]]: apoyando las rodillas y las manos en el suelo
+* [[bolsa de gatos]]: [[embrollo]]
+* [[buscarle la quinta pata al gato|buscarle la quinta pata]] o [[buscarle los tres pies al gato|los tres pies al gato]]: insistir exageradamente en los defectos de algo
+* [[a ver quien pone el cascabel al gato]]: Quien se atreve a enfrentarse a alguien problemático o agresivo
+* [[cuatro gatos]]: muy poca gente
+* [[defenderse como gato boca arriba]], [[defenderse como gato de espaldas|de espaldas]] o [[defenderse como gato panza arriba|panza arriba]]: defenderse agresiva y desesperadamente (coloquial)
+* [[dar gato por liebre|dar]] o [[pasar gato por liebre]]: engañar dando algo de menor valor que lo acordado
+* [[darle el palo al gato]]: acertar, particularmente al lograr un negocio ventajoso (Chile, coloquial)
+* [[echar el gato a las barbas]]: insultar a alguno (España)
+* [[estar más perdido que un gato en una fábrica de sifones]]: estar muy perdido, confuso o desorientado.
+* [[gato casero]]: ratero de poca monta (España)
+* [[gato de agua]]: trampa para ratones hecha con agua
+* [[gato de campo]]: con afición por el robo o habilidad para realizarlo (Chile, coloquial)
+* [[gato viejo]]: persona astuta y perspicaz que intenta no parecerlo (España)
+* [[gato negro]]: en la Edad Media se relacionó a los gatos negros con la brujería.
+* [[gollo de gato]]
+{{rel-centro}}
+* [[haber gato encerrado]]: haber algo oculto o sospechoso.
+* [[jugar al gato y al ratón]]: oponerse encarnizadamente
+* [[llevarse como el perro y el gato]]: llevarse muy mal
+* [[llevarse el gato al agua]]: vencer en un enfrentamiento (España)
+* [[mano de gato|mano]] o [[manito de gato]]
+* [[más asustado que gato en bote]]
+* [[más ladrón que gato de campo]]
+* [[más rayado que charango de gato]]: [[loco]], [[delirante]] (Chile, coloquial)
+* [[meca de gato]]
+* [[mojón de gato]]
+* [[ojo de gato]]
+* [[pelo de gato]]
+* [[quedar como gato mojado]]: resultar humillado (Cataluña)
+* [[tener siete vidas como los gatos]]: salir indemne de un accidentes
+{{rel-abajo}}
+
+=== Refranes ===
+* [[cierra la puerta que se escapa el gato]]: se usa para reprender a quien revela intimidades frente a un tercero (España)
+* [[el gato escaldado, del agua fría huye]]: quien ha sufrido un percance, trata de huir de lo que le recuerda al mismo.
+* [[gato con guantes no caza ratones]]: indica que cuando se va a realizar una labor manual hay que llevar la indumentaria adecuada.
+* [[hasta los gatos quieren zapatos]]: se usa para reprender ambiciones excesivas
+* [[la curiosidad mató al gato]]: se usa para advertir a quien investiga asuntos turbios o peligrosos
+
+=== Información adicional ===
+:*'''Pares mínimos:''' [[gata]], [[gueto]], [[catar|cato]], [[dato]], [[hato]], [[matar|mato]], [[nato]], [[pato]], [[rato]], [[gajo]], [[gallo]], [[gamo]], [[ganar|gano]]
+{{anagrama|gota|toga}}.
+
+=== Véase también ===
+{{w}}
+* [[felino]]
+* [[gatear]]
+* [[gatera]]
+* [[minino]]
+* [[perro]]
+
+{{clear}}
+
+=== Traducciones ===
+{{trad-arriba}}
+{{t+|af|1|kat}}
+{{t+|de|1, 2|Katze|f|,|1|Kater|m|nota|gato macho|,|7|Wagenheber|m|,|7|Heber|m|,|8|Kreis und Kreuz|,|8|Tic Tac Toe}}
+{{t+|ay|1|phisi}}
+{{t+|hy|1|կատու|tr|katu}}
+{{t+|ast|1|gatu}}
+{{t+|az|1|pişik}}
+{{t+|br|1|kazh}}
+{{t+|bg|котарак|m|,|котка|f|}}
+{{t+|ca|1|gat|,|8|tres en ratlla|,|1|móx|nota|Islas Beleares}}
+{{t+|ko|고양이}}
+{{t+|da|1|kat|,|7|donkraft|,|8|kryds og bolle}}
+{{t+|eo|1|kato|8|eo|tiktakto}}
+{{t+|et|1|kass}}
+{{t+|eu|katu}}
+{{t+|fi|1|kissa|,|7|tunkki|,|nosturi}}
+{{t+|fr|1|chat|m|,|7|cric|m}}
+{{t+|cy|1|cath|f}}
+{{t+|gl|1|gato|m|,|8|pai fillo nai|,|8|tres en raia}}
+{{t+|ka|1|კატა|tr=[[k'at'a]]}}
+{{t+|el|1|γάτα}}
+{{t+|gn|1|mbarakaja}}
+{{t+|hu|1|macska}}
+{{t+|io|1|kato}}
+{{t+|en|1|cat|,|3, 4|hooker|,|5|john|,|7|jack|,|8|noughts and crosses|,|8|tic-tac-toe}}
+{{trad-centro}}
+{{t+|ga|1|cat|m}}
+{{t+|it|1|gatto|m|,|7|cric|,|7|cricco|m}}
+{{t+|ja|1|猫}} (ねこ "neko"), {{trad|ja|ジャッキ|7}} (jakki), {{trad|ja|三目並べ|8}}
+{{t+|ka|კატა}}
+{{t+|ku|kitik}}
+{{t+|la|1|feles}}
+{{t+|yua|1|mis}}
+{{t+|arn|1|narki|,|1|ñayki}}
+{{t+|nl|1|kat|,|1|krik|f|,|8|boter-kaas-en-eieren|,|8|boter, kaas en eieren}}
+{{t+|no|1|katt}}
+{{t+|nn|1|katt}}
+{{t+|pap|1|pushi}}
+{{t+|pl|1|kot|,|8|kółko i krzyżyk}}
+{{t+|pt|1|gato|,|8|jogo da velha}}
+{{t+|qu|1|michi|nota|Bolivia|,|1|misi|nota|Bolivia|,|1|misi|nota|Ecuador}}
+{{t+|rap|kuri}}
+{{t+|ro|1,2|pisică|,|1|pisică de casă}}
+{{t+|ru|1|кот|m|,|1|кошка|f|,|8|крестики-нолики}}
+{{t+|sr|1|мачак|m|,|1|мачка|f|,|8|икс-окс}}
+{{t+|sv|1|katt}}
+{{t+|uk|1|кіт, |m|,|1|кішка|f|}}
+{{t+|crh|mışıq}}
+{{trad-abajo}}
+
+== Referencias y notas ==
+<references />
+{{Lunfa2000}}
+
+[[ay:gato]]
+[[az:gato]]
+[[ca:gato]]
+[[chr:gato]]
+[[co:gato]]
+[[cs:gato]]
+[[cy:gato]]
+[[da:gato]]
+[[de:gato]]
+[[el:gato]]
+[[en:gato]]
+[[eo:gato]]
+[[et:gato]]
+[[eu:gato]]
+[[fa:gato]]
+[[fi:gato]]
+[[fj:gato]]
+[[fr:gato]]
+[[ga:gato]]
+[[gl:gato]]
+[[gv:gato]]
+[[hu:gato]]
+[[hy:gato]]
+[[id:gato]]
+[[io:gato]]
+[[is:gato]]
+[[it:gato]]
+[[ja:gato]]
+[[ko:gato]]
+[[ku:gato]]
+[[la:gato]]
+[[lb:gato]]
+[[li:gato]]
+[[lo:gato]]
+[[lt:gato]]
+[[lv:gato]]
+[[mg:gato]]
+[[mk:gato]]
+[[nah:gato]]
+[[nl:gato]]
+[[no:gato]]
+[[oc:gato]]
+[[pl:gato]]
+[[pt:gato]]
+[[ro:gato]]
+[[roa-rup:gato]]
+[[ru:gato]]
+[[sk:gato]]
+[[sv:gato]]
+[[sw:gato]]
+[[ta:gato]]
+[[th:gato]]
+[[tl:gato]]
+[[tr:gato]]
+[[ug:gato]]
+[[uk:gato]]
+[[uz:gato]]
+[[vec:gato]]
+[[vo:gato]]
+[[zh:gato]]
+

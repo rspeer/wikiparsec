@@ -104,10 +104,10 @@ in various ways.
 >   (pRelationSubsection "Sinnverwandte Wörter" "related" term) <|>
 >   (pRelationSubsection "Synonyme" "synonym" term) <|>
 >   (pRelationSubsection "Wortbildungen" "derived" term) <|>
->   (pRelationSubsection "Verkleinerungsformen" "hasForm/diminutive" term) <|>
->   (pRelationSubsection "Vergrößerungsformen" "hasForm/augmentative" term) <|>
->   (pRelationSubsection "Weibliche Wortformen" "hasForm/feminine" term) <|>
->   (pRelationSubsection "Männliche Wortformen" "hasForm/masculine" term) <|>
+>   (pRelationSubsection "Verkleinerungsformen" "*form/diminutive" term) <|>
+>   (pRelationSubsection "Vergrößerungsformen" "*form/augmentative" term) <|>
+>   (pRelationSubsection "Weibliche Wortformen" "*form/feminine" term) <|>
+>   (pRelationSubsection "Männliche Wortformen" "*form/masculine" term) <|>
 >   (pFactsFromTemplate term) <|>
 >   -- If we don't match any of our desired section types, consume a line
 >   -- and return nothing
@@ -302,7 +302,7 @@ data into account.
 >
 > makeInflectionAnnotation :: (Text, Text) -> Annotation
 > makeInflectionAnnotation (name, value) = mapFromList [
->   ("rel", "hasForm/" <> name),
+>   ("rel", "*form/" <> name),
 >   ("form", name),
 >   ("page", value)]
 

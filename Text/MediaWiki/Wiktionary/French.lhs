@@ -78,13 +78,6 @@ in the section headings:
 >         Just etym -> return (term [title, language, pos, etym])
 >         Nothing   -> return (term [title, language, pos])
 >
-> getTextInList :: Int -> [AnnotatedText] -> Maybe Text
-> getTextInList idx atexts = getText <$> index atexts idx
->
-> getAnnotationInList :: Int -> Text -> [AnnotatedText] -> Maybe Text
-> getAnnotationInList idx key atexts =
->   -- use the Maybe monad to return Nothing for any missing index
->   index atexts idx >>= \atext -> lookup key (mconcat (getAnnotations atext))
 
 
 Parsing sections
