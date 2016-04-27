@@ -1,4 +1,4 @@
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction, DeriveGeneric #-}
 
 > import WikiPrelude
 > import Data.LanguageType
@@ -8,7 +8,7 @@
 > import Text.MediaWiki.Wiktionary.English (enParseWiktionary)
 > import Text.MediaWiki.Wiktionary.French (frParseWiktionary)
 > import Text.MediaWiki.Wiktionary.German (deParseWiktionary)
-> import Data.Aeson (encode)
+> import Data.Aeson (encode, ToJSON)
 
 Language handling
 =================
@@ -23,12 +23,24 @@ will be in, so we can delegate to the appropriate handler.
 > languageHandler "de"  = deParseWiktionary
 > languageHandler other = error ("unknown language: " <> (cs (fromLanguage other)))
 
+Page info
+=========
+
+> data PageInfo = PageInfo {
+>   title :: Text,
+>   language :: Language
+> } deriving (Eq, Show, Generic)
+>
+> instance ToJSON PageInfo
+
 Top level
 =========
 
 > handlePage :: Language -> WikiPage -> IO ()
 > handlePage language page = do
->   when (pageNamespace page == "0" && pageRedirect page == Nothing)
+>   when (pageNamespace page == "0" && pageRedirect page == Nothing) $ do
+>     let pageInfo = PageInfo { title=(pageTitle page), language=language }
+>     (println . encode) pageInfo
 >     (mapM_ (println . encode)
 >            (languageHandler language (pageTitle page) (pageText page)))
 
