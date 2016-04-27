@@ -39,7 +39,7 @@ AnnotatedText object.
 > evalHeading :: Text -> AnnotatedText
 > evalHeading heading =
 >   case parseOnly (annotatedWikiText frTemplates) heading of
->     Left err      -> error err
+>     Left err      -> annotate [] heading
 >     Right atext   -> atext
 
 The section type is whatever text was returned when we parsed the section
