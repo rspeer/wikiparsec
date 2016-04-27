@@ -90,6 +90,7 @@ Executable wiktionary-parser
                        Text.MediaWiki.Wiktionary.English,
                        Text.MediaWiki.Wiktionary.French,
                        Text.MediaWiki.Wiktionary.German,
+                       Text.Language.Normalize,
                        WikiPrelude
   build-depends:       base,
                        classy-prelude ==0.12.*,
