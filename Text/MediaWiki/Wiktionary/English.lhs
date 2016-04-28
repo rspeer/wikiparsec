@@ -203,18 +203,27 @@ to template arguments that aren't there.
 
 > syntacticLabels :: HashSet Text
 > syntacticLabels = setFromList [
->   "", "and", "&", "or", "_", "now", "except", "except in", "outside",
->   "especially", "chiefly", "mainly", "mostly", "particularly", "primarily",
->   "excluding", "extremely", "frequently", "including", "literally",
->   "literal", "many", "markedly", "mildly", "now", "nowadays", "of", "of a",
->   "of an", "often", "originally", "possibly", "rarely", "slightly",
->   "sometimes", "somewhat", "strongly", "typically", "usually", "very"]
+>   "", "and", "&", "or", "_", ",", "now", "except", "except in", "etc.",
+>   "outside", "especially", "chiefly", "mainly", "mostly", "particularly",
+>   "primarily", "excluding", "extremely", "frequently", "including",
+>   "literally", "literal", "many", "markedly", "mildly", "now", "nowadays",
+>   "of", "of a", "of an", "often", "originally", "possibly", "rarely",
+>   "slightly", "sometimes", "somewhat", "strongly", "typically", "usually",
+>   "very", "in", "of"]
+
+> syntacticPrefixes :: [Text]
+> syntacticPrefixes = [
+>   "~ ", "with ", "of ", "as ", "especially", "in ", "+ ", "by ",
+>   "followed by ", "no longer", "often ", "chiefly ", "takes ",
+>   "usually ", "on "
+>   ]
 
 These labels provide grammatical (not semantic) information. We'll keep them
 separate in case we ever want to output them:
 
 > grammarLabels :: HashSet Text
-> grammarLabels = setFromList [ "abbreviation", "acronym", "active", "active voice",
+> grammarLabels = setFromList [
+>   "abbreviation", "acronym", "active", "active voice",
 >   "in the active", "ambitransitive", "archaic-verb-form", "attributive",
 >   "attributively", "auxiliary", "by ellipsis", "by extension", "causative",
 >   "collectively", "comparable", "copulative", "copular", "countable",
@@ -222,14 +231,15 @@ separate in case we ever want to output them:
 >   "idiom", "impersonal", "in the singular", "in singular", "in the dual",
 >   "in dual", "in the plural", "in plural",
 >   "in the mediopassive", "in mediopassive", "mediopassive", "inanimate",
->   "indefinite", "indef", "initialism", "intransitive", "not comparable",
+>   "indefinite", "indef", "initialism", "intransitive",
+>   "mass noun", "a mass noun", "not comparable",
 >   "notcomp", "uncomparable", "middle", "middle voice", "in the middle",
 >   "onomatopoeia", "ordinal", "plural", "passive", "passive voice",
 >   "in the passive", "plural only", "pluralonly", "plurale tantum",
->   "possessive pronoun", "postpositive", "productive", "reciprocal",
+>   "possessive", "possessive pronoun", "postpositive", "productive", "reciprocal",
 >   "reflexive", "set phrase", "singular", "singular only", "singulare tantum",
->   "no plural", "transitive", "uncountable", "usually plural",
->   "usually in the plural", "usually in plural", "mass noun", "a mass noun"]
+>   "no plural", "transitive", "uds.", "uncountable", "usually plural",
+>   "usually in the plural", "usually in plural"]
 
 Combine these together into a set of all labels we want to ignore.
 
@@ -241,7 +251,8 @@ way in the entry. I don't even know what it's supposed to mean, so let's leave
 out these labels.
 
 > ignoreLabel :: Text -> Bool
-> ignoreLabel label = (elem label ignoredLabels) || (isPrefixOf "~" label)
+> ignoreLabel label = (elem label ignoredLabels) ||
+>                     (any (\prefix -> isPrefixOf prefix label) syntacticPrefixes)
 
 > handleLabelTemplate :: Template -> AnnotatedText
 > handleLabelTemplate template =
@@ -258,7 +269,9 @@ Qualifiers are similar to labels, but take just a single argument.
 > handleQualifierTemplate :: Template -> AnnotatedText
 > handleQualifierTemplate template =
 >   let label = get "1" template in
->     annotate [labelToAnnotation label] ""
+>     if (ignoreLabel label)
+>       then mempty
+>       else annotate [labelToAnnotation label] ""
 
 Sense IDs
 ---------
