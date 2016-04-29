@@ -196,9 +196,9 @@ solderFacts = [
     WiktionaryFact "translation" (term ["solder","en","n","1","any of various alloys that are used to join small pieces of metal together"]) (term ["lehim","tr"]),
     WiktionaryFact "translation" (term ["solder","en","n","1","any of various alloys that are used to join small pieces of metal together"]) (term ["sodr","cy"]),
     WiktionaryFact "definition" (term ["solder","en","v","1","to join with solder"]) (term ["To join with (or as if with) solder","en"]),
-    WiktionaryFact "antonym" (term ["solder","en","v","1"]) (term ["desolder"]),
-    WiktionaryFact "derived" (term ["solder","en","v","1"]) (term ["solderer"]),
-    WiktionaryFact "derived" (term ["solder","en","v","1"]) (term ["soldering iron"]),
+    WiktionaryFact "antonym" (term ["solder","en","v","1"]) (term ["desolder", "en"]),
+    WiktionaryFact "derived" (term ["solder","en","v","1"]) (term ["solderer", "en"]),
+    WiktionaryFact "derived" (term ["solder","en","v","1"]) (term ["soldering iron", "en"]),
     WiktionaryFact "translation" (term ["solder","en","v","1","to join with solder"]) (term ["զոդել","hy"]),
     WiktionaryFact "translation" (term ["solder","en","v","1","to join with solder"]) (term ["запоявам","bg"]),
     WiktionaryFact "translation" (term ["solder","en","v","1","to join with solder"]) (term ["споявам","bg"]),
@@ -246,8 +246,8 @@ solderFacts = [
     WiktionaryFact "link" (term ["solder","fr","v","1","def.4"]) (term ["end up"]),
     WiktionaryFact "link" (term ["solder","fr","v","1","def.4"]) (term ["result"]),
     WiktionaryFact "related" (term ["solder","fr","v","1"]) (term ["solde","fr"]),
-    WiktionaryFact "related" (term ["solder","fr","v","1"]) (term ["solderie"]),
-    WiktionaryFact "related" (term ["solder","fr","v","1"]) (term ["soldeur"])]
+    WiktionaryFact "related" (term ["solder","fr","v","1"]) (term ["solderie","fr"]),
+    WiktionaryFact "related" (term ["solder","fr","v","1"]) (term ["soldeur","fr"])]
 
 testExtract :: (Eq a, Show a) => (Text -> a) -> Text -> a -> Test
 testExtract func input output = (cs input) ~: (func input) ~?= output

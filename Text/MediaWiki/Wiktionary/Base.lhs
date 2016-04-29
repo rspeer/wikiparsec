@@ -158,6 +158,37 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 
 (TODO: explain why languages get complicated here)
 
+> annotationToFact :: Language -> WiktionaryTerm -> Annotation -> WiktionaryFact
+> annotationToFact thisLang thisTerm annot =
+>   let otherTerm = annotationToTerm thisLang annot
+>       -- The annotation might come with a term sense (term senses can sneak
+>       -- in from many different directions). If it does, it specifies a
+>       -- sense of the word *being defined*, not the word it's connected to.
+>       termSense = case (lookup "senseID" annot) of
+>                     Nothing -> thisTerm
+>                     Just sense -> thisTerm {wtSense=Just sense}
+>       rel       = findWithDefault "link" "rel" annot
+>   in makeFact rel termSense otherTerm
+
+It may seem intuitive that, if the Annotation doesn't come with a language, we
+would default to using `thisLang`.
+
+That would actually introduce errors. If a word is being defined in English,
+that does not necessarily mean that any word linked in the definition is an
+English word. It could be the same as the word being defined, instead.
+
+As an example, on the English Wiktionary, a definition of the Spanish word
+"tengo" is "First-person singular ([[yo]]) present indicative form of
+[[tener]]." Neither "yo" or "tener" here should be considered an English word,
+despite that they appear in an English definition. If we have no way to
+determine the language of a link, we should leave it unspecified to be inferred
+later.
+
+The reason we take in `thisLang` is because we might have to look up a language
+that's given as a *section* name, such as [[tener#Spanish]]. In this case, we
+don't get a language code, we get the name of the language in `thisLang` and we
+need to convert it to a language code, and that's what we need `thisLang` for.
+
 > annotationToTerm :: Language -> Annotation -> WiktionaryTerm
 > annotationToTerm thisLang annot =
 >   let maybeLanguage = (annotationLanguage thisLang annot) in
@@ -186,18 +217,24 @@ Converting an Annotation representing a term to a WiktionaryTerm:
 >   case uncons sectionRef of
 >     Just ('#', language) -> Just (lookupLanguage thisLang language)
 >     otherwise            -> Nothing
->
-> annotationToFact :: Language -> WiktionaryTerm -> Annotation -> WiktionaryFact
-> annotationToFact language thisTerm annot =
->   let otherTerm = annotationToTerm language annot
->       -- The annotation might come with a term sense (term senses can sneak
->       -- in from many different directions). If it does, it specifies a
->       -- sense of the word *being defined*, not the word it's connected to.
->       termSense = case (lookup "senseID" annot) of
->                     Nothing -> thisTerm
->                     Just sense -> thisTerm {wtSense=Just sense}
->       rel       = findWithDefault "link" "rel" annot
->   in makeFact rel termSense otherTerm
+
+Despite the above, there are sections where you *do* know what language a link
+is in. For example, in a "Synonyms" section, the linked words are going to be
+in the same language as the word being defined (not necessarily `thisLang`,
+which is the language of the entry).
+
+So `fillAnnotationLanguage` allows the language to be filled in by a default
+that may or may not be present. You still need to pass `thisLang` in case of
+section names such as `[[tener#Spanish]]`.
+
+> fillAnnotationLanguage :: Maybe Language -> Language -> Annotation -> Annotation
+> fillAnnotationLanguage maybeDefLanguage thisLang annot =
+>   case maybeDefLanguage of
+>     Nothing -> annot
+>     Just defLanguage ->
+>       case (annotationLanguage thisLang annot) of
+>         Nothing   -> insertMap "language" (fromLanguage defLanguage) annot
+>         otherwise -> annot
 
 We might have an annotation assigning a sense ID to this text:
 
@@ -423,7 +460,9 @@ vary by language in RelationSectionInfo.
 >     <$> map (entryToFacts language thisTerm)
 >     <$> mconcat
 >     <$> many ((itemRule tproc) <|> pRelationIgnored)
->
+
+pRelationItem is a sensible default function to pass as `rsItemRule`.
+
 > pRelationItem :: TemplateProc -> Parser [AnnotatedText]
 > pRelationItem tproc =
 >   extractTopLevel <$> listItem tproc "*"
@@ -432,11 +471,13 @@ vary by language in RelationSectionInfo.
 > pRelationIgnored = wikiTextLine ignoreTemplates >> newLine >> return []
 >
 > entryToFacts :: Language -> WiktionaryTerm -> AnnotatedText -> [WiktionaryFact]
-> entryToFacts language thisTerm defText =
+> entryToFacts thisLang thisTerm defText =
 >   let defSense  = findSenseID defText
 >       termSense = thisTerm {wtSense=defSense}
->   in map (annotationToFact language termSense) (plainLinkAnnotations defText)
-
+>       termLang  = wtLanguage thisTerm
+>       annots    = map (fillAnnotationLanguage termLang thisLang)
+>                       (plainLinkAnnotations defText)
+>   in map (annotationToFact thisLang termSense) annots
 
 
 The translation section
