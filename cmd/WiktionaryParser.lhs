@@ -8,7 +8,8 @@
 > import Text.MediaWiki.Wiktionary.English (enParseWiktionary)
 > import Text.MediaWiki.Wiktionary.French (frParseWiktionary)
 > import Text.MediaWiki.Wiktionary.German (deParseWiktionary)
-> import Data.Aeson (encode, ToJSON)
+> import Data.Aeson (ToJSON)
+> import Data.Aeson.Encode.Pretty (encodePretty', Config(..), keyOrder)
 
 Language handling
 =================
@@ -26,12 +27,35 @@ will be in, so we can delegate to the appropriate handler.
 Page info
 =========
 
+PageInfo is just a struct that can be JSON-encoded to let readers know when we
+start handling a new page, so that they can transform the data one page at a
+time.
+
 > data PageInfo = PageInfo {
 >   title :: Text,
 >   language :: Language
 > } deriving (Eq, Show, Generic)
 >
 > instance ToJSON PageInfo
+
+JSON printing
+=============
+
+We'll use Aeson's `encodePretty'` function so that we can output keys in a
+consistent order for reproducible builds.
+
+However, that function also inserts newlines, which would ruin the "streaming
+JSON" format we want to output, in which there's exactly one object per line.
+So we also need to post-process the result to remove newlines.
+
+> customOrder = keyOrder ["rel", "language", "text", "pos"]
+> customConfig = Config { confIndent = 0, confCompare = customOrder <> compare }
+>
+> customEncode :: ToJSON a => a -> Text
+> customEncode obj = replace "\n" " " $ cs $ encodeMultiline obj
+>
+> encodeMultiline :: ToJSON a => a -> LByteString
+> encodeMultiline = encodePretty' customConfig
 
 Top level
 =========
@@ -40,8 +64,8 @@ Top level
 > handlePage language page = do
 >   when (pageNamespace page == "0" && pageRedirect page == Nothing) $ do
 >     let pageInfo = PageInfo { title=(pageTitle page), language=language }
->     (println . encode) pageInfo
->     (mapM_ (println . encode)
+>     (println . customEncode) pageInfo
+>     (mapM_ (println . customEncode)
 >            (languageHandler language (pageTitle page) (pageText page)))
 
 > main :: IO ()
