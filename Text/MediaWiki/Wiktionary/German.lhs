@@ -224,7 +224,7 @@ Part of speech headings
 
 > handlePOSTemplate :: Template -> AnnotatedText
 > handlePOSTemplate t = buildA $ do
->   adapt "pos" arg1 t
+>   put "pos" (partOfSpeechMap (get "1" t))
 >   put "language" (getLanguage "2" t)
 >   return "POS"
 >
