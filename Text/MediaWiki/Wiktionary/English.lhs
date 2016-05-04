@@ -53,21 +53,14 @@ a function that will extract WiktionaryFacts.
 >           maybePos    = findPartOfSpeech subheads
 >           etymNumber  = findEtymologyNumber subheads
 >           sectionType = getSectionType subheads
->       in case maybePos of
->         -- If there's no heading we recognize as a part of speech, then
->         -- this is a section we don't want to parse. (This may change if
->         -- we decide to parse etymology sections.)
->         Nothing  -> []
->         Just pos ->
->           -- Build the WiktionaryTerm object and pass it on to the
->           -- section parser.
->           let thisTerm = WiktionaryTerm {
->             wtText=title,
->             wtLanguage=Just language,
->             wtEtym=Just etymNumber,
->             wtPos=Just (partOfSpeechMap pos),
->             wtSense=Nothing
->             } in chooseSectionParser sectionType thisTerm content
+>           thisTerm    = WiktionaryTerm {
+>                           wtText=title,
+>                           wtLanguage=Just language,
+>                           wtEtym=Just etymNumber,
+>                           wtPos=partOfSpeechMap <$> maybePos,
+>                           wtSense=Nothing
+>                           }
+>       in chooseSectionParser sectionType thisTerm content
 
 `chooseSectionParser` selects a particular function for making WiktionaryFacts,
 based on the type of section we're parsing.
@@ -75,6 +68,7 @@ based on the type of section we're parsing.
 > chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
 > chooseSectionParser "POS" = enParseDefinitions
 > chooseSectionParser "Translations" = enParseTranslations
+> chooseSectionParser "Etymology" = enParseEtymology
 > chooseSectionParser "Synonyms" = enParseRelation "synonym"
 > chooseSectionParser "Antonyms" = enParseRelation "antonym"
 > chooseSectionParser "Hyponyms" = enParseRelation "hyponym"
@@ -133,6 +127,16 @@ returns a Maybe Text that contains the word sense if present.
 > pTransBottom :: Parser ()
 > pTransBottom = specificTemplate enTemplates "trans-bottom" >> return ()
 
+In an etymology section, we just want to extract all the templates that
+link to another word. We parse the section using `sectionAnnotated`, extract
+the links, and create "derived/etym" relations from them.
+
+> enParseEtymology :: WiktionaryTerm -> Text -> [WiktionaryFact]
+> enParseEtymology thisTerm text =
+>   let etymParsed = parseOrDefault mempty (sectionAnnotated enTemplates) text
+>       annots = plainLinkAnnotations etymParsed
+>       facts = map (annotationToFact "en" thisTerm) annots
+>   in map (assignRel "derived/etym") facts
 
 Finding headings
 ================
