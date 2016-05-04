@@ -105,9 +105,9 @@ a function that will extract WiktionaryFacts.
 > chooseSectionParser "synonymes"       = frParseRelation "synonym"
 > chooseSectionParser "quasi-synonymes" = frParseRelation "quasi-synonym"
 > chooseSectionParser "antonymes"       = frParseRelation "antonym"
-> chooseSectionParser "hyponymes"       = frParseRelation "hyponym"
+> chooseSectionParser "hyponymes"       = frParseRelation "*hypernym"
 > chooseSectionParser "hyperonymes"     = frParseRelation "hypernym"
-> chooseSectionParser "méronymes"       = frParseRelation "meronym"
+> chooseSectionParser "méronymes"       = frParseRelation "*holonym"
 > chooseSectionParser "holonymes"       = frParseRelation "holonym"
 > chooseSectionParser "troponymes"      = frParseRelation "troponym"
 > chooseSectionParser "augmentatifs"    = frParseRelation "augmentative"
@@ -120,7 +120,6 @@ a function that will extract WiktionaryFacts.
 > chooseSectionParser "variantes orthographiques" = frParseRelation "variant"
 > chooseSectionParser "var-ortho"       = frParseRelation "variant"
 > chooseSectionParser _                 = const (const [])
-
 
 Defining section parsers
 ------------------------

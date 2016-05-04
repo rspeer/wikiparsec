@@ -98,7 +98,7 @@ in various ways.
 > pSubsection :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pSubsection term =
 >   (pDefinitionSubsection term) <|>
->   (pRelationSubsection "Unterbegriffe" "hyponym" term) <|>
+>   (pRelationSubsection "Unterbegriffe" "*hypernym" term) <|>
 >   (pRelationSubsection "Oberbegriffe" "hypernym" term) <|>
 >   (pRelationSubsection "Gegenwörter" "antonym" term) <|>
 >   (pRelationSubsection "Sinnverwandte Wörter" "related" term) <|>

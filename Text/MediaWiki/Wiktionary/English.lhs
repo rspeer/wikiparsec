@@ -71,9 +71,9 @@ based on the type of section we're parsing.
 > chooseSectionParser "Etymology" = enParseEtymology
 > chooseSectionParser "Synonyms" = enParseRelation "synonym"
 > chooseSectionParser "Antonyms" = enParseRelation "antonym"
-> chooseSectionParser "Hyponyms" = enParseRelation "hyponym"
+> chooseSectionParser "Hyponyms" = enParseRelation "*hypernym"
 > chooseSectionParser "Hypernyms" = enParseRelation "hypernym"
-> chooseSectionParser "Meronyms" = enParseRelation "meronym"
+> chooseSectionParser "Meronyms" = enParseRelation "*holonym"
 > chooseSectionParser "Holonyms" = enParseRelation "holonym"
 > chooseSectionParser "Troponyms" = enParseRelation "troponym"
 > chooseSectionParser "Coordinate terms" = enParseRelation "coordinate"
