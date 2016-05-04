@@ -146,14 +146,14 @@ catEntry = unlines [
 
 catFacts :: [WiktionaryFact]
 catFacts = [
-    WiktionaryFact "form/nominativ_singular" (term ["Katze"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/nominativ_plural" (term ["Katzen"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/genitiv_singular" (term ["Katze"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/genitiv_plural" (term ["Katzen"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/dativ_singular" (term ["Katze"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/dativ_plural" (term ["Katzen"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/akkusativ_singular" (term ["Katze"]) (term ["Katze","de","n"]),
-    WiktionaryFact "form/akkusativ_plural" (term ["Katzen"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/nominativ_singular" (term ["Katze","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/nominativ_plural" (term ["Katzen","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/genitiv_singular" (term ["Katze","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/genitiv_plural" (term ["Katzen","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/dativ_singular" (term ["Katze","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/dativ_plural" (term ["Katzen","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/akkusativ_singular" (term ["Katze","de"]) (term ["Katze","de","n"]),
+    WiktionaryFact "form/akkusativ_plural" (term ["Katzen","de"]) (term ["Katze","de","n"]),
     WiktionaryFact "definition" (term ["Katze","de","n","","def.1"]) (term ["dem Menschen verbundenes, anschmiegsames Haustier (Felis silvestris catus), in zahlreichen Rassen gezüchtet","de"]),
     WiktionaryFact "link" (term ["Katze","de","n","","def.1"]) (term ["Mensch"]),
     WiktionaryFact "link" (term ["Katze","de","n","","def.1"]) (term ["verbunden"]),

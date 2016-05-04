@@ -283,7 +283,9 @@ data into account.
 > handleInflectionTemplate :: Template -> AnnotatedText
 > handleInflectionTemplate t =
 >   let pairs = (filter keepInflectionArg) $ (map normalizeInflectionArg) $ mapToList t
->       annotations = map makeInflectionAnnotation pairs
+>       (languageName, _) = splitFirst " " (get "0" t)
+>       language = lookupLanguage "de" languageName
+>       annotations = map (makeInflectionAnnotation language) pairs
 >   in annotate annotations ""
 >
 > normalizeInflectionName :: Text -> Text
@@ -300,9 +302,10 @@ data into account.
 >   not (any (\prefix -> isPrefixOf prefix name) skippedInflectionPrefixes) &&
 >   value /= "—" && value /= "-" && value /= ""
 >
-> makeInflectionAnnotation :: (Text, Text) -> Annotation
-> makeInflectionAnnotation (name, value) = mapFromList [
+> makeInflectionAnnotation :: Language -> (Text, Text) -> Annotation
+> makeInflectionAnnotation language (name, value) = mapFromList [
 >   ("rel", "*form/" <> name),
+>   ("language", fromLanguage language),
 >   ("form", name),
 >   ("page", value)]
 
