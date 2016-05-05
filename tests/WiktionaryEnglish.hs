@@ -159,11 +159,11 @@ solderEntry = unlines [
 
 solderFacts :: [WiktionaryFact]
 solderFacts = [
-    WiktionaryFact "derived/etym" (term ["solder","en","","1"]) (term ["solderen","enm"]),
-    WiktionaryFact "derived/etym" (term ["solder","en","","1"]) (term ["solder","fro"]),
-    WiktionaryFact "derived/etym" (term ["solder","en","","1"]) (term ["souder","fr"]),
-    WiktionaryFact "derived/etym" (term ["solder","en","","1"]) (term ["solidare","la"]),
-    WiktionaryFact "derived/etym" (term ["solder","en","","1"]) (term ["solido","la"]),
+    WiktionaryFact "derived/etym" (term ["solderen","enm"]) (term ["solder","en","","1"]),
+    WiktionaryFact "derived/etym" (term ["solder","fro"]) (term ["solder","en","","1"]),
+    WiktionaryFact "derived/etym" (term ["souder","fr"]) (term ["solder","en","","1"]),
+    WiktionaryFact "derived/etym" (term ["solidare","la"]) (term ["solder","en","","1"]),
+    WiktionaryFact "derived/etym" (term ["solido","la"]) (term ["solder","en","","1"]),
     WiktionaryFact "definition" (term ["solder","en","n","1","def.1"]) (term ["Any of various alloys, often of tin and lead, that are used to join small pieces of metal together","en"]),
     WiktionaryFact "link" (term ["solder","en","n","1","def.1"]) (term ["alloy"]),
     WiktionaryFact "link" (term ["solder","en","n","1","def.1"]) (term ["tin"]),
@@ -241,7 +241,7 @@ solderFacts = [
     WiktionaryFact "related" (term ["solder","en","","1"]) (term ["braze","en"]),
     WiktionaryFact "related" (term ["solder","en","","1"]) (term ["flux","en"]),
     WiktionaryFact "related" (term ["solder","en","","1"]) (term ["weld","en"]),
-    WiktionaryFact "derived/etym" (term ["solder","fr","","1"]) (term ["solde","fr"]),
+    WiktionaryFact "derived/etym" (term ["solde","fr"]) (term ["solder","fr","","1"]),
     WiktionaryFact "definition" (term ["solder","fr","v","1","def.1"]) (term ["to close (a deal)","en"]),
     WiktionaryFact "link" (term ["solder","fr","v","1","def.1"]) (term ["close"]),
     WiktionaryFact "definition" (term ["solder","fr","v","1","def.2"]) (term ["to settle, to pay off (debt)","en"]),

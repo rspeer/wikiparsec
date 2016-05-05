@@ -134,9 +134,9 @@ the links, and create "derived/etym" relations from them.
 > enParseEtymology :: WiktionaryTerm -> Text -> [WiktionaryFact]
 > enParseEtymology thisTerm text =
 >   let etymParsed = parseOrDefault mempty (sectionAnnotated enTemplates) text
->       annots = plainLinkAnnotations etymParsed
+>       annots = languageTaggedAnnotations etymParsed
 >       facts = map (annotationToFact "en" thisTerm) annots
->   in map (assignRel "derived/etym") facts
+>   in map (assignRel "*derived/etym") facts
 
 Finding headings
 ================

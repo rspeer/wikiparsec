@@ -152,7 +152,12 @@ Working with annotations:
 > plainLinkAnnotation annot = linkableAnnotation annot && (findWithDefault "link" "rel" annot) == "link"
 >
 > plainLinkAnnotations :: AnnotatedText -> [Annotation]
-> plainLinkAnnotations astring = filter plainLinkAnnotation (getAnnotations astring)
+> plainLinkAnnotations atext = filter plainLinkAnnotation (getAnnotations atext)
+>
+> languageTaggedAnnotation :: Annotation -> Bool
+> languageTaggedAnnotation annot = plainLinkAnnotation annot && (findWithDefault "" "language" annot) /= ""
+> languageTaggedAnnotations atext = filter languageTaggedAnnotation (getAnnotations atext)
+
 
 Converting an Annotation representing a term to a WiktionaryTerm:
 
