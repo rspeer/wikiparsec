@@ -263,10 +263,12 @@ arguments.
 
 > skippedInflectionArgs :: HashSet Text
 > skippedInflectionArgs = setFromList [
->   "weitere_konjugationen",
->   "weitere_deklinationen",
+>   "weitere_konjugationen", "weitere_deklinationen",
 >   "hilfsverb", "unpersönlich", "klasse",
->   "genus", "stamm", "wort",
+>   "wort", "bedeutung", "herkunft", "gegenwörter",
+>   "unicode", "radikal", "zusatzstriche", "strichzahl", "viereckenindex",
+>   "cangjie", "n", "sg", "pl",
+>   "morse", "braille", "html-hex", "html-dez", "block",
 >   "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
 >   ]
 
@@ -275,7 +277,7 @@ adding pictures to the entry, and arguments that are written phonetically in
 IPA.
 
 > skippedInflectionPrefixes :: [Text]
-> skippedInflectionPrefixes = ["bild", "ipa_"]
+> skippedInflectionPrefixes = ["bild", "ipa_", "stamm", "genus", "navi", "1", "2"]
 
 `handleInflectionTemplate` parses an inflection template, taking the above
 data into account.
