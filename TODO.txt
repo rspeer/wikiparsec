@@ -2,4 +2,7 @@ Next steps:
 
 - normalize the names of inflections
 - [[Appendix:English proper nouns]] shouldn't count as a see also link
-- false parallelism in "noTemplates" and "enTemplates"
+- More etymology templates: {{prefix}}, {{suffix}}, {{compound}}...
+- Handle {{rel4}} and similar meta-templates
+- Handle different POS sections that reduce to the same letter as different etymologies/senses
+- Stop considering '-adj' or '-nom' in section links to be part of the language

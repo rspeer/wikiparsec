@@ -134,7 +134,10 @@ and switch the arguments.
 > makeGenericFact = makeFact "RelatedTo"
 >
 > assignRel :: Text -> WiktionaryFact -> WiktionaryFact
-> assignRel rel (WiktionaryFact _ from to) = makeFact rel from to
+> assignRel rel fact@(WiktionaryFact oldRel from to) =
+>   case oldRel of
+>     "link" -> makeFact rel from to
+>     _      -> fact
 
 
 Annotations

@@ -73,11 +73,11 @@ in the section headings:
 >     else do
 >       language <- getTextInList 1 headingValues
 >       pos <- getAnnotationInList 2 "pos" headingValues
+>       let pos' = partOfSpeechMap pos
 >       -- use pattern-matching on "etym" because it's allowed to be Nothing
 >       case getAnnotationInList 2 "etym" headingValues of
->         Just etym -> return (term [title, language, pos, etym])
->         Nothing   -> return (term [title, language, pos])
->
+>         Just etym -> return (term [title, language, pos', etym])
+>         Nothing   -> return (term [title, language, pos'])
 
 
 Parsing sections

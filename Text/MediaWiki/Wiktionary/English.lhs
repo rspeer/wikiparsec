@@ -129,14 +129,14 @@ returns a Maybe Text that contains the word sense if present.
 
 In an etymology section, we just want to extract all the templates that
 link to another word. We parse the section using `sectionAnnotated`, extract
-the links, and create "derived/etym" relations from them.
+the links, and create "related/etym" relations from them.
 
 > enParseEtymology :: WiktionaryTerm -> Text -> [WiktionaryFact]
 > enParseEtymology thisTerm text =
 >   let etymParsed = parseOrDefault mempty (sectionAnnotated enTemplates) text
 >       annots = languageTaggedAnnotations etymParsed
 >       facts = map (annotationToFact "en" thisTerm) annots
->   in map (assignRel "*derived/etym") facts
+>   in map (assignRel "related/etym") facts
 
 Finding headings
 ================
@@ -303,6 +303,45 @@ Links
 >   adapt "gloss" ["4", "gloss"] t
 >   adapt "pos" ["pos"] t
 >   visible ["3", "2"] t
+>
+> handleDerivationTemplate :: Template -> AnnotatedText
+> handleDerivationTemplate t = buildA $ do
+>   put "rel" "*derived/etym"
+>   adapt "language" arg2 t
+>   adapt "page" arg3 t
+>   visible arg3 t
+>
+> handleCognateTemplate :: Template -> AnnotatedText
+> handleCognateTemplate t = buildA $ do
+>   put "rel" "related/etym"
+>   adapt "language" arg1 t
+>   adapt "page" arg2 t
+>   visible arg2 t
+>
+> handlePrefixTemplate :: Template -> AnnotatedText
+> handlePrefixTemplate t = buildA $ do
+>   put "rel" "*derived"
+>   adapt "language" arg1 t
+>   adapt "page" arg3 t
+>   visible arg3 t
+>
+> handleSuffixTemplate :: Template -> AnnotatedText
+> handleSuffixTemplate t = buildA $ do
+>   put "rel" "*derived"
+>   adapt "language" arg1 t
+>   adapt "page" arg2 t
+>   visible arg2 t
+>
+> handleCompoundTemplate :: Template -> AnnotatedText
+> handleCompoundTemplate t =
+>   let language = get "1" t
+>       term1 = get "2" t
+>       term2 = get "3" t
+>       text = term1 <> " + " <> term2
+>   in annotate
+>     [mapFromList [("rel", "*derived"), ("language", language), ("page", term1)],
+>      mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
+>     text
 
 Translations
 ------------
@@ -414,6 +453,19 @@ Putting it all together
 > enTemplates "link"      = handleLinkTemplate
 > enTemplates "m"         = handleLinkTemplate
 > enTemplates "mention"   = handleLinkTemplate
+> enTemplates "inherited" = handleDerivationTemplate
+> enTemplates "inh"       = handleDerivationTemplate
+> enTemplates "derived"   = handleDerivationTemplate
+> enTemplates "der"       = handleDerivationTemplate
+> enTemplates "borrowed"  = handleDerivationTemplate
+> enTemplates "borrowing" = handleDerivationTemplate
+> enTemplates "bor"       = handleDerivationTemplate
+> enTemplates "cognate"   = handleCognateTemplate
+> enTemplates "cog"       = handleCognateTemplate
+> enTemplates "prefix"    = handlePrefixTemplate
+> enTemplates "suffix"    = handleSuffixTemplate
+> enTemplates "compound"  = handleCompoundTemplate
+> enTemplates "blend"     = handleCompoundTemplate
 > enTemplates "label"     = handleLabelTemplate
 > enTemplates "lbl"       = handleLabelTemplate
 > enTemplates "lb"        = handleLabelTemplate
@@ -423,8 +475,7 @@ Putting it all together
 > enTemplates "t"         = handleTranslationTemplate
 > enTemplates "t+"        = handleTranslationTemplate
 > enTemplates "t-"        = handleTranslationTemplate
-> -- "t\195\184" is "tø" written as a bytestring
-> enTemplates "t\195\184" = handleTranslationTemplate
+> enTemplates "tø"        = handleTranslationTemplate
 > -- ignore the more uncertain translation templates, t-check and t+check
 >
 > enTemplates "form of"             = handleAbstractFormTemplate

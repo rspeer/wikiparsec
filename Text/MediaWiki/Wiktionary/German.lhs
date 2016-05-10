@@ -100,7 +100,7 @@ in various ways.
 >   (pDefinitionSubsection term) <|>
 >   (pRelationSubsection "Unterbegriffe" "*hypernym" term) <|>
 >   (pRelationSubsection "Oberbegriffe" "hypernym" term) <|>
->   (pRelationSubsection "Gegenwörter" "antonym" term) <|>
+>   (pRelationSubsection "Gegenwörter" "distinct" term) <|>
 >   (pRelationSubsection "Sinnverwandte Wörter" "related" term) <|>
 >   (pRelationSubsection "Synonyme" "synonym" term) <|>
 >   (pRelationSubsection "Wortbildungen" "derived" term) <|>
@@ -267,8 +267,9 @@ arguments.
 >   "hilfsverb", "unpersönlich", "klasse",
 >   "wort", "bedeutung", "herkunft", "gegenwörter",
 >   "unicode", "radikal", "zusatzstriche", "strichzahl", "viereckenindex",
->   "cangjie", "n", "sg", "pl",
->   "morse", "braille", "html-hex", "html-dez", "block",
+>   "cangjie", "n", "sg", "pl", "endung", "syn", "s", "k",
+>   "morse", "braille", "html", "html-hex", "html-dez", "block", "språk",
+>   "html-entity",
 >   "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
 >   ]
 
@@ -277,7 +278,19 @@ adding pictures to the entry, and arguments that are written phonetically in
 IPA.
 
 > skippedInflectionPrefixes :: [Text]
-> skippedInflectionPrefixes = ["bild", "ipa_", "stamm", "genus", "navi", "1", "2"]
+> skippedInflectionPrefixes = ["bild", "ipa_", "stamm", "genus", "navi", "1", "2",
+>                              "deklination", "klasse"]
+
+Some values, as well, indicate that we shouldn't use this entry as a form. Some
+of these, like [?], indicate that someone just put a meaningless value in a
+template.  Others are incomplete and depend on a human reader's intuition, such
+as listing the plural of "la leche entera" as simply "las".
+
+> skippedInflectionValues :: HashSet Text
+> skippedInflectionValues = setFromList [
+>   "ja", "nein", "--", "[?]", "——", "...",
+>   "le", "la", "los", "las"
+>   ]
 
 `handleInflectionTemplate` parses an inflection template, taking the above
 data into account.
@@ -302,7 +315,8 @@ data into account.
 > keepInflectionArg (name, value) =
 >   not (member name skippedInflectionArgs) &&
 >   not (any (\prefix -> isPrefixOf prefix name) skippedInflectionPrefixes) &&
->   value /= "—" && value /= "-" && value /= ""
+>   (length value) >= 2 && not (isPrefixOf "Flexion:" value) &&
+>   not (member value skippedInflectionValues)
 >
 > makeInflectionAnnotation :: Language -> (Text, Text) -> Annotation
 > makeInflectionAnnotation language (name, value) = mapFromList [
