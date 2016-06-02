@@ -104,7 +104,7 @@ Here's what we're exporting from the module:
 >   module Data.LanguageType,
 >   module Control.Monad.Writer,
 >   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
->   listTakeWhile, listDropWhile,
+>   breakOn, breakOnEnd, listTakeWhile, listDropWhile,
 >   get, getAll, getPrioritized, put, nonEmpty,
 >   println
 >   ) where
@@ -121,11 +121,13 @@ Some of these exports are just re-exporting things we can import:
 Text operations
 ---------------
 
-`replace` and `splitOn` are functions that apply to Text that for some reason
-didn't make it into the ClassyPrelude.
+These are functions that apply to Text that for some reason didn't make it into
+the ClassyPrelude.
 
 > replace = T.replace
 > splitOn = T.splitOn
+> breakOn = T.breakOn
+> breakOnEnd = T.breakOnEnd
 > dropAround = T.dropAround
 > dropWhileEnd = T.dropWhileEnd
 > toTitle = T.toTitle

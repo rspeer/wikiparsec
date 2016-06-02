@@ -5,7 +5,6 @@ backtracking:
 
 > module Text.MediaWiki.SplitUtils (splitFirst, splitLast) where
 > import WikiPrelude
-> import Data.Text (breakOn)
 
 `splitFirst` finds the first occurrence of a separator character, and
 splits the string at that point, returning the text before and after the

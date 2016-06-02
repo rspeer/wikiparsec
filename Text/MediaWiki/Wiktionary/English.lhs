@@ -415,6 +415,15 @@ Form-of templates
 >       put "language" "es"
 >       adapt "page" ["3", "1"] t
 >       invisible
+>
+> handleSwedishFormTemplate t =
+>   let (formStart, formEnd) = breakOnEnd "-form-" (get "0" t)
+>       formStr = replace "-" "+" formEnd
+>   in buildA $ do
+>       put "rel" ("form/" <> formStr)
+>       put "language" "sv"
+>       adapt "page" ["1"] t
+>       invisible
 
 There are many templates named "xx-verb form of", and they tend to work in
 similar ways: several arguments to the template are symbols for various kinds
@@ -431,7 +440,17 @@ to know which language it is, and which template arguments to look up.
 >     adapt "page" arg1 t
 >     invisible
 
-We need to handle:
+> handleLanguageFormTemplate2 :: Language -> [Text] -> Template -> AnnotatedText
+> handleLanguageFormTemplate2 language formKeys t =
+>   let forms = getAll formKeys t
+>       formStr = intercalate "+" forms
+>   in buildA $ do
+>     put "rel" ("form/" <> formStr)
+>     put "language" (fromLanguage language)
+>     adapt "page" arg2 t
+>     invisible
+
+Possible templates still to handle:
 
 - [[Category:Form-of_templates]]
 - feminine plural past participle of
@@ -439,9 +458,6 @@ We need to handle:
 - masculine plural past participle of
 - masculine singular past participle of
 - neuter singular past participle of
-- gerund of
-- imperative of
-- reflexive of
 - verbal noun of
 
 
@@ -508,22 +524,30 @@ Putting it all together
 > enTemplates "participle of"                        = handleFormTemplate "ptcp"
 > enTemplates "active participle of"                 = handleFormTemplate "ptcp+actv"
 > enTemplates "passive participle of"                = handleFormTemplate "ptcp+pasv"
+> enTemplates "second-person singular past of"       = handleFormTemplate "archaic+2+s+past"
+> enTemplates "plural of"                            = handleFormTemplate "p"
+> enTemplates "gerund of"                            = handleFormTemplate "ger"
+> enTemplates "imperative of"                        = handleFormTemplate "imp"
+> enTemplates "reflexive of"                         = handleFormTemplate "ref"
+> enTemplates "singular definite of"                 = handleFormTemplate "s+def"
+> enTemplates "plural definite of"                   = handleFormTemplate "p+def"
+> enTemplates "singular indefinite of"               = handleFormTemplate "s+indef"
+> enTemplates "plural indefinite of"                 = handleFormTemplate "p+indef"
 > enTemplates "en-third-person singular of"          = handleSpecificFormsTemplate "en" ["3+s+pres"]
 > enTemplates "en-third person singular of"          = handleSpecificFormsTemplate "en" ["3+s+pres"]
 > enTemplates "en-archaic second-person singular of" = handleSpecificFormsTemplate "en" ["archaic+2+s+pres"]
 > enTemplates "en-archaic third-person singular of"  = handleSpecificFormsTemplate "en" ["archaic+3+s+pres"]
-> enTemplates "second-person singular past of"       = handleFormTemplate "archaic+2+s+past"
->
-> enTemplates "plural of"                   = handleFormTemplate "p"
-> enTemplates "gerund of"                   = handleFormTemplate "ger"
 >
 > enTemplates "en-irregular plural of"      = handleSpecificFormsTemplate "en" ["p"]
 > enTemplates "en-comparative of"           = handleSpecificFormsTemplate "en" ["comp"]
 > enTemplates "en-superlative of"           = handleSpecificFormsTemplate "en" ["sup"]
 >
-> enTemplates "de-inflected form of" = handleSpecificFormsTemplate "de" ["?"]
-> enTemplates "de-zu-infinitive of"  = handleSpecificFormsTemplate "de" ["zu"]
-> enTemplates "de-verb form of"      = handleLanguageFormTemplate "de" ["2","3","4","5"]
+> enTemplates "de-inflected form of"        = handleSpecificFormsTemplate "de" ["?"]
+> enTemplates "de-zu-infinitive of"         = handleSpecificFormsTemplate "de" ["zu"]
+> enTemplates "de-verb form of"             = handleLanguageFormTemplate "de" ["2","3","4","5"]
+> enTemplates "nl-noun form of"             = handleLanguageFormTemplate2 "nl" ["1"]
+> enTemplates "nl-adj form of"              = handleLanguageFormTemplate2 "nl" ["1"]
+> enTemplates "nl-verb form of"             = handleLanguageFormTemplate "nl" ["p","n","t","m"]
 >
 > enTemplates "es-verb form of"      = handleSpanishVerbTemplate
 > enTemplates "es-compound of"       = handleSpanishCompoundTemplate
@@ -532,7 +556,12 @@ Putting it all together
 > enTemplates "pt-adj form of"  = handleLanguageFormTemplate "pt" ["2","3","4"]
 > enTemplates "pt-verb form of" = handleLanguageFormTemplate "pt" ["3","4","5","6"]
 >
-> enTemplates "fi-form of"       = handleLanguageFormTemplate "pt" ["case","pr","pl","mood","tense","suffix"]
-> enTemplates "ru-participle of" = handleLanguageFormTemplate "pt" ["2","3","4","5"]
-> enTemplates _         = skipTemplate
+> enTemplates "fi-form of"       = handleLanguageFormTemplate "fi" ["case","pr","pl","mood","tense","suffix"]
+> enTemplates "ru-participle of" = handleLanguageFormTemplate "ru" ["2","3","4","5"]
+>
+> enTemplates x
+>   | isPrefixOf "sv-noun-form" x = handleSwedishFormTemplate
+>   | isPrefixOf "sv-adj-form"  x = handleSwedishFormTemplate
+>   | isPrefixOf "sv-verb-form" x = handleSwedishFormTemplate
+>   | otherwise                   = skipTemplate
 
