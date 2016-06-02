@@ -1,0 +1,33 @@
+{{also|bakát}}
+==Swedish==
+
+===Adjective===
+{{head|sv|adjective form}}
+
+# {{sv-adj-form-abs-indef-n|bakad}}
+
+===Verb===
+{{head|sv|verb form}}
+
+# {{sv-verb-form-sup|baka}}
+
+----
+
+==Tagal Murut==
+
+===Noun===
+{{head|mvv|noun}}
+
+# [[root]] {{gloss|of plant}}
+
+[[el:bakat]]
+[[fr:bakat]]
+[[id:bakat]]
+[[jv:bakat]]
+[[lt:bakat]]
+[[hu:bakat]]
+[[mg:bakat]]
+[[sv:bakat]]
+[[chr:bakat]]
+[[zh:bakat]]
+
