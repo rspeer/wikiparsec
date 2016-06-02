@@ -289,7 +289,7 @@ as listing the plural of "la leche entera" as simply "las".
 > skippedInflectionValues :: HashSet Text
 > skippedInflectionValues = setFromList [
 >   "ja", "nein", "--", "[?]", "——", "...",
->   "le", "la", "los", "las"
+>   "le", "la", "los", "las", "&mdash;", "&ndash;"
 >   ]
 
 `handleInflectionTemplate` parses an inflection template, taking the above

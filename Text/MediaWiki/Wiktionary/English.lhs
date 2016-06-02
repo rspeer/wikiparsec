@@ -532,5 +532,7 @@ Putting it all together
 > enTemplates "pt-adj form of"  = handleLanguageFormTemplate "pt" ["2","3","4"]
 > enTemplates "pt-verb form of" = handleLanguageFormTemplate "pt" ["3","4","5","6"]
 >
+> enTemplates "fi-form of"       = handleLanguageFormTemplate "pt" ["case","pr","pl","mood","tense","suffix"]
+> enTemplates "ru-participle of" = handleLanguageFormTemplate "pt" ["2","3","4","5"]
 > enTemplates _         = skipTemplate
 
