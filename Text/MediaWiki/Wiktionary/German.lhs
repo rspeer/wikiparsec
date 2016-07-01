@@ -269,7 +269,7 @@ arguments.
 >   "unicode", "radikal", "zusatzstriche", "strichzahl", "viereckenindex",
 >   "cangjie", "n", "sg", "pl", "endung", "syn", "s", "k",
 >   "morse", "braille", "html", "html-hex", "html-dez", "block", "språk",
->   "html-entity",
+>   "html-entity", "hilfsverb2",
 >   "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
 >   ]
 
@@ -289,7 +289,8 @@ as listing the plural of "la leche entera" as simply "las".
 > skippedInflectionValues :: HashSet Text
 > skippedInflectionValues = setFromList [
 >   "ja", "nein", "--", "[?]", "——", "...",
->   "le", "la", "los", "las", "&mdash;", "&ndash;"
+>   "le", "la", "los", "las", "&mdash;", "&ndash;",
+>   "die", "der", "das", "mehr"
 >   ]
 
 `handleInflectionTemplate` parses an inflection template, taking the above

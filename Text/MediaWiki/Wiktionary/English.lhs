@@ -497,6 +497,8 @@ Putting it all together
 > enTemplates "form of"             = handleAbstractFormTemplate
 > enTemplates "alternative form of" = handleFormTemplate "alternate"
 > enTemplates "alternate form of"   = handleFormTemplate "alternate"
+> enTemplates "alternative spelling of" = handleFormTemplate "alternate"
+> enTemplates "misspelling of"      = handleFormTemplate "alternate"
 > enTemplates "alt form of"         = handleFormTemplate "alternate"
 > enTemplates "alt form"            = handleFormTemplate "alternate"
 > enTemplates "altform"             = handleFormTemplate "alternate"
