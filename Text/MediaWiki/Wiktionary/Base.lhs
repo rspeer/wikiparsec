@@ -226,24 +226,6 @@ need to convert it to a language code, and that's what we need `thisLang` for.
 >     Just ('#', language) -> Just (lookupLanguage thisLang language)
 >     otherwise            -> Nothing
 
-Despite the above, there are sections where you *do* know what language a link
-is in. For example, in a "Synonyms" section, the linked words are going to be
-in the same language as the word being defined (not necessarily `thisLang`,
-which is the language of the entry).
-
-So `fillAnnotationLanguage` allows the language to be filled in by a default
-that may or may not be present. You still need to pass `thisLang` in case of
-section names such as `[[tener#Spanish]]`.
-
-> fillAnnotationLanguage :: Maybe Language -> Language -> Annotation -> Annotation
-> fillAnnotationLanguage maybeDefLanguage thisLang annot =
->   case maybeDefLanguage of
->     Nothing -> annot
->     Just defLanguage ->
->       case (annotationLanguage thisLang annot) of
->         Nothing   -> insertMap "language" (fromLanguage defLanguage) annot
->         otherwise -> annot
-
 We might have an annotation assigning a sense ID to this text:
 
 > findSenseID :: AnnotatedText -> Maybe Text
@@ -482,9 +464,7 @@ pRelationItem is a sensible default function to pass as `rsItemRule`.
 > entryToFacts thisLang thisTerm defText =
 >   let defSense  = findSenseID defText
 >       termSense = thisTerm {wtSense=defSense}
->       termLang  = wtLanguage thisTerm
->       annots    = map (fillAnnotationLanguage termLang thisLang)
->                       (plainLinkAnnotations defText)
+>       annots    = plainLinkAnnotations defText
 >   in map (annotationToFact thisLang termSense) annots
 
 
