@@ -793,9 +793,7 @@ Other relevant labels from https://fr.wiktionary.org/wiki/Catégorie:Modèles_de
 
 > otherLabels :: HashSet Text
 > otherLabels = setFromList [
->   "archaïque",
 >   "argot",  -- see also the template rule that handles templates starting with "argot"
->   "désuet",
 >   "vulgaire"]
 >
 > contextLabels = domainLabels <> regionLabels <> otherLabels

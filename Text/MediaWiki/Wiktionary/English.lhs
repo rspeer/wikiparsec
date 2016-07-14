@@ -245,10 +245,16 @@ separate in case we ever want to output them:
 >   "no plural", "transitive", "uds.", "uncountable", "usually plural",
 >   "usually in the plural", "usually in plural"]
 
+> usageLabels :: HashSet Text
+> usageLabels = setFromList [
+>   "obsolete", "rare", "dated", "archaic", "colloquial", "informal",
+>   "figuratively", "figurative", "poetic", "uncommon", "neologism",
+>   "obsolete form"]
+
 Combine these together into a set of all labels we want to ignore.
 
 > ignoredLabels :: HashSet Text
-> ignoredLabels = syntacticLabels <> grammarLabels
+> ignoredLabels = syntacticLabels <> grammarLabels <> usageLabels
 
 Some entries contain labels that look like `~ par`. They come out exactly this
 way in the entry. I don't even know what it's supposed to mean, so let's leave
