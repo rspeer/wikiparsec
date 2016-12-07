@@ -117,8 +117,6 @@ those used in dictionary entries of Semitic languages.
 >     (0x730 <= ord && ord <= 0x748) ||
 >     -- Cyrillic kamora
 >     ord == 0x484 ||
->     -- middle-dot used for annotating many dictionary entries
->     c == '·'
 >
 > filterMarks :: Text -> Text
 > filterMarks = filter (not . isMark)
