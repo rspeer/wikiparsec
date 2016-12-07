@@ -1,0 +1,25 @@
+body {
+    margin-left: 2em;
+    width: 50em;
+    font-family: 'Bitstream Charter', serif;
+    font-size: 14pt;
+}
+
+code {
+    font-family: 'Inconsolata', 'Consolas', 'Andale Mono', monospace;
+}
+
+p {    
+    line-height: 1.3em;
+}
+p code {
+    padding: 0.2em;
+    background-color: #eee;
+}
+
+div.sourceCode {
+    background-color: #eee;
+    margin-left: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+}
