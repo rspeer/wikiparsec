@@ -2,7 +2,9 @@
 *.swp
 build/
 dist/
+misc/
 .hsenv
 hsenv.log
 cabal.sandbox.config
 *.prof
+.stack-work
