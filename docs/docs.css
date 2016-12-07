@@ -6,7 +6,8 @@ body {
 }
 
 code {
-    font-family: 'Inconsolata', 'Consolas', 'Andale Mono', monospace;
+    font-family: 'Noto Mono', 'Consolas', 'Andale Mono', monospace;
+    font-size: 88%;
 }
 
 p {    
@@ -22,4 +23,8 @@ div.sourceCode {
     margin-left: 1em;
     padding-left: 1em;
     padding-right: 1em;
+}
+
+h1 {
+    margin-top: 3em;
 }
