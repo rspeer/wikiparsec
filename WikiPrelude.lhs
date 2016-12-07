@@ -177,6 +177,9 @@ in priority order. It returns the empty value only if it finds none of them.
 > getPrioritized (key:rest) map = findWithDefault (getPrioritized rest map) key map
 > getPrioritized [] map         = mempty
 
+`getAll` is a step in `getPrioritized`. It takes a list of keys and a mapping,
+and returns the list of values of those keys that exist.
+
 > getAll :: (IsMap m, Monoid (MapValue m)) => [ContainerKey m] -> m -> [MapValue m]
 > getAll keys m = catMaybes (map (\key -> lookup key m) keys)
 
