@@ -1,3 +1,6 @@
+`Text.Language.Normalize` - converts words to a standard form
+=============================================================
+
 > {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 > module Text.Language.Normalize where
 > import WikiPrelude

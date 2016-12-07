@@ -1,5 +1,5 @@
-A custom Prelude for Wiki parsing
-=================================
+`WikiPrelude` - A custom Prelude for Wiki parsing
+=================================================
 
 The Haskell standard library is called the 'Prelude'. There is general
 agreement that the Prelude is not very good code and should be replaced with
@@ -18,7 +18,7 @@ be appended. This leads to cleaner code and easier refactoring.
 
 
 Monads and monoids, oversimplified
-==================================
+----------------------------------
 
 A [classic joke][] about Haskell defines these terms: "A monad is a monoid in
 the category of endofunctors, what's the problem?"
@@ -89,7 +89,7 @@ parses some input and then returns some Text.
 
 
 Here's where the actual code starts
-===================================
+-----------------------------------
 
 > {-# LANGUAGE NoImplicitPrelude, FlexibleContexts #-}
 
