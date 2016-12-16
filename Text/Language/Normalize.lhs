@@ -17,7 +17,9 @@ letters, and languages that leave accents alone.
 
 MediaWiki's implementation is part of its "Module:languages" Lua code. The
 configuration for all languages with two-letter language codes can be seen
-at: https://en.wiktionary.org/wiki/Module:languages/data2.
+in Wiktionary's [languages/data2][] module.
+
+[languages/data2]: https://en.wiktionary.org/wiki/Module:languages/data2
 
 We apply a sequence of steps to the text:
 
@@ -66,6 +68,10 @@ version of `e`.
 There don't seem to be any languages that use carons as dictionary markings
 that should be removed, so we simply always leave carons as is.
 
+Here's what I think is the list of languages that should drop all diacritics,
+though I admit I started seriously skimming when I got to the three-letter
+language codes.
+
 > diacriticDroppingLanguages :: [Language]
 > diacriticDroppingLanguages = [
 >   "ab", "be", "bg", "ce", "cu", "el", "ka", "la", "lt",
@@ -74,7 +80,13 @@ that should be removed, so we simply always leave carons as is.
 >   "hil", "huz", "inh", "kjj", "lui", "lzz", "mga", "miq", "moe",
 >   "nci", "odt", "ofs", "oge", "olt", "osx", "ppl", "rue", "sga", "sva",
 >   "unm", "xfa", "xmk"]
->
+
+`filterDiacritics` takes in NFD-decomposed text and removes the characters
+that are diacritic marks, using a straightforward `filter`.
+
+We need to alter some Cyrillic letters to make sure that legitimate vowels
+aren't taken apart by the filter -- more on that next.
+
 > filterDiacritics :: Text -> Text
 > filterDiacritics = (filter (not . isDiacritic)) . fixCyrillicVowels
 >
@@ -116,14 +128,13 @@ those used in dictionary entries of Semitic languages.
 >     -- Syriac marks
 >     (0x730 <= ord && ord <= 0x748) ||
 >     -- Cyrillic kamora
->     ord == 0x484 ||
+>     ord == 0x484
 >
 > filterMarks :: Text -> Text
 > filterMarks = filter (not . isMark)
 >
 > replaceAlifWasla :: Text -> Text
 > replaceAlifWasla = replace "ٱ" "ا"
->
 
 Things we haven't dealt with:
 

@@ -1,5 +1,19 @@
+Wikiparsec: tools that parse Wikipedia and Wiktionary
+=====================================================
+
+Wikiparsec provides tools for parsing the complex MediaWiki syntax that
+appears on Wikipedia and Wiktionary, for the purpose of information
+extraction.
+
+I'm aware that many other tools do the same, but I think most of them are too
+sloppy about their parsing. Wikiparsec is designed for cases where it's
+important to have the *correct* parse of the page, and extract detailed
+information from it. In particular, it's used to provide dictionary definitions
+to [ConceptNet](http://conceptnet.io).
+
+
 Compiling and running the code
-==============================
+------------------------------
 
 This code is meant to be built with [Haskell Stack][stack]. Install Stack and
 build this code with:
@@ -36,7 +50,7 @@ bunzip2 -c enwiktionary.xml.bz2 | stack exec wiktionary-parser en
 
 
 Why this code is in Haskell
-===========================
+---------------------------
 
 I've been facing the problem of how to deal with Wikitext well for a long time.
 I didn't originally expect to solve it using Haskell.
@@ -80,13 +94,12 @@ One thing I love about Haskell is the Literate Haskell (`.lhs`) format. The
 Haskell compiler can interpret it without any pre-processing, and it encourages
 documentation as the rule and code as the exception.
 
-Lines that start with the character `>` are code. There won't be any of that
-until I get to the header. The rest is Markdown. The documentation tool
-`pandoc` can convert this all into nicely-formatted HTML, but just reading the
-Markdown + Haskell source should do the job too.
+Lines that start with the character `>` are code. The rest is Markdown. The
+documentation tool `pandoc` can convert this all into nicely-formatted HTML,
+which you might even be reading right now, but just reading the Markdown +
+Haskell source should do the job too.
 
 You could start reading with `WikiPrelude.lhs`, which sets up the functions
 we want to be available in all our modules, or `Text/Wiki/MediaWiki.lhs`,
 which performs the basic level of parsing for MediaWiki syntax.
-
 

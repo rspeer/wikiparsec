@@ -10,14 +10,23 @@ I built this code on an alternative Haskell standard library, the Classy
 Prelude, because it's got a good idea of how to deal with different data types
 such as Texts and ByteStrings. Instead of prefixed functions that deal with one
 data type, ClassyPrelude uses generic functions that can apply to any data type
-that does the right things.
+that does the right things, because it defines these functions in terms of
+type classes.
 
 Instead of having to use `T.append` to append texts, and `Char8.append` to
 append ByteStrings, or whatever, we just use `append` to append things that can
 be appended. This leads to cleaner code and easier refactoring.
 
+It comes at a price: when a type signature in the code is slightly wrong,
+Haskell with the Classy Prelude will output error messages that are more
+confusing than usual, because everything is a level of abstraction removed from
+the actual types you mean to use.
 
-Monads and monoids, oversimplified
+Speaking of abstraction, let's talk about two important concepts that happen
+to be typeclasses with frightening names: Monoids and Monads.
+
+
+Monoids and monads, oversimplified
 ----------------------------------
 
 A [classic joke][] about Haskell defines these terms: "A monad is a monoid in
@@ -55,12 +64,12 @@ to concatenate.)
 When I'm willing to call all these sequencey things Monoids, then instead of
 having to use awkwardly-namespaced functions for dealing with all these types
 separately (like `T.append` for text, versus `BS.append` for bytestrings), I
-can use `mappend` to append whatever monoidy things I have, and `mempty` to
-get an empty one.
+can use `mappend` to append whatever monoidy things I have, and `mempty` or
+`ø` to get an empty one.
 
 By the way, Haskell programmers show their apprecation for functions they find
 really important by giving them infix operators. So `mappend list1 list2` is
-also spelled `list1 <> list2`.
+also spelled `list1 <> list2`, or in fancy Unicode, `list1 ⊕ list2`.
 
 Monads are stateful things you can do
 -------------------------------------
@@ -91,7 +100,27 @@ parses some input and then returns some Text.
 Here's where the actual code starts
 -----------------------------------
 
-> {-# LANGUAGE NoImplicitPrelude, FlexibleContexts #-}
+Every module starts with a LANGUAGE line telling the Haskell compiler
+which optional language features to use.
+
+The ones we'll see a lot are
+`NoImplicitPrelude`, telling it not to import the Prelude because we're
+defining our own right here, and `OverloadedStrings`, which lets us
+use quoted literals as whatever type they need to be, instead of them
+ending up as a String, an awful type you never want to use because it's
+a linked list of characters.
+
+We also turn on `UnicodeSyntax` a lot so we can bling out our code.
+
+Various LANGUAGE lines throughout this codebase will turn on other features
+such as `FlexibleContexts`, and honestly I have no clear idea what they do,
+except that the compiler tells me things like "I can't compile this unless you
+turn on `FlexibleContexts`".
+
+`OverloadedStrings` would be dangerous to have on while we're still defining
+what strings even are, so it's not turned on in the WikiPrelude.
+
+> {-# LANGUAGE NoImplicitPrelude, UnicodeSyntax, FlexibleContexts #-}
 
 The WikiPrelude is a small extension of the ClassyPrelude, designed to
 include some more types and functions that we'll need throughout the parser.
@@ -105,16 +134,17 @@ Here's what we're exporting from the module:
 >   module Control.Monad.Writer,
 >   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
 >   breakOn, breakOnEnd, listTakeWhile, listDropWhile,
->   get, getAll, getPrioritized, put, nonEmpty,
->   println
+>   get, getAll, getPrioritized, nonEmpty,
+>   println, ø, (∈), (⊕)
 >   ) where
 
-Some of these exports are just re-exporting things we can import:
+Some of these exports are just re-exporting things that we import en masse:
 
 > import ClassyPrelude hiding (takeWhile)
 > import qualified ClassyPrelude as P
-> import Data.String.Conversions hiding ((<>))
+> import Data.String.Conversions hiding ((<>), (⊕))
 > import Data.LanguageType
+> import Data.Monoid.Unicode ((⊕), (∅))
 > import Control.Monad.Writer (Writer, writer, pass, runWriter, execWriter)
 > import qualified Data.Text as T
 
@@ -157,6 +187,27 @@ Attoparsec, so we need to rename the ClassyPrelude one.
 > listDropWhile = P.dropWhile
 
 
+Unicode shenanigans
+-------------------
+
+We can use Unicode operators to work with monoids, and we might as well do so
+because we'll be working with a lot of monoids.
+
+One thing I want to do is define the empty monoid as the letter ø. I know it's
+supposed to be the math symbol ∅. You have to put that one in parentheses
+because it's a symbol and Haskell's parser thinks it's supposed to be an infix
+operator. But ø is a name, and that's exactly what we need.
+
+> ø :: Monoid α => α
+> ø = (∅)
+
+`∈` is the element-of operator, and actually having it as an infix operator is
+rather nice. We have to make sure it refers to the ClassyPrelude version of
+`elem`, complete with its type signature (which I just copied and pasted).
+
+> (∈) :: MonoFoldableEq c => Element c -> c -> Bool
+> (∈) = elem
+
 Mapping operations
 ------------------
 
@@ -167,15 +218,16 @@ returns an empty sequence if it's not there.
 What I'm calling a sequence is what Haskell calls a monoid -- see the section
 "Monoids are things you can concatenate" above.
 
+
 > get :: (IsMap map, Monoid (MapValue map)) => ContainerKey map -> map -> MapValue map
-> get = findWithDefault mempty
+> get = findWithDefault ø
 
 `getPrioritized` is like `get`, but tries looking up multiple different keys
 in priority order. It returns the empty value only if it finds none of them.
 
 > getPrioritized :: (IsMap map, Monoid (MapValue map)) => [ContainerKey map] -> map -> MapValue map
 > getPrioritized (key:rest) map = findWithDefault (getPrioritized rest map) key map
-> getPrioritized [] map         = mempty
+> getPrioritized [] map         = ø
 
 `getAll` is a step in `getPrioritized`. It takes a list of keys and a mapping,
 and returns the list of values of those keys that exist.
@@ -185,21 +237,8 @@ and returns the list of values of those keys that exist.
 
 Undoing our default empty sequence by turning empty sequences into Nothing:
 
-> nonEmpty :: (Monoid a, Eq a) => Maybe a -> Maybe a
+> nonEmpty :: (Monoid α, Eq α) => Maybe α -> Maybe α
 > nonEmpty val =
 >   case val of
->     Just something -> if (something == mempty) then Nothing else val
+>     Just something -> if (something == ø) then Nothing else val
 >     Nothing -> Nothing
-
-I found myself having to build up a map with pieces from another map often
-enough that the syntax was getting quite repetitive. So this `put` function
-turns the process of building a map into a Writer monad, allowing us to use
-`do` syntax and create a domain-specific language for building mappings.
-This syntax will be extended in `Text.MediaWiki.Wiktionary.Base`.
-
-> put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
-> put key value =
->   if (value == mempty)
->     then writer (value, mempty)
->     else writer (value, singletonMap key value)
-

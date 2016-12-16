@@ -1,4 +1,4 @@
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax, FlexibleContexts #-}
 
 This file defines how to parse Wiktionary entries, as a layer above the basic
 handling of wiki syntax in `Wikitext.lhs`.
@@ -78,7 +78,7 @@ JSON representation as the string representation of a WiktionaryTerm.
 >                  wtEtym term,
 >                  wtSense term]
 >         showList = ushow (squishMaybes items)
->     in cs ("(term " <> showList <> ")")
+>     in cs ("(term " ⊕ showList ⊕ ")")
 >
 > squishMaybes :: [Maybe Text] -> [Text]
 > squishMaybes list = reverse $ map (fromMaybe "") $ listDropWhile isNothing $ reverse list
@@ -327,7 +327,7 @@ something to make them part of the definition above.
 >
 > adjustLabel :: Text -> Text -> AnnotatedText -> LabeledDef
 > adjustLabel senseLabel defn atext =
->   let senseID     = "def." <> senseLabel
+>   let senseID     = "def." ⊕ senseLabel
 >       annotations = (singletonMap "senseID" senseID):getAnnotations atext
 >       atext'      = annotate annotations defn
 >   in (senseID, atext')
@@ -386,7 +386,7 @@ Converting definitions to facts:
 >       termSense = thisTerm {wtSense=defSense}
 >       defPieces = splitDefinition (stripSpaces (getText defText))
 >   in (map (makeDefinitionFact termSense language) defPieces)
->      <> (map (annotationToFact language termSense) (linkableAnnotations defText))
+>      ⊕ (map (annotationToFact language termSense) (linkableAnnotations defText))
 
 > makeDefinitionFact termSense language definition =
 >   makeFact "definition" termSense (simpleTerm language definition)
@@ -545,7 +545,7 @@ Looking up sections
 
 > findHeading :: HashSet Text -> [Text] -> Maybe Text
 > findHeading choices headings =
->   let filtered = filter (\x -> elem x choices) headings
+>   let filtered = filter (∈ choices) headings
 >   in headMay filtered
 >
 > findPrefixedHeading :: Text -> [Text] -> Maybe Text
@@ -555,7 +555,7 @@ Looking up sections
 >   in headMay mapped
 >
 > intersectLists :: (Eq a) => [a] -> [a] -> [a]
-> intersectLists list1 list2 = filter (\x -> elem x list1) list2
+> intersectLists list1 list2 = filter (∈ list1) list2
 
 
 Transforming templates
@@ -563,11 +563,24 @@ Transforming templates
 
 Many of the template functions we define will involve converting a Template
 value into an AnnotatedText. To get some convenient `do` syntax for this, we
-use `put`, a function defined in `WikiPrelude` that uses a Writer monad.
+use `put`, which lets us concatenate together values using a monad called
+Writer.
+
+The Writer monad maintains a state, which is a monoid, and the action of the monad
+is to append things onto that monoid. I promise this will be really useful.
+
+> put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
+> put key value =
+>   if (value == ø)
+>     then writer (value, ø)
+>     else writer (value, singletonMap key value)
+
 
 Repeatedly running `put` will build up a Map, and in the end it returns a
 value. Here, the value it returns will be the Text, and the Map will become
 an Annotation on that text.
+
+TODO: explain the rest of this
 
 > buildA :: Writer Annotation Text -> AnnotatedText
 > buildA m =

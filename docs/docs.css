@@ -1,6 +1,6 @@
 body {
     margin-left: 2em;
-    width: 50em;
+    margin-right: 2em;
     font-family: 'Bitstream Charter', serif;
     font-size: 14pt;
 }
@@ -10,8 +10,10 @@ code {
     font-size: 88%;
 }
 
-p {    
+p {
     line-height: 1.3em;
+    width: 50em;
+    text-align: justify;
 }
 p code {
     padding: 0.2em;
@@ -21,10 +23,24 @@ p code {
 div.sourceCode {
     background-color: #eee;
     margin-left: 1em;
+    margin-right: 1em;
     padding-left: 1em;
     padding-right: 1em;
 }
 
+pre.sh {
+    background-color: #555;
+    color: #fff;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding: 1em;
+}
+
 h1 {
     margin-top: 3em;
+}
+
+a {
+    text-decoration: none;
+    color: #36c;
 }

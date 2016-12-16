@@ -30,6 +30,7 @@ Library
                        Data.LanguageType, Data.LanguageNames
   build-depends:       HUnit,
                        base,
+                       base-unicode-symbols,
                        classy-prelude ==0.12.*,
                        string-conversions ==0.4.*,
                        utf8-string,
@@ -59,6 +60,7 @@ Executable wiki2text
                        Text.MediaWiki.WikiText,
                        WikiPrelude
   build-depends:       base,
+                       base-unicode-symbols,
                        classy-prelude ==0.12.*,
                        string-conversions ==0.4.*,
                        utf8-string,
@@ -93,6 +95,7 @@ Executable wiktionary-parser
                        Text.Language.Normalize,
                        WikiPrelude
   build-depends:       base,
+                       base-unicode-symbols,
                        classy-prelude ==0.12.*,
                        string-conversions ==0.4.*,
                        utf8-string,
