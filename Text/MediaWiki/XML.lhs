@@ -14,6 +14,29 @@ The purpose of this module is to extract the page contents from a MediaWiki XML
 dump, and send the resulting contents on to `Text.MediaWiki.HTML`, the next
 step of parsing.
 
+As a reference, this is what a page of a MediaWiki XML dump looks like:
+
+```xml
+  <page>
+    <title>Albedo</title>
+    <ns>0</ns>
+    <id>39</id>
+    <revision>
+      [... lots of metadata tags ...]
+      <text xml:space="preserve">{{Other uses}}
+        {{Use dmy dates|date=June 2013}}
+        [[File:Albedo-e hg.svg|thumb|Percentage of diffusely reflected sunlight in relation to various surface conditions]]
+
+        '''Albedo''' ({{IPAc-en|æ|l|ˈ|b|iː|d|oʊ}}) is the &quot;whiteness&quot; of a surface. It is a '''reflection coefficient''', and has a value of less than one.
+        [... rest of article text ...]
+      </text>
+    </revision>
+  </page>
+```
+
+The elements we care about within a `<page>` are `<ns>` (the *namespace*),
+`<title>`, `<text>`, and `<redirect>` if it exists.
+
 > module Text.MediaWiki.XML where
 > import WikiPrelude
 
@@ -35,11 +58,14 @@ it will only ever contain 4 elements.)
 
 > type ByteStringAssoc = [(ByteString, ByteString)]
 
-`lookup key aList` finds the item in an association list whose first part is
-`key`, and returns `Just` the item's second part (its value). Most of the
-elements we're looking for are present on every article in the XML dump, so we
-define `justLookup` here, which gets the unwrapped value. It unwraps `Just x`
-into `x` by using `fromMaybe` with an error as the default case.
+`lookup key aList` is a standard function that finds the item in an association
+list whose first part is `key`, and returns `Just` the item's second part (its
+value).
+
+Most of the elements we're looking for are present on every article in the XML
+dump, so we define `justLookup` here, which gets the unwrapped value. It
+unwraps `Just x` into `x` by using `fromMaybe` with an error as the default
+case.
 
 > justLookup :: ByteString -> ByteStringAssoc -> ByteString
 > justLookup key aList = fromMaybe (error ("Missing tag: " ++ (show key))) (lookup key aList)
@@ -68,7 +94,7 @@ Something we can do with monads besides sequence things together is to apply
 a normal-looking function to the value that's wrapped by the monad. That's what
 the "lift" operator does, which is typically spelled `<$>` (even in other
 functional programming languages). We'll use it here to `decodeUtf8` the value
-inside the `Maybe`.
+inside the `Maybe`, or if the value is `Nothing`, leave it that way.
 
 > makeWikiPage :: ByteStringAssoc -> WikiPage
 > makeWikiPage subtags = WikiPage {
@@ -86,12 +112,17 @@ values in a `WikiPage` record.
 SAX events
 ----------
 
-This is the part where we use SAX rules to find the appropriate tags:
+SAX, the Streaming API for XML, is a form of XML parser that isn't given a
+tree of tags, just a sequence of events such as the beginnings and ends
+of tags. Using a SAX parser requires implementing handlers for each of these
+events, keeping track of whatever state is necessary.
+
+To find the appropriate tags in Wikipedia's XML dump, we're going to run such
+a state machine, which reacts to SAX events and turns them into WikiPages.
 
 > findPageTags = handleEventStream [] []
 
-We're basically defining a state machine that reacts to SAX events and turns
-them into WikiPages. Its state is contained in its first two arguments. The
+The state of `handleEventStream` is contained in its first two arguments. The
 first is a ByteStringAssoc of the relevant tags we've found for the current
 article, and the second is the text of the current tag, which we also have to
 build up statefully because it could arrive in chunks instead of all at once.
@@ -166,34 +197,38 @@ raise an error.
 > handleEventStream subtags chunks (misc:rest) = error ("Can't handle element: " ++ show misc)
 
 
-Top level
----------
+The whole XML-parsing process
+-----------------------------
 
-At the top level, we have a stream of XML data coming from somewhere.  We scan
-through it, extracting `WikiPage` records. We pass those records on to a `sink`
-that says what to do with them, which is not decided by this module.
+We have a stream of XML data coming from somewhere.  We scan through it,
+extracting `WikiPage` records. We pass those records on to a `sink` that says
+what to do with them, which is not decided by this module.
 
 `processMediaWikiContent` is the key function here. Its input is a lazy
 ByteString (`LByteString`), which means that we can get bytes from the front of
 it without having to read the whole thing first.
 
 The result of `SAX.parse` is a lazy list of `SAXEvents`, which we scan through
-and turn into `WikiPage` records using the SAX handlers defined above.
+and turn into `WikiPage` records using the SAX handlers defined above,
+particularly `findPageTags`.
 
 The `sink` is a function that takes our `WikiPage` records and does something
 with them that will go to stdout (whose type is `IO ()`). The result of this
 whole function is that a bunch of things happen to stdout, so its return type
 is also `IO ()`.
 
+We're not defining a `sink` here. The sink is different depending on what data
+you're working with and what you're intending to do with it, and that's for the
+top-level program to decide.
+
 > processMediaWikiContent :: LByteString -> (WikiPage -> IO ()) -> IO ()
 > processMediaWikiContent content sink = do
 >   let events = SAX.parse SAX.defaultParseOptions content
 >   mapM_ sink (findPageTags events)
 
-`findPageTags` is the function that turns XML tags into association lists, and
-we'll get to it in a moment, but first we'll define where this XML stream is
-coming from. It's coming from an open file handle, specifically stdin, because
-the data is being piped into this program straight out of `bunzip2`.
+Finally, we define where this XML stream is coming from. It's coming from an
+open file handle, specifically stdin, because the data is being piped into this
+program straight out of `bunzip2`.
 
 > processMediaWikiStream :: Handle -> (WikiPage -> IO ()) -> IO ()
 > processMediaWikiStream source sink = do

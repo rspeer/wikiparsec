@@ -7,9 +7,16 @@ extraction.
 
 I'm aware that many other tools do the same, but I think most of them are too
 sloppy about their parsing. Wikiparsec is designed for cases where it's
-important to have the *correct* parse of the page, and extract detailed
-information from it. In particular, it's used to provide dictionary definitions
-to [ConceptNet](http://conceptnet.io).
+important to parse the page as correctly as possible (without running an embedded
+instance of MediaWiki), and extract detailed information from that parse.
+
+We're not outputting a fully-general tree structure of everything going on in
+the Wikitext (if you output that, you *still* have a parsing problem). Instead,
+the parser is connected to functions that extract relevant information for the
+problem at hand, and those functions are responsible for the output.
+
+Wikiparsec is used to provide dictionary definitions to
+[ConceptNet](http://conceptnet.io).
 
 
 Compiling and running the code
