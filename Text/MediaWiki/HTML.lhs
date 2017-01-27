@@ -1,7 +1,7 @@
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
-
 `Text.MediaWiki.HTML`: removing HTML from Wikitext
 ==================================================
+
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
 
 After parsing the XML of a MediaWiki entry, the result then needs to be
 decoded as (potentially very sloppy) HTML, the contents of which are Wikitext.
