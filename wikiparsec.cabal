@@ -24,7 +24,7 @@ Library
                        Text.MediaWiki.Wiktionary.German,
                        WikiPrelude
   other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
-                       Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.SplitUtils, Text.MediaWiki.AnnotatedText,
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML,
                        Data.LanguageType, Data.LanguageNames
@@ -53,7 +53,7 @@ Executable wiki2text
     -O2
   main-is:             cmd/Wiki2Text.lhs
   other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
-                       Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.SplitUtils, Text.MediaWiki.AnnotatedText,
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML, Text.MediaWiki.XML,
                        Data.LanguageType, Data.LanguageNames,
@@ -83,7 +83,7 @@ Executable wiktionary-parser
     -O2
   main-is:             cmd/WiktionaryParser.lhs
   other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
-                       Text.MediaWiki.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.SplitUtils, Text.MediaWiki.AnnotatedText,
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML, Text.MediaWiki.XML,
                        Data.LanguageType, Data.LanguageNames,

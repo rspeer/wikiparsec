@@ -1,14 +1,20 @@
+`Text.SplitUtils`: manipulating delimited strings
+=================================================
+
 > {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 
-Some string-splitting functions that help us parse Wikitext without
+Some string-splitting functions will help us parse Wikitext without
 backtracking:
 
-> module Text.MediaWiki.SplitUtils (splitFirst, splitLast) where
+> module Text.SplitUtils (splitFirst, splitLast) where
 > import WikiPrelude
 
 `splitFirst` finds the first occurrence of a separator character, and
 splits the string at that point, returning the text before and after the
 separator. If the separator never appears, the suffix will be the empty string.
+
+It turns out that this exact function is in the Classy Prelude, and it's called
+`breakOn`.
 
 > splitFirst :: Text -> Text -> (Text, Text)
 > splitFirst = breakOn

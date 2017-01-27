@@ -7,7 +7,7 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import WikiPrelude
 > import Text.MediaWiki.WikiText
 > import Text.MediaWiki.ParseTools
-> import Text.MediaWiki.SplitUtils
+> import Text.SplitUtils
 > import Text.MediaWiki.AnnotatedText
 > import Text.MediaWiki.Templates
 > import Data.Attoparsec.Text

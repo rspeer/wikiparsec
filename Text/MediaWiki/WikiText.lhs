@@ -1,7 +1,10 @@
+`Text.MediaWiki.WikiText`: parse the WikiText format
+====================================================
+
 > {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}
 
 Setup
-=====
+-----
 
 To parse the mess that is Wiktionary, we make use of Attoparsec, a
 well-regarded parser-combinator library for Haskell.
@@ -14,7 +17,7 @@ well-regarded parser-combinator library for Haskell.
 Pull in some string-manipulating utilities that are defined elsewhere in
 this package:
 
-> import Text.MediaWiki.SplitUtils (splitFirst, splitLast)
+> import Text.SplitUtils (splitFirst, splitLast)
 
 Some common shorthand for defining parse rules:
 
@@ -32,7 +35,7 @@ Marking up text:
 > import Text.MediaWiki.AnnotatedText
 
 Spans of text
-=============
+-------------
 
 Some formatting allows whitespace as long as it stays on the same line --
 for example, the whitespace around headings and after list bullets.
@@ -147,11 +150,8 @@ rule does.
 > wikiTextAtEndOfLink tproc = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]<?> "wikitext at end of link"
 > wikiTextInTemplate tproc  = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInTemplate]            <?> "wikitext inside template"
 
-Wiki syntax items
-=================
-
-Links
------
+Wiki syntax for links
+---------------------
 
 External links appear in single brackets. They contain a URL, a space, and
 the text that labels the link, such as:
@@ -292,8 +292,8 @@ when they appear in plain text. For that reason, "\n" often belongs in
 >     )
 
 
-Lists
------
+Wiki syntax for lists
+---------------------
 
 Here's a hierarchical data type for describing the contents of lists, which
 semantically can contain other lists.
@@ -387,8 +387,8 @@ And here are the rules for parsing lists:
 > isPlainItem _ = False
 
 
-Templates
----------
+Wiki syntax for templates
+-------------------------
 
 A simple template looks like this:
 
@@ -455,7 +455,7 @@ have to be evaluated.
 > templateRest tproc offset = endOfTemplate <|> (string "|" >> templateArgs tproc offset)
 >
 > endOfTemplate :: Parser Template
-> endOfTemplate = string "}}" >> return mempty
+> endOfTemplate = string "}}" >> return ø
 >
 > intToText :: Int -> Text
 > intToText = pack . show
@@ -474,8 +474,8 @@ general rule for parsing template expressions.
 >   return (("0",name):parsed)
 
 
-Tables
-------
+Wiki syntax for tables
+----------------------
 
 Tables have complex formatting, and thus far we're just going to be skipping
 them.

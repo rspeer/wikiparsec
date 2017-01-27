@@ -41,7 +41,7 @@ We apply a sequence of steps to the text:
 
 > normalizeText :: Language -> Text -> Text
 > normalizeText lang =
->   if (elem lang diacriticDroppingLanguages)
+>   if (lang ∈ diacriticDroppingLanguages)
 >     then (normalize NFC) . filterDiacritics . filterMarks . (normalize NFD) . replaceAlifWasla
 >     else (normalize NFC) . filterMarks . (normalize NFD) . replaceAlifWasla
 

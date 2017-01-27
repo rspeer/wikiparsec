@@ -7,7 +7,7 @@ Export only the top-level, namespaced functions.
 > import WikiPrelude
 > import Text.MediaWiki.Templates
 > import Text.MediaWiki.AnnotatedText
-> import Text.MediaWiki.SplitUtils
+> import Text.SplitUtils
 > import Text.MediaWiki.ParseTools
 > import Text.MediaWiki.Sections
 > import Text.MediaWiki.WikiText

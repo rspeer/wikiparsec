@@ -1,3 +1,6 @@
+`Text.MediaWiki.AnnotatedText`: a data type for slightly-marked-up text
+=======================================================================
+
 > {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}
 > module Text.MediaWiki.AnnotatedText where
 > import WikiPrelude
@@ -40,19 +43,28 @@ Text) and a list of Annotations for it.
 >
 > annotate :: [Annotation] -> Text -> AnnotatedText
 > annotate annos t = AnnotatedText annos t
->
+
+Some simple functions to extract values from AnnotatedText:
+
 > getAnnotations :: AnnotatedText -> [Annotation]
 > getAnnotations (AnnotatedText annos t) = annos
 >
 > getText :: AnnotatedText -> Text
 > getText (AnnotatedText annos t) = t
->
+
+We convert plain Text into AnnotatedText by annotating it with nothing.
+The same goes for a plain ByteString, except we have to decode it from UTF-8
+first.
+
 > annotFromText :: Text -> AnnotatedText
 > annotFromText = annotate []
 >
 > annotFromBytes :: ByteString -> AnnotatedText
 > annotFromBytes = annotFromText . decodeUtf8
->
+
+`singleAnnotation` maps a single key to a single value, with no text. This can
+be concatenated to other AnnotatedText as a way to add a property.
+
 > singleAnnotation :: Text -> Text -> AnnotatedText
 > singleAnnotation key val = annotate [singletonMap key val] ""
 
@@ -74,7 +86,9 @@ AnnotatedTexts with line breaks between the texts:
 > transformA :: (Text -> Text) -> AnnotatedText -> AnnotatedText
 > transformA op (AnnotatedText a t) = AnnotatedText a (op t)
 
-We can use a string literal as an AnnotatedText:
+We can use a string literal as an AnnotatedText. `pack` converts Haskell's
+shitty built-in `String` type to `Text`, and `annotFromText` converts that
+to an `AnnotatedText`.
 
 > instance IsString AnnotatedText where
 >   fromString = (annotFromText . pack)
