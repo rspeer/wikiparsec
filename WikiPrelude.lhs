@@ -57,9 +57,9 @@ lists. Sets also work, if you think about the "union" operation as being like
 concatenation.
 
 (A mathematician might say I'm overlooking some monoids that are a big deal,
-like addition of integers. But in Haskell code, you wouldn't *use* a monoid to
-add integers. You'd use good old `+` for that. Monoids are for things you need
-to concatenate.)
+like addition of numbers. But you wouldn't realistically *use* a monoid to add
+numbers. You'd use `+` to add numbers. Monoids are for things you need to
+concatenate.)
 
 When I'm willing to call all these sequencey things Monoids, then instead of
 having to use awkwardly-namespaced functions for dealing with all these types

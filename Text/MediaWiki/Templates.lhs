@@ -1,8 +1,8 @@
+`Text.MediaWiki.Templates`: representing and applying templates
+===============================================================
+
 > {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
-
-Handling templates
-==================
-
+>
 > module Text.MediaWiki.Templates where
 > import WikiPrelude
 > import Text.MediaWiki.AnnotatedText
@@ -42,20 +42,31 @@ AnnotatedText for any template.
 > ignoreTemplates :: TemplateProc
 > ignoreTemplates = const skipTemplate
 
-Two useful template actions. `skipTemplate` outputs the empty string no matter
-what the arguments of the template are. `idTemplate` returns the name of the
-template. `useArg` returns a given named or positional argument.
+Generally useful template actions
+---------------------------------
+
+`skipTemplate` outputs the empty string no matter what the arguments of the
+template are.
+
+`idTemplate` returns the name of the template as its value.
+
+`useArg` returns a given named or positional argument.
 
 Keep in mind that template arguments are always Text, even the positional
 ones such as "1". We do this to keep types consistent as we emulate PHP.
 
 > skipTemplate :: TemplateAction
-> skipTemplate = const mempty
+> skipTemplate = const ø
 >
 > useArg :: Text -> TemplateAction
 > useArg arg = annotFromText . (get arg)
 > idTemplate = useArg "0"
->
+
+When we parse a template, we get a result of type `Template`. To actually
+evaluate it, we extract its template name (its 0th argument), pass that
+template name to `tproc` to get a function that specifies what to do, and apply
+that function to the `Template` structure.
+
 > evalTemplate :: TemplateProc -> Template -> AnnotatedText
 > evalTemplate tproc tdata =
 >   let action = tproc (get "0" tdata) in action tdata

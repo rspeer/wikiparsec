@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Test.HUnit
-import Text.MediaWiki.SplitUtils
+import Text.SplitUtils
 import Control.Monad
 
 splitTests = test [

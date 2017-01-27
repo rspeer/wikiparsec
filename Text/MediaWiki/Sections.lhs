@@ -1,7 +1,7 @@
 `Text.MediaWiki.Sections`: separating the sections of a Wiki page
 =================================================================
 
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}
 
 In an ideal world, this parsing step wouldn't be necessary. Wikitext
 headings would just be markup that we could parse along with the rest
@@ -290,7 +290,7 @@ section headings is effectively in a level-1 section called "top". Let's just
 add the heading for it before we scan its lines.
 
 > preparePage :: Text -> [TextLine]
-> preparePage text = readLines ("=top=\n" <> text)
+> preparePage text = readLines ("=top=\n" ⊕ text)
 >
 > pPage :: LineParser [WikiSection]
 > pPage = convertSections <$> many pSection

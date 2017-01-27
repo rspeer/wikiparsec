@@ -1,13 +1,67 @@
 `Text.MediaWiki.WikiText`: parse the WikiText format
 ====================================================
 
-> {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}
+> {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings, UnicodeSyntax #-}
+
+This is the core of Wikiparsec: a set of parsing rules for handling the Wikitext
+format.
+
+These rules can be used to extract structured information or unstructured text
+from Wikitext, depending on the task at hand. For example, the `anyList` parser
+will parse this Wikitext:
+
+    # item 1
+    #* item 2a
+    #* item 2b
+    # item 3
+
+into this data structure:
+
+    OrderedList [Item "item 1", BulletList [Item "item 2a", Item "item 2b"], Item "item 3"]
+
+In contrast, the `articleSectionWikitext` parser will extract the plain text
+from this paragraph of Wikitext:
+
+    [[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius's home from 1904 until
+    his death|alt=A white house of north European appearance with an orange
+    tiled roof, surrounded by trees]]
+    Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous [[Grand
+    Duchy of Finland|grand duchy]] within the [[Russian Empire]] having earlier
+    been under Swedish control for many centuries. The country remained divided
+    between a culturally dominant Swedish-speaking minority, to which the
+    Sibelius family belonged, and a more nationalistically-minded
+    Finnish-speaking, or "[[Fennoman movement|Fennoman]]" majority. In about
+    1889 Sibelius met his future wife, [[Aino Sibelius|Aino Järnefelt]], who
+    came from a staunch Fennoman family.  Sibelius's association with the
+    Järnefelts helped to awaken and develop his own nationalism; in 1892, the
+    year of his marriage to Aino, he completed his first overtly nationalistic
+    work, the symphonic suite ''[[Kullervo (Sibelius)|Kullervo]]''. Through the
+    1890s, as Russian control over the duchy grew increasingly oppressive,
+    Sibelius produced a series of works reflecting Finnish resistance to
+    foreign rule, culminating in the tone poem ''[[Finlandia]]''.
+
+Resulting in this text:
+
+    Ainola, Sibelius's home from 1904 until his death
+    Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous grand
+    duchy within the Russian Empire having earlier been under Swedish control
+    for many centuries. The country remained divided between a culturally
+    dominant Swedish-speaking minority, to which the Sibelius family belonged,
+    and a more nationalistically-minded Finnish-speaking, or "Fennoman"
+    majority. In about 1889 Sibelius met his future wife, Aino Järnefelt, who
+    came from a staunch Fennoman family. Sibelius's association with the
+    Järnefelts helped to awaken and develop his own nationalism; in 1892, the
+    year of his marriage to Aino, he completed his first overtly nationalistic
+    work, the symphonic suite Kullervo. Through the 1890s, as Russian control
+    over the duchy grew increasingly oppressive, Sibelius produced a series of
+    works reflecting Finnish resistance to foreign rule, culminating in the
+    tone poem Finlandia.
 
 Setup
 -----
 
-To parse the mess that is Wiktionary, we make use of Attoparsec, a
-well-regarded parser-combinator library for Haskell.
+Import the WikiPrelude and Attoparsec. Hide a couple of function names that
+we'll want to redefine.
 
 > module Text.MediaWiki.WikiText where
 > import WikiPrelude hiding (try)
@@ -19,10 +73,10 @@ this package:
 
 > import Text.SplitUtils (splitFirst, splitLast)
 
-Some common shorthand for defining parse rules:
+Our useful tools for defining parse rules:
 
 > import Text.MediaWiki.ParseTools (nop, appendChar, textWith, textWithout,
->   skipChars, textChoices, concatMany, notFollowedByChar, possiblyEmpty,
+>   skipChars, textChoices, notFollowedByChar, possiblyEmpty,
 >   delimitedSpan, optionMaybe)
 
 Handling templates:
@@ -109,7 +163,10 @@ it'll just return the bracket as is.
 >     notFollowedByChar c
 >     return (singleton c)
 >   )
->
+
+These closing brackets and braces are just string literals, but we assign
+them a more meaningful name for the purpose of debugging using `<?>`.
+
 > extraneousCloseBrackets = string "]]" <?> "junk closing brackets"
 > extraneousCloseBraces   = string "}}" <?> "junk closing braces"
 
@@ -144,6 +201,17 @@ miscellaneous text. When we encounter a template, we have to turn it into an
 AnnotatedText value and then a plain Text value, which the `templateText`
 rule does.
 
+Any parse rule that can handle templates needs to be passed a `TemplateProc`,
+specifying what to do when it encounters a template. The desired behavior
+varies by the use case. Sometimes we want to convert certain templates into
+links or annotations, in which case we'll pass in a procedure that defines how
+to do that. Sometimes we just want to throw all templates out, in which case
+`ignoreTemplates` is the `TemplateProc` that we want.
+
+So `wikiTextLine` and its siblings are not Attoparsec parser combinators, per
+se; instead, they're functions that you apply to a `TemplateProc` to get a
+parser combinator. `wikiTextLine ignoreTemplates` is a parser combinator.
+
 > wikiTextLine :: TemplateProc -> Parser Text
 > wikiTextLine tproc        = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]       <?> "line of wikitext"
 > wikiTextInLink tproc      = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                <?> "wikitext inside link"
@@ -156,8 +224,10 @@ Wiki syntax for links
 External links appear in single brackets. They contain a URL, a space, and
 the text that labels the link, such as:
 
-    In:  [http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]
-    Out: "David Van Tassel"
+    [http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]
+
+We would like to extract just the visible text from that link, which is
+"David Van Tassel".
 
 External links can have no text, in which case they just get an arbitrary
 number as their text, which we'll disregard. There's also a type of external
@@ -166,11 +236,20 @@ the same as if it weren't a link, so we can disregard that case.
 
 The following rules extract the text of an external link.
 
+We start by matching a single left bracket (under the assumption that, if there
+were two left brackets, they would have been matched by the `internalLinkText`
+rule first). After that, we parse the interior of the link. If that fails, we
+just return the left bracket as plain text, simulating MediaWiki's error
+handling.
+
 > externalLinkText :: Parser Text
 > externalLinkText = do
 >   char '['
 >   externalLinkMatch <|> return "["
->
+
+After the left bracket, we look for a URL schema, the rest of the URL, and a
+possible label on the link.
+
 > externalLinkMatch = do
 >   schema
 >   urlText
@@ -178,6 +257,17 @@ The following rules extract the text of an external link.
 >
 > schema = choice (map string ["http://", "https://", "ftp://", "news://", "irc://", "mailto:", "//"]) <?> "external link schema"
 > externalLinkLabelOrEnd = externalLinkEnd <|> externalLinkLabel
+
+After the URL, the link might end, in which case there's no label and we want
+to throw it out. Or there can be a label, in which case we want to get its text,
+which could include formatting and could require error handling,
+using the `messyTextInExtLink` rule.
+
+The `*>` operator means "parse the first thing, throw it out, and parse the
+second thing for its value". `<*` is the same but gets the value from the first
+thing. The value that counts is the one being pointed to. These operators let
+us write simple combinations of parsers without do-notation.
+
 > externalLinkEnd = char ']' *> return ""
 > externalLinkLabel = skipSpace *> messyTextInExtLink <* externalLinkEnd
 
@@ -188,8 +278,8 @@ Internal links have many possible components. In general, they take the form:
 The only part that has to be present is the page name. If the label is not
 given, then the label is the same as the page.
 
-When parsing internal links, we return just their label. However, other
-details of the link are added to the LinkState.
+We represent the result of parsing a link as AnnotatedText, where the label is
+the text and the other properties are annotations. Some examples:
 
      In:    [[word]]
      Out:   AnnotatedText [mapFromList [("page", "word")]] "word"
@@ -206,7 +296,6 @@ details of the link are added to the LinkState.
      In:    [[Category:English nouns]]
      Out:   AnnotatedText [mapFromList [("namespace", "Category"), ("page", "English nouns")]] "English nouns"
 
-
 > internalLink :: TemplateProc -> Parser AnnotatedText
 > internalLink tproc = do
 >   string "[["
@@ -221,6 +310,27 @@ details of the link are added to the LinkState.
 >        string "]]"
 >        return annotated
 >
+> parseLink :: Text -> Annotation
+> parseLink target =
+>   makeLink namespace page section
+>   where
+>     (namespace, local) = splitLast ":" target
+>     (page, section) = splitFirst "#" local
+
+The label of a link can be made of Wikitext and can even include templates.
+When we encounter a label that's different from the link target, we need
+to parse it as Wikitext, including handling templates with a `TemplateProc`.
+
+> alternateText :: TemplateProc -> Parser Text
+> alternateText tproc = do
+>   char '|'
+>   text <- wikiTextAtEndOfLink tproc
+>   return (extractLinkText text)
+>
+
+In some cases, we only want the text of the link, in which case we operate on
+the parse result with `getText`.
+
 > internalLinkText :: TemplateProc -> Parser Text
 > internalLinkText tproc = getText <$> internalLink tproc
 
@@ -242,12 +352,6 @@ the text we want to extract is:
 
     Ainola, Sibelius's home from 1904 until his death
 
-> alternateText :: TemplateProc -> Parser Text
-> alternateText tproc = do
->   char '|'
->   text <- wikiTextAtEndOfLink tproc
->   return (extractLinkText text)
->
 > extractLinkText :: Text -> Text
 > extractLinkText text =
 >   -- Get the part of a link that's most likely to be its displayed text.
@@ -255,18 +359,11 @@ the text we want to extract is:
 >   -- equals signs (which may be image metadata, for example).
 >   let parts      = splitOn "|" text
 >       noEquals t = not (isInfixOf "=" t)
->       priority   = parts <> (filter noEquals parts)
+>       priority   = parts ⊕ (filter noEquals parts)
 >   -- We use MinLen functions to convince the type system that there will
 >   -- be a "last" element. We know there is one because, even if our priority
 >   -- order is empty, we stick "" on the front as a last resort.
 >   in last (mlcons "" (toMinLenZero priority))
->
-> parseLink :: Text -> Annotation
-> parseLink target =
->   makeLink namespace page section
->   where
->     (namespace, local) = splitLast ":" target
->     (page, section) = splitFirst "#" local
 
 `annotatedWikiText` parses text that may or may not contain links or templates,
 and returns it in an AnnotatedText data structure.
@@ -285,10 +382,10 @@ when they appear in plain text. For that reason, "\n" often belongs in
 
 > annotatedWikiTextWithout :: [Char] -> TemplateProc -> Parser AnnotatedText
 > annotatedWikiTextWithout exclude tproc =
->   mconcat <$> many (
+>   mconcat <$> many' (
 >     internalLink tproc
 >     <|> templateValue tproc
->     <|> annotFromText <$> (textWithout (exclude <> "\n[]{}"))
+>     <|> annotFromText <$> (textWithout (exclude ⊕ "\n[]{}"))
 >     )
 
 
@@ -315,7 +412,10 @@ a list of AnnotatedTexts.
 > extractTextLines (BulletList items) = extractTextLinesFromList items
 > extractTextLines (OrderedList items) = extractTextLinesFromList items
 > extractTextLines (IndentedList items) = extractTextLinesFromList items
->
+
+If we're extracting lines from a list and encounter a sublist, use
+`concat` to flatten the results of `extractTextLines` into a single list.
+
 > extractTextLinesFromList :: [ListItem] -> [AnnotatedText]
 > extractTextLinesFromList items = concat (map extractTextLines items)
 
@@ -326,7 +426,9 @@ AnnotatedText, with the list item texts separated by line breaks.
 > extractText = joinAnnotatedLines . extractTextLines
 
 In some cases (such as Wiktionary definition lists), we want to extract only
-the texts from the top level of a list, not from the sublists.
+the texts from the top level of a list, not from the sublists. Instead of
+recursing, we go on to the `extractItem` function, which returns a single
+element for a leaf and nothing for a list.
 
 > extractTopLevel :: ListItem -> [AnnotatedText]
 > extractTopLevel (Item item) = [item]
@@ -336,11 +438,11 @@ the texts from the top level of a list, not from the sublists.
 > extractTopLevel (IndentedList items) = extractTopLevelFromList items
 >
 > extractTopLevelFromList :: [ListItem] -> [AnnotatedText]
-> extractTopLevelFromList items = concat (map extractItemsFromList items)
+> extractTopLevelFromList items = concat (map extractItem items)
 >
-> extractItemsFromList :: ListItem -> [AnnotatedText]
-> extractItemsFromList (Item item) = [item]
-> extractItemsFromList _ = []
+> extractItem :: ListItem -> [AnnotatedText]
+> extractItem (Item item) = [item]
+> extractItem _ = []
 
 And here are the rules for parsing lists:
 
