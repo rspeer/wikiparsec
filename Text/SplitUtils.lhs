@@ -1,11 +1,10 @@
 `Text.SplitUtils`: manipulating delimited strings
 =================================================
 
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
-
 Some string-splitting functions will help us parse Wikitext without
 backtracking:
 
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 > module Text.SplitUtils (splitFirst, splitLast) where
 > import WikiPrelude
 

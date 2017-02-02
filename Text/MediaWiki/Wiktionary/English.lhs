@@ -42,7 +42,7 @@ a function that will extract WiktionaryFacts.
 > enParseSection title (WikiSection {headings=headings, content=content}) =
 >   -- The first two headings are the meaningless level-1 heading and the
 >   -- language heading. If those aren't there, bail out.
->   case uncons (drop 1 headings) of
+>   case unPrependChar (drop 1 headings) of
 >     Nothing -> []
 >     -- langHeading will contain the level-2 heading (for the language),
 >     -- and subheads will contain levels 3 and later. Now we need to look

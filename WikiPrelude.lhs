@@ -213,7 +213,8 @@ Mapping operations
 
 In many situations we have a mapping whose values are sequences. This lets us
 write the convenient `get` function, which looks up a key in the mapping, or
-returns an empty sequence if it's not there.
+returns an empty sequence if it's not there. This is often easier than checking
+cases of `Maybe` values.
 
 What I'm calling a sequence is what Haskell calls a monoid -- see the section
 "Monoids are things you can concatenate" above.
@@ -235,7 +236,9 @@ and returns the list of values of those keys that exist.
 > getAll :: (IsMap m, Monoid (MapValue m)) => [ContainerKey m] -> m -> [MapValue m]
 > getAll keys m = catMaybes (map (\key -> lookup key m) keys)
 
-Undoing our default empty sequence by turning empty sequences into Nothing:
+Perhaps we've gotten some values that may or may not be empty using `get`, and
+now we want to turn them back into a proper `Maybe`. This function replaces
+`Maybe ø` with `Nothing`:
 
 > nonEmpty :: (Monoid α, Eq α) => Maybe α -> Maybe α
 > nonEmpty val =

@@ -271,9 +271,9 @@ compareLists name input output =
 defnTests = [
     testExtract (parseDefinitions "en" enTemplates (termPos "en" "test" "Noun"))
                 "# {{senseid|en|first}} definition 1\n# {{senseid|en|second}} definition 2\n# definition 3"
-                [WiktionaryFact "definition" (termSense "en" "test" "Noun" "" "first") (simpleTerm "en" "definition 1"),
-                 WiktionaryFact "definition" (termSense "en" "test" "Noun" "" "second") (simpleTerm "en" "definition 2"),
-                 WiktionaryFact "definition" (termSense "en" "test" "Noun" "" "def.3") (simpleTerm "en" "definition 3")]
+                [WiktionaryFact "definition" (term ["test", "en", "Noun", "", "first"]) (simpleTerm "en" "definition 1"),
+                 WiktionaryFact "definition" (term ["test", "en", "Noun", "", "second"]) (simpleTerm "en" "definition 2"),
+                 WiktionaryFact "definition" (term ["test", "en", "Noun", "", "def.3"]) (simpleTerm "en" "definition 3")]
     ]
 
 entryTests = compareLists "Example entry for 'solder'" (enParseWiktionary "solder" solderEntry) solderFacts

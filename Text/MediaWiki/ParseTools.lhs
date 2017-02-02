@@ -28,6 +28,9 @@ sequence, for people who don't keep a copy of SICP under their pillow:
 > prependChar :: Char -> Text -> Text
 > prependChar = cons
 >
+> unPrependChar :: Text -> Maybe (Char, Text)
+> unPrependChar = uncons
+>
 > appendChar :: Text -> Char -> Text
 > appendChar = snoc
 

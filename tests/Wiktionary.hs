@@ -42,7 +42,7 @@ annoWriter2 = buildA $ do
   return "literal"
 
 tests = test [
-    "show term" ~: (show termRussian) ~?= "(term [\"остынуть\",\"ru\"])",
+    "show term" ~: (show termRussian) ~?= "{\"text\":\"остынуть\",\"language\":\"ru\"}",
     "JSON decodes properly" ~: assert (isJust redecoded),
     "JSON fact matches" ~: decode (encode fact1) ~?= factJSONValue,
     "find sense ID" ~: findSenseIDInList (getAnnotations at1) ~?= (Just senseName),

@@ -1,8 +1,10 @@
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax, FlexibleContexts #-}
+`Text.MediaWiki.Wiktionary.Base`: parsing Wiktionary in general
+===============================================================
 
 This file defines how to parse Wiktionary entries, as a layer above the basic
-handling of wiki syntax in `Wikitext.lhs`.
+handling of wiki syntax in `Text.MediaWiki.WikiText`.
 
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax, FlexibleContexts #-}
 > module Text.MediaWiki.Wiktionary.Base where
 > import WikiPrelude
 > import Text.MediaWiki.WikiText
@@ -19,23 +21,35 @@ handling of wiki syntax in `Wikitext.lhs`.
 > import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 > import Text.Show.Unicode
 
-Handling entire pages
----------------------
+An entry point for parsing an entire page
+-----------------------------------------
 
-> handleFile :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
-> handleFile languageParser title filename = do
->   contents <- (readFile filename) :: IO ByteString
->   let fromHTML = extractWikiTextFromHTML contents
->   mapM_ (println . show) (languageParser title fromHTML)
->
+The `handleFileJSON` function isn't actually used anywhere except for
+experimentation, but it is similar to what the `WiktionaryParser` command needs
+to do. I include it here to illustrate what we need to accomplish.
+
+This function takes in a file containing a Wiktionary page, as Wikitext that
+possibly includes HTML. It extracts a list of facts from it using a
+`languageParser` that's defined separately for each language of Wiktionary
+being parsed. (We'll see those modules later.) The extracted facts are then
+encoded as JSON structures and sent to standard out.
+
+The `languageParser` is a function that takes in a page title (which is
+important because it tells us what word is being defined) and the non-HTML
+Wikitext of that page, and outputs a list of WiktionaryFacts.
+
+The WiktionaryFacts are converted to output by sending them through
+the JSON `encode` and then through `println`. `mapM_` applies this chain
+of functions to each of the results, in order, using the IO monad.
+
 > handleFileJSON :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
 > handleFileJSON languageParser title filename = do
 >   contents <- (readFile filename) :: IO ByteString
 >   let fromHTML = extractWikiTextFromHTML contents
 >   mapM_ (println . encode) (languageParser title fromHTML)
 
-Data types
-----------
+The `WiktionaryTerm` data type
+------------------------------
 
 A WiktionaryTerm is a piece of text that can be defined on Wiktionary. It is
 defined by its term text, which is required, along with other fields which may
@@ -56,9 +70,9 @@ and by default their etymology label is "1".)
 >   wtEtym :: Maybe Text
 > } deriving (Eq)
 
-We export a term to JSON by constructing an object that keeps the values that
-are `Just val`, and excludes the ones that are `Nothing`. We also use this
-JSON representation as the string representation of a WiktionaryTerm.
+We export a term to JSON by constructing an object that associates keys with
+the record values that are `Just val`, and leaves out the values that are
+`Nothing`.
 
 > instance ToJSON WiktionaryTerm where
 >   toJSON term =
@@ -69,24 +83,42 @@ JSON representation as the string representation of a WiktionaryTerm.
 >                       ("sense", wtSense term)]
 >         existingPairs = mapMaybe moveSecondMaybe maybePairs
 >     in object [key .= value | (key, value) <- existingPairs]
->
-> instance Show WiktionaryTerm where
->   show term =
->     let items = [Just (wtText term),
->                  fromLanguage <$> (wtLanguage term),
->                  wtPos term,
->                  wtEtym term,
->                  wtSense term]
->         showList = ushow (squishMaybes items)
->     in cs ("(term " ⊕ showList ⊕ ")")
->
-> squishMaybes :: [Maybe Text] -> [Text]
-> squishMaybes list = reverse $ map (fromMaybe "") $ listDropWhile isNothing $ reverse list
->
+
+`mapMaybe` is a version of `map` that throws out `Nothing` values and unwraps
+the rest. To use it with our pairs, we need `moveSecondMaybe`, which is pretty
+much defined by its type signature.
+
 > moveSecondMaybe :: (a, Maybe b) -> Maybe (a, b)
 > moveSecondMaybe (first, Just second) = Just (first, second)
 > moveSecondMaybe (first, Nothing)     = Nothing
->
+
+Now that we have these JSON representations, we can also use them as the
+string representation in the REPL. First we convert the term to a JSON value,
+then `encode` it to a ByteString.
+
+To convert this to Unicode that Haskell can be convinced to show with
+`Text.Show.Unicode`, we coerce it with `cs`, the all-purpose string converter.
+We get `cs` from `Data.String.Conversions` in our prelude. It applies the
+appropriate string conversion depending on the type constraints, and assumes
+UTF-8 everywhere.
+
+> instance Show WiktionaryTerm where
+>   show = cs . encode . toJSON
+
+`term` is a constructor for WiktionaryTerms. Because many of the fields of a
+WiktionaryTerm are optional, it takes a single argument that is a list of Texts.
+This list can contain:
+
+- Element 0: the text of the term
+- Element 1: the language code
+- Element 2: the part of speech
+- Element 3: the etymology label
+- Element 4: the sense label
+
+Elements after the end of the list will become `Nothing`. Elements in the middle
+can also be set to `Nothing` by giving the empty string as their value. (This is
+why we defined `nonEmpty` as part of our monoid toolkit in the WikiPrelude.)
+
 > term :: [Text] -> WiktionaryTerm
 > term items =
 >   let language = toLanguage (fromMaybe "und" (index items 1)) in
@@ -97,19 +129,25 @@ JSON representation as the string representation of a WiktionaryTerm.
 >       wtEtym = nonEmpty (index items 3),
 >       wtSense = nonEmpty (index items 4)
 >       }
->
+
+Two more constructors for straightforward cases. `simpleTerm` takes in the language code and
+the text, and produces a WiktionaryTerm.
+
 > simpleTerm :: Language -> Text -> WiktionaryTerm
 > simpleTerm language text = term [text, fromLanguage language]
->
+
+`termPos` is similar to `simpleTerm`, but takes the part of speech as a third argument.
+
 > termPos :: Language -> Text -> Text -> WiktionaryTerm
 > termPos language text pos = term [text, fromLanguage language, pos]
->
-> termSense :: Language -> Text -> Text -> Text -> Text -> WiktionaryTerm
-> termSense language text pos etym sense = term [text, fromLanguage language, pos, etym, sense]
->
+
+
+The `WiktionaryFact` data type
+------------------------------
 
 A WiktionaryFact expresses a relationship between terms that we can extract
-from a page.
+from a page. Much like a ConceptNet edge, it's defined by a relation `rel` that
+points `from` one term `to` another term.
 
 > data WiktionaryFact = WiktionaryFact Text WiktionaryTerm WiktionaryTerm deriving (Show, Eq)
 >
@@ -127,12 +165,18 @@ and switch the arguments.
 
 > makeFact :: Text -> WiktionaryTerm -> WiktionaryTerm -> WiktionaryFact
 > makeFact rel from to =
->   case (uncons rel) of
+>   case (unPrependChar rel) of
 >     Just ('*', rev) -> WiktionaryFact rev to from
 >     _               -> WiktionaryFact rel from to
 >
 > makeGenericFact = makeFact "RelatedTo"
->
+
+Sometimes we have to parse things into WiktionaryFacts, but won't find out the
+relation until after we've parsed them. In those cases, we use `"link"` as the
+generic placeholder for the relation. `assignRel` replaces the relation
+`"link"` with the specified `rel`, while leaving other, more specific relations
+as is.
+
 > assignRel :: Text -> WiktionaryFact -> WiktionaryFact
 > assignRel rel fact@(WiktionaryFact oldRel from to) =
 >   case oldRel of
@@ -140,10 +184,10 @@ and switch the arguments.
 >     _      -> fact
 
 
-Annotations
------------
+Annotations that link to terms
+------------------------------
 
-Working with annotations:
+TODO: document these
 
 > linkableAnnotation :: Annotation -> Bool
 > linkableAnnotation annot = (get "page" annot /= "") && (get "namespace" annot == "")
@@ -161,10 +205,7 @@ Working with annotations:
 > languageTaggedAnnotation annot = plainLinkAnnotation annot && (findWithDefault "" "language" annot) /= ""
 > languageTaggedAnnotations atext = filter languageTaggedAnnotation (getAnnotations atext)
 
-
 Converting an Annotation representing a term to a WiktionaryTerm:
-
-(TODO: explain why languages get complicated here)
 
 > annotationToFact :: Language -> WiktionaryTerm -> Annotation -> WiktionaryFact
 > annotationToFact thisLang thisTerm annot =
@@ -222,7 +263,7 @@ need to convert it to a language code, and that's what we need `thisLang` for.
 >
 > sectionLanguage :: Language -> Text -> Maybe Language
 > sectionLanguage thisLang sectionRef =
->   case uncons sectionRef of
+>   case unPrependChar sectionRef of
 >     Just ('#', language) -> Just (lookupLanguage thisLang language)
 >     otherwise            -> Nothing
 
@@ -239,6 +280,7 @@ We might have an annotation assigning a sense ID to this text:
 > findSenseIDInList [] = Nothing
 
 Working with lists of headings:
+(TODO: document this)
 
 > getTextInList :: Int -> [AnnotatedText] -> Maybe Text
 > getTextInList idx atexts = getText <$> index atexts idx
@@ -284,7 +326,7 @@ recursively run this parser to parse the rest.
 To distinguish different definitions, we associate them with an automatically
 generated ID such as "def.1.1".
 
-TODO give an example because this is all confusing
+TODO: give an example because this is all confusing
 
 > type LabeledDef = (Text, AnnotatedText)
 >

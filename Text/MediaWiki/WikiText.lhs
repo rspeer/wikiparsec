@@ -377,8 +377,8 @@ Sometimes there's extra syntax going on, so we need to exclude specific
 characters from the wikitext.
 
 When this rule is used, it will consume any character except the listed ones
-when they appear in plain text. For that reason, "\n" often belongs in
-`exclude`.
+when they appear in plain text. For that reason, the line break `\n` often
+belongs in `exclude`.
 
 > annotatedWikiTextWithout :: [Char] -> TemplateProc -> Parser AnnotatedText
 > annotatedWikiTextWithout exclude tproc =
@@ -621,17 +621,23 @@ outputs its plain text, and returns nothing.
 > outputPlainText :: Text -> IO ()
 > outputPlainText input =
 >    case parseOnly (sectionText ignoreTemplates <* endOfInput) input of
->     Left err -> showError input err
->     Right x -> putStrLn x
->
+>      Left err -> showError input err
+>      Right x -> putStrLn x
+
+`inspectText` shows the parsed plain text as well as its annotations.
+
 > inspectText :: Text -> IO ()
 > inspectText input =
 >   case parseOnly (sectionAnnotated ignoreTemplates <* endOfInput) input of
 >     Left err -> showError input err
->     Right (AnnotatedText links text) -> do
+>     Right (AnnotatedText annos text) -> do
 >       putStrLn text
->       print links
->
+>       print annos
+
+`inspectString` is designed to be usable from the REPL, where OverloadedStrings
+may not be available: it takes in a built-in String (a type that is generally not
+used in this codebase), and converts it to a Text so it can be inspected.
+
 > inspectString :: String -> IO ()
 > inspectString input = inspectText $ pack input
 
