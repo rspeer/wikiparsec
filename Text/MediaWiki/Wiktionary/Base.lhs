@@ -21,33 +21,6 @@ handling of wiki syntax in `Text.MediaWiki.WikiText`.
 > import Text.MediaWiki.HTML (extractWikiTextFromHTML)
 > import Text.Show.Unicode
 
-An entry point for parsing an entire page
------------------------------------------
-
-The `handleFileJSON` function isn't actually used anywhere except for
-experimentation, but it is similar to what the `WiktionaryParser` command needs
-to do. I include it here to illustrate what we need to accomplish.
-
-This function takes in a file containing a Wiktionary page, as Wikitext that
-possibly includes HTML. It extracts a list of facts from it using a
-`languageParser` that's defined separately for each language of Wiktionary
-being parsed. (We'll see those modules later.) The extracted facts are then
-encoded as JSON structures and sent to standard out.
-
-The `languageParser` is a function that takes in a page title (which is
-important because it tells us what word is being defined) and the non-HTML
-Wikitext of that page, and outputs a list of WiktionaryFacts.
-
-The WiktionaryFacts are converted to output by sending them through
-the JSON `encode` and then through `println`. `mapM_` applies this chain
-of functions to each of the results, in order, using the IO monad.
-
-> handleFileJSON :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
-> handleFileJSON languageParser title filename = do
->   contents <- (readFile filename) :: IO ByteString
->   let fromHTML = extractWikiTextFromHTML contents
->   mapM_ (println . encode) (languageParser title fromHTML)
-
 The `WiktionaryTerm` data type
 ------------------------------
 
@@ -187,56 +160,105 @@ as is.
 Annotations that link to terms
 ------------------------------
 
-TODO: document these
+Recall that an Annotation marks up a span of text with a mapping from keys to
+optional values.
+
+We collect various Annotations on our text when parsing a Wiktionary entry.
+These might indicate specific structured relations, such as "this word is an
+antonym of 'down'", or they might indicate ordinary links that require further
+context to understand, such as "the definition contains a link to the word
+'direction'".
+
+The annotations we get from Wiktionary entries may contain:
+
+- `"page"`, the name of the page being linked to.
+
+- `"namespace"`, the MediaWiki namespace of the link.
+
+- `"language"`, the language of the dictionary entry being linked to. (As Wiktionary
+  puts multiple languages on the same page, sometimes this is unknown.)
+
+- `"rel"`, the relationship indicated by the link. A specific template could give us
+  a specific relation such as `"antonym"`. Plain links have the relation `"link"`.
+
+`linkableAnnotation` is a filter for annotations that we consider usable as links:
+their "page" value is present, and their "namespace" is not. A link with a namespace
+would be a link to something that's not a dictionary entry, such as an image, an audio
+file, a category, or a discussion page.
 
 > linkableAnnotation :: Annotation -> Bool
 > linkableAnnotation annot = (get "page" annot /= "") && (get "namespace" annot == "")
 >
 > linkableAnnotations :: AnnotatedText -> [Annotation]
 > linkableAnnotations atext = filter linkableAnnotation (getAnnotations atext)
->
+
+`plainLinkAnnotation` further filters these annotations for those with no specific relation:
+their "rel" value is "link" or is absent.
+
 > plainLinkAnnotation :: Annotation -> Bool
 > plainLinkAnnotation annot = linkableAnnotation annot && (findWithDefault "link" "rel" annot) == "link"
 >
 > plainLinkAnnotations :: AnnotatedText -> [Annotation]
 > plainLinkAnnotations atext = filter plainLinkAnnotation (getAnnotations atext)
->
+
+`languageTaggedAnnotation` filters linkable annotations for those whose
+language is known.
+
 > languageTaggedAnnotation :: Annotation -> Bool
-> languageTaggedAnnotation annot = plainLinkAnnotation annot && (findWithDefault "" "language" annot) /= ""
+> languageTaggedAnnotation annot = linkableAnnotation annot && (get "language" annot) /= ""
+>
+> languageTaggedAnnotations :: AnnotatedText -> [Annotation]
 > languageTaggedAnnotations atext = filter languageTaggedAnnotation (getAnnotations atext)
 
-Converting an Annotation representing a term to a WiktionaryTerm:
+You might notice that these Annotations contain most of the information we need for a
+WiktionaryTerm. Is the target of a linkableAnnotation just a WiktionaryTerm?
+
+There's one thing that's not quite aligned: if we have an annotation
+with a known "senseID", it specifies a sense of the word *being defined*, not the word
+being linked to. (As far as I know, there's no mechanism on Wiktionary for relating a specific
+sense of one word to a specific sense of another word.)
+
+So really, the Annotation is filling in information about *two* WiktionaryTerms that are related
+by a WiktionaryFact. We take this into account with a function that converts an Annotation to a
+WiktionaryFact, given the current term being defined (`thisTerm`) and the language of this
+Wiktionary (`thisLang`).
+
+One more subtlety: why don't we get `thisLang` from `thisTerm`? Those are
+usually different. If the Spanish word `amigo` is being defined on the English
+Wiktionary, then `thisTerm` has a language of Spanish, but `thisLang` is
+English.
+
 
 > annotationToFact :: Language -> WiktionaryTerm -> Annotation -> WiktionaryFact
 > annotationToFact thisLang thisTerm annot =
 >   let otherTerm = annotationToTerm thisLang annot
->       -- The annotation might come with a term sense (term senses can sneak
->       -- in from many different directions). If it does, it specifies a
->       -- sense of the word *being defined*, not the word it's connected to.
+>       -- If we have a senseID, fill it in as the sense of `thisTerm`.
 >       termSense = case (lookup "senseID" annot) of
 >                     Nothing -> thisTerm
 >                     Just sense -> thisTerm {wtSense=Just sense}
 >       rel       = findWithDefault "link" "rel" annot
 >   in makeFact rel termSense otherTerm
 
-It may seem intuitive that, if the Annotation doesn't come with a language, we
-would default to using `thisLang`.
+As a sub-step of this, we do need `annotationToTerm`, the function that will
+create the WiktionaryTerm being linked to.
 
-That would actually introduce errors. If a word is being defined in English,
-that does not necessarily mean that any word linked in the definition is an
-English word. It could be the same as the word being defined, instead.
+It may seem intuitive that, if the Annotation doesn't come with a language, we
+would default to using `thisLang`. That would actually introduce errors. If a
+word is being defined in English, that does not necessarily mean that any word
+linked in the definition is an English word. It could be the same as the word
+being defined, instead.
 
 As an example, on the English Wiktionary, a definition of the Spanish word
-"tengo" is "First-person singular ([[yo]]) present indicative form of
-[[tener]]." Neither "yo" or "tener" here should be considered an English word,
+"tengo" is `First-person singular ([[yo]]) present indicative form of
+[[tener]].` Neither "yo" or "tener" here should be considered an English word,
 despite that they appear in an English definition. If we have no way to
 determine the language of a link, we should leave it unspecified to be inferred
 later.
 
 The reason we take in `thisLang` is because we might have to look up a language
-that's given as a *section* name, such as [[tener#Spanish]]. In this case, we
-don't get a language code, we get the name of the language in `thisLang` and we
-need to convert it to a language code, and that's what we need `thisLang` for.
+that's given as a *section* name, such as [[tener#Spanish]]. "Spanish" is the name
+of language `es` in language `en`. The language code we need to get out of that is
+`es`, but we need to know that `thisLang` is `en` to extract that language code.
 
 > annotationToTerm :: Language -> Annotation -> WiktionaryTerm
 > annotationToTerm thisLang annot =
@@ -248,10 +270,11 @@ need to convert it to a language code, and that's what we need `thisLang` for.
 >       wtEtym=(lookup "etym" annot),
 >       wtSense=(lookup "sense" annot)
 >     }
->
-> pageName :: Text -> Text
-> pageName name = fst (splitFirst "#" name)
->
+
+These helper functions get the language of an Annotation, if possible, either
+by finding the language code in the "language" value, or deciphering a
+natural-language name from the "section" value.
+
 > annotationLanguage :: Language -> Annotation -> Maybe Language
 > annotationLanguage thisLang annot =
 >   case (lookup "language" annot) of
@@ -267,7 +290,17 @@ need to convert it to a language code, and that's what we need `thisLang` for.
 >     Just ('#', language) -> Just (lookupLanguage thisLang language)
 >     otherwise            -> Nothing
 
-We might have an annotation assigning a sense ID to this text:
+`pageName` is a helper function for getting the name of an entry being linked
+to, even if it still has a section attached for some reason. (TODO: can we
+clean up the processing to make sure the section has always been handled?)
+
+> pageName :: Text -> Text
+> pageName name = fst (splitFirst "#" name)
+
+We might find out the sense ID from a different Annotation than the one
+containing a link, so we have to handle this at the AnnotatedText level.
+`findSenseID` scans through all annotations on a span of text, returning the
+first sense ID it finds, if any.
 
 > findSenseID :: AnnotatedText -> Maybe Text
 > findSenseID atext = findSenseIDInList (getAnnotations atext)
@@ -278,17 +311,6 @@ We might have an annotation assigning a sense ID to this text:
 >     Just x -> Just x
 >     Nothing -> findSenseIDInList rest
 > findSenseIDInList [] = Nothing
-
-Working with lists of headings:
-(TODO: document this)
-
-> getTextInList :: Int -> [AnnotatedText] -> Maybe Text
-> getTextInList idx atexts = getText <$> index atexts idx
->
-> getAnnotationInList :: Int -> Text -> [AnnotatedText] -> Maybe Text
-> getAnnotationInList idx key atexts =
->   -- use the Maybe monad to return Nothing for any missing index
->   index atexts idx >>= \atext -> lookup key (mconcat (getAnnotations atext))
 
 Definition sections
 -------------------
@@ -304,24 +326,31 @@ this section.
 
 > parseDefinitions :: Language -> TemplateProc -> WiktionaryTerm -> Text -> [WiktionaryFact]
 > parseDefinitions language tproc thisTerm text =
->   let defs = parseOrDefault [] (pDefinitionSection tproc) text in
->     concat (map (definitionToFacts language thisTerm) defs)
+>   let parser = skipMiscellaneousLines (pNumberedDefinitionList tproc)
+>       defs = parseOrDefault [] parser text
+>   in concat (map (definitionToFacts language thisTerm) defs)
 
-Skip miscellaneous lines at the start of the section: try to parse each line as
-pDefinitionList, and if that fails, parse one line, throw it out, and
-recursively run this parser to parse the rest.
+The above function is calling a parse rule that it constructs with
+`skipMiscellaneousLines (pNumberedDefinitionList tproc)`.
 
-> pDefinitionSection :: TemplateProc -> Parser [LabeledDef]
-> pDefinitionSection tproc =
->   pNumberedDefinitionList tproc <|>
->   (newLine >> pDefinitionSection tproc) <|>
->   (wikiTextLine ignoreTemplates >> newLine >> pDefinitionSection tproc)
->
+`pNumberedDefinitionList` is the main parse rule for definitions. It takes in a
+TemplateProc so it knows how to handle templates. But we want to modify the
+parser so that it isn't thrown off if the definition section starts with
+something weird that isn't a definition, such as an image. That modification is
+done by `skipMiscellaneousLines`.
+
+To do this, it tries to parse each line with the inner parse rule. If that
+fails, it parses one line with the generic rule `wikiTextLine`, throws it out,
+and recursively runs itself to parse the rest.
+
+> skipMiscellaneousLines :: Parser α -> Parser α
+> skipMiscellaneousLines parser =
+>   parser <|>
+>   (newLine >> skipMiscellaneousLines parser) <|>
+>   (wikiTextLine ignoreTemplates >> newLine >> skipMiscellaneousLines parser)
+
 > pNumberedDefinitionList :: TemplateProc -> Parser [LabeledDef]
 > pNumberedDefinitionList tproc = extractNumberedDefs <$> orderedList tproc "#"
->
-> pLabeledDefinitionList :: TemplateProc -> Parser [LabeledDef]
-> pLabeledDefinitionList tproc = extractLabeledDefs <$> indentedList tproc ":"
 
 To distinguish different definitions, we associate them with an automatically
 generated ID such as "def.1.1".
@@ -353,6 +382,11 @@ starting with `#`, for example, a definition line starts with `:[1]`.
 We aren't going to parse sub-definitions, the ones that start with `::[a]` or
 something to make them part of the definition above.
 
+`pLabeledDefinitionList` is similar to `pNumberedDefinitionList` above.
+
+> pLabeledDefinitionList :: TemplateProc -> Parser [LabeledDef]
+> pLabeledDefinitionList tproc = extractLabeledDefs <$> indentedList tproc ":"
+>
 > extractLabeledDefs :: ListItem -> [LabeledDef]
 > extractLabeledDefs (IndentedList items) = mconcat (map extractLabeledDefItem items)
 > extractLabeledDefs _ = error "Wrong type of list"
@@ -642,3 +676,31 @@ TODO: explain the rest of this
 > arg1 = ["1"]
 > arg2 = ["2"]
 > arg3 = ["3"]
+
+An entry point for parsing an entire page
+-----------------------------------------
+
+The `handleFileJSON` function isn't actually used anywhere except for
+experimentation, but it is similar to what the `WiktionaryParser` command needs
+to do. I include it here to illustrate what we need to accomplish.
+
+This function takes in a file containing a Wiktionary page, as Wikitext that
+possibly includes HTML. It extracts a list of facts from it using a
+`languageParser` that's defined separately for each language of Wiktionary
+being parsed. (We'll see those modules later.) The extracted facts are then
+encoded as JSON structures and sent to standard out.
+
+The `languageParser` is a function that takes in a page title (which is
+important because it tells us what word is being defined) and the non-HTML
+Wikitext of that page, and outputs a list of WiktionaryFacts.
+
+The WiktionaryFacts are converted to output by sending them through
+the JSON `encode` and then through `println`. `mapM_` applies this chain
+of functions to each of the results, in order, using the IO monad.
+
+> handleFileJSON :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
+> handleFileJSON languageParser title filename = do
+>   contents <- (readFile filename) :: IO ByteString
+>   let fromHTML = extractWikiTextFromHTML contents
+>   mapM_ (println . encode) (languageParser title fromHTML)
+

@@ -63,8 +63,9 @@ templates) to the simple set of POS symbols used in WordNet or ConceptNet.
 >   | isPrefixOf "verb" pos = "v"
 >   | otherwise = "_"
 
-Figure out what term we're talking about from the values of the templates
-in the section headings:
+The French Wiktionary uses templates in its section titles, and they contain
+important information. So `getTerm` in French needs to take in a list of
+headings, as AnnotatedTexts, to help identify the term being defined.
 
 > getTerm :: Text -> [AnnotatedText] -> Maybe WiktionaryTerm
 > getTerm title headingValues =
@@ -78,6 +79,16 @@ in the section headings:
 >       case getAnnotationInList 2 "etym" headingValues of
 >         Just etym -> return (term [title, language, pos', etym])
 >         Nothing   -> return (term [title, language, pos'])
+
+Helper functions for extracting information from lists of headings:
+
+> getTextInList :: Int -> [AnnotatedText] -> Maybe Text
+> getTextInList idx atexts = getText <$> index atexts idx
+>
+> getAnnotationInList :: Int -> Text -> [AnnotatedText] -> Maybe Text
+> getAnnotationInList idx key atexts =
+>   -- use the Maybe monad to return Nothing for any missing index
+>   index atexts idx >>= \atext -> lookup key (mconcat (getAnnotations atext))
 
 
 Parsing sections
