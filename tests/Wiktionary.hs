@@ -64,6 +64,18 @@ tests = test [
     "find prefixed heading 3" ~: findPrefixedHeading "Etymology" ["top", "English", "Etymology 1", "Noun"] ~?= Just " 1",
     "annotated text from writer" ~: annoWriter ~?= annotate [annotationFromList [("1","one"),("2","two")]] "test",
 
+    "extract ordered 1" ~: extractNumberedDefs (OrderedList
+                                                 [(Item "one"),
+                                                  (OrderedList
+                                                    [(Item "one point one"),
+                                                     (Item "one point two")]),
+                                                  (Item "two"),
+                                                  (IndentedList [(Item "ignore this")])]) ~?=
+      [("def.1", "one"),
+       ("def.1.1", "one point one"),
+       ("def.1.2", "one point two"),
+       ("def.2", "two")],
+
     "extract labeled 1" ~: extractLabeledDefs (IndentedList [(Item "[1] walk"), (Item "[1–3, 7a, 13] go")]) ~?=
       [("def.1", annotate [singletonMap "senseID" "def.1"] "walk"),
        ("def.1", annotate [singletonMap "senseID" "def.1"] "go"),

@@ -259,6 +259,7 @@ The reason we take in `thisLang` is because we might have to look up a language
 that's given as a *section* name, such as [[tener#Spanish]]. "Spanish" is the name
 of language `es` in language `en`. The language code we need to get out of that is
 `es`, but we need to know that `thisLang` is `en` to extract that language code.
+(We could be cleverer than this if we had the Python `langcodes` module. Alas.)
 
 > annotationToTerm :: Language -> Annotation -> WiktionaryTerm
 > annotationToTerm thisLang annot =
@@ -292,7 +293,7 @@ natural-language name from the "section" value.
 
 `pageName` is a helper function for getting the name of an entry being linked
 to, even if it still has a section attached for some reason. (TODO: can we
-clean up the processing to make sure the section has always been handled?)
+clean up the processing to make this function unnecessary?)
 
 > pageName :: Text -> Text
 > pageName name = fst (splitFirst "#" name)
@@ -320,6 +321,22 @@ list. For example, the English dictionary has sections labeled with a part of
 speech, such as "Noun", whose contents are a numbered list of English definitions
 of the word.
 
+Here's an abridged example of the definition section for the word "thing":
+
+    {{en-noun}}
+
+    # That which is considered to [[exist]] as a separate [[entity]], [[object]], [[quality]] or [[concept]].
+    # A [[word]], [[symbol]], [[sign]], or other [[referent]] that can be used to refer to any entity.
+    # An individual object or distinct entity.
+    # {{lb|en|informal}} Something that is normal or generally recognised.
+    #: {{ux|en|Bacon pie? Is that a '''thing'''?}}
+    # {{lb|en|legal}}
+    ## Whatever can be [[own]]ed.
+    ## [[corporeal|Corporeal]] [[object]].
+    # {{lb|en|somewhat|_|dated}} The [[latest]] [[fad]] or [[fashion]].
+    #: {{ux|en|What do you mean you don't twerk, Stacy? It's the latest '''thing'''!}}
+
+
 Here, we parse the Wikitext for the numbered list, then pass its entries
 on to `definitionToFacts`. If there's a parse error, we return nothing for
 this section.
@@ -336,8 +353,9 @@ The above function is calling a parse rule that it constructs with
 `pNumberedDefinitionList` is the main parse rule for definitions. It takes in a
 TemplateProc so it knows how to handle templates. But we want to modify the
 parser so that it isn't thrown off if the definition section starts with
-something weird that isn't a definition, such as an image. That modification is
-done by `skipMiscellaneousLines`.
+something that isn't a definition, such as an image or a template that
+introduces the definition. That modification is done by
+`skipMiscellaneousLines`.
 
 To do this, it tries to parse each line with the inner parse rule. If that
 fails, it parses one line with the generic rule `wikiTextLine`, throws it out,
@@ -352,41 +370,76 @@ and recursively runs itself to parse the rest.
 > pNumberedDefinitionList :: TemplateProc -> Parser [LabeledDef]
 > pNumberedDefinitionList tproc = extractNumberedDefs <$> orderedList tproc "#"
 
-To distinguish different definitions, we associate them with an automatically
-generated ID such as "def.1.1".
+Parsing an ordered list as a definition list involves running the `orderedList`
+parser (from `Text.MediaWiki.WikiText`), then passing the result to
+`extractNumberedDefs`.
 
-TODO: give an example because this is all confusing
+`extractNumberedDefs` is going to associate each definition with a unique label
+such as "def.1". To produce these labels, starting with the text "def", we add
+1-based indices for their location in a possibly nested list:
+
+    # def.1
+    # def.2
+    ## def.2.1
+    ## def.2.2
+    # def.3
+
+The result of `extractNumberedDefs` is a list of LabeledDefs, which are defined
+as pairs with one of these labels and the AnnotatedText of the definition.
 
 > type LabeledDef = (Text, AnnotatedText)
->
+
+First we define how to start this iterative process:
+
+> extractNumberedDefs :: ListItem -> [LabeledDef]
 > extractNumberedDefs = extractNumbered "def"
 >
 > extractNumbered :: Text -> ListItem -> [LabeledDef]
 > extractNumbered prefix (OrderedList items) = extractNumberedIter prefix 1 items
 > extractNumbered prefix _ = error "Wrong type of list"
->
+
+The first case we handle is an item that introduces a sub-list. The sub-list gets
+the item's label as its prefix.
+
+After that, we handle normal items, sub-lists that aren't OrderedLists which we
+ignore, and the base case at the end of the list.
+
 > extractNumberedIter :: Text -> Int -> [ListItem] -> [LabeledDef]
 > extractNumberedIter prefix counter list =
 >   let newPrefix = mconcat [prefix, ".", cs (show counter)]
 >   in case list of
->     ((Item item):rest)         -> (newPrefix, item):(extractNumberedIter prefix (counter + 1) rest)
->     ((OrderedList items):rest) -> (extractNumberedIter newPrefix 1 items)
->                                   ++ (extractNumberedIter prefix (counter + 1) rest)
->     _:rest                     -> extractNumberedIter prefix counter rest
->     []                         -> []
+>     ((Item item):(OrderedList items):rest) -> (newPrefix, item):(
+>                                                 (extractNumberedIter newPrefix 1 items)
+>                                                 ++ (extractNumberedIter prefix (counter + 1) rest)
+>                                                 )
+>     ((Item item):rest)                     -> (newPrefix, item):(extractNumberedIter prefix (counter + 1) rest)
+>     _:rest                                 -> extractNumberedIter prefix counter rest
+>     []                                     -> []
 
 In German and some other Wiktionaries that have followed its lead, lists have
 specifically numbered word senses instead of automatic numbering. Instead of
 starting with `#`, for example, a definition line starts with `:[1]`.
 
-We aren't going to parse sub-definitions, the ones that start with `::[a]` or
-something to make them part of the definition above.
+TODO: We don't bother parsing sub-definitions in this format. If the line after
+definition 1 starts with, for example, `::[a]`, we could interpret this as a
+definition labeled "1a", but we currently don't.
 
-`pLabeledDefinitionList` is similar to `pNumberedDefinitionList` above.
+`pLabeledDefinitionList` is a parse rule for these definitions, similar to
+`pNumberedDefinitionList` above.
 
 > pLabeledDefinitionList :: TemplateProc -> Parser [LabeledDef]
 > pLabeledDefinitionList tproc = extractLabeledDefs <$> indentedList tproc ":"
->
+
+`extractLabeledDefs` scans through the items in an IndentedList, and parses them
+as definitions with optional labels, using the parse rule `pLabeledItem`.
+
+A definition can have zero or more labels. If it has zero labels, then it is
+probably the sole definition of the word, so we make one LabeledDef where we
+keep the definition and use the empty string as its label.
+
+If it has one or more labels, we make a LabeledDef coresponding to each label,
+using `adjustLabel`, defined below.
+
 > extractLabeledDefs :: ListItem -> [LabeledDef]
 > extractLabeledDefs (IndentedList items) = mconcat (map extractLabeledDefItem items)
 > extractLabeledDefs _ = error "Wrong type of list"
@@ -395,16 +448,25 @@ something to make them part of the definition above.
 > extractLabeledDefItem (Item item) =
 >   case parseOnly pLabeledItem (getText item) of
 >     Left err -> []
->     Right (maybeLabelList, defn) ->
->       case maybeLabelList of
->         Just labelList -> [adjustLabel label defn item | label <- labelList]
->         Nothing        -> [("", item)]
+>     Right (labelList, defn) ->
+>       case labelList of
+>         []                -> [("", item)]
+>         nonEmptyLabelList -> [adjustLabel label defn item | label <- nonEmptyLabelList]
 > extractLabeledDefItem _ = []
->
+
+`adjustLabel` transforms an AnnotatedText representing a list item for the fact
+that we've parsed a bracketed part at the beginning as a sense label. The
+existing AnnotatedText has no `senseID`, and contains the bracketed part as
+literal text.
+
+We convert it into a new AnnotatedText whose `senseID` is named after the
+label, and whose text is the remaining text, passed in as `defn`.  The other
+annotations are preserved.
+
 > adjustLabel :: Text -> Text -> AnnotatedText -> LabeledDef
 > adjustLabel senseLabel defn atext =
 >   let senseID     = "def." ⊕ senseLabel
->       annotations = (singletonMap "senseID" senseID):getAnnotations atext
+>       annotations = (singletonMap "senseID" senseID):(getAnnotations atext)
 >       atext'      = annotate annotations defn
 >   in (senseID, atext')
 >
@@ -421,14 +483,17 @@ like:
 Here, sense 1 of "gehen" is translated as "walk", but all of senses 1, 2, 3, 7,
 and 13 are translated as "go".
 
-> pLabeledItem :: Parser (Maybe [Text], Text)
+`pLabeledItem` parses one of these items as a list of zero or more labels, followed
+by the remaining plain text of the definition.
+
+> pLabeledItem :: Parser ([Text], Text)
 > pLabeledItem = do
->   labels <- pMaybeBracketedLabels
+>   labels <- pOptionalBracketedLabels
 >   text <- takeText
 >   return (labels, text)
 >
-> pMaybeBracketedLabels :: Parser (Maybe [Text])
-> pMaybeBracketedLabels = pBracketedLabels <|> return Nothing
+> pOptionalBracketedLabels :: Parser [Text]
+> pOptionalBracketedLabels = pBracketedLabels <|> return []
 >
 > pBracketedLabels = do
 >   string "["
