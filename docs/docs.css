@@ -15,25 +15,28 @@ p {
     width: 50em;
     text-align: justify;
 }
-p code {
+p code, ol code, ul code {
     padding: 0.2em;
     background-color: #eee;
+    font-size: 75%;
 }
 
-div.sourceCode {
+pre.literate {
     background-color: #eee;
+    border-style: solid;
+    border-color: green;
+    border-width: 0 0 0 3pt;
+}
+
+pre {
     margin-left: 1em;
     margin-right: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 1em;
 }
 
 pre.sh {
     background-color: #555;
     color: #fff;
-    margin-left: 1em;
-    margin-right: 1em;
-    padding: 1em;
 }
 
 h1 {
