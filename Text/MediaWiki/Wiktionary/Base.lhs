@@ -491,30 +491,61 @@ by the remaining plain text of the definition.
 >   labels <- pOptionalBracketedLabels
 >   text <- takeText
 >   return (labels, text)
->
+
+`pOptionalBracketedLabels` returns a list of labels, as text, if they are present,
+or an empty list if they are not.
+
 > pOptionalBracketedLabels :: Parser [Text]
 > pOptionalBracketedLabels = pBracketedLabels <|> return []
->
+
+`pBracketedLabels` parses a list of labels, assuming they're there. If the labels
+aren't there, it fails (in which case it's the job of `pOptionalBracketedLabels`
+to return an empty list).
+
 > pBracketedLabels = do
 >   string "["
 >   labels <- pLabels
 >   string "]"
 >   skipSpace
 >   return (Just labels)
->
+
+The interior of a label list is either single labels or ranges, separated
+by commas and optional whitespace. For example: `1, 2a, 4-6`. We find these
+comma-separated groups of labels, and concatenate them into one big list.
+
 > pLabels :: Parser [Text]
 > pLabels = mconcat <$> sepBy1 pCommaSeparatedLabel (char ',' >> skipSpace)
->
+
+`pure` is the confusingly-named Haskell function that lifts a value into a type
+that wraps it. In this case, `pSingleLabel` has type `Parser Text`, `<$>`
+applies an operation to the `Text` inside the `Parser` monad, and `pure <$>`
+will wrap a list around the single `Text` item so that it can be used as a
+value of type `[Text]`.
+
 > pCommaSeparatedLabel :: Parser [Text]
 > pCommaSeparatedLabel = pLabelRange <|> (pure <$> pSingleLabel)
->
+
+A single label is usually a whole number, but sometimes there are
+sub-definitions that use letters, such as definition 2 being listed as `[2a]`
+and `[2b]`. If the sub-definitions go beyond letter `j`, it's getting a bit
+ridiculous, though.
+
 > pSingleLabel = textWith "0123456789abcdefghij"
->
+
+A label range is made of whole-numbered labels (parsed using `decimal`)
+separated by some kind of dash. When we parse one, we return it as a list of
+the numeric values that it spans.
+
+We don't deal with ranges involving letters, such as `[2a-d]`.
+
 > pLabelRange = do
 >   startNum <- decimal
 >   textWith "-–—"
 >   endNum <- decimal
 >   return (map tshow [startNum..endNum])
+
+
+
 
 Converting definitions to facts:
 
