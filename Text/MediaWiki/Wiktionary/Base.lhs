@@ -515,22 +515,24 @@ comma-separated groups of labels, and concatenate them into one big list.
 
 > pLabels :: Parser [Text]
 > pLabels = mconcat <$> sepBy1 pCommaSeparatedLabel (char ',' >> skipSpace)
-
-`pure` is the confusingly-named Haskell function that lifts a value into a type
-that wraps it. In this case, `pSingleLabel` has type `Parser Text`, `<$>`
-applies an operation to the `Text` inside the `Parser` monad, and `pure <$>`
-will wrap a list around the single `Text` item so that it can be used as a
-value of type `[Text]`.
-
+>
 > pCommaSeparatedLabel :: Parser [Text]
-> pCommaSeparatedLabel = pLabelRange <|> (pure <$> pSingleLabel)
+> pCommaSeparatedLabel = pLabelRange <|> pSingleLabel
 
 A single label is usually a whole number, but sometimes there are
 sub-definitions that use letters, such as definition 2 being listed as `[2a]`
 and `[2b]`. If the sub-definitions go beyond letter `j`, it's getting a bit
 ridiculous, though.
 
-> pSingleLabel = textWith "0123456789abcdefghij"
+Instead of the `do` block, this could have been written more concisely and
+more confusingly as `pure <$> textWith "0123456789abcdefghij"`. Typical
+Haskell programmers may wonder why I didn't do it that way, and others
+may wonder why you *would* do it that way.
+
+> pSingleLabel :: Parser [Text]
+> pSingleLabel = do
+>   label <- textWith "0123456789abcdefghij"
+>   return [label]
 
 A label range is made of whole-numbered labels (parsed using `decimal`)
 separated by some kind of dash. When we parse one, we return it as a list of
@@ -545,9 +547,27 @@ We don't deal with ranges involving letters, such as `[2a-d]`.
 >   return (map tshow [startNum..endNum])
 
 
+When we get a LabeledDef value -- that is, an AnnotatedText for a definition, with
+a text label -- the next thing we want to do is convert it into some number of
+WiktionaryFacts.
 
+First we find the word sense that the definitions should use. Often this comes
+from the label. But if a template within the definition has specifically provided
+a SenseID, we use that first.
 
-Converting definitions to facts:
+`mplus` is an operator on monads. Here we're applying it to the Maybe monad,
+where it returns the first `Just` value, to prioritize the sources that might
+provide a sense label.
+
+`thisTerm` is the term being defined, which we refine by filling in its `wtSense`
+with the sense label we found.
+
+As for the actual text of the definition, we split it into multiple independent
+definitions by running the `pDefinitionText` parser on it, defined next.
+
+The WiktionaryFacts that we output are a fact built with `makeDefinitionFact` for
+each piece of the definition text, plus a fact built with `annotationToFact`
+for each usable annotation on that text.
 
 > definitionToFacts :: Language -> WiktionaryTerm -> LabeledDef -> [WiktionaryFact]
 > definitionToFacts language thisTerm defPair =
@@ -560,9 +580,20 @@ Converting definitions to facts:
 >   in (map (makeDefinitionFact termSense language) defPieces)
 >      ⊕ (map (annotationToFact language termSense) (linkableAnnotations defText))
 
+`makeDefinitionFact` makes a WiktionaryFact out of readable text in a definition.
+It takes in the term being defined and the language it's being defined in. It outputs
+a WiktionaryFact whose `rel` is "definition", pointing from the term being defined,
+to a term made out of the definition text in the appropriate language.
+
+> makeDefinitionFact :: WiktionaryTerm -> Language -> WiktionaryFact
 > makeDefinitionFact termSense language definition =
 >   makeFact "definition" termSense (simpleTerm language definition)
->
+
+`splitDefinition` runs the `pDefinitionText` parser as a separate parsing
+stage.  This parser should be able to parse whatever it's given as a
+definition, so if it fails, it's not just a situation where the Wiktionary
+parser should backtrack, it's a runtime error that should be raised.
+
 > splitDefinition :: Text -> [Text]
 > splitDefinition definition =
 >   if definition == "" then []
@@ -574,22 +605,62 @@ Converting definitions to facts:
 Parsing the language of definitions
 -----------------------------------
 
+Definitions on Wiktionary often define the same thing in multiple ways. These sub-definitions
+are usually separated by semicolons. For example, the first definition of "vector" is:
+
+    A directed quantity, one with both magnitude and direction; the signed difference between two points.
+
+When you split at the semicolon, you get two separate ways to describe this word sense.
+
+Some definitions, especially of words in other languages, are just a list of synonyms separated by
+commas. The definition of the Russian word "специалист" is:
+
+    specialist, expert
+
+We also want to parse that form of definition. However, we restrict it to a list of single
+words, because we don't want every comma that appears in a definition (such as the one above) to
+act as a place to split the definition.
+
+This could probably be done better. When the Japanese word "車" is defined as
+"a car, an automobile, a carriage, a cart", we fail to recognize that as four
+definitions joined by commas, because they contain spaces. Fortunately, each of
+those words is also a link, which `annotationToFact` will be able to turn into
+a WiktionaryFact, so we do get the four separate definitions anyway.
+
+So to parse a definition, we first look for single words separated by commas.
+Failing that, we look for sub-definitions separated by semicolons, with an
+optional period at the end.  If neither parser works (perhaps the definition is
+multiple sentences, so splitting it at semicolons would be likely to be wrong),
+we just return the entire text as a single definition.
+
 > pDefinitionText :: Parser [Text]
 > pDefinitionText = (pDefCommas <|> pDefSemicolons <|> pDefAnything)
 >
 > pCommaItem     = textWithout " ,;:."
 > pSemicolonItem = textWithout ";."
->
+
+To parse the definition as comma-separated, it must be made of items that parse as
+`pCommaItem`, separated by `", "`. This must encompass the entire definition, so at
+the end we make sure to parse `endOfInput` (discarding its meaningless value).
+
 > pDefCommas :: Parser [Text]
 > pDefCommas = sepBy1 pCommaItem (string ", ") <* endOfInput
->
+
+Parsing the definition as semicolon-separated is similar, but we have the
+additional thing that there's an optional period at the end. That makes the
+rule complicated enough that we break it into steps using a `do` block.
+
 > pDefSemicolons :: Parser [Text]
 > pDefSemicolons = do
 >   items <- sepBy pSemicolonItem (string "; ")
 >   option '.' (char '.')
 >   endOfInput
 >   return items
->
+
+`pDefAnything` parses literally anything and wraps it in a list. We can get
+away with this because it's running in a sub-parser. It won't consume the rest
+of the whole page, just the whole definition.
+
 > pDefAnything :: Parser [Text]
 > pDefAnything = do
 >   text <- takeText
@@ -598,6 +669,8 @@ Parsing the language of definitions
 
 Relation sections
 -----------------
+
+TODO: this refers to something we haven't introduced yet
 
 Similarly to the translation section, we group together some parameters that
 vary by language in RelationSectionInfo.
