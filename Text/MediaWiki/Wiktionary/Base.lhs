@@ -670,21 +670,54 @@ of the whole page, just the whole definition.
 Relation sections
 -----------------
 
-TODO: this refers to something we haven't introduced yet
+Multiple languages of Wiktionary have sections for particular relations, such as "Synonyms",
+"Antonyms", and the generic "Related terms". Such a section could look like this (for the
+English word *loud*):
 
-Similarly to the translation section, we group together some parameters that
-vary by language in RelationSectionInfo.
+    ====Antonyms====
+    * {{sense|sound}} {{l|en|quiet}}, {{l|en|soft}}
+    * {{sense|person}} {{l|en|quiet}}
+
+We want to extract the links from such a bulleted list and turn them into WiktionaryFacts.
+The general idea of what we want to do is the same across languages, but the details vary.
+So in this code, we define a structure called `RelationSectionInfo` that encapsulates
+the language-specific details of the process, and pass it as an argument to functions that
+do the work in general.
+
+The details we need to keep track of are:
+
+- The Language that we're handling
+- The template procedure for handling templates in that language
+- A parse rule for parsing one item from the relation section
 
 > data RelationSectionInfo = RelationSectionInfo {
->   rsLanguage :: Language,             -- the language to be parsed
->   rsTemplateProc :: TemplateProc,     -- the template procedure to use
+>   rsLanguage :: Language,                                 -- the language to be parsed
+>   rsTemplateProc :: TemplateProc,                         -- the template procedure to use
 >   rsItemRule :: (TemplateProc -> Parser [AnnotatedText])  -- how to parse items
 > }
->
+
+`parseRelation` gets the result of parsing an entire relation section. It takes these arguments:
+
+- The RelationSectionInfo for the language
+- The Wikitext to be parsed
+- The term being defined
+- The relation name that will go in the "rel" field of the WiktionaryFacts
+
+and it produces a list of WiktionaryFacts, or the empty list if it fails to parse. Its return value
+is a plain value, not wrapped in a Parser.
+
+This function passes most of its arguments on to the actual parse rule `pRelationSection`.
+
 > parseRelation :: RelationSectionInfo -> Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
 > parseRelation rsInfo rel thisTerm text =
 >   parseOrDefault [] (pRelationSection rsInfo rel thisTerm) text
->
+
+`pRelationSection` is the parse rule. It repeatedly applies the `rsItemRule`
+(or ignores a line), converts the AnnotatedTexts it returns to WiktionaryFacts
+using `entryToFacts` (defined below), and applies the given `rel` to these
+facts. It uses `mconcat` to flatten together multiple lists of results as it
+goes.
+
 > pRelationSection :: RelationSectionInfo -> Text -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pRelationSection rsInfo rel thisTerm =
 >   let tproc = (rsTemplateProc rsInfo)
@@ -696,15 +729,23 @@ vary by language in RelationSectionInfo.
 >     <$> mconcat
 >     <$> many ((itemRule tproc) <|> pRelationIgnored)
 
-pRelationItem is a sensible default function to pass as `rsItemRule`.
+pRelationItem is a sensible default function to pass as `rsItemRule`: it gets the AnnotatedText
+contents of one list item introduced by the bullet `*`.
 
 > pRelationItem :: TemplateProc -> Parser [AnnotatedText]
 > pRelationItem tproc =
 >   extractTopLevel <$> listItem tproc "*"
->
+
+Lines that don't match the rule for parsing items -- such as templates outside
+of the list, or blank lines -- are skipped, producing no results.
+
 > pRelationIgnored :: Parser [AnnotatedText]
 > pRelationIgnored = wikiTextLine ignoreTemplates >> newLine >> return []
->
+
+`entryToFacts` is a simpler version of `definitionToFacts` that's not specialized for definitions.
+It converts the annotations on an AnnotatedText to some number of WiktionaryFacts, applying
+a word sense ID if it exists.
+
 > entryToFacts :: Language -> WiktionaryTerm -> AnnotatedText -> [WiktionaryFact]
 > entryToFacts thisLang thisTerm defText =
 >   let defSense  = findSenseID defText
@@ -722,7 +763,8 @@ languages, most notably the names of the templates involved.
 
 If we passed in all these details as arguments to `parseTranslations`, the type
 of `parseTranslations` and its helper functions would be horrifying. Instead,
-we'll group them together into a TranslationSectionInfo struct.
+like we did for relation sections, we'll group them together into a
+TranslationSectionInfo struct.
 
 > data TranslationSectionInfo = TranslationSectionInfo {
 >   tsLanguage :: Language,             -- the language to be parsed
@@ -731,11 +773,23 @@ we'll group them together into a TranslationSectionInfo struct.
 >   tsIgnoreRule :: Parser (),          -- a parser for lines to ignore
 >   tsEndRule :: Parser ()              -- a parser for the end of a translation list
 > }
->
+
+As with relation sections above, `parseTranslations` runs the parse rule we're
+about to define and extracts its list of results (if any). Its arguments are:
+
+- The TranslationSectionInfo for the language
+- The term being defined
+- The Wikitext to be parsed
+
+It returns (as a plain value, not wrapped in a Parser) the list of facts it
+extracts, if any.
+
 > parseTranslations :: TranslationSectionInfo -> WiktionaryTerm -> Text -> [WiktionaryFact]
 > parseTranslations tsInfo thisTerm text =
 >   parseOrDefault [] (pTranslationSection tsInfo thisTerm) text
->
+
+`pTranslationSection` parses one or more translation groups (defined below).
+
 > pTranslationSection :: TranslationSectionInfo -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationSection tsInfo thisTerm = concat <$> many1 (pTranslationGroup tsInfo thisTerm)
 
@@ -743,16 +797,27 @@ A translation group is a portion of the "Translations" section that all applies 
 word sense. It's delimited by a start template and an end template. The start template might
 return a word sense, or might return Nothing.
 
+This parser runs `tsStartRule` and possibly gets a word sense from it, then
+runs `pTranslationGroupBody` with that word sense to get the translations it
+will actually return, and finally runs `tsEndRule`. It skips blank lines before
+and after.
+
 > pTranslationGroup :: TranslationSectionInfo -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationGroup tsInfo thisTerm = do
 >   optionalTextChoices [newLine]
 >   maybeSense <- tsStartRule tsInfo
 >   let senseTerm = thisTerm {wtSense=maybeSense}
->   let language = tsLanguage tsInfo
 >   items <- pTranslationGroupBody tsInfo senseTerm
 >   tsEndRule tsInfo
 >   optionalTextChoices [newLine]
 >   return items
+
+The body of a translation group is a list of translation items, defining translations of a
+particular sense of a WiktionaryTerm (or an ambiguous WiktionaryTerm whose sense is Nothing).
+
+We look for one or more lines that are either matches for `pTranslationItem` or for `tsIgnoreRule`.
+We concatenate together the AnnotatedTexts they produce, then run `extractTranslations` on them
+to turn them into WiktionaryFacts.
 
 > pTranslationGroupBody :: TranslationSectionInfo -> WiktionaryTerm -> Parser [WiktionaryFact]
 > pTranslationGroupBody tsInfo thisTerm =
@@ -779,7 +844,8 @@ lists -- multiple kinds of translations for the same language, for example.
 > pTranslationItem :: TranslationSectionInfo -> Parser [AnnotatedText]
 > pTranslationItem tsInfo = extractTopLevel <$> listItem (tsTemplateProc tsInfo) "*"
 
-This rule will generally be useful in writing the "ignore" parse rule:
+The `tsIgnoreRule` has to be written for each language, as a parser that takes in lines
+and returns `()`. As one simple case, `pBlankLine` parses a blank line and returns `()`.
 
 > pBlankLine :: Parser ()
 > pBlankLine = newLine >> return ()
