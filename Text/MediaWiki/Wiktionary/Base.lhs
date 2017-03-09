@@ -854,19 +854,36 @@ and returns `()`. As one simple case, `pBlankLine` parses a blank line and retur
 Looking up sections
 -------------------
 
+To understand what we're parsing, we need to understand what kind of section it is.
+
+Sections don't necessarily come out and *tell* you what kind of section they
+are. For example, it would be great if the section that contains definitions
+were named **Definitions**.  However, in the grand Wiktionary tradition of
+conflating semantics with presentation, the heading on that section is the part
+of speech, such as **Noun** or **Adverb**.
+
+`findHeading` handles one case of this problem: given our current stack of
+headings (the hierarchy of headings leading to a section), we want to find the first
+one (if any) that matches a known set, such as names of parts of speech.
+
+Simple example: when `findHeading (HashSet ["Noun", "Verb", "Adjective"])` is run
+on the list `["English", "Etymology 1", "Noun"]`, it will return `Just "Noun"`.
+When run on `["English", "Etymology 1"]`, it will return `Nothing`.
+
 > findHeading :: HashSet Text -> [Text] -> Maybe Text
 > findHeading choices headings =
 >   let filtered = filter (∈ choices) headings
 >   in headMay filtered
->
+
+`findPrefixedHeading` finds the first heading in a stack of headings that begins
+with a particular prefix, such as "Etymology ". If it returns a result, the
+result is a `Just` containing the rest of the heading, such as "1".
+
 > findPrefixedHeading :: Text -> [Text] -> Maybe Text
 > findPrefixedHeading prefix headings =
 >   let filtered = filter (isPrefixOf prefix) headings
 >       mapped   = map (drop (length prefix)) filtered
 >   in headMay mapped
->
-> intersectLists :: (Eq a) => [a] -> [a] -> [a]
-> intersectLists list1 list2 = filter (∈ list1) list2
 
 
 Transforming templates
