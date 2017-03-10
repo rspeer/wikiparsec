@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="docs.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<nav id="TOC">
+<ul>
+<li><a href="#wikiparsec-tools-that-parse-wikipedia-and-wiktionary">Wikiparsec: tools that parse Wikipedia and Wiktionary</a><ul>
+<li><a href="#compiling-and-running-the-code">Compiling and running the code</a></li>
+<li><a href="#why-this-code-is-in-haskell">Why this code is in Haskell</a></li>
+<li><a href="#this-looks-like-markdown-wheres-the-code">This looks like Markdown, where’s the code?</a></li>
+</ul></li>
+<li><a href="#wikiprelude---a-custom-prelude-for-wiki-parsing"><code>WikiPrelude</code> - A custom Prelude for Wiki parsing</a><ul>
+<li><a href="#monoids-and-monads-oversimplified">Monoids and monads, oversimplified</a></li>
+<li><a href="#monoids-are-things-you-can-concatenate">Monoids are things you can concatenate</a></li>
+<li><a href="#monads-are-stateful-things-you-can-do">Monads are stateful things you can do</a></li>
+<li><a href="#heres-where-the-actual-code-starts">Here’s where the actual code starts</a></li>
+<li><a href="#text-operations">Text operations</a></li>
+<li><a href="#list-operations">List operations</a></li>
+<li><a href="#unicode-shenanigans">Unicode shenanigans</a></li>
+<li><a href="#mapping-operations">Mapping operations</a></li>
+</ul></li>
+<li><a href="#text.splitutils-manipulating-delimited-strings"><code>Text.SplitUtils</code>: manipulating delimited strings</a></li>
+<li><a href="#text.language.normalize---converts-words-to-a-standard-form"><code>Text.Language.Normalize</code> - converts words to a standard form</a><ul>
+<li><a href="#diacritics-and-when-to-drop-them">Diacritics and when to drop them</a></li>
+</ul></li>
+<li><a href="#data.languagetype-gives-language-codes-their-own-type"><code>Data.LanguageType</code>: gives language codes their own type</a></li>
+<li><a href="#data.languagenames-convert-between-language-codes-and-language-names"><code>Data.LanguageNames</code>: convert between language codes and language names</a><ul>
+<li><a href="#a-note-on-indexing">A note on indexing</a></li>
+</ul></li>
+<li><a href="#text.mediawiki.xml-extracting-wiki-pages-from-xml-dumps"><code>Text.MediaWiki.XML</code>: extracting Wiki pages from XML dumps</a><ul>
+<li><a href="#data-structures">Data structures</a></li>
+<li><a href="#sax-events">SAX events</a></li>
+<li><a href="#the-whole-xml-parsing-process">The whole XML-parsing process</a></li>
+</ul></li>
+<li><a href="#text.mediawiki.html-removing-html-from-wikitext"><code>Text.MediaWiki.HTML</code>: removing HTML from Wikitext</a><ul>
+<li><a href="#handling-html-with-tagsoup">Handling HTML with TagSoup</a></li>
+<li><a href="#skipping-obnoxious-tags">Skipping obnoxious tags</a></li>
+</ul></li>
+<li><a href="#text.mediawiki.sections-separating-the-sections-of-a-wiki-page"><code>Text.MediaWiki.Sections</code>: separating the sections of a Wiki page</a><ul>
+<li><a href="#data-structures-1">Data structures</a></li>
+<li><a href="#reading-lines">Reading lines</a></li>
+<li><a href="#a-line-by-line-parser">A line-by-line parser</a></li>
+<li><a href="#parsing-sections">Parsing sections</a></li>
+<li><a href="#converting-sections">Converting sections</a></li>
+<li><a href="#parsing-the-whole-page">Parsing the whole page</a></li>
+</ul></li>
+<li><a href="#text.mediawiki.annotatedtext-a-data-type-for-slightly-marked-up-text"><code>Text.MediaWiki.AnnotatedText</code>: a data type for slightly-marked-up text</a></li>
+<li><a href="#text.mediawiki.wikitext-parse-the-wikitext-format"><code>Text.MediaWiki.WikiText</code>: parse the WikiText format</a><ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#spans-of-text">Spans of text</a></li>
+<li><a href="#wiki-syntax-for-links">Wiki syntax for links</a></li>
+<li><a href="#wiki-syntax-for-lists">Wiki syntax for lists</a></li>
+<li><a href="#wiki-syntax-for-templates">Wiki syntax for templates</a></li>
+<li><a href="#wiki-syntax-for-tables">Wiki syntax for tables</a></li>
+<li><a href="#parsing-sections-at-a-time">Parsing sections at a time</a></li>
+<li><a href="#entry-points">Entry points</a></li>
+</ul></li>
+<li><a href="#text.mediawiki.templates-representing-and-applying-templates"><code>Text.MediaWiki.Templates</code>: representing and applying templates</a><ul>
+<li><a href="#generally-useful-template-actions">Generally useful template actions</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="wikiparsec-tools-that-parse-wikipedia-and-wiktionary">Wikiparsec: tools that parse Wikipedia and Wiktionary</h1>
+<p>Wikiparsec provides tools for parsing the complex MediaWiki syntax that appears on Wikipedia and Wiktionary, for the purpose of information extraction.</p>
+<p>I’m aware that many other tools do the same, but I think most of them are too sloppy about their parsing. Wikiparsec is designed for cases where it’s important to parse the page as correctly as possible (without running an embedded instance of MediaWiki), and extract detailed information from that parse.</p>
+<p>We’re not outputting a fully-general tree structure of everything going on in the Wikitext (if you output that, you <em>still</em> have a parsing problem). Instead, the parser is connected to functions that extract relevant information for the problem at hand, and those functions are responsible for the output.</p>
+<p>Wikiparsec is used to provide dictionary definitions to <a href="http://conceptnet.io">ConceptNet</a>.</p>
+<h2 id="compiling-and-running-the-code">Compiling and running the code</h2>
+<p>This code is meant to be built with <a href="https://github.com/commercialhaskell/stack">Haskell Stack</a>. Install Stack and build this code with:</p>
+<pre class="sh"><code>stack build</code></pre>
+<p>The top-level programs are <code>wiki2text</code> and <code>wiktionary-parser</code>. <code>wiki2text</code> extracts paragraphs of plain text from a MediaWiki dump in XML format (ideally Wikipedia). It can be run with:</p>
+<pre class="sh"><code>bunzip2 -c wikipedia.xml.bz2 | stack exec wiki2text</code></pre>
+<p><code>wiktionary-parser</code> parses the structure of some languages’ Wiktionaries to extract a stream of lexical facts in JSON format. It takes one argument, the language code of the Wiktionary it will be parsing. Each language has its own structure of Wiktionary entries, and so far we can parse:</p>
+<ul>
+<li>English (<code>en</code>)</li>
+<li>French (<code>fr</code>)</li>
+<li>German (<code>de</code>)</li>
+</ul>
+<p>To run it in English, for example:</p>
+<pre class="sh"><code>bunzip2 -c enwiktionary.xml.bz2 | stack exec wiktionary-parser en</code></pre>
+<h2 id="why-this-code-is-in-haskell">Why this code is in Haskell</h2>
+<p>I’ve been facing the problem of how to deal with Wikitext well for a long time. I didn’t originally expect to solve it using Haskell.</p>
+<p>The thing about Haskell is that it’s designed by mathematicians, and for the most part, it’s also documented for mathematicians. Everything about the language encourages you to write code that’s not about down-to-earth things like functions, strings, and lists, but instead is about functors, monoids, and monads. This gives Haskell code a reputation for being incomprehensible to most people.</p>
+<p>Now, sometimes a problem comes along that mathematicians, with their lofty abstractions, are actually much better equipped to solve than a typical software developer. One of those problems is parsing. Other languages struggle with parsing while Haskell just <em>nails</em> it.</p>
+<p>I am not much of a mathematician. I like functional programming, but I also like writing straightforward understandable Python code. But I needed to be able to write a powerful, extensible parser for Wikitext, and I could tell my Python code wasn’t going to cut it. I looked at my available options for this kind of parsing, and found that they amounted to:</p>
+<ul>
+<li>Something based on Parsec in Haskell</li>
+<li>Something based on Parsec but in another programming language, imperfectly pretending to be Haskell</li>
+<li>Awful spaghetti hacks</li>
+</ul>
+<p>There are already Wikitext parsers that are awful spaghetti hacks, and I can’t build on those. (The reference implementation – MediaWiki itself – would be a great example, but so are the various Java-based parsers I’ve seen.) So the next best choice is Haskell.</p>
+<p>And if nobody else, another audience I’m writing for is my future self. I can imagine a year from now, coming back to this code, saying “what the hell was I thinking with all these monads”, and wanting to start over, unless I write some documentation that explains what I was thinking.</p>
+<h2 id="this-looks-like-markdown-wheres-the-code">This looks like Markdown, where’s the code?</h2>
+<p>One thing I love about Haskell is the Literate Haskell (<code>.lhs</code>) format. The Haskell compiler can interpret it without any pre-processing, and it encourages documentation as the rule and code as the exception.</p>
+<p>Lines that start with the character <code>&gt;</code> are code. The rest is Markdown. The documentation tool <code>pandoc</code> can convert this all into nicely-formatted HTML, which you might even be reading right now, but just reading the Markdown + Haskell source should do the job too.</p>
+<p>You could start reading with <code>WikiPrelude.lhs</code>, which sets up the functions we want to be available in all our modules, or <code>Text/Wiki/MediaWiki.lhs</code>, which performs the basic level of parsing for MediaWiki syntax.</p>
+<h1 id="wikiprelude---a-custom-prelude-for-wiki-parsing"><code>WikiPrelude</code> - A custom Prelude for Wiki parsing</h1>
+<p>The Haskell standard library is called the ‘Prelude’. There is general agreement that the Prelude is not very good code and should be replaced with something else. There is absolutely no agreement on what it should be replaced with.</p>
+<p>I built this code on an alternative Haskell standard library, the Classy Prelude, because it’s got a good idea of how to deal with different data types such as Texts and ByteStrings. Instead of prefixed functions that deal with one data type, ClassyPrelude uses generic functions that can apply to any data type that does the right things, because it defines these functions in terms of type classes.</p>
+<p>Instead of having to use <code>T.append</code> to append texts, and <code>Char8.append</code> to append ByteStrings, or whatever, we just use <code>append</code> to append things that can be appended. This leads to cleaner code and easier refactoring.</p>
+<p>It comes at a price: when a type signature in the code is slightly wrong, Haskell with the Classy Prelude will output error messages that are more confusing than usual, because everything is a level of abstraction removed from the actual types you mean to use.</p>
+<p>Speaking of abstraction, let’s talk about two important concepts that happen to be typeclasses with frightening names: Monoids and Monads.</p>
+<h2 id="monoids-and-monads-oversimplified">Monoids and monads, oversimplified</h2>
+<p>A <a href="http://james-iry.blogspot.com/2009/05/brief-incomplete-and-mostly-wrong.html">classic joke</a> about Haskell defines these terms: “A monad is a monoid in the category of endofunctors, what’s the problem?”</p>
+<p>It’s funny because it’s true. Haskell works best when you embrace its poorly-named mathematical abstractions, and monads and monoids are the ones that are going to come up in this code. But in actual Haskell code, the full generality of the mathematical abstraction usually doesn’t matter; it’s all about how you use it.</p>
+<p>So let’s oversimplify what these things are, the way we oversimplify other mathematical concepts like “matrix” when programming.</p>
+<p>If you’re a Haskell programmer reading this, you’ll find this section to be old hat. I don’t know many Haskell programmers, though. This documentation is for other people who come across this code and are just familiar with functional programming in general.</p>
+<h2 id="monoids-are-things-you-can-concatenate">Monoids are things you can concatenate</h2>
+<p>A <strong>monoid</strong> is a type of thing that can be empty and can be concatenated. Some monoids you’ll encounter in this code are Unicode text, ByteStrings, and lists. Sets also work, if you think about the “union” operation as being like concatenation.</p>
+<p>(A mathematician might say I’m overlooking some monoids that are a big deal, like addition of numbers. But you wouldn’t realistically <em>use</em> a monoid to add numbers. You’d use <code>+</code> to add numbers. Monoids are for things you need to concatenate.)</p>
+<p>When I’m willing to call all these sequencey things Monoids, then instead of having to use awkwardly-namespaced functions for dealing with all these types separately (like <code>T.append</code> for text, versus <code>BS.append</code> for bytestrings), I can use <code>mappend</code> to append whatever monoidy things I have, and <code>mempty</code> or <code>ø</code> to get an empty one.</p>
+<p>By the way, Haskell programmers show their apprecation for functions they find really important by giving them infix operators. So <code>mappend list1 list2</code> is also spelled <code>list1 &lt;&gt; list2</code>, or in fancy Unicode, <code>list1 ⊕ list2</code>.</p>
+<h2 id="monads-are-stateful-things-you-can-do">Monads are stateful things you can do</h2>
+<p>A <strong>monad</strong> is a way to do stateful things in sequence. The advantage of using a monad is that it keeps track of the state for you while you just return a result. Without monads, you might have to write functions that take in <code>(actualInput, state)</code> and return <code>(actualOutput, newState)</code>, which would be repetitive and error-prone.</p>
+<p>In Haskell, doing any sort of I/O requires an IO monad: your code is changing the state of what it’s read from and written to the rest of the system.</p>
+<p>Parsing is a monad. Your state is where you are in the input. When you parse something and move the cursor forward through the input, that modifies the state.</p>
+<p>Monads are important enough to Haskell that they get their own syntax, the <code>do</code> block, which just lets you list a bunch of state-changing things you need to do to a monad, in order.</p>
+<p>Because IO and parsing are the same kind of thing, they look similar in the type system. A function of type <code>IO Text</code> is a function that does some IO and then returns some Text. A function of type <code>Parser Text</code> is a function that parses some input and then returns some Text.</p>
+<h2 id="heres-where-the-actual-code-starts">Here’s where the actual code starts</h2>
+<p>Every module starts with a LANGUAGE line telling the Haskell compiler which optional language features to use.</p>
+<p>The ones we’ll see a lot are <code>NoImplicitPrelude</code>, telling it not to import the Prelude because we’re defining our own right here, and <code>OverloadedStrings</code>, which lets us use quoted literals as whatever type they need to be, instead of them ending up as a String, an awful type you never want to use because it’s a linked list of characters.</p>
+<p>We also turn on <code>UnicodeSyntax</code> a lot so we can bling out our code.</p>
+<p>Various LANGUAGE lines throughout this codebase will turn on other features such as <code>FlexibleContexts</code>, and honestly I have no clear idea what they do, except that the compiler tells me things like “I can’t compile this unless you turn on <code>FlexibleContexts</code>”.</p>
+<p><code>OverloadedStrings</code> would be dangerous to have on while we’re still defining what strings even are, so it’s not turned on in the WikiPrelude.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, UnicodeSyntax, FlexibleContexts #-}</span></code></pre></div>
+<p>The WikiPrelude is a small extension of the ClassyPrelude, designed to include some more types and functions that we’ll need throughout the parser.</p>
+<p>Here’s what we’re exporting from the module:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">WikiPrelude</span> (
+  <span class="kw">module</span> <span class="dt">ClassyPrelude</span>,
+  <span class="kw">module</span> <span class="dt">Data.String.Conversions</span>,
+  <span class="kw">module</span> <span class="dt">Data.LanguageType</span>,
+  <span class="kw">module</span> <span class="dt">Control.Monad.Writer</span>,
+  replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
+  breakOn, breakOnEnd, listTakeWhile, listDropWhile,
+  get, getAll, getPrioritized, nonEmpty,
+  println, ø, (∈), (⊕)
+  ) <span class="kw">where</span></code></pre></div>
+<p>Some of these exports are just re-exporting things that we import en masse:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">ClassyPrelude</span> <span class="kw">hiding</span> (takeWhile)
+<span class="kw">import qualified</span> <span class="dt">ClassyPrelude</span> <span class="kw">as</span> <span class="dt">P</span>
+<span class="kw">import </span><span class="dt">Data.String.Conversions</span> <span class="kw">hiding</span> ((&lt;&gt;), (⊕))
+<span class="kw">import </span><span class="dt">Data.LanguageType</span>
+<span class="kw">import </span><span class="dt">Data.Monoid.Unicode</span> ((⊕), (∅))
+<span class="kw">import </span><span class="dt">Control.Monad.Writer</span> (<span class="dt">Writer</span>, writer, pass, runWriter, execWriter)
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">T</span></code></pre></div>
+<h2 id="text-operations">Text operations</h2>
+<p>These are functions that apply to Text that for some reason didn’t make it into the ClassyPrelude.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">replace <span class="fu">=</span> T.replace
+splitOn <span class="fu">=</span> T.splitOn
+breakOn <span class="fu">=</span> T.breakOn
+breakOnEnd <span class="fu">=</span> T.breakOnEnd
+dropAround <span class="fu">=</span> T.dropAround
+dropWhileEnd <span class="fu">=</span> T.dropWhileEnd
+toTitle <span class="fu">=</span> T.toTitle</code></pre></div>
+<p>Another kind of standard thing we need to do is trim spaces from the start and end of a string:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">stripSpaces ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+stripSpaces <span class="fu">=</span> dropAround (\c <span class="ot">-&gt;</span> c <span class="fu">==</span> <span class="ch">&#39; &#39;</span> <span class="fu">||</span> c <span class="fu">==</span> <span class="ch">&#39;\n&#39;</span>)</code></pre></div>
+<p>Writing any sort of text to stdout:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">println ::</span> (<span class="dt">IOData</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+println <span class="fu">=</span> hPutStrLn stdout</code></pre></div>
+<h2 id="list-operations">List operations</h2>
+<p>The name <code>takeWhile</code> has conflicting definitions in ClassyPrelude and Attoparsec, so we need to rename the ClassyPrelude one.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">listTakeWhile ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]
+listTakeWhile <span class="fu">=</span> P.takeWhile
+
+<span class="ot">listDropWhile ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]
+listDropWhile <span class="fu">=</span> P.dropWhile</code></pre></div>
+<h2 id="unicode-shenanigans">Unicode shenanigans</h2>
+<p>We can use Unicode operators to work with monoids, and we might as well do so because we’ll be working with a lot of monoids.</p>
+<p>One thing I want to do is define the empty monoid as the letter ø. I know it’s supposed to be the math symbol ∅. You have to put that one in parentheses because it’s a symbol and Haskell’s parser thinks it’s supposed to be an infix operator. But ø is a name, and that’s exactly what we need.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">ø<span class="ot"> ::</span> <span class="dt">Monoid</span> α <span class="ot">=&gt;</span> α
+ø <span class="fu">=</span> (∅)</code></pre></div>
+<p><code>∈</code> is the element-of operator, and actually having it as an infix operator is rather nice. We have to make sure it refers to the ClassyPrelude version of <code>elem</code>, complete with its type signature (which I just copied and pasted).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">(∈)<span class="ot"> ::</span> <span class="dt">MonoFoldableEq</span> c <span class="ot">=&gt;</span> <span class="dt">Element</span> c <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+(∈) <span class="fu">=</span> elem</code></pre></div>
+<h2 id="mapping-operations">Mapping operations</h2>
+<p>In many situations we have a mapping whose values are sequences. This lets us write the convenient <code>get</code> function, which looks up a key in the mapping, or returns an empty sequence if it’s not there. This is often easier than checking cases of <code>Maybe</code> values.</p>
+<p>What I’m calling a sequence is what Haskell calls a monoid – see the section “Monoids are things you can concatenate” above.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">get ::</span> (<span class="dt">IsMap</span> map, <span class="dt">Monoid</span> (<span class="dt">MapValue</span> map)) <span class="ot">=&gt;</span> <span class="dt">ContainerKey</span> map <span class="ot">-&gt;</span> map <span class="ot">-&gt;</span> <span class="dt">MapValue</span> map
+get <span class="fu">=</span> findWithDefault ø</code></pre></div>
+<p><code>getPrioritized</code> is like <code>get</code>, but tries looking up multiple different keys in priority order. It returns the empty value only if it finds none of them.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getPrioritized ::</span> (<span class="dt">IsMap</span> map, <span class="dt">Monoid</span> (<span class="dt">MapValue</span> map)) <span class="ot">=&gt;</span> [<span class="dt">ContainerKey</span> map] <span class="ot">-&gt;</span> map <span class="ot">-&gt;</span> <span class="dt">MapValue</span> map
+getPrioritized (key<span class="fu">:</span>rest) map <span class="fu">=</span> findWithDefault (getPrioritized rest map) key map
+getPrioritized [] map         <span class="fu">=</span> ø</code></pre></div>
+<p><code>getAll</code> is a step in <code>getPrioritized</code>. It takes a list of keys and a mapping, and returns the list of values of those keys that exist.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getAll ::</span> (<span class="dt">IsMap</span> m, <span class="dt">Monoid</span> (<span class="dt">MapValue</span> m)) <span class="ot">=&gt;</span> [<span class="dt">ContainerKey</span> m] <span class="ot">-&gt;</span> m <span class="ot">-&gt;</span> [<span class="dt">MapValue</span> m]
+getAll keys m <span class="fu">=</span> catMaybes (map (\key <span class="ot">-&gt;</span> lookup key m) keys)</code></pre></div>
+<p>Perhaps we’ve gotten some values that may or may not be empty using <code>get</code>, and now we want to turn them back into a proper <code>Maybe</code>. This function replaces <code>Maybe ø</code> with <code>Nothing</code>:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">nonEmpty ::</span> (<span class="dt">Monoid</span> α, <span class="dt">Eq</span> α) <span class="ot">=&gt;</span> <span class="dt">Maybe</span> α <span class="ot">-&gt;</span> <span class="dt">Maybe</span> α
+nonEmpty val <span class="fu">=</span>
+  <span class="kw">case</span> val <span class="kw">of</span>
+    <span class="dt">Just</span> something <span class="ot">-&gt;</span> <span class="kw">if</span> (something <span class="fu">==</span> ø) <span class="kw">then</span> <span class="dt">Nothing</span> <span class="kw">else</span> val
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Nothing</span></code></pre></div>
+<h1 id="text.splitutils-manipulating-delimited-strings"><code>Text.SplitUtils</code>: manipulating delimited strings</h1>
+<p>Some string-splitting functions will help us parse Wikitext without backtracking:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}</span>
+<span class="kw">module</span> <span class="dt">Text.SplitUtils</span> (splitFirst, splitLast) <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span></code></pre></div>
+<p><code>splitFirst</code> finds the first occurrence of a separator character, and splits the string at that point, returning the text before and after the separator. If the separator never appears, the suffix will be the empty string.</p>
+<p>It turns out that this exact function is in the Classy Prelude, and it’s called <code>breakOn</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">splitFirst ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> (<span class="dt">Text</span>, <span class="dt">Text</span>)
+splitFirst <span class="fu">=</span> breakOn</code></pre></div>
+<p><code>splitLast</code> does the same with the <em>last</em> occurrence, and it’s easier to define as a reversal of <code>splitFirst</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">splitLast ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> (<span class="dt">Text</span>, <span class="dt">Text</span>)
+splitLast delim text <span class="fu">=</span>
+  <span class="kw">let</span> (beforeR, afterR) <span class="fu">=</span> breakOn (reverse delim) (reverse text) <span class="kw">in</span>
+    (reverse afterR, reverse beforeR)</code></pre></div>
+<h1 id="text.language.normalize---converts-words-to-a-standard-form"><code>Text.Language.Normalize</code> - converts words to a standard form</h1>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}</span>
+<span class="kw">module</span> <span class="dt">Text.Language.Normalize</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span>
+<span class="kw">import </span><span class="dt">Data.Text.ICU.Normalize</span> (normalize, <span class="dt">NormalizationMode</span>(..))</code></pre></div>
+<p>Wiktionary has some automatic translations that it applies in language-tagged links. You can write a link in some fully-explicit dictionary form with accent marks, vowel points, or whatever, and Wiktionary will reduce it so that it links to a more common entry name without the extra marks.</p>
+<p>Different transformations are applied to different languages, but in this module we’ve generalized them into two categories: languages that remove accents from letters, and languages that leave accents alone.</p>
+<p>MediaWiki’s implementation is part of its “Module:languages” Lua code. The configuration for all languages with two-letter language codes can be seen in Wiktionary’s <a href="https://en.wiktionary.org/wiki/Module:languages/data2">languages/data2</a> module.</p>
+<p>We apply a sequence of steps to the text:</p>
+<ul>
+<li><p>Replace U+671 ARABIC LETTER ALEF WASLA with U+617 ARABIC LETTER ALEF</p></li>
+<li><p>Decompose the characters into NFD form, so that diacritics and marks appear as their own codepoints</p></li>
+<li><p>Remove marks that should always be removed: those that annotate the pronunciation of a word in Arabic, Hebrew, or Syriac, plus a couple of miscellaneous marks used in dictionary-ese</p></li>
+<li><p>If this language is in <code>diacriticDroppingLanguages</code>, remove all codepoints from U+300 to U+36F, the Unicode block for diacritics that combine with Latin, Cyrillic, and Greek letters, except that we leave U+30C COMBINING CARON. See “Diacritics and when to drop them” for why.</p></li>
+<li><p>Recompose the characters into NFC form.</p></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">normalizeText ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+normalizeText lang <span class="fu">=</span>
+  <span class="kw">if</span> (lang ∈ diacriticDroppingLanguages)
+    <span class="kw">then</span> (normalize <span class="dt">NFC</span>) <span class="fu">.</span> filterDiacritics <span class="fu">.</span> filterMarks <span class="fu">.</span> (normalize <span class="dt">NFD</span>) <span class="fu">.</span> replaceAlifWasla
+    <span class="kw">else</span> (normalize <span class="dt">NFC</span>) <span class="fu">.</span> filterMarks <span class="fu">.</span> (normalize <span class="dt">NFD</span>) <span class="fu">.</span> replaceAlifWasla</code></pre></div>
+<h2 id="diacritics-and-when-to-drop-them">Diacritics and when to drop them</h2>
+<p>In some languages, accents or diacritics on top of characters are very important, as they change one letter to another. The letter <code>ä</code> is distinct from <code>a</code> in German and many Scandinavian languages, for example, and Spanish <code>ñ</code> is distinct from <code>n</code>.</p>
+<p>In other languages, words are only written with accents in dictionaries, so to get the word that people actually use, you need to strip the accents off.</p>
+<p>There are some languages that want to remove all diacritics <em>except</em> for carons, because the caron makes a lexically-distinct letter, while other diacritics are just accent marks used in dictionary annotations. For example, if the text “življénje” is linked in Slovene (language “sl”), it will link to “življenje”, because <code>ž</code> is different from <code>z</code> but <code>é</code> is just a marked-up version of <code>e</code>.</p>
+<p>There don’t seem to be any languages that use carons as dictionary markings that should be removed, so we simply always leave carons as is.</p>
+<p>Here’s what I think is the list of languages that should drop all diacritics, though I admit I started seriously skimming when I got to the three-letter language codes.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">diacriticDroppingLanguages ::</span> [<span class="dt">Language</span>]
+diacriticDroppingLanguages <span class="fu">=</span> [
+  <span class="st">&quot;ab&quot;</span>, <span class="st">&quot;be&quot;</span>, <span class="st">&quot;bg&quot;</span>, <span class="st">&quot;ce&quot;</span>, <span class="st">&quot;cu&quot;</span>, <span class="st">&quot;el&quot;</span>, <span class="st">&quot;ka&quot;</span>, <span class="st">&quot;la&quot;</span>, <span class="st">&quot;lt&quot;</span>,
+  <span class="st">&quot;mk&quot;</span>, <span class="st">&quot;ny&quot;</span>, <span class="st">&quot;os&quot;</span>, <span class="st">&quot;ru&quot;</span>, <span class="st">&quot;sh&quot;</span>, <span class="st">&quot;sl&quot;</span>, <span class="st">&quot;so&quot;</span>, <span class="st">&quot;tg&quot;</span>, <span class="st">&quot;uk&quot;</span>,
+  <span class="st">&quot;ang&quot;</span>, <span class="st">&quot;arc&quot;</span>, <span class="st">&quot;chl&quot;</span>, <span class="st">&quot;dum&quot;</span>, <span class="st">&quot;enm&quot;</span>, <span class="st">&quot;gmh&quot;</span>, <span class="st">&quot;gml&quot;</span>, <span class="st">&quot;goh&quot;</span>, <span class="st">&quot;got&quot;</span>, <span class="st">&quot;grc&quot;</span>,
+  <span class="st">&quot;hil&quot;</span>, <span class="st">&quot;huz&quot;</span>, <span class="st">&quot;inh&quot;</span>, <span class="st">&quot;kjj&quot;</span>, <span class="st">&quot;lui&quot;</span>, <span class="st">&quot;lzz&quot;</span>, <span class="st">&quot;mga&quot;</span>, <span class="st">&quot;miq&quot;</span>, <span class="st">&quot;moe&quot;</span>,
+  <span class="st">&quot;nci&quot;</span>, <span class="st">&quot;odt&quot;</span>, <span class="st">&quot;ofs&quot;</span>, <span class="st">&quot;oge&quot;</span>, <span class="st">&quot;olt&quot;</span>, <span class="st">&quot;osx&quot;</span>, <span class="st">&quot;ppl&quot;</span>, <span class="st">&quot;rue&quot;</span>, <span class="st">&quot;sga&quot;</span>, <span class="st">&quot;sva&quot;</span>,
+  <span class="st">&quot;unm&quot;</span>, <span class="st">&quot;xfa&quot;</span>, <span class="st">&quot;xmk&quot;</span>]</code></pre></div>
+<p><code>filterDiacritics</code> takes in NFD-decomposed text and removes the characters that are diacritic marks, using a straightforward <code>filter</code>.</p>
+<p>We need to alter some Cyrillic letters to make sure that legitimate vowels aren’t taken apart by the filter – more on that next.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">filterDiacritics ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+filterDiacritics <span class="fu">=</span> (filter (not <span class="fu">.</span> isDiacritic)) <span class="fu">.</span> fixCyrillicVowels
+
+<span class="ot">isDiacritic ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isDiacritic c <span class="fu">=</span>
+  <span class="kw">let</span> ord <span class="fu">=</span> fromEnum c <span class="kw">in</span>
+    <span class="co">-- skip 0x30c (caron)</span>
+    (<span class="bn">0x300</span> <span class="fu">&lt;=</span> ord <span class="fu">&amp;&amp;</span> ord <span class="fu">&lt;=</span> <span class="bn">0x30b</span>) <span class="fu">||</span>
+    (<span class="bn">0x30d</span> <span class="fu">&lt;=</span> ord <span class="fu">&amp;&amp;</span> ord <span class="fu">&lt;=</span> <span class="bn">0x36f</span>)</code></pre></div>
+<p>Some accents are used for markup on Latin letters, but are an essential part of a Cyrillic letter. For example, <code>ĕ</code> should be the same as <code>e</code>, particularly in Latin-language entries. But <code>Й</code> should not become <code>И</code>, even though the combining character (U+306 COMBINING BREVE) is the same.</p>
+<p>To prevent Cyrillic vowels from being modified by this procedure, we re-compose them first.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">fixCyrillicVowels <span class="fu">=</span>
+  (replace <span class="st">&quot;Й&quot;</span> <span class="st">&quot;Й&quot;</span>) <span class="fu">.</span>
+  (replace <span class="st">&quot;й&quot;</span> <span class="st">&quot;й&quot;</span>) <span class="fu">.</span>
+  (replace <span class="st">&quot;Ё&quot;</span> <span class="st">&quot;Ё&quot;</span>) <span class="fu">.</span>
+  (replace <span class="st">&quot;ё&quot;</span> <span class="st">&quot;ё&quot;</span>)</code></pre></div>
+<p>We define “marks” to be notation that should always be removed, particularly those used in dictionary entries of Semitic languages.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">isMark ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isMark c <span class="fu">=</span>
+  <span class="kw">let</span> ord <span class="fu">=</span> fromEnum c <span class="kw">in</span>
+    <span class="co">-- Arabic combining marks</span>
+    (<span class="bn">0x64b</span> <span class="fu">&lt;=</span> ord <span class="fu">&amp;&amp;</span> ord <span class="fu">&lt;=</span> <span class="bn">0x65f</span>) <span class="fu">||</span>
+    <span class="co">-- Arabic tatweel and superscript alif</span>
+    ord <span class="fu">==</span> <span class="bn">0x640</span> <span class="fu">||</span> ord <span class="fu">==</span> <span class="bn">0x670</span> <span class="fu">||</span>
+    <span class="co">-- Hebrew marks</span>
+    (<span class="bn">0x591</span> <span class="fu">&lt;=</span> ord <span class="fu">&amp;&amp;</span> ord <span class="fu">&lt;=</span> <span class="bn">0x5bd</span>) <span class="fu">||</span>
+    (<span class="bn">0x5bf</span> <span class="fu">&lt;=</span> ord <span class="fu">&amp;&amp;</span> ord <span class="fu">&lt;=</span> <span class="bn">0x5c5</span>) <span class="fu">||</span>
+    ord <span class="fu">==</span> <span class="bn">0x5c7</span> <span class="fu">||</span>
+    <span class="co">-- Syriac marks</span>
+    (<span class="bn">0x730</span> <span class="fu">&lt;=</span> ord <span class="fu">&amp;&amp;</span> ord <span class="fu">&lt;=</span> <span class="bn">0x748</span>) <span class="fu">||</span>
+    <span class="co">-- Cyrillic kamora</span>
+    ord <span class="fu">==</span> <span class="bn">0x484</span>
+
+<span class="ot">filterMarks ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+filterMarks <span class="fu">=</span> filter (not <span class="fu">.</span> isMark)
+
+<span class="ot">replaceAlifWasla ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+replaceAlifWasla <span class="fu">=</span> replace <span class="st">&quot;ٱ&quot;</span> <span class="st">&quot;ا&quot;</span></code></pre></div>
+<p>Things we haven’t dealt with:</p>
+<ul>
+<li>Marks in Armenian, which seem to mostly be punctuation but there’s an “emphasis mark” that may affect entry names</li>
+<li>Northern Sami apostrophes between double consonants</li>
+<li>Thai hyphens</li>
+<li>Kurdish apostrophe normalization</li>
+</ul>
+<h1 id="data.languagetype-gives-language-codes-their-own-type"><code>Data.LanguageType</code>: gives language codes their own type</h1>
+<p>This module defines a Language type that we can keep separate from other strings. A Language contains nothing but a Text of its language code, such as “en”, but it’s a different type.</p>
+<p>This makes our type signatures clearer, and it’s implemented with <code>newtype</code>, so it should have no run-time cost.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings, NoImplicitPrelude #-}</span>
+<span class="kw">module</span> <span class="dt">Data.LanguageType</span> (<span class="dt">Language</span>, fromLanguage, toLanguage) <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">ClassyPrelude</span>
+<span class="kw">import </span><span class="dt">Data.Aeson</span> (<span class="dt">ToJSON</span>, toJSON)</code></pre></div>
+<p>We define Language as a type containing nothing but a Text. A Language can be displayed to the console and compared to other Languages in the obvious ways that we can just ask Haskell to derive.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">newtype</span> <span class="dt">Language</span> <span class="fu">=</span> <span class="dt">Language</span> <span class="dt">Text</span> <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>, <span class="dt">Ord</span>)</code></pre></div>
+<p><code>fromLanguage</code> and <code>toLanguage</code> convert between Languages and Texts.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">fromLanguage ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+fromLanguage (<span class="dt">Language</span> code) <span class="fu">=</span> code
+
+<span class="ot">toLanguage ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Language</span>
+toLanguage code <span class="fu">=</span> <span class="dt">Language</span> code</code></pre></div>
+<p>A string literal can represent a Language when type inference requires it.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">IsString</span> <span class="dt">Language</span> <span class="kw">where</span>
+  fromString <span class="fu">=</span> toLanguage <span class="fu">.</span> pack</code></pre></div>
+<p>A Language looks just like a string when you encode it to JSON.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">ToJSON</span> <span class="dt">Language</span> <span class="kw">where</span>
+  toJSON <span class="fu">=</span> toJSON <span class="fu">.</span> fromLanguage</code></pre></div>
+<h1 id="data.languagenames-convert-between-language-codes-and-language-names"><code>Data.LanguageNames</code>: convert between language codes and language names</h1>
+<p>One of the particularly difficult things about dealing with Wiktionary is that information in different languages is often distinguished by the human-readable name of the language, instead of by a language code.</p>
+<p>This is largely for historical reasons, because many entries were written before the many languages of Wiktionary were organized by a tangle of templates and Lua code, so the problem is worse on Wiktionaries with more history (English and German).</p>
+<p>An entry defining a French word in English, for example, may be listed as being in “French”; the same entry in German may be listed as being in “Französisch”; and that entry in Japanese may sensibly be listed as being in <code>{{fr}}</code>, which shows up as “フランス語” on the page. We want to be able to recognize all of these as the language code <code>fr</code>.</p>
+<p>This is a small part of what the Python module <code>langcodes</code> does, reimplemented in Haskell. In fact, it gets most of its information from a file that’s generated by a Python script that uses <code>langcodes</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings, NoImplicitPrelude #-}</span>
+
+<span class="kw">module</span> <span class="dt">Data.LanguageNames</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span></code></pre></div>
+<p>Most of the language names we need appear in <code>Data.LanguageNamesData</code>, the module that the Python script described above generates.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.LanguageNamesData</span> (languageData)</code></pre></div>
+<p>Given that information, we define <code>lookupLanguage</code>, whose first argument is the language to look up language names in, and whose second argument is the name to look up. We define a number of special cases that don’t appear in LanguageNamesData, then delegate the rest to LanguageNamesData.</p>
+<p>The English and German Wiktionaries use some names that are not quite the name that langcodes expects:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">lookupLanguage ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Language</span>
+lookupLanguage <span class="st">&quot;en&quot;</span> <span class="st">&quot;Rapanui&quot;</span> <span class="fu">=</span> <span class="st">&quot;rap&quot;</span>
+lookupLanguage <span class="st">&quot;en&quot;</span> <span class="st">&quot;Tok Pisin&quot;</span> <span class="fu">=</span> <span class="st">&quot;tpi&quot;</span>
+lookupLanguage <span class="st">&quot;en&quot;</span> <span class="st">&quot;Bokmål&quot;</span> <span class="fu">=</span> <span class="st">&quot;nb&quot;</span>
+lookupLanguage <span class="st">&quot;de&quot;</span> <span class="st">&quot;International&quot;</span> <span class="fu">=</span> <span class="st">&quot;mul&quot;</span></code></pre></div>
+<p>The French Wiktionary uses language codes for most purposes, but occasionally there will be a link referring directly to a section of a page by spelling the language name out in French. We need to be able to recognize those.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;Français&quot;</span> <span class="fu">=</span> <span class="st">&quot;fr&quot;</span>
+lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;Anglais&quot;</span> <span class="fu">=</span> <span class="st">&quot;en&quot;</span>
+lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;Italian&quot;</span> <span class="fu">=</span> <span class="st">&quot;it&quot;</span>
+lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;Italien&quot;</span> <span class="fu">=</span> <span class="st">&quot;it&quot;</span>
+lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;Allemand&quot;</span> <span class="fu">=</span> <span class="st">&quot;de&quot;</span>
+lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;Espagnol&quot;</span> <span class="fu">=</span> <span class="st">&quot;es&quot;</span></code></pre></div>
+<p>When defining multilingual conventions, the French Wiktionary uses the template <code>{{conv}}</code>, where it would normally use a language code template such as <code>{{en}}</code>. We want to consider this to be the same as the language code <code>mul</code>, for “Multilingual” or “Multiple languages”.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">lookupLanguage <span class="st">&quot;fr&quot;</span> <span class="st">&quot;conv&quot;</span> <span class="fu">=</span> <span class="st">&quot;mul&quot;</span></code></pre></div>
+<p>In other cases where a language is expected on the French Wiktionary, it will just be defined by its standard language code.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">lookupLanguage <span class="st">&quot;fr&quot;</span> code <span class="fu">=</span> toLanguage code</code></pre></div>
+<p>Any language we haven’t named so far gets looked up in the <code>languageMap</code> that is derived from LanguageNamesData.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">lookupLanguage lang name <span class="fu">=</span> findWithDefault <span class="st">&quot;und&quot;</span> (lang, name) languageMap</code></pre></div>
+<p>Why doesn’t LanguageNamesData define the map itself, as a big literal? Well, this is tragic, but the Haskell compiler is not good at handling big, structured literals at all. In fact, what I ended up doing to make this not take 10 minutes to compile was to make LanguageNamesData define nothing but an enormous <em>string</em> of comma-separated values, which we parse into the <code>languageMap</code> at runtime.</p>
+<p>We read the CSV string by applying <code>entryTuple</code> to each line:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">languageMap ::</span> <span class="dt">Map</span> (<span class="dt">Language</span>, <span class="dt">Text</span>) <span class="dt">Language</span>
+languageMap <span class="fu">=</span> mapFromList (map entryTuple (lines languageDataText))</code></pre></div>
+<p><code>entryTuple</code> needs to give a (Language, Text) key and a (Language) value for each line, which we extract from the three fields of the CSV.</p>
+<p>We tell this function that its input is a Text, even though it’s actually a crappy old String. The <code>OverloadedStrings</code> language extension will convert it to a Text automatically so it fits the type signature.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">entryTuple ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> ((<span class="dt">Language</span>, <span class="dt">Text</span>), <span class="dt">Language</span>)
+entryTuple line <span class="fu">=</span>
+  <span class="kw">let</span> entry <span class="fu">=</span> splitSeq <span class="st">&quot;,&quot;</span> line
+      <span class="dt">Just</span> lang <span class="fu">=</span> index entry <span class="dv">0</span>
+      <span class="dt">Just</span> name <span class="fu">=</span> index entry <span class="dv">1</span>
+      <span class="dt">Just</span> code <span class="fu">=</span> index entry <span class="dv">2</span>
+  <span class="kw">in</span> ((toLanguage lang, name), toLanguage code)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">languageDataText ::</span> <span class="dt">Text</span>
+languageDataText <span class="fu">=</span> pack languageData</code></pre></div>
+<h2 id="a-note-on-indexing">A note on indexing</h2>
+<p><code>index</code>, used above, is the Classy Prelude’s replacement for <code>!!</code>, the index operator, which is the worst idea in Haskell. If you index something out of bounds, <code>!!</code> crashes the program at runtime, making it a terrible default.</p>
+<p><code>index seq i</code> returns a <code>Maybe</code> value, which is either <code>Just</code> the <code>i</code>th element of <code>seq</code>, or <code>Nothing</code> if it was out of bounds. Of course, we’re confident enough that we’re indexing in bounds here that we immediately pattern-match it against <code>Just x</code>… which would crash the program with an undefined match result if it got <code>Nothing</code>.</p>
+<p>But at least we <em>chose</em> to do it this way, and we let the type system know what we’re doing.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}</span></code></pre></div>
+<h1 id="text.mediawiki.xml-extracting-wiki-pages-from-xml-dumps"><code>Text.MediaWiki.XML</code>: extracting Wiki pages from XML dumps</h1>
+<p>Parsing MediaWiki involves a stack of syntaxes nested inside each other:</p>
+<ol type="1">
+<li>XML</li>
+<li>HTML tags, entities, and comments</li>
+<li>The section structure of a Wiki page</li>
+<li>Wiki formatting, such as <code>[[links]]</code> and <code>{{templates}}</code></li>
+</ol>
+<p>The purpose of this module is to extract the page contents from a MediaWiki XML dump, and send the resulting contents on to <code>Text.MediaWiki.HTML</code>, the next step of parsing.</p>
+<p>As a reference, this is what a page of a MediaWiki XML dump looks like:</p>
+<div class="sourceCode"><pre class="sourceCode xml"><code class="sourceCode xml">  <span class="kw">&lt;page&gt;</span>
+    <span class="kw">&lt;title&gt;</span>Albedo<span class="kw">&lt;/title&gt;</span>
+    <span class="kw">&lt;ns&gt;</span>0<span class="kw">&lt;/ns&gt;</span>
+    <span class="kw">&lt;id&gt;</span>39<span class="kw">&lt;/id&gt;</span>
+    <span class="kw">&lt;revision&gt;</span>
+      [... lots of metadata tags ...]
+      <span class="kw">&lt;text</span><span class="ot"> xml:space=</span><span class="st">&quot;preserve&quot;</span><span class="kw">&gt;</span>{{Other uses}}
+        {{Use dmy dates|date=June 2013}}
+        [[File:Albedo-e hg.svg|thumb|Percentage of diffusely reflected sunlight in relation to various surface conditions]]
+
+        &#39;&#39;&#39;Albedo&#39;&#39;&#39; ({{IPAc-en|æ|l|ˈ|b|iː|d|oʊ}}) is the <span class="dv">&amp;quot;</span>whiteness<span class="dv">&amp;quot;</span> of a surface. It is a &#39;&#39;&#39;reflection coefficient&#39;&#39;&#39;, and has a value of less than one.
+        [... rest of article text ...]
+      <span class="kw">&lt;/text&gt;</span>
+    <span class="kw">&lt;/revision&gt;</span>
+  <span class="kw">&lt;/page&gt;</span></code></pre></div>
+<p>The elements we care about within a <code>&lt;page&gt;</code> are <code>&lt;ns&gt;</code> (the <em>namespace</em>), <code>&lt;title&gt;</code>, <code>&lt;text&gt;</code>, and <code>&lt;redirect&gt;</code> if it exists.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Text.MediaWiki.XML</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span></code></pre></div>
+<p>We use Expat SAX for streaming XML decoding:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import qualified</span> <span class="dt">Text.XML.Expat.SAX</span> <span class="kw">as</span> <span class="dt">SAX</span></code></pre></div>
+<p>The output will be sent onward to the HTML parser:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Text.MediaWiki.HTML</span> (extractWikiTextFromHTML)</code></pre></div>
+<h2 id="data-structures">Data structures</h2>
+<p>When we extract sub-tags of the page, we’ll represent them as an association list from ByteStrings to ByteStrings. (An association list, which is just a list of pairs, will work fine as a mapping here because the mapping is small: it will only ever contain 4 elements.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">ByteStringAssoc</span> <span class="fu">=</span> [(<span class="dt">ByteString</span>, <span class="dt">ByteString</span>)]</code></pre></div>
+<p><code>lookup key aList</code> is a standard function that finds the item in an association list whose first part is <code>key</code>, and returns <code>Just</code> the item’s second part (its value).</p>
+<p>Most of the elements we’re looking for are present on every article in the XML dump, so we define <code>justLookup</code> here, which gets the unwrapped value. It unwraps <code>Just x</code> into <code>x</code> by using <code>fromMaybe</code> with an error as the default case.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">justLookup ::</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">ByteStringAssoc</span> <span class="ot">-&gt;</span> <span class="dt">ByteString</span>
+justLookup key aList <span class="fu">=</span> fromMaybe (error (<span class="st">&quot;Missing tag: &quot;</span> <span class="fu">++</span> (show key))) (lookup key aList)</code></pre></div>
+<p>Once we’ve found the subtags, then we’ll wrap them up as a record called <code>WikiPage</code>, making sure to decode the values appropriately.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">WikiPage</span> <span class="fu">=</span> <span class="dt">WikiPage</span> {
+<span class="ot">  pageNamespace ::</span> <span class="dt">Text</span>,
+<span class="ot">  pageTitle ::</span> <span class="dt">Text</span>,
+<span class="ot">  pageText ::</span> <span class="dt">Text</span>,
+<span class="ot">  pageRedirect ::</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+} <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>)</code></pre></div>
+<p>There’s one tag that is not always present, which is <code>redirect</code>, so we don’t use <code>justLookup</code> on that tag. Instead, we get its value as a <code>Maybe ByteString</code>, then decode it into a <code>Maybe Text</code>.</p>
+<p>Did you know that <code>Maybe</code> is a monad? The “sequence of things you can do” is perhaps not as obvious as it is with IO, but the idea is that you can string together operations that take unwrapped values and produce <code>Maybe</code> values, and if any of them ever produces <code>Nothing</code>, the result of the whole chain of computation is <code>Nothing</code>.</p>
+<p>Something we can do with monads besides sequence things together is to apply a normal-looking function to the value that’s wrapped by the monad. That’s what the “lift” operator does, which is typically spelled <code>&lt;$&gt;</code> (even in other functional programming languages). We’ll use it here to <code>decodeUtf8</code> the value inside the <code>Maybe</code>, or if the value is <code>Nothing</code>, leave it that way.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">makeWikiPage ::</span> <span class="dt">ByteStringAssoc</span> <span class="ot">-&gt;</span> <span class="dt">WikiPage</span>
+makeWikiPage subtags <span class="fu">=</span> <span class="dt">WikiPage</span> {
+   pageNamespace <span class="fu">=</span> decodeUtf8 (justLookup <span class="st">&quot;ns&quot;</span> subtags),
+   pageTitle <span class="fu">=</span> decodeUtf8 (justLookup <span class="st">&quot;title&quot;</span> subtags),
+   pageText <span class="fu">=</span> extractWikiTextFromHTML (justLookup <span class="st">&quot;text&quot;</span> subtags),
+   pageRedirect <span class="fu">=</span> decodeUtf8 <span class="fu">&lt;$&gt;</span> lookup <span class="st">&quot;redirect&quot;</span> subtags
+}</code></pre></div>
+<p>To restate what the above does: <code>makeWikiPage</code> takes in the association list of XML tags we found. It runs the page text through <code>extractWikiTextFromHTML</code> and decodes the other values as UTF-8 plain text. It returns all these decoded values in a <code>WikiPage</code> record.</p>
+<h2 id="sax-events">SAX events</h2>
+<p>SAX, the Streaming API for XML, is a form of XML parser that isn’t given a tree of tags, just a sequence of events such as the beginnings and ends of tags. Using a SAX parser requires implementing handlers for each of these events, keeping track of whatever state is necessary.</p>
+<p>To find the appropriate tags in Wikipedia’s XML dump, we’re going to run such a state machine, which reacts to SAX events and turns them into WikiPages.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">findPageTags <span class="fu">=</span> handleEventStream [] []</code></pre></div>
+<p>The state of <code>handleEventStream</code> is contained in its first two arguments. The first is a ByteStringAssoc of the relevant tags we’ve found for the current article, and the second is the text of the current tag, which we also have to build up statefully because it could arrive in chunks instead of all at once.</p>
+<p>So the arguments are three lazy lists:</p>
+<ol type="1">
+<li>Tags we haven’t put into WikiPages yet (<code>subtags</code>)</li>
+<li>Text we haven’t put into tags yet (<code>chunks</code>)</li>
+<li>SAX events we have left to handle</li>
+</ol>
+<p>and the output is a lazy list of WikiPages we get when we handle those events.</p>
+<p>This is a good example of what lazy lists are for, because it means we can start getting results and passing them on to another function before we’re done parsing all of the XML. (I would also gladly use imperative code for this, but that’s not a good option here in Haskell-land.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleEventStream ::</span> <span class="dt">ByteStringAssoc</span> <span class="ot">-&gt;</span> [<span class="dt">ByteString</span>] <span class="ot">-&gt;</span> [<span class="dt">SAX.SAXEvent</span> <span class="dt">ByteString</span> <span class="dt">ByteString</span>] <span class="ot">-&gt;</span> [<span class="dt">WikiPage</span>]</code></pre></div>
+<p>If there are no SAX events, there are no WikiPages. This is the base case we encounter at the end of the stream.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks [] <span class="fu">=</span> []</code></pre></div>
+<p>If the next event is a StartElement for the <code>&lt;page&gt;</code> tag, clear the accumulated tags and text (there might be some that came from miscellaneous elements before the first page), and continue parsing.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.StartElement</span> <span class="st">&quot;page&quot;</span> attrs)<span class="fu">:</span>rest) <span class="fu">=</span> handleEventStream [] [] rest</code></pre></div>
+<p>If the next event is a <code>&lt;redirect&gt;</code> tag, extract the title from its attributes, and add <code>(&quot;redirect&quot;, title)</code> to the list of pending tags.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.StartElement</span> <span class="st">&quot;redirect&quot;</span> attrs)<span class="fu">:</span>rest) <span class="fu">=</span>
+  <span class="kw">let</span> title <span class="fu">=</span> justLookup <span class="st">&quot;title&quot;</span> attrs
+  <span class="kw">in</span> handleEventStream ((<span class="st">&quot;redirect&quot;</span>,title)<span class="fu">:</span>subtags) [] rest</code></pre></div>
+<p>If the next event is some other opening tag, clear the pending text.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.StartElement</span> elt attrs)<span class="fu">:</span>rest) <span class="fu">=</span> handleEventStream subtags [] rest</code></pre></div>
+<p>If the next event is the EndElement representing <code>&lt;/page&gt;</code>, pass our accumulated subtags to <code>makeWikiPage</code>. The resulting WikiPage will be the next result in our output list. Results after that, of course, are whatever we find when we handle the rest of the events. We clear out the <code>subtags</code> and <code>chunks</code> we got for this page, because we’re done with them now.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.EndElement</span> <span class="st">&quot;page&quot;</span>)<span class="fu">:</span>rest) <span class="fu">=</span> ((makeWikiPage subtags)<span class="fu">:</span>(handleEventStream [] [] rest))</code></pre></div>
+<p>If the next event is CharacterData, we take the chunk of bytes it contains and cons it onto our <code>chunks</code> list (that means inserting it at the front of a linked list).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.CharacterData</span> t)<span class="fu">:</span>rest) <span class="fu">=</span> handleEventStream subtags (t<span class="fu">:</span>chunks) rest</code></pre></div>
+<p>If the next event is an EndElement but not the end of a page, we put the element name we saw and its text into our list of subtags. The text arrived in chunks that we consed together into a linked list, so they’re backwards. We reverse the order of the list, and then using the fact that ByteString is a Monoid, we <code>mconcat</code> them into a single ByteString.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.EndElement</span> elt)<span class="fu">:</span>rest) <span class="fu">=</span> handleEventStream ((elt, mconcat (reverse chunks))<span class="fu">:</span>subtags) [] rest</code></pre></div>
+<p>If the next event is an XML parse error, well, raise an error.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks ((<span class="dt">SAX.FailDocument</span> (<span class="dt">SAX.XMLParseError</span> err loc))<span class="fu">:</span>rest) <span class="fu">=</span>
+  error (<span class="st">&quot;XML parse error: &quot;</span> <span class="fu">++</span> err <span class="fu">++</span> <span class="st">&quot; at &quot;</span> <span class="fu">++</span> (show loc))</code></pre></div>
+<p>That should be all the cases. If an XML element we weren’t expecting appears, raise an error.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">handleEventStream subtags chunks (misc<span class="fu">:</span>rest) <span class="fu">=</span> error (<span class="st">&quot;Can&#39;t handle element: &quot;</span> <span class="fu">++</span> show misc)</code></pre></div>
+<h2 id="the-whole-xml-parsing-process">The whole XML-parsing process</h2>
+<p>We have a stream of XML data coming from somewhere. We scan through it, extracting <code>WikiPage</code> records. We pass those records on to a <code>sink</code> that says what to do with them, which is not decided by this module.</p>
+<p><code>processMediaWikiContent</code> is the key function here. Its input is a lazy ByteString (<code>LByteString</code>), which means that we can get bytes from the front of it without having to read the whole thing first.</p>
+<p>The result of <code>SAX.parse</code> is a lazy list of <code>SAXEvents</code>, which we scan through and turn into <code>WikiPage</code> records using the SAX handlers defined above, particularly <code>findPageTags</code>.</p>
+<p>The <code>sink</code> is a function that takes our <code>WikiPage</code> records and does something with them that will go to stdout (whose type is <code>IO ()</code>). The result of this whole function is that a bunch of things happen to stdout, so its return type is also <code>IO ()</code>.</p>
+<p>We’re not defining a <code>sink</code> here. The sink is different depending on what data you’re working with and what you’re intending to do with it, and that’s for the top-level program to decide.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">processMediaWikiContent ::</span> <span class="dt">LByteString</span> <span class="ot">-&gt;</span> (<span class="dt">WikiPage</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+processMediaWikiContent content sink <span class="fu">=</span> <span class="kw">do</span>
+  <span class="kw">let</span> events <span class="fu">=</span> SAX.parse SAX.defaultParseOptions content
+  mapM_ sink (findPageTags events)</code></pre></div>
+<p>Finally, we define where this XML stream is coming from. It’s coming from an open file handle, specifically stdin, because the data is being piped into this program straight out of <code>bunzip2</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">processMediaWikiStream ::</span> <span class="dt">Handle</span> <span class="ot">-&gt;</span> (<span class="dt">WikiPage</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+processMediaWikiStream source sink <span class="fu">=</span> <span class="kw">do</span>
+  content <span class="ot">&lt;-</span> hGetContents source
+  processMediaWikiContent content sink
+
+processMediaWikiStdin <span class="fu">=</span> processMediaWikiStream stdin</code></pre></div>
+<h1 id="text.mediawiki.html-removing-html-from-wikitext"><code>Text.MediaWiki.HTML</code>: removing HTML from Wikitext</h1>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}</span></code></pre></div>
+<p>After parsing the XML of a MediaWiki entry, the result then needs to be decoded as (potentially very sloppy) HTML, the contents of which are Wikitext. This module is responsible for handling the HTML and converting it into a string of Wikitext without HTML tags.</p>
+<p>Here is an example snippet of Wikitext that includes HTML:</p>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">  Albedo <span class="kw">&lt;math&gt;</span>{\alpha}<span class="kw">&lt;/math&gt;</span> can then be given as:
+
+  :<span class="kw">&lt;math&gt;</span>{\alpha}= (1-D) \bar \alpha(\theta_i) + D \bar{ \bar \alpha}.<span class="kw">&lt;/math&gt;</span>
+
+  [[Directional-hemispherical reflectance]] is sometimes referred to as
+  <span class="kw">&lt;em&gt;</span>black-sky albedo<span class="kw">&lt;/em&gt;</span> and [[bi-hemispherical reflectance]] as
+  <span class="kw">&lt;em&gt;</span>white-sky albedo<span class="kw">&lt;/em&gt;</span>.  These terms are important because they allow the
+  albedo to be calculated for any given illumination conditions from a
+  knowledge of the intrinsic properties of the surface.<span class="kw">&lt;ref</span>
+<span class="ot">  name=</span><span class="st">&quot;BlueskyAlbedo&quot;</span><span class="kw">/&gt;</span></code></pre></div>
+<p>We want to remove the tags, leaving just the text. In the case of the <code>&lt;math&gt;</code> tag, we want to remove its text content as well, so we don’t end up with LaTeX in our output. The desired output is this string of Wikitext:</p>
+<pre><code>  Albedo  can then be given as:
+
+  :
+
+  [[Directional-hemispherical reflectance]] is sometimes referred to as
+  black-sky albedo and [[bi-hemispherical reflectance]] as white-sky albedo.
+  These terms are important because they allow the albedo to be calculated for
+  any given illumination conditions from a knowledge of the intrinsic
+  properties of the surface.</code></pre>
+<h2 id="handling-html-with-tagsoup">Handling HTML with TagSoup</h2>
+<p>We import a bunch of stuff from the <code>TagSoup</code> library. In particular, we import <code>parseTags</code> from its <code>Fast.Utf8Only</code> variant, because our input is UTF-8 only and we like being fast.</p>
+<p>TagSoup’s <code>parseTags</code> takes in HTML and returns a lazy list of tag-related events, making it much like SAX for XML.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Text.MediaWiki.HTML</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span>
+<span class="kw">import </span><span class="dt">Text.HTML.TagSoup</span> <span class="kw">hiding</span> (parseTags, renderTags)
+<span class="kw">import </span><span class="dt">Text.HTML.TagSoup.Fast.Utf8Only</span></code></pre></div>
+<p>We have a ByteString of HTML. We’re going to leave it as a ByteString for a while, because <code>TagSoup.Fast.Utf8Only</code> works on ByteStrings of UTF-8.</p>
+<p>We run <code>parseTags</code> on the HTML to get a list of tag events, then run our function <code>extractFromTags</code>, which will give us the text contained within the tags as ByteString values. We concatenate those ByteStrings together, and finally decode the result into Text at the end.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractWikiTextFromHTML ::</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+extractWikiTextFromHTML <span class="fu">=</span> decodeUtf8 <span class="fu">.</span> mconcat <span class="fu">.</span> extractFromTags <span class="fu">.</span> parseTags</code></pre></div>
+<p>The <code>Tag</code> type is an enumeration of possible tag events: <code>TagOpen</code>, <code>TagClose</code>, <code>TagText</code>, and possibly other events we don’t care about. <code>extractFromTags</code> handles these different cases with different implementations.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractFromTags ::</span> [<span class="dt">Tag</span> <span class="dt">ByteString</span>] <span class="ot">-&gt;</span> [<span class="dt">ByteString</span>]</code></pre></div>
+<p>Our main goal is to ignore tags and get at the text. When we see a <code>TagOpen</code>, we don’t pay much attention to it. But there are some tags we want to ignore extra hard, identified by the <code>skippedSpan</code> function. More on that below.</p>
+<p>We avoid skipping in a particular case where the HTML was misparsed, identified by <code>(slashedAttrs attrs)</code>, because typically this would just consume the rest of the page looking for a closing tag that won’t exist.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">extractFromTags ((<span class="dt">TagOpen</span> tag attrs)<span class="fu">:</span>rest) <span class="fu">=</span>
+  <span class="kw">if</span> (skippedSpan tag <span class="fu">&amp;&amp;</span> not (slashedAttrs attrs))
+    <span class="kw">then</span> skipUntilClose tag rest
+    <span class="kw">else</span> extractFromTags rest</code></pre></div>
+<p>When we encounter <code>TagText</code>, we cons its content onto our output list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">extractFromTags ((<span class="dt">TagText</span> text)<span class="fu">:</span>rest) <span class="fu">=</span> text<span class="fu">:</span>(extractFromTags rest)</code></pre></div>
+<p>When we encounter any other event, we ignore it.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">extractFromTags (_<span class="fu">:</span>rest) <span class="fu">=</span> extractFromTags rest</code></pre></div>
+<p>When there are no tags remaining, there is nothing left to extract.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">extractFromTags [] <span class="fu">=</span> []</code></pre></div>
+<h2 id="skipping-obnoxious-tags">Skipping obnoxious tags</h2>
+<p>There are some tags we’ll want to skip entirely, not trying to extract any text from their contents. The <code>&lt;code&gt;</code> tag is a straightforward example. Some of these tags are made up by MediaWiki, instead of being typical HTML tags.</p>
+<p>When we see one of these tags, we go into a different recursive method, <code>skipUntilClose</code>, that doesn’t extract any text. It just barrels through the events, throwing most of them out, until it encounters the corresponding closing tag, at which point it returns control to <code>extractFromTags</code>.</p>
+<p>This would give slightly erroneous results if these tags were ever nested recursively, because we only keep track of a single closing tag we’re looking for, not a stack. There is never a reason to nest these tags within themselves, though, and doing so would probably confuse MediaWiki as much as it confuses us.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">skippedSpan ::</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+skippedSpan tag <span class="fu">=</span> tag <span class="fu">==</span> <span class="st">&quot;math&quot;</span> <span class="fu">||</span> tag <span class="fu">==</span> <span class="st">&quot;code&quot;</span> <span class="fu">||</span> tag <span class="fu">==</span> <span class="st">&quot;ref&quot;</span> <span class="fu">||</span>
+                  tag <span class="fu">==</span> <span class="st">&quot;gallery&quot;</span> <span class="fu">||</span> tag <span class="fu">==</span> <span class="st">&quot;hiero&quot;</span> <span class="fu">||</span> tag <span class="fu">==</span> <span class="st">&quot;timeline&quot;</span>
+
+<span class="ot">skipUntilClose ::</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> [<span class="dt">Tag</span> <span class="dt">ByteString</span>] <span class="ot">-&gt;</span> [<span class="dt">ByteString</span>]
+skipUntilClose target ((<span class="dt">TagClose</span> tag)<span class="fu">:</span>rest) <span class="fu">=</span>
+  <span class="kw">if</span> tag <span class="fu">==</span> target
+    <span class="kw">then</span> extractFromTags rest
+    <span class="kw">else</span> skipUntilClose target rest
+skipUntilClose target (_<span class="fu">:</span>rest) <span class="fu">=</span> skipUntilClose target rest
+skipUntilClose target [] <span class="fu">=</span> []</code></pre></div>
+<p>Self-closing tags, like <code>&lt;ref name=&quot;reference&quot; /&gt;</code>, are a bit weird. They are intended to show up as a <code>TagOpen</code> immediately followed by a <code>TagClose</code>, which <code>skipUntilClose</code> would handle perfectly well. However, MediaWiki and TagSoup disagree on whether the self-closing slash needs a space before it. If the space isn’t there, the tag may end up parsed as an opening tag with one of its attribute names ending in <code>/</code>, and that would make <code>skipUntilClose</code> skip the rest of the entire page.</p>
+<p><code>slashedAttrs</code> identifies when that has happened and lets us just ignore the tag.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">slashedAttrs ::</span> [(<span class="dt">ByteString</span>,<span class="dt">ByteString</span>)] <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+slashedAttrs ((name,value)<span class="fu">:</span>rest) <span class="fu">=</span> slashed name <span class="fu">||</span> slashed value <span class="fu">||</span> slashedAttrs rest
+slashedAttrs [] <span class="fu">=</span> <span class="dt">False</span>
+slashed <span class="fu">=</span> isSuffixOf <span class="st">&quot;/&quot;</span></code></pre></div>
+<h1 id="text.mediawiki.sections-separating-the-sections-of-a-wiki-page"><code>Text.MediaWiki.Sections</code>: separating the sections of a Wiki page</h1>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax #-}</span></code></pre></div>
+<p>In an ideal world, this parsing step wouldn’t be necessary. Wikitext headings would just be markup that we could parse along with the rest of the page.</p>
+<p>But here we are, reimplementing a monstrous PHP parser that’s defined by its behavior in Haskell. This is <em>clearly</em> not an ideal world.</p>
+<p>We parse sections in this separate step for two reasons:</p>
+<ul>
+<li><p>Wikitext constructs can have very different meanings depending on what section they appear in. On Wiktionary, for example, a numbered list could mean lots of things, but if it’s in a level-3 or level-4 section named with a part of speech, it’s the list of definitions of the word.</p></li>
+<li><p>If something goes wrong in parsing Wikitext, dividing the page into sections can put the brakes on it. Instead of failing to parse the rest of the page, we recover at the start of the next section.</p></li>
+</ul>
+<p>We’ll be parsing sections using a Parsec parser that consumes a line at a time. (Not Attoparsec, which we’ll be using for the more detailed parsing of Wikitext – in this case we need Parsec’s flexibility about what data structure its input is made of).</p>
+<p>Parsec builds parsing rules out of Haskell functions (combinators). One of these combinators is called <code>many</code>. Unfortunately, that’s also the name of a function in the Classy Prelude. We need Parsec’s version of <code>many</code> so we hide the one we got via WikiPrelude.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Text.MediaWiki.Sections</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span> <span class="kw">hiding</span> (many)
+<span class="kw">import </span><span class="dt">Text.Parsec.Pos</span>
+<span class="kw">import </span><span class="dt">Text.Parsec.Prim</span>
+<span class="kw">import </span><span class="dt">Text.Parsec.Combinator</span>
+<span class="kw">import </span><span class="dt">Text.Parsec.Error</span></code></pre></div>
+<h2 id="data-structures-1">Data structures</h2>
+<p>First we break the text into lines. Then we group these lines into individual sections with their headings. Finally, we step through the sections, converting them into contextualized WikiSection objects that know about their entire stack of headings.</p>
+<p>Here we define the data structures representing the outputs of these various steps.</p>
+<p>A <code>TextLine</code> is either a <code>Heading</code> or <code>Plain</code>. If it’s a <code>Heading</code>, it contains a number indicating its level, along with its title text. The heading <code>== Example ==</code> would become <code>(Heading 2 &quot;Example&quot;)</code>.</p>
+<p>“<code>Plain Text</code>” makes a nice noun phrase, but remember that it’s just a similar construction to <code>Heading Int Text</code>. It just means that there’s a version of <code>TextLine</code> called <code>Plain</code>, whose single value has type <code>Text</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">TextLine</span> <span class="fu">=</span> <span class="dt">Heading</span> <span class="dt">Int</span> <span class="dt">Text</span> <span class="fu">|</span> <span class="dt">Plain</span> <span class="dt">Text</span> <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>)
+
+<span class="ot">isHeading ::</span> <span class="dt">TextLine</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isHeading (<span class="dt">Heading</span> _ _) <span class="fu">=</span> <span class="dt">True</span>
+isHeading _             <span class="fu">=</span> <span class="dt">False</span></code></pre></div>
+<p><code>getText</code> gets the text out of a TextLine.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getText ::</span> <span class="dt">TextLine</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+getText (<span class="dt">Plain</span> text) <span class="fu">=</span> text
+getText (<span class="dt">Heading</span> level text) <span class="fu">=</span> text</code></pre></div>
+<p>When we parse a section full of lines, we represent it as a <code>SingleSection</code> record, containing values for its level, the title of its heading, and the text of its content.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">SingleSection</span> <span class="fu">=</span> <span class="dt">SingleSection</span> {
+<span class="ot">  ssLevel ::</span> <span class="dt">Int</span>,
+<span class="ot">  ssHeading ::</span> <span class="dt">Text</span>,
+<span class="ot">  ssContent ::</span> <span class="dt">Text</span>
+} <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>)</code></pre></div>
+<p>A WikiSection is a SingleSection in context. It contains not just its own title, but the titles of all higher-level sections that contain it.</p>
+<p>It doesn’t need to keep track of its level as a number, because that’s just the length of the <code>headings</code> list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">WikiSection</span> <span class="fu">=</span> <span class="dt">WikiSection</span> {
+<span class="ot">  headings ::</span> [<span class="dt">Text</span>],
+<span class="ot">  content ::</span> <span class="dt">Text</span>
+} <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>)</code></pre></div>
+<h2 id="reading-lines">Reading lines</h2>
+<p>This is a kind of lexer for the section parser. We sort the lines of the page into two types: headings and non-headings.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">readLines ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">TextLine</span>]
+readLines text <span class="fu">=</span> map parseTextLine (lines text)</code></pre></div>
+<p>On some Wikimedia projects, the sections are separated by horizontal rules (I guess the section formatting wasn’t enough). This is semantically meaningless, so replace the rules (written as four or more dashes) with blank lines.</p>
+<p>We parse each line by trying to parse it as a heading, and keeping track of its <em>level</em>, the number of equals signs surrounding it. If we get level 0, it wasn’t a heading at all, it’s plain text. Either way, return the <code>TextLine</code> structure for what we found on the line.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">parseTextLine ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">TextLine</span>
+parseTextLine text <span class="fu">=</span>
+  <span class="kw">if</span> isPrefixOf <span class="st">&quot;----&quot;</span> text
+    <span class="kw">then</span> (<span class="dt">Plain</span> <span class="st">&quot;&quot;</span>)   <span class="co">-- remove horizontal rules</span>
+    <span class="kw">else</span>
+      <span class="kw">let</span> (innerText, level) <span class="fu">=</span> headingWithLevel (stripSpaces text)
+      <span class="kw">in</span>  (<span class="kw">if</span> level <span class="fu">==</span> <span class="dv">0</span> <span class="kw">then</span> (<span class="dt">Plain</span> text) <span class="kw">else</span> (<span class="dt">Heading</span> level (stripSpaces innerText)))</code></pre></div>
+<p><code>headingWithLevel</code> recursively removes equals signs from the left and right side of the line, returning the remaining text and the number of removed pairs of equals signs.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">headingWithLevel ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> (<span class="dt">Text</span>, <span class="dt">Int</span>)
+headingWithLevel text <span class="fu">=</span>
+  <span class="kw">case</span> trimEquals text <span class="kw">of</span>
+    <span class="dt">Just</span> trimmed <span class="ot">-&gt;</span>
+      <span class="kw">let</span> (finalText, innerLevel) <span class="fu">=</span> headingWithLevel trimmed <span class="kw">in</span>
+        (finalText, innerLevel <span class="fu">+</span> <span class="dv">1</span>)
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> (text, <span class="dv">0</span>)</code></pre></div>
+<p><code>trimEquals</code> takes in a text, and if it can trim an equals sign from each end, returns <code>Just</code> the trimmed result. Otherwise, it returns <code>Nothing</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">trimEquals ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+trimEquals text <span class="fu">=</span>
+  <span class="kw">case</span> stripPrefix <span class="st">&quot;=&quot;</span> text <span class="kw">of</span>
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Nothing</span>
+    <span class="dt">Just</span> x  <span class="ot">-&gt;</span> stripSuffix <span class="st">&quot;=&quot;</span> x</code></pre></div>
+<h2 id="a-line-by-line-parser">A line-by-line parser</h2>
+<p><code>Parsec</code> is a parsing monad with a lot of parameters:</p>
+<ul>
+<li>The first parameter is the data type that it takes as input.</li>
+<li>The second parameter is the type of the internal state it keeps while parsing.</li>
+<li>The third parameter is the type that the value of an expression should have when it parses successfully.</li>
+</ul>
+<p>The third parameter typically varies from one parsing expression to another, while the first two stay fixed, so a typical thing to do is to define a more specific type that fills in the first two parameters.</p>
+<p>In this case, a LineParser takes in a list of TextLines, and keeps no state.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">LineParser</span> <span class="fu">=</span> <span class="dt">Parsec</span> [<span class="dt">TextLine</span>] ()</code></pre></div>
+<p>Our parsing expressions will all be wrapped in this monad, because the monad keeps track of how to backtrack and try something else when a particular expression fails to parse. So if a function uses the <code>LineParser</code> monad and returns a <code>Text</code> value if the parse succeeds, its return type is <code>LineParser Text</code>.</p>
+<p>Usually, you’d build up a parser from parsing primitives that Parsec provides, such as matching literal strings or character classes. But none of those primitives are defined on [TextLine], a type we just made up. So we need to define our own primitive, which is a bit cumbersome.</p>
+<p>Defining a primitive requires defining three functions, two of which are only there for debugging:</p>
+<ul>
+<li><code>showLine</code>: how this value should be shown in debugging output</li>
+<li><code>nextPos</code>: how to keep track of the line and column number of the input</li>
+<li><code>test</code> (in this case <code>testLine</code>): actually decides whether something parses or not. Returns <code>Just value</code> if it parses, and <code>Nothing</code> if not.</li>
+</ul>
+<p>Our primitive, <code>matchLine</code>, takes in a predicate of type (TextLine -&gt; Bool), and successfully parses lines where that predicate returns <code>true</code>, returning the line as the value.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">matchLine ::</span> (<span class="dt">TextLine</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">LineParser</span> <span class="dt">TextLine</span>
+matchLine pred <span class="fu">=</span>
+  <span class="kw">let</span> showLine <span class="fu">=</span> show
+      nextPos pos x xs <span class="fu">=</span> updatePosLine pos x
+      testLine line <span class="fu">=</span> <span class="kw">if</span> pred line <span class="kw">then</span> <span class="dt">Just</span> line <span class="kw">else</span> <span class="dt">Nothing</span>
+  <span class="kw">in</span>  tokenPrim showLine nextPos testLine</code></pre></div>
+<p>Because we have to track line and column numbers, we just borrow a Parsec function named <code>incSourceLine</code> to increment the line number each time we parse a line. The column number is always 1.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">updatePosLine ::</span> <span class="dt">SourcePos</span> <span class="ot">-&gt;</span> <span class="dt">TextLine</span> <span class="ot">-&gt;</span> <span class="dt">SourcePos</span>
+updatePosLine pos _ <span class="fu">=</span> incSourceLine pos <span class="dv">1</span></code></pre></div>
+<p>Now we can use our primitive to define two parsing expressions. One matches plain text lines (returning their text), and the other matches headings (returning the <code>Heading</code> structure).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pPlainLine ::</span> <span class="dt">LineParser</span> <span class="dt">Text</span>
+pPlainLine <span class="fu">=</span> getText <span class="fu">&lt;$&gt;</span> matchLine (not <span class="fu">.</span> isHeading)
+
+<span class="ot">pHeadingLine ::</span> <span class="dt">LineParser</span> <span class="dt">TextLine</span>
+pHeadingLine <span class="fu">=</span> matchLine isHeading</code></pre></div>
+<h2 id="parsing-sections">Parsing sections</h2>
+<p>Okay. We’ve defined a parsing monad, <code>LineParser</code>, and some expressions that use it. Now we get to actually use Parsec to make things easier. This is the first parser being introduced, and the simplest, so I’ll explain it in detail.</p>
+<p><code>LineParser</code> is a monad, so we can use <code>do</code>-notation to describe a sequence of things to do with it. We get to write the sequence as if every step succeeds, and we get to use the monad assignment operator <code>&lt;-</code> to assign names to the <em>unwrapped</em> values that result from the successful parses.</p>
+<p>In short, we get to just describe the happy path. Any other path causes the result of the whole <code>do</code> expression to be a failed parse, which is exactly what we want.</p>
+<p><code>pSection</code> parses an entire section, returning a <code>SingleSection</code> value. It first parses the heading, then uses the <code>many</code> combinator to parse plain lines until it fails (because it reached another heading or the end of the page).</p>
+<p><code>many pPlainLine</code> returns a list of the lines that were parsed, which we can glue back together with the standard function <code>unlines</code>.</p>
+<p>In the end, we <code>return</code> the <code>SingleSection</code> value. Unlike in other programming languages, <code>return</code> doesn’t have anything to do with the flow of the program. It just means “wrap this value in the monad”.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pSection ::</span> <span class="dt">LineParser</span> <span class="dt">SingleSection</span>
+pSection <span class="fu">=</span> <span class="kw">do</span>
+  <span class="dt">Heading</span> level name <span class="ot">&lt;-</span> pHeadingLine
+  textLines <span class="ot">&lt;-</span> many pPlainLine
+  return (<span class="dt">SingleSection</span> { ssLevel <span class="fu">=</span> level, ssHeading <span class="fu">=</span> name, ssContent <span class="fu">=</span> unlines textLines })</code></pre></div>
+<h2 id="converting-sections">Converting sections</h2>
+<p>Here’s how we convert a list of SingleSections into a list of contextualized WikiSections.</p>
+<p><code>processSectionHeadings</code> is a recursive function that uses its first argument, of type <code>[Text]</code>, to track the current stack of headings.</p>
+<p>(Note: we’re keeping the stack in order from left to right, and altering the end of it. Probably the more functional-linked-listy thing to do would be to store the stack backwards, so we could alter the front of it with the operations that are most efficient on linked lists. Oh well.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">convertSections ::</span> [<span class="dt">SingleSection</span>] <span class="ot">-&gt;</span> [<span class="dt">WikiSection</span>]
+convertSections <span class="fu">=</span> processSectionHeadings []</code></pre></div>
+<p>Define the usual base case: if there are no sections left in the input, there are no sections left to return.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">processSectionHeadings ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> [<span class="dt">SingleSection</span>] <span class="ot">-&gt;</span> [<span class="dt">WikiSection</span>]
+processSectionHeadings headingStack [] <span class="fu">=</span> []</code></pre></div>
+<p>We split off the first section, <code>sec</code>, from the remaining input, and use <code>applyHeadings</code> to turn it into a WikiSection. We then recurse, with our <code>headingsStack</code> now being <code>sec</code>’s set of headings.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">processSectionHeadings headingStack (sec<span class="fu">:</span>rest) <span class="fu">=</span>
+  <span class="kw">let</span> sec&#39; <span class="fu">=</span> (applyHeadings headingStack sec)
+      heds <span class="fu">=</span> (headings sec&#39;)
+  <span class="kw">in</span>  (sec&#39;<span class="fu">:</span>(processSectionHeadings heds rest))</code></pre></div>
+<p><code>applyHeadings</code> takes in a previous stack of headings and a new section. When this section has a heading level of <em>n</em>, the new heading stack will be the existing <em>n - 1</em> headings above it, followed by the new heading.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">applyHeadings ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">SingleSection</span> <span class="ot">-&gt;</span> <span class="dt">WikiSection</span>
+applyHeadings headingStack sec <span class="fu">=</span>
+  <span class="kw">let</span> heds <span class="fu">=</span> (take ((ssLevel sec) <span class="fu">-</span> <span class="dv">1</span>) headingStack) <span class="fu">++</span> [ssHeading sec]
+  <span class="kw">in</span>  <span class="dt">WikiSection</span> { headings <span class="fu">=</span> heds, content <span class="fu">=</span> ssContent sec }</code></pre></div>
+<h2 id="parsing-the-whole-page">Parsing the whole page</h2>
+<p>It’s convenient for us if all text is in a section. The text that precedes any section headings is effectively in a level-1 section called “top”. Let’s just add the heading for it before we scan its lines.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">preparePage ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">TextLine</span>]
+preparePage text <span class="fu">=</span> readLines (<span class="st">&quot;=top=\n&quot;</span> ⊕ text)
+
+<span class="ot">pPage ::</span> <span class="dt">LineParser</span> [<span class="dt">WikiSection</span>]
+pPage <span class="fu">=</span> convertSections <span class="fu">&lt;$&gt;</span> many pSection
+
+<span class="ot">parsePageIntoSections ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WikiSection</span>]
+parsePageIntoSections text <span class="fu">=</span>
+  <span class="kw">case</span> (parse pPage <span class="st">&quot;&quot;</span> (preparePage text)) <span class="kw">of</span>
+    <span class="dt">Left</span> err       <span class="ot">-&gt;</span> []
+    <span class="dt">Right</span> sections <span class="ot">-&gt;</span> sections</code></pre></div>
+<h1 id="text.mediawiki.annotatedtext-a-data-type-for-slightly-marked-up-text"><code>Text.MediaWiki.AnnotatedText</code>: a data type for slightly-marked-up text</h1>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings #-}</span>
+<span class="kw">module</span> <span class="dt">Text.MediaWiki.AnnotatedText</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span></code></pre></div>
+<p>Text can be marked up with things such as internal links. During parsing, we will want to keep track of the annotations on text, without having to use a full-blown AST to represent which spans the annotations applied to.</p>
+<p>Annotations can represent MediaWiki links, which have a <code>namespace</code>, <code>page</code>, and <code>section</code>, or more complex relationships expressed by templates. We represent these using a Map.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Annotation</span> <span class="fu">=</span> <span class="dt">Map</span> <span class="dt">Text</span> <span class="dt">Text</span></code></pre></div>
+<p><code>annotationFromList</code> builds an Annotation, much like <code>mapFromList</code>, but also avoids putting unnecessary empty values into the map.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotationFromList ::</span> [(<span class="dt">Text</span>, <span class="dt">Text</span>)] <span class="ot">-&gt;</span> <span class="dt">Annotation</span>
+annotationFromList pairs <span class="fu">=</span> mapFromList (filter filterEmpty pairs)
+
+<span class="ot">filterEmpty ::</span> (<span class="dt">Text</span>, <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+filterEmpty (a, b) <span class="fu">=</span> b <span class="fu">/=</span> <span class="st">&quot;&quot;</span></code></pre></div>
+<p><code>makeLink</code> is a constant that can be used as a template for making Annotations for internal links.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">makeLink ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span>
+makeLink namespace page section <span class="fu">=</span> annotationFromList [
+  (<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;link&quot;</span>),
+  (<span class="st">&quot;namespace&quot;</span>, namespace),
+  (<span class="st">&quot;page&quot;</span>, page),
+  (<span class="st">&quot;section&quot;</span>, section)]</code></pre></div>
+<p>The simplifying assumption here is that, in a parse rule that produces annotations, the annotations apply to the entire span of text that was parsed. So what we need to keep track of in an AnnotatedText is one string (as a Text) and a list of Annotations for it.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">AnnotatedText</span> <span class="fu">=</span> <span class="dt">AnnotatedText</span> [<span class="dt">Annotation</span>] <span class="dt">Text</span> <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>)
+
+<span class="ot">annotate ::</span> [<span class="dt">Annotation</span>] <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+annotate annos t <span class="fu">=</span> <span class="dt">AnnotatedText</span> annos t</code></pre></div>
+<p>Some simple functions to extract values from AnnotatedText:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getAnnotations ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>]
+getAnnotations (<span class="dt">AnnotatedText</span> annos t) <span class="fu">=</span> annos
+
+<span class="ot">getText ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+getText (<span class="dt">AnnotatedText</span> annos t) <span class="fu">=</span> t</code></pre></div>
+<p>We convert plain Text into AnnotatedText by annotating it with nothing. The same goes for a plain ByteString, except we have to decode it from UTF-8 first.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotFromText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+annotFromText <span class="fu">=</span> annotate []
+
+<span class="ot">annotFromBytes ::</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+annotFromBytes <span class="fu">=</span> annotFromText <span class="fu">.</span> decodeUtf8</code></pre></div>
+<p><code>singleAnnotation</code> maps a single key to a single value, with no text. This can be concatenated to other AnnotatedText as a way to add a property.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">singleAnnotation ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+singleAnnotation key val <span class="fu">=</span> annotate [singletonMap key val] <span class="st">&quot;&quot;</span></code></pre></div>
+<p>An AnnotatedText is a Monoid, meaning that it can be concatenated:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">AnnotatedText</span> <span class="kw">where</span>
+  mempty  <span class="fu">=</span> annotFromText <span class="st">&quot;&quot;</span>
+  mappend (<span class="dt">AnnotatedText</span> a1 t1) (<span class="dt">AnnotatedText</span> a2 t2)
+    <span class="fu">=</span> <span class="dt">AnnotatedText</span> (a1 <span class="fu">++</span> a2) (t1 <span class="fu">++</span> t2)</code></pre></div>
+<p>One particular kind of concatenation we’ll want to do is joining AnnotatedTexts with line breaks between the texts:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">joinAnnotatedLines ::</span> [<span class="dt">AnnotatedText</span>] <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+joinAnnotatedLines ats <span class="fu">=</span>
+  annotate (mconcat (map getAnnotations ats))
+           (unlines (map getText ats))
+
+<span class="ot">transformA ::</span> (<span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+transformA op (<span class="dt">AnnotatedText</span> a t) <span class="fu">=</span> <span class="dt">AnnotatedText</span> a (op t)</code></pre></div>
+<p>We can use a string literal as an AnnotatedText. <code>pack</code> converts Haskell’s shitty built-in <code>String</code> type to <code>Text</code>, and <code>annotFromText</code> converts that to an <code>AnnotatedText</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">IsString</span> <span class="dt">AnnotatedText</span> <span class="kw">where</span>
+  fromString <span class="fu">=</span> (annotFromText <span class="fu">.</span> pack)</code></pre></div>
+<h1 id="text.mediawiki.wikitext-parse-the-wikitext-format"><code>Text.MediaWiki.WikiText</code>: parse the WikiText format</h1>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings, UnicodeSyntax #-}</span></code></pre></div>
+<p>This is the core of Wikiparsec: a set of parsing rules for handling the Wikitext format.</p>
+<p>These rules can be used to extract structured information or unstructured text from Wikitext, depending on the task at hand. For example, the <code>anyList</code> parser will parse this Wikitext:</p>
+<pre><code># item 1
+#* item 2a
+#* item 2b
+# item 3</code></pre>
+<p>into this data structure:</p>
+<pre><code>OrderedList [Item &quot;item 1&quot;, BulletList [Item &quot;item 2a&quot;, Item &quot;item 2b&quot;], Item &quot;item 3&quot;]</code></pre>
+<p>In contrast, the <code>articleSectionWikitext</code> parser will extract the plain text from this paragraph of Wikitext:</p>
+<pre><code>[[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius&#39;s home from 1904 until
+his death|alt=A white house of north European appearance with an orange
+tiled roof, surrounded by trees]]
+Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous [[Grand
+Duchy of Finland|grand duchy]] within the [[Russian Empire]] having earlier
+been under Swedish control for many centuries. The country remained divided
+between a culturally dominant Swedish-speaking minority, to which the
+Sibelius family belonged, and a more nationalistically-minded
+Finnish-speaking, or &quot;[[Fennoman movement|Fennoman]]&quot; majority. In about
+1889 Sibelius met his future wife, [[Aino Sibelius|Aino Järnefelt]], who
+came from a staunch Fennoman family.  Sibelius&#39;s association with the
+Järnefelts helped to awaken and develop his own nationalism; in 1892, the
+year of his marriage to Aino, he completed his first overtly nationalistic
+work, the symphonic suite &#39;&#39;[[Kullervo (Sibelius)|Kullervo]]&#39;&#39;. Through the
+1890s, as Russian control over the duchy grew increasingly oppressive,
+Sibelius produced a series of works reflecting Finnish resistance to
+foreign rule, culminating in the tone poem &#39;&#39;[[Finlandia]]&#39;&#39;.</code></pre>
+<p>Resulting in this text:</p>
+<pre><code>Ainola, Sibelius&#39;s home from 1904 until his death
+Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous grand
+duchy within the Russian Empire having earlier been under Swedish control
+for many centuries. The country remained divided between a culturally
+dominant Swedish-speaking minority, to which the Sibelius family belonged,
+and a more nationalistically-minded Finnish-speaking, or &quot;Fennoman&quot;
+majority. In about 1889 Sibelius met his future wife, Aino Järnefelt, who
+came from a staunch Fennoman family. Sibelius&#39;s association with the
+Järnefelts helped to awaken and develop his own nationalism; in 1892, the
+year of his marriage to Aino, he completed his first overtly nationalistic
+work, the symphonic suite Kullervo. Through the 1890s, as Russian control
+over the duchy grew increasingly oppressive, Sibelius produced a series of
+works reflecting Finnish resistance to foreign rule, culminating in the
+tone poem Finlandia.</code></pre>
+<h2 id="setup">Setup</h2>
+<p>Import the WikiPrelude and Attoparsec. Hide a couple of function names that we’ll want to redefine.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Text.MediaWiki.WikiText</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span> <span class="kw">hiding</span> (try)
+<span class="kw">import </span><span class="dt">Data.Attoparsec.Text</span> <span class="kw">hiding</span> (endOfLine)
+<span class="kw">import </span><span class="dt">Data.Attoparsec.Combinator</span></code></pre></div>
+<p>Pull in some string-manipulating utilities that are defined elsewhere in this package:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Text.SplitUtils</span> (splitFirst, splitLast)</code></pre></div>
+<p>Our useful tools for defining parse rules:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Text.MediaWiki.ParseTools</span> (nop, appendChar, textWith, textWithout,
+  skipChars, textChoices, notFollowedByChar, possiblyEmpty,
+  delimitedSpan, optionMaybe)</code></pre></div>
+<p>Handling templates:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Text.MediaWiki.Templates</span> (<span class="dt">Template</span>, <span class="dt">TemplateProc</span>, ignoreTemplates,
+  evalTemplate)</code></pre></div>
+<p>Marking up text:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Text.MediaWiki.AnnotatedText</span></code></pre></div>
+<h2 id="spans-of-text">Spans of text</h2>
+<p>Some formatting allows whitespace as long as it stays on the same line – for example, the whitespace around headings and after list bullets.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">optionalSameLineSpaces ::</span> <span class="dt">Parser</span> ()
+optionalSameLineSpaces <span class="fu">=</span> skipChars <span class="st">&quot; \t&quot;</span></code></pre></div>
+<p>Here we’re going to define some parsers that scan through characters, within a line, that aren’t involved in any interesting Wiki syntax.</p>
+<p>We don’t worry about apostrophes here, which are perhaps the least interesting level of Wiki syntax. Any span of Wikitext can have double or triple apostrophes in it to indicate bold and italic text. Single apostrophes are, of course, just apostrophes.</p>
+<p>We could modify every parse rule that handles basic text to also have a case for bold and italic spans and an exception for individual apostrophes, but instead, we could take advantage of the fact that these spans are at the lowest level of syntax and we want to ignore them anyway.</p>
+<p>We’ll just post-process the parse result to remove the sequences of apostrophes, by chaining it through the <code>discardSpans</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">discardSpans ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+discardSpans <span class="fu">=</span> (replace <span class="st">&quot;&#39;&#39;&quot;</span> <span class="st">&quot;&quot;</span>) <span class="fu">.</span> (replace <span class="st">&quot;&#39;&#39;&#39;&quot;</span> <span class="st">&quot;&quot;</span>)</code></pre></div>
+<p>What we count as plain text has to depend on what environment we’re in, such as whether we’re currently parsing a link or a template.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">plainText ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+plainText           <span class="fu">=</span> discardSpans <span class="fu">&lt;$&gt;</span> textWithout <span class="st">&quot;[]{}\n&quot;</span>
+plainTextInTemplate <span class="fu">=</span> discardSpans <span class="fu">&lt;$&gt;</span> textWithout <span class="st">&quot;[]{}|\n&quot;</span>
+plainTextInArg      <span class="fu">=</span> discardSpans <span class="fu">&lt;$&gt;</span> textWithout <span class="st">&quot;[]{}|=\n&quot;</span>
+plainTextInLink     <span class="fu">=</span> plainTextInTemplate
+urlText             <span class="fu">=</span> textWithout <span class="st">&quot;[]| \n&quot;</span></code></pre></div>
+<p>There’s a quirk in Wiki syntax: things that would cause syntax errors just get output as themselves. So sometimes, some of the characters excluded by <code>plainText</code> are going to appear as plain text, even in contexts where they would have a meaning – such as a single closing bracket when two closing brackets would end a link.</p>
+<p>It would be excessive to actually try to simulate MediaWiki’s error handling, but we can write some expressions that allows various combinations of brackets to be matched as plain text:</p>
+<ul>
+<li><code>]]</code> in a context where we’re not expecting to end an internal link</li>
+<li><code>}}</code> in a context where we’re not expecting to end a template</li>
+<li>A single <code>{</code> not followed by <code>|</code></li>
+<li>A single <code>]</code></li>
+<li>A single <code>}</code></li>
+</ul>
+<p>We don’t handle single opening brackets here because those often introduce external links. Instead, if the external link parser fails to parse a link, it’ll just return the bracket as is.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">looseBracket ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+looseBracket <span class="fu">=</span> oneButNotTwoOf <span class="st">&quot;]}&quot;</span> <span class="fu">&lt;|&gt;</span> looseOpeningBrace
+
+<span class="ot">looseOpeningBrace ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+looseOpeningBrace <span class="fu">=</span> <span class="kw">do</span>
+  char <span class="ch">&#39;{&#39;</span>
+  notFollowedByChar <span class="ch">&#39;{&#39;</span>
+  notFollowedByChar <span class="ch">&#39;|&#39;</span>
+  return <span class="st">&quot;{&quot;</span>
+
+<span class="ot">oneButNotTwoOf ::</span> [<span class="dt">Char</span>] <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+oneButNotTwoOf chars <span class="fu">=</span> try (
+  <span class="kw">do</span>
+    c <span class="ot">&lt;-</span> satisfy (inClass chars)
+    notFollowedByChar c
+    return (singleton c)
+  )</code></pre></div>
+<p>These closing brackets and braces are just string literals, but we assign them a more meaningful name for the purpose of debugging using <code>&lt;?&gt;</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">extraneousCloseBrackets <span class="fu">=</span> string <span class="st">&quot;]]&quot;</span> <span class="fu">&lt;?&gt;</span> <span class="st">&quot;junk closing brackets&quot;</span>
+extraneousCloseBraces   <span class="fu">=</span> string <span class="st">&quot;}}&quot;</span> <span class="fu">&lt;?&gt;</span> <span class="st">&quot;junk closing braces&quot;</span></code></pre></div>
+<p>Attoparsec has a misnamed combinator named <code>endOfLine</code>. I say it’s misnamed because it matches an actual line break, but doesn’t match at the end of the input.</p>
+<p>We define <code>newLine</code> here to match the line break (I don’t think we need to handle <code>\r</code> when our input comes from XML), and <code>endOfLine</code> to also include the end of input.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">newLine ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+newLine <span class="fu">=</span> string <span class="st">&quot;\n&quot;</span>
+
+<span class="ot">endOfLine ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+endOfLine <span class="fu">=</span> (endOfInput <span class="fu">&gt;&gt;</span> nop) <span class="fu">&lt;|&gt;</span> newLine <span class="fu">&lt;?&gt;</span> <span class="st">&quot;end of line&quot;</span></code></pre></div>
+<p>Now we can define some spans of text that handle errors, and allow line breaks where appropriate.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">messyText ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+messyText            <span class="fu">=</span> textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces, newLine] <span class="fu">&lt;?&gt;</span> <span class="st">&quot;plain text&quot;</span>
+messyTextLine        <span class="fu">=</span> textChoices [plainText, looseBracket, extraneousCloseBrackets, extraneousCloseBraces]          <span class="fu">&lt;?&gt;</span> <span class="st">&quot;line of plain text&quot;</span>
+messyTextInLink      <span class="fu">=</span> textChoices [plainTextInLink, looseBracket, extraneousCloseBraces, newLine]                    <span class="fu">&lt;?&gt;</span> <span class="st">&quot;plain text inside link&quot;</span>
+messyTextInExtLink   <span class="fu">=</span> textChoices [plainText, oneButNotTwoOf <span class="st">&quot;[{}&quot;</span>, extraneousCloseBraces, newLine]                  <span class="fu">&lt;?&gt;</span> <span class="st">&quot;plain text inside external link&quot;</span>
+messyTextAtEndOfLink <span class="fu">=</span> textChoices [plainText, looseBracket, extraneousCloseBraces, newLine]                          <span class="fu">&lt;?&gt;</span> <span class="st">&quot;plain text at end of link&quot;</span>
+messyTextInTemplate  <span class="fu">=</span> textChoices [plainTextInTemplate, looseBracket, extraneousCloseBrackets, newLine]              <span class="fu">&lt;?&gt;</span> <span class="st">&quot;plain text inside template&quot;</span></code></pre></div>
+<p>Wikitext in general is either some big special environment like a list or a table – which we’ll handle elsewhere – or it’s made of links, templates, and miscellaneous text. When we encounter a template, we have to turn it into an AnnotatedText value and then a plain Text value, which the <code>templateText</code> rule does.</p>
+<p>Any parse rule that can handle templates needs to be passed a <code>TemplateProc</code>, specifying what to do when it encounters a template. The desired behavior varies by the use case. Sometimes we want to convert certain templates into links or annotations, in which case we’ll pass in a procedure that defines how to do that. Sometimes we just want to throw all templates out, in which case <code>ignoreTemplates</code> is the <code>TemplateProc</code> that we want.</p>
+<p>So <code>wikiTextLine</code> and its siblings are not Attoparsec parser combinators, per se; instead, they’re functions that you apply to a <code>TemplateProc</code> to get a parser combinator. <code>wikiTextLine ignoreTemplates</code> is a parser combinator.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">wikiTextLine ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+wikiTextLine tproc        <span class="fu">=</span> textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]       <span class="fu">&lt;?&gt;</span> <span class="st">&quot;line of wikitext&quot;</span>
+wikiTextInLink tproc      <span class="fu">=</span> textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                <span class="fu">&lt;?&gt;</span> <span class="st">&quot;wikitext inside link&quot;</span>
+wikiTextAtEndOfLink tproc <span class="fu">=</span> textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]<span class="fu">&lt;?&gt;</span> <span class="st">&quot;wikitext at end of link&quot;</span>
+wikiTextInTemplate tproc  <span class="fu">=</span> textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInTemplate]            <span class="fu">&lt;?&gt;</span> <span class="st">&quot;wikitext inside template&quot;</span></code></pre></div>
+<h2 id="wiki-syntax-for-links">Wiki syntax for links</h2>
+<p>External links appear in single brackets. They contain a URL, a space, and the text that labels the link, such as:</p>
+<pre><code>[http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]</code></pre>
+<p>We would like to extract just the visible text from that link, which is “David Van Tassel”.</p>
+<p>External links can have no text, in which case they just get an arbitrary number as their text, which we’ll disregard. There’s also a type of external link that is just a bare URL in the text. Its effect on the text is exactly the same as if it weren’t a link, so we can disregard that case.</p>
+<p>The following rules extract the text of an external link.</p>
+<p>We start by matching a single left bracket (under the assumption that, if there were two left brackets, they would have been matched by the <code>internalLinkText</code> rule first). After that, we parse the interior of the link. If that fails, we just return the left bracket as plain text, simulating MediaWiki’s error handling.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">externalLinkText ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+externalLinkText <span class="fu">=</span> <span class="kw">do</span>
+  char <span class="ch">&#39;[&#39;</span>
+  externalLinkMatch <span class="fu">&lt;|&gt;</span> return <span class="st">&quot;[&quot;</span></code></pre></div>
+<p>After the left bracket, we look for a URL schema, the rest of the URL, and a possible label on the link.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">externalLinkMatch <span class="fu">=</span> <span class="kw">do</span>
+  schema
+  urlText
+  externalLinkLabelOrEnd
+
+schema <span class="fu">=</span> choice (map string [<span class="st">&quot;http://&quot;</span>, <span class="st">&quot;https://&quot;</span>, <span class="st">&quot;ftp://&quot;</span>, <span class="st">&quot;news://&quot;</span>, <span class="st">&quot;irc://&quot;</span>, <span class="st">&quot;mailto:&quot;</span>, <span class="st">&quot;//&quot;</span>]) <span class="fu">&lt;?&gt;</span> <span class="st">&quot;external link schema&quot;</span>
+externalLinkLabelOrEnd <span class="fu">=</span> externalLinkEnd <span class="fu">&lt;|&gt;</span> externalLinkLabel</code></pre></div>
+<p>After the URL, the link might end, in which case there’s no label and we want to throw it out. Or there can be a label, in which case we want to get its text, which could include formatting and could require error handling, using the <code>messyTextInExtLink</code> rule.</p>
+<p>The <code>*&gt;</code> operator means “parse the first thing, throw it out, and parse the second thing for its value”. <code>&lt;*</code> is the same but gets the value from the first thing. The value that counts is the one being pointed to. These operators let us write simple combinations of parsers without do-notation.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">externalLinkEnd <span class="fu">=</span> char <span class="ch">&#39;]&#39;</span> <span class="fu">*&gt;</span> return <span class="st">&quot;&quot;</span>
+externalLinkLabel <span class="fu">=</span> skipSpace <span class="fu">*&gt;</span> messyTextInExtLink <span class="fu">&lt;*</span> externalLinkEnd</code></pre></div>
+<p>Internal links have many possible components. In general, they take the form:</p>
+<pre><code>[[namespace:page#section|label]]</code></pre>
+<p>The only part that has to be present is the page name. If the label is not given, then the label is the same as the page.</p>
+<p>We represent the result of parsing a link as AnnotatedText, where the label is the text and the other properties are annotations. Some examples:</p>
+<pre><code> In:    [[word]]
+ Out:   AnnotatedText [mapFromList [(&quot;page&quot;, &quot;word&quot;)]] &quot;word&quot;
+
+ In:    [[word|this word]]
+ Out:   AnnotatedText [mapFromList [(&quot;page&quot;, &quot;word&quot;)]] &quot;this word&quot;
+
+ In:    [[word#English]]
+ Out:   AnnotatedText [mapFromList [(&quot;page&quot;, &quot;word&quot;), (&quot;section&quot;, &quot;English&quot;)]] &quot;word&quot;
+
+ In:    [[w:en:Word]]
+ Out:   AnnotatedText [mapFromList [(&quot;namespace&quot;, &quot;w:en&quot;), (&quot;page&quot;, &quot;word&quot;)]] &quot;Word&quot;
+
+ In:    [[Category:English nouns]]
+ Out:   AnnotatedText [mapFromList [(&quot;namespace&quot;, &quot;Category&quot;), (&quot;page&quot;, &quot;English nouns&quot;)]] &quot;English nouns&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">internalLink ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+internalLink tproc <span class="fu">=</span> <span class="kw">do</span>
+  string <span class="st">&quot;[[&quot;</span>
+  target <span class="ot">&lt;-</span> plainTextInLink
+  maybeText <span class="ot">&lt;-</span> optionMaybe (alternateText tproc)
+  <span class="kw">let</span> {
+    link      <span class="fu">=</span> parseLink target;
+    annotated <span class="fu">=</span> <span class="kw">case</span> maybeText <span class="kw">of</span>
+                  <span class="dt">Just</span> text <span class="ot">-&gt;</span> annotate [link] text
+                  <span class="dt">Nothing</span>   <span class="ot">-&gt;</span> annotate [link] (get <span class="st">&quot;page&quot;</span> link)
+  } <span class="kw">in</span> <span class="kw">do</span>
+       string <span class="st">&quot;]]&quot;</span>
+       return annotated
+
+<span class="ot">parseLink ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span>
+parseLink target <span class="fu">=</span>
+  makeLink namespace page section
+  <span class="kw">where</span>
+    (namespace, local) <span class="fu">=</span> splitLast <span class="st">&quot;:&quot;</span> target
+    (page, section) <span class="fu">=</span> splitFirst <span class="st">&quot;#&quot;</span> local</code></pre></div>
+<p>The label of a link can be made of Wikitext and can even include templates. When we encounter a label that’s different from the link target, we need to parse it as Wikitext, including handling templates with a <code>TemplateProc</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">alternateText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+alternateText tproc <span class="fu">=</span> <span class="kw">do</span>
+  char <span class="ch">&#39;|&#39;</span>
+  text <span class="ot">&lt;-</span> wikiTextAtEndOfLink tproc
+  return (extractLinkText text)</code></pre></div>
+<p>In some cases, we only want the text of the link, in which case we operate on the parse result with <code>getText</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">internalLinkText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+internalLinkText tproc <span class="fu">=</span> getText <span class="fu">&lt;$&gt;</span> internalLink tproc</code></pre></div>
+<p>There are complicated syntaxes on MediaWiki that look like internal links, particularly the Image: or File: syntax, which can have multiple vertical-bar-separated parts, and assigns properties such as alternate text to an image, as well as a plain-text caption that has no special syntax to introduce it – it seems to be determined by process of elimination.</p>
+<p>Our best guess at which part of the syntax is the caption is the last one without an equals sign. If all parts have an equals sign, perhaps because there’s an innocent equals sign in a link’s text, then we return the last part.</p>
+<p>For example, in this image syntax:</p>
+<pre><code>[[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius&#39;s home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]</code></pre>
+<p>the text we want to extract is:</p>
+<pre><code>Ainola, Sibelius&#39;s home from 1904 until his death</code></pre>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractLinkText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+extractLinkText text <span class="fu">=</span>
+  <span class="co">-- Get the part of a link that&#39;s most likely to be its displayed text.</span>
+  <span class="co">-- If there are many parts to choose from, prefer the ones without</span>
+  <span class="co">-- equals signs (which may be image metadata, for example).</span>
+  <span class="kw">let</span> parts      <span class="fu">=</span> splitOn <span class="st">&quot;|&quot;</span> text
+      noEquals t <span class="fu">=</span> not (isInfixOf <span class="st">&quot;=&quot;</span> t)
+      priority   <span class="fu">=</span> parts ⊕ (filter noEquals parts)
+  <span class="co">-- We use MinLen functions to convince the type system that there will</span>
+  <span class="co">-- be a &quot;last&quot; element. We know there is one because, even if our priority</span>
+  <span class="co">-- order is empty, we stick &quot;&quot; on the front as a last resort.</span>
+  <span class="kw">in</span> last (mlcons <span class="st">&quot;&quot;</span> (toMinLenZero priority))</code></pre></div>
+<p><code>annotatedWikiText</code> parses text that may or may not contain links or templates, and returns it in an AnnotatedText data structure.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotatedWikiText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+annotatedWikiText tproc <span class="fu">=</span> concat <span class="fu">&lt;$&gt;</span> many1 (annotatedWikiTextPiece tproc)
+annotatedWikiTextPiece tproc <span class="fu">=</span> internalLink tproc <span class="fu">&lt;|&gt;</span> templateValue tproc <span class="fu">&lt;|&gt;</span> simpleWikiTextPiece
+simpleWikiTextPiece <span class="fu">=</span> annotFromText <span class="fu">&lt;$&gt;</span> choice [wikiTable, externalLinkText, messyTextLine]</code></pre></div>
+<p>Sometimes there’s extra syntax going on, so we need to exclude specific characters from the wikitext.</p>
+<p>When this rule is used, it will consume any character except the listed ones when they appear in plain text. For that reason, the line break <code>\n</code> often belongs in <code>exclude</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotatedWikiTextWithout ::</span> [<span class="dt">Char</span>] <span class="ot">-&gt;</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+annotatedWikiTextWithout exclude tproc <span class="fu">=</span>
+  mconcat <span class="fu">&lt;$&gt;</span> many&#39; (
+    internalLink tproc
+    <span class="fu">&lt;|&gt;</span> templateValue tproc
+    <span class="fu">&lt;|&gt;</span> annotFromText <span class="fu">&lt;$&gt;</span> (textWithout (exclude ⊕ <span class="st">&quot;\n[]{}&quot;</span>))
+    )</code></pre></div>
+<h2 id="wiki-syntax-for-lists">Wiki syntax for lists</h2>
+<p>Here’s a hierarchical data type for describing the contents of lists, which semantically can contain other lists.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">ListItem</span> <span class="fu">=</span> <span class="dt">Item</span> <span class="dt">AnnotatedText</span>
+              <span class="fu">|</span> <span class="dt">ListHeading</span> <span class="dt">AnnotatedText</span>
+              <span class="fu">|</span> <span class="dt">BulletList</span> [<span class="dt">ListItem</span>]
+              <span class="fu">|</span> <span class="dt">OrderedList</span> [<span class="dt">ListItem</span>]
+              <span class="fu">|</span> <span class="dt">IndentedList</span> [<span class="dt">ListItem</span>]
+              <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>)</code></pre></div>
+<p>Sometimes we just want the text that the list contains. <code>extractTextLines</code> returns the texts of the list items (whatever kind of items they are) as a list of AnnotatedTexts.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractTextLines ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractTextLines (<span class="dt">Item</span> t) <span class="fu">=</span> [t]
+extractTextLines (<span class="dt">ListHeading</span> t) <span class="fu">=</span> [t]
+extractTextLines (<span class="dt">BulletList</span> items) <span class="fu">=</span> extractTextLinesFromList items
+extractTextLines (<span class="dt">OrderedList</span> items) <span class="fu">=</span> extractTextLinesFromList items
+extractTextLines (<span class="dt">IndentedList</span> items) <span class="fu">=</span> extractTextLinesFromList items</code></pre></div>
+<p>If we’re extracting lines from a list and encounter a sublist, use <code>concat</code> to flatten the results of <code>extractTextLines</code> into a single list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractTextLinesFromList ::</span> [<span class="dt">ListItem</span>] <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractTextLinesFromList items <span class="fu">=</span> concat (map extractTextLines items)</code></pre></div>
+<p><code>extractText</code> concatenates the result of <code>extractTextLines</code> into a single AnnotatedText, with the list item texts separated by line breaks.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractText ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+extractText <span class="fu">=</span> joinAnnotatedLines <span class="fu">.</span> extractTextLines</code></pre></div>
+<p>In some cases (such as Wiktionary definition lists), we want to extract only the texts from the top level of a list, not from the sublists. Instead of recursing, we go on to the <code>extractItem</code> function, which returns a single element for a leaf and nothing for a list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractTopLevel ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractTopLevel (<span class="dt">Item</span> item) <span class="fu">=</span> [item]
+extractTopLevel (<span class="dt">ListHeading</span> item) <span class="fu">=</span> []
+extractTopLevel (<span class="dt">BulletList</span> items) <span class="fu">=</span> extractTopLevelFromList items
+extractTopLevel (<span class="dt">OrderedList</span> items) <span class="fu">=</span> extractTopLevelFromList items
+extractTopLevel (<span class="dt">IndentedList</span> items) <span class="fu">=</span> extractTopLevelFromList items
+
+<span class="ot">extractTopLevelFromList ::</span> [<span class="dt">ListItem</span>] <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractTopLevelFromList items <span class="fu">=</span> concat (map extractItem items)
+
+<span class="ot">extractItem ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractItem (<span class="dt">Item</span> item) <span class="fu">=</span> [item]
+extractItem _ <span class="fu">=</span> []</code></pre></div>
+<p>And here are the rules for parsing lists:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">listItems ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">ListItem</span>]
+listItems tproc marker <span class="fu">=</span> <span class="kw">do</span>
+  lookAhead (string marker)
+  many1 (listItem tproc marker)
+
+<span class="ot">listItem ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">ListItem</span>
+listItem tproc marker <span class="fu">=</span> subList tproc marker <span class="fu">&lt;|&gt;</span> singleListItem tproc marker</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">subList ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">ListItem</span>
+subList tproc marker <span class="fu">=</span> bulletList tproc (appendChar marker <span class="ch">&#39;*&#39;</span>)
+                   <span class="fu">&lt;|&gt;</span> orderedList tproc (appendChar marker <span class="ch">&#39;#&#39;</span>)
+                   <span class="fu">&lt;|&gt;</span> indentedList tproc (appendChar marker <span class="ch">&#39;:&#39;</span>)
+                   <span class="fu">&lt;|&gt;</span> listHeading tproc (appendChar marker <span class="ch">&#39;;&#39;</span>)
+
+<span class="ot">anyList ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">ListItem</span>
+anyList tproc <span class="fu">=</span> subList tproc <span class="st">&quot;&quot;</span>
+
+<span class="ot">anyListText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+anyListText tproc <span class="fu">=</span> extractText <span class="fu">&lt;$&gt;</span> anyList tproc <span class="fu">&lt;?&gt;</span> <span class="st">&quot;list&quot;</span>
+
+<span class="ot">listHeading ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">ListItem</span>
+listHeading tproc marker <span class="fu">=</span> <span class="dt">ListHeading</span> <span class="fu">&lt;$&gt;</span> listItemContent tproc marker
+
+<span class="ot">singleListItem ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">ListItem</span>
+singleListItem tproc marker <span class="fu">=</span> <span class="dt">Item</span> <span class="fu">&lt;$&gt;</span> listItemContent tproc marker
+
+<span class="ot">listItemContent ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+listItemContent tproc marker <span class="fu">=</span> <span class="kw">do</span>
+  string marker
+  optionalSameLineSpaces
+  line <span class="ot">&lt;-</span> annotatedWikiText tproc
+  endOfLine
+  return line
+
+bulletList tproc marker   <span class="fu">=</span> <span class="dt">BulletList</span> <span class="fu">&lt;$&gt;</span> listItems tproc marker
+orderedList tproc marker  <span class="fu">=</span> <span class="dt">OrderedList</span> <span class="fu">&lt;$&gt;</span> listItems tproc marker
+indentedList tproc marker <span class="fu">=</span> <span class="dt">IndentedList</span> <span class="fu">&lt;$&gt;</span> listItems tproc marker
+
+<span class="ot">isPlainItem ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isPlainItem (<span class="dt">Item</span> s) <span class="fu">=</span> <span class="dt">True</span>
+isPlainItem _ <span class="fu">=</span> <span class="dt">False</span></code></pre></div>
+<h2 id="wiki-syntax-for-templates">Wiki syntax for templates</h2>
+<p>A simple template looks like this:</p>
+<pre><code>{{archaic}}</code></pre>
+<p>More complex templates take arguments, such as this translation into French:</p>
+<pre><code>{{t+|fr|exemple|m}}</code></pre>
+<p>And very complex templates can have both positional and named arguments:</p>
+<pre><code>{{t|ja|例え|tr=[[たとえ]], tatoe}}</code></pre>
+<p>Some templates are more detailed versions of internal links. Some are metadata that we can simply ignore. The ultimate semantics of a template can depend both on its contents and the section in which it appears, so these semantics need to be defined in the parsing rules for a specific wiki such as the English Wiktionary.</p>
+<p>Here, we define the basic syntax of templates, and return their contents in a standardized form as a mapping from argument names to values.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">template ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+template tproc <span class="fu">=</span> string <span class="st">&quot;{{&quot;</span> <span class="fu">&gt;&gt;</span> (templateArgs tproc <span class="dv">0</span>)
+
+<span class="ot">templateValue ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+templateValue tproc <span class="fu">=</span> (evalTemplate tproc) <span class="fu">&lt;$&gt;</span> template tproc
+
+<span class="ot">templateText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+templateText tproc <span class="fu">=</span> getText <span class="fu">&lt;$&gt;</span> templateValue tproc</code></pre></div>
+<p>A point that might be confusing: the following parsers take a TemplateProc as their first argument not because they’ll be using it to evaluate this template we’re parsing, but because the template might contain nested templates that have to be evaluated.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">templateArgs ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+templateArgs tproc offset <span class="fu">=</span> <span class="kw">do</span>
+  nameMaybe <span class="ot">&lt;-</span> optionMaybe (try templateArgName)
+  <span class="kw">case</span> nameMaybe <span class="kw">of</span>
+    <span class="dt">Just</span> name <span class="ot">-&gt;</span> namedArg tproc name offset
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> positionalArg tproc offset
+
+<span class="ot">templateArgName ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+templateArgName <span class="fu">=</span> <span class="kw">do</span>
+  name <span class="ot">&lt;-</span> stripSpaces <span class="fu">&lt;$&gt;</span> plainTextInArg
+  string <span class="st">&quot;=&quot;</span>
+  return name
+
+<span class="ot">namedArg ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+namedArg tproc name offset <span class="fu">=</span> <span class="kw">do</span>
+  value <span class="ot">&lt;-</span> stripSpaces <span class="fu">&lt;$&gt;</span> possiblyEmpty (wikiTextInTemplate tproc)
+  rest <span class="ot">&lt;-</span> templateRest tproc offset
+  return (insertMap name value rest)
+
+<span class="ot">positionalArg ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+positionalArg tproc offset <span class="fu">=</span> <span class="kw">do</span>
+  value <span class="ot">&lt;-</span> stripSpaces <span class="fu">&lt;$&gt;</span> possiblyEmpty (wikiTextInTemplate tproc)
+  rest <span class="ot">&lt;-</span> templateRest tproc (offset <span class="fu">+</span> <span class="dv">1</span>)
+  <span class="kw">let</span> name <span class="fu">=</span> (intToText offset) <span class="kw">in</span>
+    return (insertMap name value rest)
+
+<span class="ot">templateRest ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+templateRest tproc offset <span class="fu">=</span> endOfTemplate <span class="fu">&lt;|&gt;</span> (string <span class="st">&quot;|&quot;</span> <span class="fu">&gt;&gt;</span> templateArgs tproc offset)
+
+<span class="ot">endOfTemplate ::</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+endOfTemplate <span class="fu">=</span> string <span class="st">&quot;}}&quot;</span> <span class="fu">&gt;&gt;</span> return ø
+
+<span class="ot">intToText ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+intToText <span class="fu">=</span> pack <span class="fu">.</span> show</code></pre></div>
+<p>We can simplify some of this parsing in the case where we are looking for a <em>particular</em> template. We start by expecting two left braces and the name of the template, then parse the rest of the template as usual.</p>
+<p>We set the template name as arg 0, as it would be if we were using the more general rule for parsing template expressions.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">specificTemplate ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Template</span>
+specificTemplate tproc name <span class="fu">=</span> <span class="kw">do</span>
+  string (mappend <span class="st">&quot;{{&quot;</span> name)
+  parsed <span class="ot">&lt;-</span> templateRest tproc <span class="dv">1</span>
+  return ((<span class="st">&quot;0&quot;</span>,name)<span class="fu">:</span>parsed)</code></pre></div>
+<h2 id="wiki-syntax-for-tables">Wiki syntax for tables</h2>
+<p>Tables have complex formatting, and thus far we’re just going to be skipping them.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">wikiTable ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+wikiTable <span class="fu">=</span> wikiTableComplete
+
+<span class="ot">wikiTableComplete ::</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+wikiTableComplete <span class="fu">=</span> delimitedSpan <span class="st">&quot;{|&quot;</span> <span class="st">&quot;|}&quot;</span> <span class="fu">&gt;&gt;</span> nop</code></pre></div>
+<h2 id="parsing-sections-at-a-time">Parsing sections at a time</h2>
+<p>These functions are designed to take in entire sections of wikitext (which have already been split by the parser in <code>Sections.lhs</code>) and return the plain text that they contain.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">sectionAnnotated ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
+sectionAnnotated tproc <span class="fu">=</span>
+  transformA squishBlankLines <span class="fu">&lt;$&gt;</span>
+    possiblyEmpty (textChoices [anyListText tproc, annotatedWikiText tproc, annotFromText <span class="fu">&lt;$&gt;</span> newLine]) <span class="fu">&lt;?&gt;</span> <span class="st">&quot;section content&quot;</span>
+
+<span class="ot">sectionText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Text</span>
+sectionText tproc <span class="fu">=</span> getText <span class="fu">&lt;$&gt;</span> sectionAnnotated tproc
+
+<span class="ot">squishBlankLines ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+squishBlankLines s <span class="fu">=</span> unlines (filter isMeaningfulLine (lines s))
+
+<span class="ot">isMeaningfulLine ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isMeaningfulLine s <span class="fu">=</span> (length s) <span class="fu">&gt;</span> <span class="dv">0</span> <span class="fu">&amp;&amp;</span> not (isPrefixOf <span class="st">&quot;|&quot;</span> s) <span class="fu">&amp;&amp;</span> not (isPrefixOf <span class="st">&quot;!&quot;</span> s) <span class="fu">&amp;&amp;</span> not (isDirective s)
+isDirective s <span class="fu">=</span> (isPrefixOf <span class="st">&quot;__&quot;</span> s) <span class="fu">&amp;&amp;</span> (isSuffixOf <span class="st">&quot;__&quot;</span> s)</code></pre></div>
+<h2 id="entry-points">Entry points</h2>
+<p>Here’s a function to be run at the IO level, which takes in Wikitext, outputs its plain text, and returns nothing.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">outputPlainText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+outputPlainText input <span class="fu">=</span>
+   <span class="kw">case</span> parseOnly (sectionText ignoreTemplates <span class="fu">&lt;*</span> endOfInput) input <span class="kw">of</span>
+     <span class="dt">Left</span> err <span class="ot">-&gt;</span> showError input err
+     <span class="dt">Right</span> x <span class="ot">-&gt;</span> putStrLn x</code></pre></div>
+<p><code>inspectText</code> shows the parsed plain text as well as its annotations.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">inspectText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+inspectText input <span class="fu">=</span>
+  <span class="kw">case</span> parseOnly (sectionAnnotated ignoreTemplates <span class="fu">&lt;*</span> endOfInput) input <span class="kw">of</span>
+    <span class="dt">Left</span> err <span class="ot">-&gt;</span> showError input err
+    <span class="dt">Right</span> (<span class="dt">AnnotatedText</span> annos text) <span class="ot">-&gt;</span> <span class="kw">do</span>
+      putStrLn text
+      print annos</code></pre></div>
+<p><code>inspectString</code> is designed to be usable from the REPL, where OverloadedStrings may not be available: it takes in a built-in String (a type that is generally not used in this codebase), and converts it to a Text so it can be inspected.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">inspectString ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+inspectString input <span class="fu">=</span> inspectText <span class="fu">$</span> pack input</code></pre></div>
+<p>Showing informative errors:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">showError ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+showError str err <span class="fu">=</span> <span class="kw">do</span>
+  putStrLn <span class="st">&quot;********&quot;</span>
+  putStr <span class="st">&quot;parse error:&quot;</span>
+  print err
+  putStrLn str
+  putStrLn <span class="st">&quot;********&quot;</span></code></pre></div>
+<h1 id="text.mediawiki.templates-representing-and-applying-templates"><code>Text.MediaWiki.Templates</code>: representing and applying templates</h1>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}</span>
+
+<span class="kw">module</span> <span class="dt">Text.MediaWiki.Templates</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.AnnotatedText</span></code></pre></div>
+<p>Parsing templates the same way they’re parsed on Wikipedia or Wiktionary would be an insanely complicated and time-consuming process, as their actions are interpreted from an ad-hoc programming language <em>written in Wikitext</em> that itself has to be parsed. On top of that, some of them run PHP or Lua code via extensions.</p>
+<p>We assume here that we don’t want to be able to fill in every template; we just want to output something reasonable from the most common templates, and in most cases output nothing at all.</p>
+<p>First: the syntax of a template is represented as an association list from parameter names to values. Both the names and the values are Text.</p>
+<p>To customize the values of templates for different wikis, we’ll be passing around an object called a TemplateProc, which looks up the name of the template and returns a way to manipulate the text. That is:</p>
+<ul>
+<li><p>It takes in a Text, the same one that’s in the “0” slot of the template. (We pass this as a separate argument to make dispatch much easier, because any non-trivial computation you do will depend on the name of the template.)</p></li>
+<li><p>It returns a function that takes an Annotation of the template’s arguments and returns an AnnotatedText, which we’re calling a TemplateAction.</p></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Template</span> <span class="fu">=</span> [(<span class="dt">Text</span>, <span class="dt">Text</span>)]
+<span class="kw">type</span> <span class="dt">TemplateAction</span> <span class="fu">=</span> (<span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>)
+<span class="kw">type</span> <span class="dt">TemplateProc</span> <span class="fu">=</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">TemplateAction</span></code></pre></div>
+<p>The simplest TemplateProc is <code>ignoreTemplates</code>, which returns the empty AnnotatedText for any template.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">ignoreTemplates ::</span> <span class="dt">TemplateProc</span>
+ignoreTemplates <span class="fu">=</span> const skipTemplate</code></pre></div>
+<h2 id="generally-useful-template-actions">Generally useful template actions</h2>
+<p><code>skipTemplate</code> outputs the empty string no matter what the arguments of the template are.</p>
+<p><code>idTemplate</code> returns the name of the template as its value.</p>
+<p><code>useArg</code> returns a given named or positional argument.</p>
+<p>Keep in mind that template arguments are always Text, even the positional ones such as “1”. We do this to keep types consistent as we emulate PHP.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">skipTemplate ::</span> <span class="dt">TemplateAction</span>
+skipTemplate <span class="fu">=</span> const ø
+
+<span class="ot">useArg ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">TemplateAction</span>
+useArg arg <span class="fu">=</span> annotFromText <span class="fu">.</span> (get arg)
+idTemplate <span class="fu">=</span> useArg <span class="st">&quot;0&quot;</span></code></pre></div>
+<p>When we parse a template, we get a result of type <code>Template</code>. To actually evaluate it, we extract its template name (its 0th argument), pass that template name to <code>tproc</code> to get a function that specifies what to do, and apply that function to the <code>Template</code> structure.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">evalTemplate ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+evalTemplate tproc tdata <span class="fu">=</span>
+  <span class="kw">let</span> action <span class="fu">=</span> tproc (get <span class="st">&quot;0&quot;</span> tdata) <span class="kw">in</span> action tdata</code></pre></div>
+</body>
+</html>
