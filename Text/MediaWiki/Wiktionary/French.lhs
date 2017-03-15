@@ -849,7 +849,7 @@ Links
 -----
 
 > handleLinkTemplate :: Template -> AnnotatedText
-> handleLinkTemplate t = buildA $ do
+> handleLinkTemplate t = annotationBuilder $ do
 >   put "language" (getLanguage "2" t)
 >   adapt "page" arg1 t
 >   adapt "sense" ["sens"] t
@@ -860,7 +860,7 @@ Translations
 ------------
 
 > handleTranslationTemplate :: Template -> AnnotatedText
-> handleTranslationTemplate t = buildA $ do
+> handleTranslationTemplate t = annotationBuilder $ do
 >   put "rel" "translation"
 >   put "language" (getLanguage "1" t)
 >   adapt "page" arg2 t

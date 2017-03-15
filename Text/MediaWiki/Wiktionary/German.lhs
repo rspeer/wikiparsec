@@ -207,7 +207,7 @@ Translations
 ------------
 
 > handleTranslationTemplate :: Template -> AnnotatedText
-> handleTranslationTemplate t = skipEmpty $ buildA $ do
+> handleTranslationTemplate t = skipEmpty $ annotationBuilder $ do
 >   put "rel" "translation"
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
@@ -223,7 +223,7 @@ Part of speech headings
 -----------------------
 
 > handlePOSTemplate :: Template -> AnnotatedText
-> handlePOSTemplate t = buildA $ do
+> handlePOSTemplate t = annotationBuilder $ do
 >   put "pos" (partOfSpeechMap (get "1" t))
 >   put "language" (getLanguage "2" t)
 >   return "POS"

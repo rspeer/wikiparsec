@@ -890,12 +890,54 @@ Transforming templates
 ----------------------
 
 Many of the template functions we define will involve converting a Template
-value into an AnnotatedText. To get some convenient `do` syntax for this, we
-use `put`, which lets us concatenate together values using a monad called
-Writer.
+value into an AnnotatedText.
 
-The Writer monad maintains a state, which is a monoid, and the action of the monad
-is to append things onto that monoid. I promise this will be really useful.
+These are similar but not quite the same. A Template indicates what the
+Wikitext syntax *says*, but the AnnotatedText output says what it *means*.
+Converting one to the other will involve handling specific values based on
+how it will be used.
+
+Their types are structured somewhat differently, as well. A Template is an
+association list from Text parameters to Text values. An AnnotatedText contains
+visible text, plus any number of Annotations, which are maps from Text keys to
+Text values.
+
+But very often, we want to turn Template parameters directly into keys in an
+Annotation, or into the visible text of the AnnotatedText.  Describing these
+operations repeatedly would be quite verbose. So what we're defining here is a
+little language for turning Templates into AnnotatedTexts.
+
+To get some convenient `do` syntax for this, we use `put`, which lets us
+assemble values using a monad called Writer. The values are accumulated into a
+sort of state, using their `mconcat` operation, because the state is in fact
+a monoid. Yes, we're using a monad to build a monoid. I promise this will be
+really useful for templates.
+
+In particular, here, the monoid we're building is a map that serves as an
+Annotation.
+
+At the end, we can return a separate value that isn't part of that accumulation.
+We use this for the text that gets annotated.
+
+Here's an example (this code doesn't actually go here) of how we'll use `put`
+and `annotationBuilder`:
+
+    handlePOSTemplate t = annotationBuilder $ do
+      put "pos" (partOfSpeechMap (get "1" t))
+      put "language" (getLanguage "2" t)
+      return "POS"
+
+We get argument "1" from the template, run that through a `partOfSpeechMap`,
+and assign the result as the "pos" value of our Annotation. We do something
+similar with a function called `getLanguage`, putting the result in the
+"language" value. As the text that actually gets annotated, we return the
+placeholder text "POS".
+
+So `put` is our monoid-monad thing that uses `writer` to assemble a state using
+do-notation. We also want the values to be a Monoid, so we can check if they're
+empty. If a value is empty, we do nothing to the state (we append `ø`). If the
+value is present, we append a map that just maps `key` to `value`, and the
+effect of that is to map `key` to `value` in the state.
 
 > put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
 > put key value =
@@ -903,31 +945,58 @@ is to append things onto that monoid. I promise this will be really useful.
 >     then writer (value, ø)
 >     else writer (value, singletonMap key value)
 
+If that was obscure, don't worry about it. `annotationBuilder` is how we
+use that monad to create an AnnotatedText.
 
-Repeatedly running `put` will build up a Map, and in the end it returns a
-value. Here, the value it returns will be the Text, and the Map will become
-an Annotation on that text.
+`runWriter` runs the monad and gives us a pair of its return value and its
+state.  The state is our singular Annotation, and the return value is our text.
 
-TODO: explain the rest of this
-
-> buildA :: Writer Annotation Text -> AnnotatedText
-> buildA m =
+> annotationBuilder :: Writer Annotation Text -> AnnotatedText
+> annotationBuilder m =
 >   let (text, anno) = runWriter m in
 >     annotate [anno] text
->
-> adapt :: Text -> [Text] -> Template -> Writer Annotation Text
-> adapt keyTarget keySources = (put keyTarget) . (getPrioritized keySources)
->
-> visible :: [Text] -> Template -> Writer Annotation Text
-> visible keySources = return . (getPrioritized keySources)
->
-> invisible :: Writer Annotation Text
-> invisible = return ""
->
+
+Let's add some shorthand to our little language. Instead of just using `put`
+and `return`, we're going to write operations that look like this:
+
+    handleDerivationTemplate t = annotationBuilder $ do
+      put "rel" "*derived/etym"
+      adapt "language" arg2 t
+      adapt "page" arg3 t
+      visible arg3 t
+
+The thing we want to `put` in the annotation will often be something that we
+`get` or `getPrioritized` from the template, so we combine `getPrioritized` and
+`put` into one operation called `adapt`. It looks at the keys of the template
+given by `keySources`, and puts the first one it finds in the Annotation value
+with the key `keyTarget`.
+
+Sometimes we know exactly which argument to look in and don't need a priority
+order, so here are some lists of a single key:
+
 > arg1, arg2, arg3 :: [Text]
 > arg1 = ["1"]
 > arg2 = ["2"]
 > arg3 = ["3"]
+
+So in the `handleDerivationTemplate` example above, we get arg 2 of the Template
+and make it the `language` of the annotation, and get arg 3 of the Template and
+make it the `page`, using `adapt`. Here's its definition.
+
+> adapt :: Text -> [Text] -> Template -> Writer Annotation Text
+> adapt keyTarget keySources = (put keyTarget) . (getPrioritized keySources)
+
+`visible` is a combination of `getPrioritized` and `return` -- it similarly
+looks up a list of keys, and makes the first one it finds the text result.
+
+> visible :: [Text] -> Template -> Writer Annotation Text
+> visible keySources = return . (getPrioritized keySources)
+
+`invisible`, then, means that the text of the template is considered to be the empty
+string -- we're using it only for its Annotations.
+
+> invisible :: Writer Annotation Text
+> invisible = return ""
 
 An entry point for parsing an entire page
 -----------------------------------------

@@ -303,7 +303,7 @@ Links
 -----
 
 > handleLinkTemplate :: Template -> AnnotatedText
-> handleLinkTemplate t = buildA $ do
+> handleLinkTemplate t = annotationBuilder $ do
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
 >   adapt "gloss" ["4", "gloss"] t
@@ -311,28 +311,28 @@ Links
 >   visible ["3", "2"] t
 >
 > handleDerivationTemplate :: Template -> AnnotatedText
-> handleDerivationTemplate t = buildA $ do
+> handleDerivationTemplate t = annotationBuilder $ do
 >   put "rel" "*derived/etym"
 >   adapt "language" arg2 t
 >   adapt "page" arg3 t
 >   visible arg3 t
 >
 > handleCognateTemplate :: Template -> AnnotatedText
-> handleCognateTemplate t = buildA $ do
+> handleCognateTemplate t = annotationBuilder $ do
 >   put "rel" "related/etym"
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
 >   visible arg2 t
 >
 > handlePrefixTemplate :: Template -> AnnotatedText
-> handlePrefixTemplate t = buildA $ do
+> handlePrefixTemplate t = annotationBuilder $ do
 >   put "rel" "*derived"
 >   adapt "language" arg1 t
 >   adapt "page" arg3 t
 >   visible arg3 t
 >
 > handleSuffixTemplate :: Template -> AnnotatedText
-> handleSuffixTemplate t = buildA $ do
+> handleSuffixTemplate t = annotationBuilder $ do
 >   put "rel" "*derived"
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
@@ -353,7 +353,7 @@ Translations
 ------------
 
 > handleTranslationTemplate :: Template -> AnnotatedText
-> handleTranslationTemplate t = buildA $ do
+> handleTranslationTemplate t = annotationBuilder $ do
 >   put "rel" "translation"
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
@@ -364,7 +364,7 @@ Form-of templates
 -----------------
 
 > handleAbstractFormTemplate :: Template -> AnnotatedText
-> handleAbstractFormTemplate t = buildA $ do
+> handleAbstractFormTemplate t = annotationBuilder $ do
 >   put "rel" ("form/" <> (get "1" t))
 >   adapt "form" arg1 t
 >   adapt "page" arg2 t
@@ -372,7 +372,7 @@ Form-of templates
 >   invisible
 >
 > handleFormTemplate :: Text -> Template -> AnnotatedText
-> handleFormTemplate form t = buildA $ do
+> handleFormTemplate form t = annotationBuilder $ do
 >   put "rel" ("form/" <> form)
 >   put "form" form
 >   adapt "page" arg1 t
@@ -383,7 +383,7 @@ Form-of templates
 > handleInflectionTemplate t =
 >   let forms = getAll ["3","4","5","6","7","8","9"] t
 >       formStr = intercalate "+" forms
->   in buildA $ do
+>   in annotationBuilder $ do
 >       put "rel" ("form/" <> formStr)
 >       adapt "language" ["lang"] t
 >       adapt "page" arg1 t
@@ -407,7 +407,7 @@ Form-of templates
 >                  "no"  -> ["informal"]
 >                  _     -> []
 >       formStr = intercalate "+" (formal <> forms)
->   in buildA $ do
+>   in annotationBuilder $ do
 >       put "rel" ("form/" <> formStr)
 >       put "language" "es"
 >       adapt "page" ["1", "inf", "verb", "infinitive"] t
@@ -416,7 +416,7 @@ Form-of templates
 > handleSpanishCompoundTemplate t =
 >   let forms = getAll ["mood", "person"] t
 >       formStr = intercalate "+" ("compound":forms)
->   in buildA $ do
+>   in annotationBuilder $ do
 >       put "rel" ("form/" <> formStr)
 >       put "language" "es"
 >       adapt "page" ["3", "1"] t
@@ -425,7 +425,7 @@ Form-of templates
 > handleSwedishFormTemplate t =
 >   let (formStart, formEnd) = breakOnEnd "-form-" (get "0" t)
 >       formStr = replace "-" "+" formEnd
->   in buildA $ do
+>   in annotationBuilder $ do
 >       put "rel" ("form/" <> formStr)
 >       put "language" "sv"
 >       adapt "page" ["1"] t
@@ -440,7 +440,7 @@ to know which language it is, and which template arguments to look up.
 > handleLanguageFormTemplate language formKeys t =
 >   let forms = getAll formKeys t
 >       formStr = intercalate "+" forms
->   in buildA $ do
+>   in annotationBuilder $ do
 >     put "rel" ("form/" <> formStr)
 >     put "language" (fromLanguage language)
 >     adapt "page" arg1 t
@@ -450,7 +450,7 @@ to know which language it is, and which template arguments to look up.
 > handleLanguageFormTemplate2 language formKeys t =
 >   let forms = getAll formKeys t
 >       formStr = intercalate "+" forms
->   in buildA $ do
+>   in annotationBuilder $ do
 >     put "rel" ("form/" <> formStr)
 >     put "language" (fromLanguage language)
 >     adapt "page" arg2 t
