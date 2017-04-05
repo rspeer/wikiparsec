@@ -33,12 +33,12 @@ redecoded = (decode (encode fact1)) :: Maybe Value
 atLiteral :: AnnotatedText
 atLiteral = "literal"
 
-annoWriter = buildA $ do
+annoWriter = annotationBuilder $ do
   put "1" "one"
   put "2" "two"
   return "test"
 
-annoWriter2 = buildA $ do
+annoWriter2 = annotationBuilder $ do
   return "literal"
 
 tests = test [

@@ -1,3 +1,9 @@
+`Text.MediaWiki.Wiktionary.English`: parsing Wiktionary in English
+==================================================================
+
+This file defines specific rules for parsing the English Wiktionary, building
+on the rules in `Text.MediaWiki.Wiktionary.Base`.
+
 > {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 
 Export only the top-level, namespaced functions.
@@ -17,9 +23,9 @@ Export only the top-level, namespaced functions.
 
 
 Parsing entire pages
-====================
+--------------------
 
-This function can be passed as an argument to `handleFile` in
+This function can be passed as an argument to `handleFileJSON` in
 Text.MediaWiki.Wiktionary.Base.
 
 > enParseWiktionary :: Text -> Text -> [WiktionaryFact]
@@ -28,15 +34,13 @@ Text.MediaWiki.Wiktionary.Base.
 >     concat (map (enParseSection title) sections)
 
 
-Parsing sections
-================
-
 Choosing an appropriate section parser
 --------------------------------------
 
-`enParseSection` takes in a title and a WikiSection structure, builds
-a WiktionaryTerm structure for the term we're defining, and passes it on to
-a function that will extract WiktionaryFacts.
+`enParseSection` takes in a title and a WikiSection structure (from
+`Text.MediaWiki.Sections`), builds a WiktionaryTerm structure for the term
+we're defining, and passes it on to a function that will extract
+WiktionaryFacts.
 
 > enParseSection :: Text -> WikiSection -> [WiktionaryFact]
 > enParseSection title (WikiSection {headings=headings, content=content}) =
@@ -65,6 +69,14 @@ a function that will extract WiktionaryFacts.
 `chooseSectionParser` selects a particular function for making WiktionaryFacts,
 based on the type of section we're parsing.
 
+When we specify what kind of relation to extract, "hypernym" means that the
+terms we find will be hypernyms of the word being defined, while "*hypernym"
+reverses that -- the word being defined will be the hypernym of the words we
+find.
+
+Later, the `makeFact` function will see the asterisk and swap the arguments
+when constructing a WiktionaryFact.
+
 > chooseSectionParser :: Text -> WiktionaryTerm -> Text -> [WiktionaryFact]
 > chooseSectionParser "POS" = enParseDefinitions
 > chooseSectionParser "Translations" = enParseTranslations
@@ -80,6 +92,10 @@ based on the type of section we're parsing.
 > chooseSectionParser "Derived terms" = enParseRelation "derived"
 > chooseSectionParser "Related terms" = enParseRelation "related"
 > chooseSectionParser "See also" = enParseRelation "related"
+
+The default case, for a section type we don't know how to parse, is a function
+that ignores two arguments and returns the empty list.
+
 > chooseSectionParser x = const (const [])
 
 
@@ -467,8 +483,8 @@ Possible templates still to handle:
 - verbal noun of
 
 
-Putting it all together
------------------------
+The big template dispatcher
+---------------------------
 
 > enTemplates :: TemplateProc
 > enTemplates "l"         = handleLinkTemplate

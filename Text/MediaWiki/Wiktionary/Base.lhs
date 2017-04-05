@@ -507,7 +507,7 @@ to return an empty list).
 >   labels <- pLabels
 >   string "]"
 >   skipSpace
->   return (Just labels)
+>   return labels
 
 The interior of a label list is either single labels or ranges, separated
 by commas and optional whitespace. For example: `1, 2a, 4-6`. We find these
@@ -580,12 +580,13 @@ for each usable annotation on that text.
 >   in (map (makeDefinitionFact termSense language) defPieces)
 >      ⊕ (map (annotationToFact language termSense) (linkableAnnotations defText))
 
-`makeDefinitionFact` makes a WiktionaryFact out of readable text in a definition.
-It takes in the term being defined and the language it's being defined in. It outputs
-a WiktionaryFact whose `rel` is "definition", pointing from the term being defined,
-to a term made out of the definition text in the appropriate language.
+`makeDefinitionFact` makes a WiktionaryFact out of readable text in a
+definition.  It takes in the term being defined and the language it's being
+defined in, and then the text of the definition. It outputs a WiktionaryFact
+whose `rel` is "definition", pointing from the term being defined, to a term
+made out of the definition text in the appropriate language.
 
-> makeDefinitionFact :: WiktionaryTerm -> Language -> WiktionaryFact
+> makeDefinitionFact :: WiktionaryTerm -> Language -> Text -> WiktionaryFact
 > makeDefinitionFact termSense language definition =
 >   makeFact "definition" termSense (simpleTerm language definition)
 
@@ -945,11 +946,12 @@ effect of that is to map `key` to `value` in the state.
 >     then writer (value, ø)
 >     else writer (value, singletonMap key value)
 
-If that was obscure, don't worry about it. `annotationBuilder` is how we
-use that monad to create an AnnotatedText.
+If that was obscure, don't worry about it.
 
+`annotationBuilder` is how we use that monad to create an AnnotatedText.
 `runWriter` runs the monad and gives us a pair of its return value and its
-state.  The state is our singular Annotation, and the return value is our text.
+accumulated state. The state is our singular Annotation, and the return value
+is our text.
 
 > annotationBuilder :: Writer Annotation Text -> AnnotatedText
 > annotationBuilder m =
