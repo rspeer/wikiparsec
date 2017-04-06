@@ -190,7 +190,7 @@ up the translation section.
 >
 > pDeTranslationItem :: WiktionaryTerm -> Parser [WiktionaryFact]
 > pDeTranslationItem thisTerm = do
->   labels <- pOptionalBracketedLabels
+>   labels <- pBracketedLabels
 >   atext <- annotatedWikiTextWithout ";" deTemplates
 >   let labelAppliers = map applyLabel labels
 >   let labeledAnnotations = labelAppliers <*> (filter isTranslation (getAnnotations atext))
