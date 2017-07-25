@@ -507,7 +507,7 @@ to return an empty list).
 >   labels <- pLabels
 >   string "]"
 >   skipSpace
->   return (Just labels)
+>   return labels
 
 The interior of a label list is either single labels or ranges, separated
 by commas and optional whitespace. For example: `1, 2a, 4-6`. We find these
@@ -585,7 +585,7 @@ It takes in the term being defined and the language it's being defined in. It ou
 a WiktionaryFact whose `rel` is "definition", pointing from the term being defined,
 to a term made out of the definition text in the appropriate language.
 
-> makeDefinitionFact :: WiktionaryTerm -> Language -> WiktionaryFact
+> makeDefinitionFact :: WiktionaryTerm -> Language -> Text -> WiktionaryFact
 > makeDefinitionFact termSense language definition =
 >   makeFact "definition" termSense (simpleTerm language definition)
 
