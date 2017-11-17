@@ -89,11 +89,6 @@ build on those. (The reference implementation -- MediaWiki itself -- would be a
 great example, but so are the various Java-based parsers I've seen.) So the
 next best choice is Haskell.
 
-And if nobody else, another audience I'm writing for is my future self. I can
-imagine a year from now, coming back to this code, saying "what the hell was I
-thinking with all these monads", and wanting to start over, unless I write some
-documentation that explains what I was thinking.
-
 This looks like Markdown, where's the code?
 -------------------------------------------
 
@@ -109,4 +104,14 @@ Haskell source should do the job too.
 You could start reading with `WikiPrelude.lhs`, which sets up the functions
 we want to be available in all our modules, or `Text/Wiki/MediaWiki.lhs`,
 which performs the basic level of parsing for MediaWiki syntax.
+
+Ideally, this documentation is written with a target audience of people who
+are at least somewhat familiar with functional programming, but don't
+necessarily know a lot of details about Haskell.
+
+One member of that audience is myself. I can imagine a year from now, coming
+back to this code, saying "what the hell was I thinking with all these monads",
+and wanting to start over, unless I write some documentation that explains what
+I was thinking, in terms of both how the code is designed and how Haskell works
+in general.
 
