@@ -1,8 +1,10 @@
 Next steps:
 
+- In relation sections such as Antonyms and Derived Forms, don't parse additional explanatory links as if they _are_ these forms
+  (this creates the implausible English words derived from Japanese ones, for example)
+- Stop considering '-adj' or '-nom' in section links to be part of the language
 - normalize the names of inflections
 - [[Appendix:English proper nouns]] shouldn't count as a see also link
 - More etymology templates: {{prefix}}, {{suffix}}, {{compound}}...
 - Handle {{rel4}} and similar meta-templates
 - Handle different POS sections that reduce to the same letter as different etymologies/senses
-- Stop considering '-adj' or '-nom' in section links to be part of the language

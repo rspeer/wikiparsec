@@ -231,8 +231,17 @@ to template arguments that aren't there.
 >   "slightly", "sometimes", "somewhat", "strongly", "typically", "usually",
 >   "very", "in", "of"]
 
-> syntacticPrefixes :: [Text]
-> syntacticPrefixes = [
+Often we can tell by the prefix of a label that it describes a feature of the
+word as a word, not of its meaning. This can be called the "use-mention
+distinction". We would like to filter out labels that are about mentioning the
+word and not about using it.
+
+Some entries contain labels that look like `~ par`. They come out exactly this
+way in the entry. I don't even know what it's supposed to mean, so let's leave
+out these labels, too.
+
+> mentionPrefixes :: [Text]
+> mentionPrefixes = [
 >   "~ ", "with ", "of ", "as ", "especially", "in ", "+ ", "by ",
 >   "followed by ", "no longer", "often ", "chiefly ", "takes ",
 >   "usually ", "on "
@@ -272,13 +281,9 @@ Combine these together into a set of all labels we want to ignore.
 > ignoredLabels :: HashSet Text
 > ignoredLabels = syntacticLabels <> grammarLabels <> usageLabels
 
-Some entries contain labels that look like `~ par`. They come out exactly this
-way in the entry. I don't even know what it's supposed to mean, so let's leave
-out these labels.
-
 > ignoreLabel :: Text -> Bool
 > ignoreLabel label = (elem label ignoredLabels) ||
->                     (any (\prefix -> isPrefixOf prefix label) syntacticPrefixes)
+>                     (any (\prefix -> isPrefixOf prefix label) mentionPrefixes)
 
 > handleLabelTemplate :: Template -> AnnotatedText
 > handleLabelTemplate template =
