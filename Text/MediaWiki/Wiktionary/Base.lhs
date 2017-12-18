@@ -731,11 +731,11 @@ goes.
 >     <$> many ((itemRule tproc) <|> pRelationIgnored)
 
 pRelationItem is a sensible default function to pass as `rsItemRule`: it gets the AnnotatedText
-contents of one list item introduced by the bullet `*`.
+contents of one list item introduced by the bullet `*`, limited to a single link.
 
 > pRelationItem :: TemplateProc -> Parser [AnnotatedText]
 > pRelationItem tproc =
->   extractTopLevel <$> listItem tproc "*"
+>   extractFirstLink <$> listItem tproc "*"
 
 Lines that don't match the rule for parsing items -- such as templates outside
 of the list, or blank lines -- are skipped, producing no results.
@@ -1026,4 +1026,3 @@ of functions to each of the results, in order, using the IO monad.
 >   contents <- (readFile filename) :: IO ByteString
 >   let fromHTML = extractWikiTextFromHTML contents
 >   mapM_ (println . encode) (languageParser title fromHTML)
-

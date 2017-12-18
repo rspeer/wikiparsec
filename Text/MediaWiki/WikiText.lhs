@@ -444,6 +444,30 @@ element for a leaf and nothing for a list.
 > extractItem (Item item) = [item]
 > extractItem _ = []
 
+If what we expect to see is a list of links to other entries, sometimes we want
+to be stingier than that, getting just the first link from each item. (So far,
+we don't need to apply this across an entire list, just one item at a time.)
+
+> extractFirstLink :: ListItem -> [AnnotatedText]
+> extractFirstLink (Item item) = [limitAnnotationToFirstLink item]
+> extractFirstLink _ = []
+>
+> limitAnnotationToFirstLink :: AnnotatedText -> AnnotatedText
+> limitAnnotationToFirstLink (AnnotatedText annos text) =
+>   AnnotatedText (filterForFirstLink annos []) text
+
+`filterForFirstLink` is used in implementing `limitAnnotationToFirstLink`,
+scanning the annotation list of an AnnotatedText and keeping only those up to
+the first that contains a "page" item.
+
+> filterForFirstLink :: [Annotation] -> [Annotation] -> [Annotation]
+> filterForFirstLink (thisAnnotation:rest) seen =
+>   if (member "page" thisAnnotation)
+>     then reverse (thisAnnotation:seen)
+>     else filterForFirstLink rest (thisAnnotation:seen)
+>
+> filterForFirstLink [] seen = reverse seen
+
 And here are the rules for parsing lists:
 
 > listItems :: TemplateProc -> Text -> Parser [ListItem]

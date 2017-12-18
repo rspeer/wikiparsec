@@ -9,7 +9,7 @@ on the rules in `Text.MediaWiki.Wiktionary.Base`.
 Export only the top-level, namespaced functions.
 
 > module Text.MediaWiki.Wiktionary.English
->   (enParseWiktionary, enTemplates) where
+>   (enParseWiktionary, enTemplates, enParseRelation) where
 > import WikiPrelude
 > import Text.MediaWiki.Templates
 > import Text.MediaWiki.AnnotatedText
@@ -593,4 +593,3 @@ The big template dispatcher
 >   | isPrefixOf "sv-adj-form"  x = handleSwedishFormTemplate
 >   | isPrefixOf "sv-verb-form" x = handleSwedishFormTemplate
 >   | otherwise                   = skipTemplate
-

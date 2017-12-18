@@ -269,11 +269,17 @@ compareLists name input output =
   [(name <> ": item " <> (show i)) ~: (index input i) ~?= (index output i) | i <- [0..(length input)]]
 
 defnTests = [
+    -- Parse a definition list with word senses
     testExtract (parseDefinitions "en" enTemplates (termPos "en" "test" "Noun"))
                 "# {{senseid|en|first}} definition 1\n# {{senseid|en|second}} definition 2\n# definition 3"
                 [WiktionaryFact "definition" (term ["test", "en", "Noun", "", "first"]) (simpleTerm "en" "definition 1"),
                  WiktionaryFact "definition" (term ["test", "en", "Noun", "", "second"]) (simpleTerm "en" "definition 2"),
-                 WiktionaryFact "definition" (term ["test", "en", "Noun", "", "def.3"]) (simpleTerm "en" "definition 3")]
+                 WiktionaryFact "definition" (term ["test", "en", "Noun", "", "def.3"]) (simpleTerm "en" "definition 3")],
+    -- Parse a "related terms" list, where the first entry has an additional link we ignore
+    testExtract (enParseWiktionary "example")
+                "==English==\n===Related terms===\n* [[entry]] with an [[addendum]]\n* [[other]]"
+                [WiktionaryFact "related" (term ["example", "en", "", "1"]) (term ["entry"]),
+                 WiktionaryFact "related" (term ["example", "en", "", "1"]) (term ["other"])]
     ]
 
 entryTests = compareLists "Example entry for 'solder'" (enParseWiktionary "solder" solderEntry) solderFacts
