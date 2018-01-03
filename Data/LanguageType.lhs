@@ -9,7 +9,8 @@ This makes our type signatures clearer, and it's implemented with `newtype`, so
 it should have no run-time cost.
 
 > {-# LANGUAGE OverloadedStrings, NoImplicitPrelude #-}
-> module Data.LanguageType (Language, fromLanguage, toLanguage) where
+> module Data.LanguageType (Language, fromLanguage, toLanguage, fixLanguageCode) where
+> import qualified Data.Text as T
 > import ClassyPrelude
 > import Data.Aeson (ToJSON, toJSON)
 
@@ -36,3 +37,42 @@ A Language looks just like a string when you encode it to JSON.
 
 > instance ToJSON Language where
 >   toJSON = toJSON . fromLanguage
+
+In etymology sections, we need to recognize abbreviations for languages that
+are not actual language codes, sometimes because they stand for etymological
+descriptions such as "Late Latin". `fixLanguageCode` converts common instances
+of these into similar real language codes.
+
+Common examples of these codes, such as "BE." for "British English", are
+also sometimes written without the period at the end, so we strip final
+periods.
+
+> fixLanguageCode :: Text -> Text
+> fixLanguageCode text
+>   | isSuffixOf "." text = mapBadCodes (T.dropEnd 1 text)
+>   | otherwise = mapBadCodes text
+
+> mapBadCodes :: Text -> Text
+> mapBadCodes "AE" = "en-US"
+> mapBadCodes "AG" = "de-AT"
+> mapBadCodes "BE" = "en-GB"
+> mapBadCodes "CF" = "fr-CA"
+> mapBadCodes "EL" = "la"
+> mapBadCodes "Ins.Sc" = "sco"
+> mapBadCodes "LL" = "la"
+> mapBadCodes "Mid.Sc" = "sco"
+> mapBadCodes "MIr" = "ira-mid"
+> mapBadCodes "ML" = "la"
+> mapBadCodes "Nor.Sc" = "sco"
+> mapBadCodes "OIr" = "ira-old"
+> mapBadCodes "ONF" = "fro"
+> mapBadCodes "O.Sc" = "sco"
+> mapBadCodes "pinhua" = "yue"
+> mapBadCodes "RL" = "la"
+> mapBadCodes "Sha" = "wuu-sha"
+> mapBadCodes "Sou.Sc" = "sco"
+> mapBadCodes "Tax" = "mul"
+> mapBadCodes "Uls.Sc" = "sco"
+> mapBadCodes "VG" = "de-AT"
+> mapBadCodes "VL" = "la"
+> mapBadCodes other = other

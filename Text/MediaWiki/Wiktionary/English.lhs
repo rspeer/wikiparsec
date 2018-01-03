@@ -9,7 +9,7 @@ on the rules in `Text.MediaWiki.Wiktionary.Base`.
 Export only the top-level, namespaced functions.
 
 > module Text.MediaWiki.Wiktionary.English
->   (enParseWiktionary, enTemplates, enParseRelation) where
+>   (enParseWiktionary, enTemplates, enParseRelation, enParseEtymology) where
 > import WikiPrelude
 > import Text.MediaWiki.Templates
 > import Text.MediaWiki.AnnotatedText
@@ -338,6 +338,15 @@ Links
 >   adapt "page" arg3 t
 >   visible arg3 t
 >
+> handleEtylTemplate :: Template -> AnnotatedText
+> handleEtylTemplate t = annotationBuilder $ do
+>   put "rel" "*derived/etym"
+>   -- The page name "-" means "figure out what word we're referring to from
+>   -- context", which is basically always the case for {{etyl}}.
+>   put "page" "-"
+>   adapt "language" arg1 t
+>   invisible
+>
 > handleCognateTemplate :: Template -> AnnotatedText
 > handleCognateTemplate t = annotationBuilder $ do
 >   put "rel" "related/etym"
@@ -366,9 +375,25 @@ Links
 >       term2 = get "3" t
 >       text = term1 <> " + " <> term2
 >   in annotate
->     [mapFromList [("rel", "*derived"), ("language", language), ("page", term1)],
->      mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
->     text
+>      [mapFromList [("rel", "derived"), ("language", language), ("page", term1)],
+>       mapFromList [("rel", "derived"), ("language", language), ("page", term2)]]
+>      text
+
+The {{ja-r}} template is used to create Japanese text with "ruby text" or
+"furigana" -- small hiragana characters above the text to indicate how the
+kanji are pronounced. In some cases, the `%` character is used to specify how
+the hiragana and kanji should be aligned.
+
+Here, we want to keep just the text as written in kanji, and discard the
+furigana.
+
+> handleJapaneseRubyTemplate :: Template -> AnnotatedText
+> handleJapaneseRubyTemplate t =
+>   let text = getPrioritized ["linkto", "1"] t
+>       term = replace "%" "" text
+>   in annotate
+>      [mapFromList [("language", "ja"), ("page", term)]]
+>      term
 
 Translations
 ------------
@@ -417,6 +442,23 @@ Form-of templates
 >                        ("language", fromLanguage language),
 >                        ("page", pageName (get "1" t))] | form <- forms]
 >   in annotate annotations ""
+
+`handleChineseFormTemplate` handles the box that identifies the simplified
+and traditional forms of a word, possibly including multiple forms of each,
+appearing at the top of an etymology section.
+
+The head-word is assumed to be a traditional form, so the "t" parameter is
+rarely used.
+
+> handleChineseFormTemplate :: Template -> AnnotatedText
+> handleChineseFormTemplate t =
+>   let simpTexts = getAll ["s", "s2", "s3"] t
+>       tradTexts = getAll ["t", "t2", "t3", "alt"] t
+>       simpLinks = [annotationFromList [("rel", "synonym"), ("language", "zh-Hans"), ("page", text)]
+>                                       | text <- simpTexts]
+>       tradLinks = [annotationFromList [("rel", "synonym"), ("language", "zh-Hant"), ("page", text)]
+>                                       | text <- tradTexts]
+>   in annotate (simpLinks ⊕ tradLinks) ""
 >
 > handleSpanishVerbTemplate :: Template -> AnnotatedText
 > handleSpanishVerbTemplate t =
@@ -505,10 +547,12 @@ The big template dispatcher
 > enTemplates "bor"       = handleDerivationTemplate
 > enTemplates "cognate"   = handleCognateTemplate
 > enTemplates "cog"       = handleCognateTemplate
+> enTemplates "ja-r"      = handleJapaneseRubyTemplate
 > enTemplates "prefix"    = handlePrefixTemplate
 > enTemplates "suffix"    = handleSuffixTemplate
 > enTemplates "compound"  = handleCompoundTemplate
 > enTemplates "blend"     = handleCompoundTemplate
+> enTemplates "etyl"      = handleEtylTemplate
 > enTemplates "label"     = handleLabelTemplate
 > enTemplates "lbl"       = handleLabelTemplate
 > enTemplates "lb"        = handleLabelTemplate
@@ -531,6 +575,16 @@ The big template dispatcher
 > enTemplates "altform"             = handleFormTemplate "alternate"
 > enTemplates "inflection of"       = handleInflectionTemplate
 > enTemplates "conjugation of"      = handleInflectionTemplate
+>
+> -- templates that take unbounded numbers of arguments
+> enTemplates "rel2" = handleUnboundedTemplate "related" "en"
+> enTemplates "rel3" = handleUnboundedTemplate "related" "en"
+> enTemplates "rel4" = handleUnboundedTemplate "related" "en"
+> enTemplates "der2" = handleUnboundedTemplate "derived" "en"
+> enTemplates "der3" = handleUnboundedTemplate "derived" "en"
+> enTemplates "der4" = handleUnboundedTemplate "derived" "en"
+> enTemplates "der5" = handleUnboundedTemplate "derived" "en"
+> enTemplates "zh-der" = handleUnboundedTemplate "derived" "zh"
 >
 > -- Should these be handled in more detail than just extracting their text?
 > enTemplates "initialism of"       = useArg "1"

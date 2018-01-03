@@ -132,7 +132,7 @@ Here's what we're exporting from the module:
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
 >   module Control.Monad.Writer,
->   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
+>   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, dropEnd, toTitle,
 >   breakOn, breakOnEnd, listTakeWhile, listDropWhile,
 >   get, getAll, getPrioritized, nonEmpty,
 >   println, ø, (∈), (⊕)
@@ -161,6 +161,7 @@ the ClassyPrelude.
 > dropAround = T.dropAround
 > dropWhileEnd = T.dropWhileEnd
 > toTitle = T.toTitle
+> dropEnd = T.dropEnd
 
 Another kind of standard thing we need to do is trim spaces from the start and
 end of a string:

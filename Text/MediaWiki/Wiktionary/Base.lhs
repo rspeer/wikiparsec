@@ -279,7 +279,7 @@ natural-language name from the "section" value.
 > annotationLanguage :: Language -> Annotation -> Maybe Language
 > annotationLanguage thisLang annot =
 >   case (lookup "language" annot) of
->     Just language -> Just (toLanguage language)
+>     Just language -> Just (toLanguage (fixLanguageCode language))
 >     Nothing ->
 >       case (lookup "section" annot) of
 >         Just section -> sectionLanguage thisLang section
@@ -999,6 +999,28 @@ string -- we're using it only for its Annotations.
 
 > invisible :: Writer Annotation Text
 > invisible = return ""
+
+Unbounded numbers of arguments
+------------------------------
+There are now templates that take an unbounded number of arguments and make
+a table out of them, such as {{der3}} on en.wiktionary.org.
+
+`handleUnboundedTemplate` builds a template-handler that handles these
+templates, given the relation to extract and the default language (usually
+the language the Wiktionary is in).
+
+> handleUnboundedTemplate :: Text -> Text -> Template -> AnnotatedText
+> handleUnboundedTemplate rel defaultLanguage t =
+>   let language = findWithDefault defaultLanguage "lang" t
+>       keys = [cs (show n) | n <- [1..200]]
+>       entries = map stripGloss (getAll keys t)
+>       annots = [annotationFromList [("rel", rel),
+>                                     ("language", language),
+>                                     ("page", text)] | text <- entries]
+>   in annotate annots ""
+>
+> stripGloss :: Text -> Text
+> stripGloss text = fst (splitFirst ":" text)
 
 An entry point for parsing an entire page
 -----------------------------------------
