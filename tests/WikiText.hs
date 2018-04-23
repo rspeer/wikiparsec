@@ -89,7 +89,6 @@ articleSectionWikitext = extractWikiTextFromHTML $ encodeUtf8 $ unlines [
 
 articleSectionText :: Text
 articleSectionText = unlines [
-    "Ainola, Sibelius's home from 1904 until his death",
     "Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous grand duchy within the Russian Empire having earlier been under Swedish control for many centuries. The country remained divided between a culturally dominant Swedish-speaking minority, to which the Sibelius family belonged, and a more nationalistically-minded Finnish-speaking, or \"Fennoman\" majority. In about 1889 Sibelius met his future wife, Aino Järnefelt, who came from a staunch Fennoman family. Sibelius's association with the Järnefelts helped to awaken and develop his own nationalism; in 1892, the year of his marriage to Aino, he completed his first overtly nationalistic work, the symphonic suite Kullervo. Through the 1890s, as Russian control over the duchy grew increasingly oppressive, Sibelius produced a series of works reflecting Finnish resistance to foreign rule, culminating in the tone poem Finlandia."
     ]
 
@@ -106,7 +105,7 @@ tableTests = [
 
 miscTests = [
     testParser looseBracket "}" "}",
-    testParser (sectionText ignoreTemplates) "[[Image:Levellers declaration and standard.gif|thumb|200px|Woodcut from a [[Diggers]] document by [[William Everard (Digger)|William Everard]]]]" "Woodcut from a Diggers document by William Everard\n",
+    testParser (sectionText ignoreTemplates) "[[Image:Levellers declaration and standard.gif|thumb|200px|Woodcut from a [[Diggers]] document by [[William Everard (Digger)|William Everard]]]]" "",
     testParser (sectionText ignoreTemplates) "{{template||arg1=1|arg2={{!}}|arg3=}}" "",
     testParser (sectionText ignoreTemplates) "{{template|arg1 = {{sub|1}}\n|arg2 = {{sub|3\n}}\n}}\n|template detritus\n|}\nnormal text" "normal text\n"
     ]
