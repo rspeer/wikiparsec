@@ -77,6 +77,36 @@ Executable wiki2text
                        hexpat ==0.20.*,
                        aeson
 
+Executable wp-summary
+  ghc-options:
+    -threaded
+    -O2
+  main-is:             cmd/WikipediaSummary.lhs
+  other-modules:       Data.LanguageNamesData, Text.MediaWiki.ParseTools,
+                       Text.SplitUtils, Text.MediaWiki.AnnotatedText,
+                       Text.MediaWiki.Templates, Text.MediaWiki.Sections,
+                       Text.MediaWiki.HTML, Text.MediaWiki.XML,
+                       Data.LanguageType, Data.LanguageNames,
+                       Text.MediaWiki.WikiText,
+                       WikiPrelude
+  build-depends:       base,
+                       base-unicode-symbols,
+                       classy-prelude ==0.12.*,
+                       string-conversions ==0.4.*,
+                       utf8-string,
+                       stringsearch,
+                       text-icu ==0.7.*,
+                       split,
+                       text, bytestring, containers,
+                       unicode-show,
+                       attoparsec ==0.13.*,
+                       parsec ==3.1.*,
+                       mtl,
+                       tagsoup,
+                       fast-tagsoup-utf8-only,
+                       hexpat ==0.20.*,
+                       aeson
+
 Executable wiktionary-parser
   ghc-options:
     -threaded

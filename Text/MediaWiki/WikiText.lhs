@@ -346,24 +346,31 @@ a link's text, then we return the last part.
 
 For example, in this image syntax:
 
-    [[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius's home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]
+    [[File:Ainola yard.jpg|300px|Ainola, Sibelius's home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]
 
 the text we want to extract is:
 
     Ainola, Sibelius's home from 1904 until his death
 
+On the other hand, images aren't usually in the flow of text; they're usually
+set off to the side using "thumb" as one of the arguments. In that case, we
+just want to skip them.
+
 > extractLinkText :: Text -> Text
 > extractLinkText text =
->   -- Get the part of a link that's most likely to be its displayed text.
->   -- If there are many parts to choose from, prefer the ones without
->   -- equals signs (which may be image metadata, for example).
->   let parts      = splitOn "|" text
->       noEquals t = not (isInfixOf "=" t)
->       priority   = parts ⊕ (filter noEquals parts)
->   -- We use MinLen functions to convince the type system that there will
->   -- be a "last" element. We know there is one because, even if our priority
->   -- order is empty, we stick "" on the front as a last resort.
->   in last (mlcons "" (toMinLenZero priority))
+>   if isPrefixOf "thumb" text
+>     then ""
+>     else
+>       -- Get the part of a link that's most likely to be its displayed text.
+>       -- If there are many parts to choose from, prefer the ones without
+>       -- equals signs (which may be image metadata, for example).
+>       let parts      = splitOn "|" text
+>           noEquals t = not (isInfixOf "=" t)
+>           priority   = parts ⊕ (filter noEquals parts)
+>       -- We use MinLen functions to convince the type system that there will
+>       -- be a "last" element. We know there is one because, even if our priority
+>       -- order is empty, we stick "" on the front as a last resort.
+>       in last (mlcons "" (toMinLenZero priority))
 
 `annotatedWikiText` parses text that may or may not contain links or templates,
 and returns it in an AnnotatedText data structure.
@@ -639,12 +646,16 @@ the plain text that they contain.
 Entry points
 ------------
 
+Parse all the text of a section.
+
+> parseEntireSection = parseOnly (sectionText ignoreTemplates <* endOfInput)
+
 Here's a function to be run at the IO level, which takes in Wikitext,
 outputs its plain text, and returns nothing.
 
 > outputPlainText :: Text -> IO ()
 > outputPlainText input =
->    case parseOnly (sectionText ignoreTemplates <* endOfInput) input of
+>    case parseEntireSection input of
 >      Left err -> showError input err
 >      Right x -> putStrLn x
 
