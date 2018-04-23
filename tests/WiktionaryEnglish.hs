@@ -159,9 +159,12 @@ solderEntry = unlines [
 
 solderFacts :: [WiktionaryFact]
 solderFacts = [
+    WiktionaryFact "derived/etym" (term ["-","enm"]) (term ["solder","en","","1"]),
     WiktionaryFact "related/etym" (term ["solder","en","","1"]) (term ["solderen","enm"]),
+    WiktionaryFact "derived/etym" (term ["-","fro"]) (term ["solder","en","","1"]),
     WiktionaryFact "related/etym" (term ["solder","en","","1"]) (term ["solder","fro"]),
     WiktionaryFact "related/etym" (term ["solder","en","","1"]) (term ["souder","fr"]),
+    WiktionaryFact "derived/etym" (term ["-","la"]) (term ["solder","en","","1"]),
     WiktionaryFact "related/etym" (term ["solder","en","","1"]) (term ["solidare","la"]),
     WiktionaryFact "related/etym" (term ["solder","en","","1"]) (term ["solido","la"]),
     WiktionaryFact "definition" (term ["solder","en","n","1","def.1"]) (term ["Any of various alloys, often of tin and lead, that are used to join small pieces of metal together","en"]),
