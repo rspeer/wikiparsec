@@ -1040,11 +1040,13 @@ important because it tells us what word is being defined) and the non-HTML
 Wikitext of that page, and outputs a list of WiktionaryFacts.
 
 The WiktionaryFacts are converted to output by sending them through
-the JSON `encode` and then through `println`. `mapM_` applies this chain
-of functions to each of the results, in order, using the IO monad.
+the JSON `encode`, then through the all-purpose text type converter `cs`
+(I really tried to name something more specific but I failed), and then through
+`println`. `mapM_` applies this chain of functions to each of the results,
+in order, using the IO monad.
 
 > handleFileJSON :: (Text -> Text -> [WiktionaryFact]) -> Text -> FilePath -> IO ()
 > handleFileJSON languageParser title filename = do
 >   contents <- (readFile filename) :: IO ByteString
 >   let fromHTML = extractWikiTextFromHTML contents
->   mapM_ (println . encode) (languageParser title fromHTML)
+>   mapM_ (println . cs . encode) (languageParser title fromHTML)

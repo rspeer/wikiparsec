@@ -132,17 +132,18 @@ Here's what we're exporting from the module:
 >   module Data.String.Conversions,
 >   module Data.LanguageType,
 >   module Control.Monad.Writer,
->   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, dropEnd, toTitle,
->   breakOn, breakOnEnd, listTakeWhile, listDropWhile,
+>   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
+>   breakOn, breakOnEnd, listTakeWhile, listDropWhile, hGetContentsLazy,
 >   get, getAll, getPrioritized, nonEmpty,
 >   println, ø, (∈), (⊕)
 >   ) where
 
 Some of these exports are just re-exporting things that we import en masse:
 
-> import ClassyPrelude hiding (takeWhile)
+> import ClassyPrelude hiding (takeWhile, splitFirst)
 > import qualified ClassyPrelude as P
 > import Data.String.Conversions hiding ((<>), (⊕))
+> import qualified Data.ByteString.Lazy as BSL
 > import Data.LanguageType
 > import Data.Monoid.Unicode ((⊕), (∅))
 > import Control.Monad.Writer (Writer, writer, pass, runWriter, execWriter)
@@ -161,7 +162,7 @@ the ClassyPrelude.
 > dropAround = T.dropAround
 > dropWhileEnd = T.dropWhileEnd
 > toTitle = T.toTitle
-> dropEnd = T.dropEnd
+> hGetContentsLazy = BSL.hGetContents
 
 Another kind of standard thing we need to do is trim spaces from the start and
 end of a string:
@@ -171,8 +172,8 @@ end of a string:
 
 Writing any sort of text to stdout:
 
-> println :: (IOData a) => a -> IO ()
-> println = hPutStrLn stdout
+> println :: Text -> IO ()
+> println = putStrLn
 
 
 List operations
@@ -206,7 +207,7 @@ operator. But ø is a name, and that's exactly what we need.
 rather nice. We have to make sure it refers to the ClassyPrelude version of
 `elem`, complete with its type signature (which I just copied and pasted).
 
-> (∈) :: MonoFoldableEq c => Element c -> c -> Bool
+> (∈) :: (MonoFoldable c, Eq (Element c)) => Element c -> c -> Bool
 > (∈) = elem
 
 Mapping operations
@@ -236,6 +237,12 @@ and returns the list of values of those keys that exist.
 
 > getAll :: (IsMap m, Monoid (MapValue m)) => [ContainerKey m] -> m -> [MapValue m]
 > getAll keys m = catMaybes (map (\key -> lookup key m) keys)
+
+Sometimes we don't want a Maybe, we want to do something different based on
+whether a key is present or not:
+
+> hasKey :: IsMap map => ContainerKey map -> map -> Bool
+> hasKey key map = isJust (lookup key map)
 
 Perhaps we've gotten some values that may or may not be empty using `get`, and
 now we want to turn them back into a proper `Maybe`. This function replaces

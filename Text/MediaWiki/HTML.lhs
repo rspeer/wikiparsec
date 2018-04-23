@@ -1,7 +1,7 @@
 `Text.MediaWiki.HTML`: removing HTML from Wikitext
 ==================================================
 
-> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}
+> {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction, FlexibleContexts #-}
 
 After parsing the XML of a MediaWiki entry, the result then needs to be
 decoded as (potentially very sloppy) HTML, the contents of which are Wikitext.
@@ -141,4 +141,3 @@ tag.
 > slashedAttrs ((name,value):rest) = slashed name || slashed value || slashedAttrs rest
 > slashedAttrs [] = False
 > slashed = isSuffixOf "/"
-

@@ -1,7 +1,7 @@
 `Text.MediaWiki.WikiText`: parse the WikiText format
 ====================================================
 
-> {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings, UnicodeSyntax #-}
+> {-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings, UnicodeSyntax, FlexibleContexts #-}
 
 This is the core of Wikiparsec: a set of parsing rules for handling the Wikitext
 format.
@@ -370,7 +370,7 @@ just want to skip them.
 >       -- We use MinLen functions to convince the type system that there will
 >       -- be a "last" element. We know there is one because, even if our priority
 >       -- order is empty, we stick "" on the front as a last resort.
->       in last (mlcons "" (toMinLenZero priority))
+>       in last (ncons "" priority)
 
 `annotatedWikiText` parses text that may or may not contain links or templates,
 and returns it in an AnnotatedText data structure.

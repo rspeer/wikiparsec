@@ -9,7 +9,8 @@
 > import Text.MediaWiki.Wiktionary.French (frParseWiktionary)
 > import Text.MediaWiki.Wiktionary.German (deParseWiktionary)
 > import Data.Aeson (ToJSON)
-> import Data.Aeson.Encode.Pretty (encodePretty', Config(..), keyOrder)
+> import Data.Aeson.Encode.Pretty (
+>     encodePretty', keyOrder, Config(..), Indent(..), NumberFormat(..))
 
 Language handling
 =================
@@ -49,7 +50,12 @@ JSON" format we want to output, in which there's exactly one object per line.
 So we also need to post-process the result to remove newlines.
 
 > customOrder = keyOrder ["rel", "language", "text", "pos"]
-> customConfig = Config { confIndent = 0, confCompare = customOrder <> compare }
+> customConfig = Config {
+>   confIndent = Spaces 0,
+>   confCompare = customOrder <> compare,
+>   confNumFormat = Generic,
+>   confTrailingNewline = False
+> }
 >
 > customEncode :: ToJSON a => a -> Text
 > customEncode obj = replace "\n" " " $ cs $ encodeMultiline obj
@@ -74,4 +80,3 @@ Top level
 >   case args of
 >     (language:_) -> processMediaWikiStdin (handlePage (toLanguage language))
 >     _            -> error "Please give a language code as a command-line argument"
-

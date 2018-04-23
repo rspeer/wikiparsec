@@ -232,8 +232,7 @@ program straight out of `bunzip2`.
 
 > processMediaWikiStream :: Handle -> (WikiPage -> IO ()) -> IO ()
 > processMediaWikiStream source sink = do
->   content <- hGetContents source
+>   content <- hGetContentsLazy source
 >   processMediaWikiContent content sink
 >
 > processMediaWikiStdin = processMediaWikiStream stdin
-
