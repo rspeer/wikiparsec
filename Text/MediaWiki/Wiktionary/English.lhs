@@ -346,27 +346,6 @@ Links
 >   put "page" "-"
 >   adapt "language" arg1 t
 >   invisible
->
-> handleCognateTemplate :: Template -> AnnotatedText
-> handleCognateTemplate t = annotationBuilder $ do
->   put "rel" "related/etym"
->   adapt "language" arg1 t
->   adapt "page" arg2 t
->   visible arg2 t
->
-> handlePrefixTemplate :: Template -> AnnotatedText
-> handlePrefixTemplate t = annotationBuilder $ do
->   put "rel" "*derived"
->   adapt "language" arg1 t
->   adapt "page" arg3 t
->   visible arg3 t
->
-> handleSuffixTemplate :: Template -> AnnotatedText
-> handleSuffixTemplate t = annotationBuilder $ do
->   put "rel" "*derived"
->   adapt "language" arg1 t
->   adapt "page" arg2 t
->   visible arg2 t
 
 The `{{compound}}` template can look like this:
 
@@ -387,37 +366,53 @@ this:
 Which makes it entirely clear that "place" and "holder" are arguments 1 and 2.
 
 I don't know if there is any unified logic to the implementation of this
-template that makes sense in MediaWiki-land, but here we'll just handle it as
-two separate cases -- one where the language is positional argument 1, and one
-where it's a keyword argument.
+template that makes sense in MediaWiki-land, so we introduce `fixLanguageArg`,
+which ensures that the first two non-language arguments are labeled "2" and "3".
 
+> fixLanguageArg :: Template -> Template
+> fixLanguageArg t = 
+>   if (hasKey "lang" t)
+>     then [("lang", get "lang" t), ("2", get "1" t), ("3", get "2" t)]
+>     else [("lang", get "1" t), ("2", get "2" t), ("3", get "3" t)]
+>
 > handleCompoundTemplate :: Template -> AnnotatedText
 > handleCompoundTemplate t =
->   if (hasKey "lang" t)
->       then handleCompoundWithKeywordLang t
->       else handleCompoundWithPositionalLang t
->
-> handleCompoundWithKeywordLang :: Template -> AnnotatedText
-> handleCompoundWithKeywordLang t =
->   let language = get "lang" t
->       term1 = get "1" t
->       term2 = get "2" t
+>   let t' = fixLanguageArg t
+>       language = get "lang" t'
+>       term1 = get "2" t'
+>       term2 = get "3" t'
 >       text = term1 <> " + " <> term2
 >   in annotate
 >      [mapFromList [("rel", "*derived"), ("language", language), ("page", term1)],
 >       mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
 >      text
+
+{{prefix}}, {{suffix}}, and {{cognate}} have a language argument that can move
+in similar ways.
+
+> handleCognateTemplate :: Template -> AnnotatedText
+> handleCognateTemplate t = annotationBuilder $ do
+>   let t' = fixLanguageArg t
+>   put "rel" "related/etym"
+>   adapt "language" ["lang"] t'
+>   adapt "page" arg2 t'
+>   visible arg2 t'
 >
-> handleCompoundWithPositionalLang :: Template -> AnnotatedText
-> handleCompoundWithPositionalLang t =
->   let language = get "1" t
->       term1 = get "2" t
->       term2 = get "3" t
->       text = term1 <> " + " <> term2
->   in annotate
->      [mapFromList [("rel", "*derived"), ("language", language), ("page", term1)],
->       mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
->      text
+> handlePrefixTemplate :: Template -> AnnotatedText
+> handlePrefixTemplate t = annotationBuilder $ do
+>   let t' = fixLanguageArg t
+>   put "rel" "*derived"
+>   adapt "language" ["lang"] t'
+>   adapt "page" arg3 t'
+>   visible arg3 t'
+>
+> handleSuffixTemplate :: Template -> AnnotatedText
+> handleSuffixTemplate t = annotationBuilder $ do
+>   let t' = fixLanguageArg t
+>   put "rel" "*derived"
+>   adapt "language" ["lang"] t'
+>   adapt "page" arg2 t'
+>   visible arg2 t'
 
 The {{ja-r}} template is used to create Japanese text with "ruby text" or
 "furigana" -- small hiragana characters above the text to indicate how the
