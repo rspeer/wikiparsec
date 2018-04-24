@@ -404,8 +404,8 @@ where it's a keyword argument.
 >       term2 = get "2" t
 >       text = term1 <> " + " <> term2
 >   in annotate
->      [mapFromList [("rel", "derived"), ("language", language), ("page", term1)],
->       mapFromList [("rel", "derived"), ("language", language), ("page", term2)]]
+>      [mapFromList [("rel", "*derived"), ("language", language), ("page", term1)],
+>       mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
 >      text
 >
 > handleCompoundWithPositionalLang :: Template -> AnnotatedText
@@ -415,8 +415,8 @@ where it's a keyword argument.
 >       term2 = get "3" t
 >       text = term1 <> " + " <> term2
 >   in annotate
->      [mapFromList [("rel", "derived"), ("language", language), ("page", term1)],
->       mapFromList [("rel", "derived"), ("language", language), ("page", term2)]]
+>      [mapFromList [("rel", "*derived"), ("language", language), ("page", term1)],
+>       mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
 >      text
 
 The {{ja-r}} template is used to create Japanese text with "ruby text" or
