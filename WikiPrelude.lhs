@@ -134,7 +134,7 @@ Here's what we're exporting from the module:
 >   module Control.Monad.Writer,
 >   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
 >   breakOn, breakOnEnd, listTakeWhile, listDropWhile, hGetContentsLazy,
->   get, getAll, getPrioritized, nonEmpty,
+>   get, getAll, getPrioritized, nonEmpty, hasKey,
 >   println, ø, (∈), (⊕)
 >   ) where
 

@@ -367,9 +367,49 @@ Links
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
 >   visible arg2 t
->
+
+The `{{compound}}` template can look like this:
+
+    {{compound|en|place|holder}}
+
+where argument 1 is the language code, and arguments 2 and 3 are the terms
+being compounded. Or it can look like this:
+
+    {{compound|lang=en|place|holder}}
+
+Which looks like it's just being more specific, but now, argument "lang" is the
+language code, and arguments 1 and 2 are the terms being compounded. Am I just
+counting positional arguments wrong? Nope, the template can even appear like
+this:
+
+    {{compound|place|holder|lang=en}}
+
+Which makes it entirely clear that "place" and "holder" are arguments 1 and 2.
+
+I don't know if there is any unified logic to the implementation of this
+template that makes sense in MediaWiki-land, but here we'll just handle it as
+two separate cases -- one where the language is positional argument 1, and one
+where it's a keyword argument.
+
 > handleCompoundTemplate :: Template -> AnnotatedText
 > handleCompoundTemplate t =
+>   if (hasKey "lang" t)
+>       then handleCompoundWithKeywordLang t
+>       else handleCompoundWithPositionalLang t
+>
+> handleCompoundWithKeywordLang :: Template -> AnnotatedText
+> handleCompoundWithKeywordLang t =
+>   let language = get "lang" t
+>       term1 = get "1" t
+>       term2 = get "2" t
+>       text = term1 <> " + " <> term2
+>   in annotate
+>      [mapFromList [("rel", "derived"), ("language", language), ("page", term1)],
+>       mapFromList [("rel", "derived"), ("language", language), ("page", term2)]]
+>      text
+>
+> handleCompoundWithPositionalLang :: Template -> AnnotatedText
+> handleCompoundWithPositionalLang t =
 >   let language = get "1" t
 >       term1 = get "2" t
 >       term2 = get "3" t
