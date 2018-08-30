@@ -23,9 +23,20 @@ Compiling and running the code
 ------------------------------
 
 This code is meant to be built with [Haskell Stack][stack]. Install Stack and
-build this code with:
+dependencies:
+
+```
+sudo apt install stack libicu-dev
+stack upgrade
+```
+
+If Stack upgraded itself, you need to start a new shell, or else the old path
+to Stack will be cached.
+
+Then build this code with:
 
 ```sh
+stack clean
 stack build
 ```
 

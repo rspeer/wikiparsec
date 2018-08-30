@@ -70,10 +70,12 @@ be concatenated to other AnnotatedText as a way to add a property.
 
 An AnnotatedText is a Monoid, meaning that it can be concatenated:
 
+> instance Semigroup AnnotatedText where
+>   (AnnotatedText a1 t1) <> (AnnotatedText a2 t2)
+>     = AnnotatedText (a1 ++ a2) (t1 ++ t2)
+
 > instance Monoid AnnotatedText where
 >   mempty  = annotFromText ""
->   mappend (AnnotatedText a1 t1) (AnnotatedText a2 t2)
->     = AnnotatedText (a1 ++ a2) (t1 ++ t2)
 
 One particular kind of concatenation we'll want to do is joining
 AnnotatedTexts with line breaks between the texts:
