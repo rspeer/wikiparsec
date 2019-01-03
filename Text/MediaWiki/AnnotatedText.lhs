@@ -24,16 +24,6 @@ avoids putting unnecessary empty values into the map.
 > filterEmpty :: (Text, Text) -> Bool
 > filterEmpty (a, b) = b /= ""
 
-`makeLink` is a constant that can be used as a template for making Annotations
-for internal links.
-
-> makeLink :: Text -> Text -> Text -> Annotation
-> makeLink namespace page section = annotationFromList [
->   ("rel", "link"),
->   ("namespace", namespace),
->   ("page", page),
->   ("section", section)]
-
 The simplifying assumption here is that, in a parse rule that produces
 annotations, the annotations apply to the entire span of text that was parsed.
 So what we need to keep track of in an AnnotatedText is one string (as a
@@ -51,6 +41,39 @@ Some simple functions to extract values from AnnotatedText:
 >
 > getText :: AnnotatedText -> Text
 > getText (AnnotatedText annos t) = t
+
+Links
+-----
+
+`makeLink` is a constant that can be used as a template for making Annotations
+for internal links.
+
+> makeLink :: Text -> Text -> Text -> Annotation
+> makeLink namespace page section = annotationFromList [
+>   ("rel", "link"),
+>   ("namespace", namespace),
+>   ("page", page),
+>   ("section", section)]
+
+`filterLink` tests whether an annotation is a link.
+
+> filterLink :: Annotation -> Bool
+> filterLink annot = (get "rel" annot) == "link"
+>
+> filterArticleLink :: Annotation -> Bool
+> filterArticleLink annot = (filterLink annot) && (get "namespace" annot) == ""
+
+If links in particular are what we're interested in, we can use `getLinks` or
+`getArticleLinks`.
+
+> getLinks :: AnnotatedText -> [Annotation]
+> getLinks atext = filter filterLink (getAnnotations atext)
+>
+> getArticleLinks :: AnnotatedText -> [Text]
+> getArticleLinks atext = map (get "page") (filter filterArticleLink (getAnnotations atext))
+
+Operations on AnnotatedTexts
+----------------------------
 
 We convert plain Text into AnnotatedText by annotating it with nothing.
 The same goes for a plain ByteString, except we have to decode it from UTF-8
