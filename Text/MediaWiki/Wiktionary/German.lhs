@@ -278,7 +278,7 @@ adding pictures to the entry, and arguments that are written phonetically in
 IPA.
 
 > skippedInflectionPrefixes :: [Text]
-> skippedInflectionPrefixes = ["bild", "ipa_", "stamm", "genus", "navi", "1", "2",
+> skippedInflectionPrefixes = ["bild", "ipa_", "stamm", "navi", "1", "2",
 >                              "deklination", "klasse"]
 
 Some values, as well, indicate that we shouldn't use this entry as a form. Some
@@ -316,7 +316,7 @@ data into account.
 > keepInflectionArg (name, value) =
 >   not (member name skippedInflectionArgs) &&
 >   not (any (\prefix -> isPrefixOf prefix name) skippedInflectionPrefixes) &&
->   (length value) >= 2 && not (isPrefixOf "Flexion:" value) &&
+>   (length value) >= 0 && not (isPrefixOf "Flexion:" value) &&
 >   not (member value skippedInflectionValues)
 >
 > makeInflectionAnnotation :: Language -> (Text, Text) -> Annotation
