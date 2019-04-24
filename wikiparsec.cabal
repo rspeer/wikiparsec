@@ -8,7 +8,7 @@ synopsis:            An LL parser for extracting information from Wiki text, par
 homepage:            http://github.com/LuminosoInsight/wikiparsec
 license:             MIT
 license-file:        LICENSE
-author:              Rob Speer
+author:              Robyn Speer
 maintainer:          rspeer@luminoso.com
 -- copyright:
 category:            Text

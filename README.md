@@ -1,8 +1,10 @@
 Wikiparsec: tools that parse Wikipedia and Wiktionary
 =====================================================
 
-Wikiparsec provides tools for parsing the complex MediaWiki syntax that
-appears on Wikipedia and Wiktionary, for the purpose of information
+Author: Robyn Speer
+
+Wikiparsec provides tools for parsing the complex MediaWiki
+syntax that appears on Wikipedia and Wiktionary, for the purpose of information
 extraction.
 
 I'm aware that many other tools do the same, but I think most of them are too
