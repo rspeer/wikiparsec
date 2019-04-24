@@ -24,6 +24,7 @@ Top level
 >   when (pageNamespace page == "0" && pageRedirect page == Nothing) $ do
 >     putStrLn (pageTitle page)
 >     (outputPlainTextPage (pageText page))
+>     putStrLn "--------"
 
 > main :: IO ()
 > main = do

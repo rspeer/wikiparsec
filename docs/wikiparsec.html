@@ -91,7 +91,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#converting-sections">Converting sections</a></li>
 <li><a href="#parsing-the-whole-page">Parsing the whole page</a></li>
 </ul></li>
-<li><a href="#text.mediawiki.annotatedtext-a-data-type-for-slightly-marked-up-text"><code>Text.MediaWiki.AnnotatedText</code>: a data type for slightly-marked-up text</a></li>
+<li><a href="#text.mediawiki.annotatedtext-a-data-type-for-slightly-marked-up-text"><code>Text.MediaWiki.AnnotatedText</code>: a data type for slightly-marked-up text</a><ul>
+<li><a href="#links">Links</a></li>
+<li><a href="#operations-on-annotatedtexts">Operations on AnnotatedTexts</a></li>
+</ul></li>
 <li><a href="#text.mediawiki.wikitext-parse-the-wikitext-format"><code>Text.MediaWiki.WikiText</code>: parse the WikiText format</a><ul>
 <li><a href="#setup">Setup</a></li>
 <li><a href="#spans-of-text">Spans of text</a></li>
@@ -105,18 +108,51 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#text.mediawiki.templates-representing-and-applying-templates"><code>Text.MediaWiki.Templates</code>: representing and applying templates</a><ul>
 <li><a href="#generally-useful-template-actions">Generally useful template actions</a></li>
 </ul></li>
+<li><a href="#text.mediawiki.wiktionary.base-parsing-wiktionary-in-general"><code>Text.MediaWiki.Wiktionary.Base</code>: parsing Wiktionary in general</a><ul>
+<li><a href="#the-wiktionaryterm-data-type">The <code>WiktionaryTerm</code> data type</a></li>
+<li><a href="#the-wiktionaryfact-data-type">The <code>WiktionaryFact</code> data type</a></li>
+<li><a href="#annotations-that-link-to-terms">Annotations that link to terms</a></li>
+<li><a href="#definition-sections">Definition sections</a></li>
+<li><a href="#parsing-the-language-of-definitions">Parsing the language of definitions</a></li>
+<li><a href="#relation-sections">Relation sections</a></li>
+<li><a href="#the-translation-section">The translation section</a></li>
+<li><a href="#looking-up-sections">Looking up sections</a></li>
+<li><a href="#transforming-templates">Transforming templates</a></li>
+<li><a href="#unbounded-numbers-of-arguments">Unbounded numbers of arguments</a></li>
+<li><a href="#an-entry-point-for-parsing-an-entire-page">An entry point for parsing an entire page</a></li>
+</ul></li>
+<li><a href="#text.mediawiki.wiktionary.english-parsing-wiktionary-in-english"><code>Text.MediaWiki.Wiktionary.English</code>: parsing Wiktionary in English</a><ul>
+<li><a href="#parsing-entire-pages">Parsing entire pages</a></li>
+<li><a href="#choosing-an-appropriate-section-parser">Choosing an appropriate section parser</a></li>
+<li><a href="#defining-section-parsers">Defining section parsers</a></li>
+</ul></li>
+<li><a href="#finding-headings">Finding headings</a></li>
+<li><a href="#evaluating-templates">Evaluating templates</a><ul>
+<li><a href="#labels">Labels</a></li>
+<li><a href="#sense-ids">Sense IDs</a></li>
+<li><a href="#links-1">Links</a></li>
+<li><a href="#translations">Translations</a></li>
+<li><a href="#form-of-templates">Form-of templates</a></li>
+<li><a href="#the-big-template-dispatcher">The big template dispatcher</a></li>
+</ul></li>
 </ul>
 </nav>
 <h1 id="wikiparsec-tools-that-parse-wikipedia-and-wiktionary">Wikiparsec: tools that parse Wikipedia and Wiktionary</h1>
+<p>Author: Robyn Speer</p>
 <p>Wikiparsec provides tools for parsing the complex MediaWiki syntax that appears on Wikipedia and Wiktionary, for the purpose of information extraction.</p>
 <p>I’m aware that many other tools do the same, but I think most of them are too sloppy about their parsing. Wikiparsec is designed for cases where it’s important to parse the page as correctly as possible (without running an embedded instance of MediaWiki), and extract detailed information from that parse.</p>
 <p>We’re not outputting a fully-general tree structure of everything going on in the Wikitext (if you output that, you <em>still</em> have a parsing problem). Instead, the parser is connected to functions that extract relevant information for the problem at hand, and those functions are responsible for the output.</p>
 <p>Wikiparsec is used to provide dictionary definitions to <a href="http://conceptnet.io">ConceptNet</a>.</p>
 <h2 id="compiling-and-running-the-code">Compiling and running the code</h2>
-<p>This code is meant to be built with <a href="https://github.com/commercialhaskell/stack">Haskell Stack</a>. Install Stack and build this code with:</p>
-<pre class="sh"><code>stack build</code></pre>
+<p>This code is meant to be built with <a href="https://github.com/commercialhaskell/stack">Haskell Stack</a>. Install Stack and dependencies:</p>
+<pre><code>sudo apt install stack libicu-dev
+stack upgrade</code></pre>
+<p>If Stack upgraded itself, you need to start a new shell, or else the old path to Stack will be cached.</p>
+<p>Then build this code with:</p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">stack</span> clean
+<span class="ex">stack</span> build</code></pre></div>
 <p>The top-level programs are <code>wiki2text</code> and <code>wiktionary-parser</code>. <code>wiki2text</code> extracts paragraphs of plain text from a MediaWiki dump in XML format (ideally Wikipedia). It can be run with:</p>
-<pre class="sh"><code>bunzip2 -c wikipedia.xml.bz2 | stack exec wiki2text</code></pre>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="fu">bunzip2</span> -c wikipedia.xml.bz2 <span class="kw">|</span> <span class="ex">stack</span> exec wiki2text</code></pre></div>
 <p><code>wiktionary-parser</code> parses the structure of some languages’ Wiktionaries to extract a stream of lexical facts in JSON format. It takes one argument, the language code of the Wiktionary it will be parsing. Each language has its own structure of Wiktionary entries, and so far we can parse:</p>
 <ul>
 <li>English (<code>en</code>)</li>
@@ -124,7 +160,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>German (<code>de</code>)</li>
 </ul>
 <p>To run it in English, for example:</p>
-<pre class="sh"><code>bunzip2 -c enwiktionary.xml.bz2 | stack exec wiktionary-parser en</code></pre>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="fu">bunzip2</span> -c enwiktionary.xml.bz2 <span class="kw">|</span> <span class="ex">stack</span> exec wiktionary-parser en</code></pre></div>
 <h2 id="why-this-code-is-in-haskell">Why this code is in Haskell</h2>
 <p>I’ve been facing the problem of how to deal with Wikitext well for a long time. I didn’t originally expect to solve it using Haskell.</p>
 <p>The thing about Haskell is that it’s designed by mathematicians, and for the most part, it’s also documented for mathematicians. Everything about the language encourages you to write code that’s not about down-to-earth things like functions, strings, and lists, but instead is about functors, monoids, and monads. This gives Haskell code a reputation for being incomprehensible to most people.</p>
@@ -136,11 +172,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Awful spaghetti hacks</li>
 </ul>
 <p>There are already Wikitext parsers that are awful spaghetti hacks, and I can’t build on those. (The reference implementation – MediaWiki itself – would be a great example, but so are the various Java-based parsers I’ve seen.) So the next best choice is Haskell.</p>
-<p>And if nobody else, another audience I’m writing for is my future self. I can imagine a year from now, coming back to this code, saying “what the hell was I thinking with all these monads”, and wanting to start over, unless I write some documentation that explains what I was thinking.</p>
 <h2 id="this-looks-like-markdown-wheres-the-code">This looks like Markdown, where’s the code?</h2>
 <p>One thing I love about Haskell is the Literate Haskell (<code>.lhs</code>) format. The Haskell compiler can interpret it without any pre-processing, and it encourages documentation as the rule and code as the exception.</p>
 <p>Lines that start with the character <code>&gt;</code> are code. The rest is Markdown. The documentation tool <code>pandoc</code> can convert this all into nicely-formatted HTML, which you might even be reading right now, but just reading the Markdown + Haskell source should do the job too.</p>
 <p>You could start reading with <code>WikiPrelude.lhs</code>, which sets up the functions we want to be available in all our modules, or <code>Text/Wiki/MediaWiki.lhs</code>, which performs the basic level of parsing for MediaWiki syntax.</p>
+<p>Ideally, this documentation is written with a target audience of people who are at least somewhat familiar with functional programming, but don’t necessarily know a lot of details about Haskell.</p>
+<p>One member of that audience is myself. I can imagine a year from now, coming back to this code, saying “what the hell was I thinking with all these monads”, and wanting to start over, unless I write some documentation that explains what I was thinking, in terms of both how the code is designed and how Haskell works in general.</p>
 <h1 id="wikiprelude---a-custom-prelude-for-wiki-parsing"><code>WikiPrelude</code> - A custom Prelude for Wiki parsing</h1>
 <p>The Haskell standard library is called the ‘Prelude’. There is general agreement that the Prelude is not very good code and should be replaced with something else. There is absolutely no agreement on what it should be replaced with.</p>
 <p>I built this code on an alternative Haskell standard library, the Classy Prelude, because it’s got a good idea of how to deal with different data types such as Texts and ByteStrings. Instead of prefixed functions that deal with one data type, ClassyPrelude uses generic functions that can apply to any data type that does the right things, because it defines these functions in terms of type classes.</p>
@@ -178,14 +215,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   <span class="kw">module</span> <span class="dt">Data.LanguageType</span>,
   <span class="kw">module</span> <span class="dt">Control.Monad.Writer</span>,
   replace, splitOn, stripSpaces, dropAround, dropWhileEnd, toTitle,
-  breakOn, breakOnEnd, listTakeWhile, listDropWhile,
-  get, getAll, getPrioritized, nonEmpty,
+  breakOn, breakOnEnd, listTakeWhile, listDropWhile, hGetContentsLazy,
+  get, getAll, getPrioritized, nonEmpty, hasKey,
   println, ø, (∈), (⊕)
   ) <span class="kw">where</span></code></pre></div>
 <p>Some of these exports are just re-exporting things that we import en masse:</p>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">ClassyPrelude</span> <span class="kw">hiding</span> (takeWhile)
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">ClassyPrelude</span> <span class="kw">hiding</span> (takeWhile, splitFirst)
 <span class="kw">import qualified</span> <span class="dt">ClassyPrelude</span> <span class="kw">as</span> <span class="dt">P</span>
 <span class="kw">import </span><span class="dt">Data.String.Conversions</span> <span class="kw">hiding</span> ((&lt;&gt;), (⊕))
+<span class="kw">import qualified</span> <span class="dt">Data.ByteString.Lazy</span> <span class="kw">as</span> <span class="dt">BSL</span>
 <span class="kw">import </span><span class="dt">Data.LanguageType</span>
 <span class="kw">import </span><span class="dt">Data.Monoid.Unicode</span> ((⊕), (∅))
 <span class="kw">import </span><span class="dt">Control.Monad.Writer</span> (<span class="dt">Writer</span>, writer, pass, runWriter, execWriter)
@@ -198,13 +236,14 @@ breakOn <span class="fu">=</span> T.breakOn
 breakOnEnd <span class="fu">=</span> T.breakOnEnd
 dropAround <span class="fu">=</span> T.dropAround
 dropWhileEnd <span class="fu">=</span> T.dropWhileEnd
-toTitle <span class="fu">=</span> T.toTitle</code></pre></div>
+toTitle <span class="fu">=</span> T.toTitle
+hGetContentsLazy <span class="fu">=</span> BSL.hGetContents</code></pre></div>
 <p>Another kind of standard thing we need to do is trim spaces from the start and end of a string:</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">stripSpaces ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
 stripSpaces <span class="fu">=</span> dropAround (\c <span class="ot">-&gt;</span> c <span class="fu">==</span> <span class="ch">&#39; &#39;</span> <span class="fu">||</span> c <span class="fu">==</span> <span class="ch">&#39;\n&#39;</span>)</code></pre></div>
 <p>Writing any sort of text to stdout:</p>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">println ::</span> (<span class="dt">IOData</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-println <span class="fu">=</span> hPutStrLn stdout</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">println ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+println <span class="fu">=</span> putStrLn</code></pre></div>
 <h2 id="list-operations">List operations</h2>
 <p>The name <code>takeWhile</code> has conflicting definitions in ClassyPrelude and Attoparsec, so we need to rename the ClassyPrelude one.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">listTakeWhile ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]
@@ -218,7 +257,7 @@ listDropWhile <span class="fu">=</span> P.dropWhile</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">ø<span class="ot"> ::</span> <span class="dt">Monoid</span> α <span class="ot">=&gt;</span> α
 ø <span class="fu">=</span> (∅)</code></pre></div>
 <p><code>∈</code> is the element-of operator, and actually having it as an infix operator is rather nice. We have to make sure it refers to the ClassyPrelude version of <code>elem</code>, complete with its type signature (which I just copied and pasted).</p>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">(∈)<span class="ot"> ::</span> <span class="dt">MonoFoldableEq</span> c <span class="ot">=&gt;</span> <span class="dt">Element</span> c <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">(∈)<span class="ot"> ::</span> (<span class="dt">MonoFoldable</span> c, <span class="dt">Eq</span> (<span class="dt">Element</span> c)) <span class="ot">=&gt;</span> <span class="dt">Element</span> c <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> <span class="dt">Bool</span>
 (∈) <span class="fu">=</span> elem</code></pre></div>
 <h2 id="mapping-operations">Mapping operations</h2>
 <p>In many situations we have a mapping whose values are sequences. This lets us write the convenient <code>get</code> function, which looks up a key in the mapping, or returns an empty sequence if it’s not there. This is often easier than checking cases of <code>Maybe</code> values.</p>
@@ -232,6 +271,9 @@ getPrioritized [] map         <span class="fu">=</span> ø</code></pre></div>
 <p><code>getAll</code> is a step in <code>getPrioritized</code>. It takes a list of keys and a mapping, and returns the list of values of those keys that exist.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getAll ::</span> (<span class="dt">IsMap</span> m, <span class="dt">Monoid</span> (<span class="dt">MapValue</span> m)) <span class="ot">=&gt;</span> [<span class="dt">ContainerKey</span> m] <span class="ot">-&gt;</span> m <span class="ot">-&gt;</span> [<span class="dt">MapValue</span> m]
 getAll keys m <span class="fu">=</span> catMaybes (map (\key <span class="ot">-&gt;</span> lookup key m) keys)</code></pre></div>
+<p>Sometimes we don’t want a Maybe, we want to do something different based on whether a key is present or not:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">hasKey ::</span> <span class="dt">IsMap</span> map <span class="ot">=&gt;</span> <span class="dt">ContainerKey</span> map <span class="ot">-&gt;</span> map <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+hasKey key map <span class="fu">=</span> isJust (lookup key map)</code></pre></div>
 <p>Perhaps we’ve gotten some values that may or may not be empty using <code>get</code>, and now we want to turn them back into a proper <code>Maybe</code>. This function replaces <code>Maybe ø</code> with <code>Nothing</code>:</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">nonEmpty ::</span> (<span class="dt">Monoid</span> α, <span class="dt">Eq</span> α) <span class="ot">=&gt;</span> <span class="dt">Maybe</span> α <span class="ot">-&gt;</span> <span class="dt">Maybe</span> α
 nonEmpty val <span class="fu">=</span>
@@ -338,7 +380,8 @@ replaceAlifWasla <span class="fu">=</span> replace <span class="st">&quot;ٱ&quo
 <p>This module defines a Language type that we can keep separate from other strings. A Language contains nothing but a Text of its language code, such as “en”, but it’s a different type.</p>
 <p>This makes our type signatures clearer, and it’s implemented with <code>newtype</code>, so it should have no run-time cost.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings, NoImplicitPrelude #-}</span>
-<span class="kw">module</span> <span class="dt">Data.LanguageType</span> (<span class="dt">Language</span>, fromLanguage, toLanguage) <span class="kw">where</span>
+<span class="kw">module</span> <span class="dt">Data.LanguageType</span> (<span class="dt">Language</span>, fromLanguage, toLanguage, fixLanguageCode) <span class="kw">where</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">T</span>
 <span class="kw">import </span><span class="dt">ClassyPrelude</span>
 <span class="kw">import </span><span class="dt">Data.Aeson</span> (<span class="dt">ToJSON</span>, toJSON)</code></pre></div>
 <p>We define Language as a type containing nothing but a Text. A Language can be displayed to the console and compared to other Languages in the obvious ways that we can just ask Haskell to derive.</p>
@@ -355,6 +398,43 @@ toLanguage code <span class="fu">=</span> <span class="dt">Language</span> code<
 <p>A Language looks just like a string when you encode it to JSON.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">ToJSON</span> <span class="dt">Language</span> <span class="kw">where</span>
   toJSON <span class="fu">=</span> toJSON <span class="fu">.</span> fromLanguage</code></pre></div>
+<p>In etymology sections, we need to recognize abbreviations for languages that are not actual language codes, sometimes because they stand for etymological descriptions such as “Late Latin”. <code>fixLanguageCode</code> converts common instances of these into similar real language codes.</p>
+<p>Common examples of these codes, such as “BE.” for “British English”, are also sometimes written without the period at the end, so we strip final periods.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">fixLanguageCode ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+fixLanguageCode text
+  <span class="fu">|</span> isSuffixOf <span class="st">&quot;.&quot;</span> text <span class="fu">=</span> mapBadCodes (T.dropEnd <span class="dv">1</span> text)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> mapBadCodes text</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">mapBadCodes ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+mapBadCodes <span class="st">&quot;AE&quot;</span> <span class="fu">=</span> <span class="st">&quot;en-US&quot;</span>
+mapBadCodes <span class="st">&quot;AG&quot;</span> <span class="fu">=</span> <span class="st">&quot;de-AT&quot;</span>
+mapBadCodes <span class="st">&quot;BE&quot;</span> <span class="fu">=</span> <span class="st">&quot;en-GB&quot;</span>
+mapBadCodes <span class="st">&quot;CF&quot;</span> <span class="fu">=</span> <span class="st">&quot;fr-CA&quot;</span>
+mapBadCodes <span class="st">&quot;Ecclesiastical Latin&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;EL&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;Ins.Sc&quot;</span> <span class="fu">=</span> <span class="st">&quot;sco&quot;</span>
+mapBadCodes <span class="st">&quot;Koine&quot;</span> <span class="fu">=</span> <span class="st">&quot;grc-koi&quot;</span>
+mapBadCodes <span class="st">&quot;Late Latin&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;LL&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;Lunfardo&quot;</span> <span class="fu">=</span> <span class="st">&quot;es-lun&quot;</span>
+mapBadCodes <span class="st">&quot;Medieval Latin&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;Mid.Sc&quot;</span> <span class="fu">=</span> <span class="st">&quot;sco&quot;</span>
+mapBadCodes <span class="st">&quot;MIr&quot;</span> <span class="fu">=</span> <span class="st">&quot;ira-mid&quot;</span>
+mapBadCodes <span class="st">&quot;ML&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;NL&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;Nor.Sc&quot;</span> <span class="fu">=</span> <span class="st">&quot;sco&quot;</span>
+mapBadCodes <span class="st">&quot;OIr&quot;</span> <span class="fu">=</span> <span class="st">&quot;ira-old&quot;</span>
+mapBadCodes <span class="st">&quot;ONF&quot;</span> <span class="fu">=</span> <span class="st">&quot;fro&quot;</span>
+mapBadCodes <span class="st">&quot;O.Sc&quot;</span> <span class="fu">=</span> <span class="st">&quot;sco&quot;</span>
+mapBadCodes <span class="st">&quot;pinhua&quot;</span> <span class="fu">=</span> <span class="st">&quot;yue&quot;</span>
+mapBadCodes <span class="st">&quot;pregrc&quot;</span> <span class="fu">=</span> <span class="st">&quot;qfa-sub-grc&quot;</span>
+mapBadCodes <span class="st">&quot;RL&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes <span class="st">&quot;Sha&quot;</span> <span class="fu">=</span> <span class="st">&quot;wuu-sha&quot;</span>
+mapBadCodes <span class="st">&quot;Sou.Sc&quot;</span> <span class="fu">=</span> <span class="st">&quot;sco&quot;</span>
+mapBadCodes <span class="st">&quot;Tax&quot;</span> <span class="fu">=</span> <span class="st">&quot;mul&quot;</span>
+mapBadCodes <span class="st">&quot;Uls.Sc&quot;</span> <span class="fu">=</span> <span class="st">&quot;sco&quot;</span>
+mapBadCodes <span class="st">&quot;VG&quot;</span> <span class="fu">=</span> <span class="st">&quot;de-AT&quot;</span>
+mapBadCodes <span class="st">&quot;VL&quot;</span> <span class="fu">=</span> <span class="st">&quot;la&quot;</span>
+mapBadCodes other <span class="fu">=</span> other</code></pre></div>
 <h1 id="data.languagenames-convert-between-language-codes-and-language-names"><code>Data.LanguageNames</code>: convert between language codes and language names</h1>
 <p>One of the particularly difficult things about dealing with Wiktionary is that information in different languages is often distinguished by the human-readable name of the language, instead of by a language code.</p>
 <p>This is largely for historical reasons, because many entries were written before the many languages of Wiktionary were organized by a tangle of templates and Lua code, so the problem is worse on Wiktionaries with more history (English and German).</p>
@@ -511,12 +591,12 @@ processMediaWikiContent content sink <span class="fu">=</span> <span class="kw">
 <p>Finally, we define where this XML stream is coming from. It’s coming from an open file handle, specifically stdin, because the data is being piped into this program straight out of <code>bunzip2</code>.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">processMediaWikiStream ::</span> <span class="dt">Handle</span> <span class="ot">-&gt;</span> (<span class="dt">WikiPage</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
 processMediaWikiStream source sink <span class="fu">=</span> <span class="kw">do</span>
-  content <span class="ot">&lt;-</span> hGetContents source
+  content <span class="ot">&lt;-</span> hGetContentsLazy source
   processMediaWikiContent content sink
 
 processMediaWikiStdin <span class="fu">=</span> processMediaWikiStream stdin</code></pre></div>
 <h1 id="text.mediawiki.html-removing-html-from-wikitext"><code>Text.MediaWiki.HTML</code>: removing HTML from Wikitext</h1>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction #-}</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, NoMonomorphismRestriction, FlexibleContexts #-}</span></code></pre></div>
 <p>After parsing the XML of a MediaWiki entry, the result then needs to be decoded as (potentially very sloppy) HTML, the contents of which are Wikitext. This module is responsible for handling the HTML and converting it into a string of Wikitext without HTML tags.</p>
 <p>Here is an example snippet of Wikitext that includes HTML:</p>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">  Albedo <span class="kw">&lt;math&gt;</span>{\alpha}<span class="kw">&lt;/math&gt;</span> can then be given as:
@@ -746,13 +826,6 @@ annotationFromList pairs <span class="fu">=</span> mapFromList (filter filterEmp
 
 <span class="ot">filterEmpty ::</span> (<span class="dt">Text</span>, <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Bool</span>
 filterEmpty (a, b) <span class="fu">=</span> b <span class="fu">/=</span> <span class="st">&quot;&quot;</span></code></pre></div>
-<p><code>makeLink</code> is a constant that can be used as a template for making Annotations for internal links.</p>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">makeLink ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span>
-makeLink namespace page section <span class="fu">=</span> annotationFromList [
-  (<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;link&quot;</span>),
-  (<span class="st">&quot;namespace&quot;</span>, namespace),
-  (<span class="st">&quot;page&quot;</span>, page),
-  (<span class="st">&quot;section&quot;</span>, section)]</code></pre></div>
 <p>The simplifying assumption here is that, in a parse rule that produces annotations, the annotations apply to the entire span of text that was parsed. So what we need to keep track of in an AnnotatedText is one string (as a Text) and a list of Annotations for it.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">AnnotatedText</span> <span class="fu">=</span> <span class="dt">AnnotatedText</span> [<span class="dt">Annotation</span>] <span class="dt">Text</span> <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>)
 
@@ -764,6 +837,27 @@ getAnnotations (<span class="dt">AnnotatedText</span> annos t) <span class="fu">
 
 <span class="ot">getText ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
 getText (<span class="dt">AnnotatedText</span> annos t) <span class="fu">=</span> t</code></pre></div>
+<h2 id="links">Links</h2>
+<p><code>makeLink</code> is a constant that can be used as a template for making Annotations for internal links.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">makeLink ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span>
+makeLink namespace page section <span class="fu">=</span> annotationFromList [
+  (<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;link&quot;</span>),
+  (<span class="st">&quot;namespace&quot;</span>, namespace),
+  (<span class="st">&quot;page&quot;</span>, page),
+  (<span class="st">&quot;section&quot;</span>, section)]</code></pre></div>
+<p><code>filterLink</code> tests whether an annotation is a link.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">filterLink ::</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+filterLink annot <span class="fu">=</span> (get <span class="st">&quot;rel&quot;</span> annot) <span class="fu">==</span> <span class="st">&quot;link&quot;</span>
+
+<span class="ot">filterArticleLink ::</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+filterArticleLink annot <span class="fu">=</span> (filterLink annot) <span class="fu">&amp;&amp;</span> (get <span class="st">&quot;namespace&quot;</span> annot) <span class="fu">==</span> <span class="st">&quot;&quot;</span></code></pre></div>
+<p>If links in particular are what we’re interested in, we can use <code>getLinks</code> or <code>getArticleLinks</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getLinks ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>]
+getLinks atext <span class="fu">=</span> filter filterLink (getAnnotations atext)
+
+<span class="ot">getArticleLinks ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>]
+getArticleLinks atext <span class="fu">=</span> map (get <span class="st">&quot;page&quot;</span>) (filter filterArticleLink (getAnnotations atext))</code></pre></div>
+<h2 id="operations-on-annotatedtexts">Operations on AnnotatedTexts</h2>
 <p>We convert plain Text into AnnotatedText by annotating it with nothing. The same goes for a plain ByteString, except we have to decode it from UTF-8 first.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotFromText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
 annotFromText <span class="fu">=</span> annotate []
@@ -774,10 +868,11 @@ annotFromBytes <span class="fu">=</span> annotFromText <span class="fu">.</span>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">singleAnnotation ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
 singleAnnotation key val <span class="fu">=</span> annotate [singletonMap key val] <span class="st">&quot;&quot;</span></code></pre></div>
 <p>An AnnotatedText is a Monoid, meaning that it can be concatenated:</p>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">AnnotatedText</span> <span class="kw">where</span>
-  mempty  <span class="fu">=</span> annotFromText <span class="st">&quot;&quot;</span>
-  mappend (<span class="dt">AnnotatedText</span> a1 t1) (<span class="dt">AnnotatedText</span> a2 t2)
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Semigroup</span> <span class="dt">AnnotatedText</span> <span class="kw">where</span>
+  (<span class="dt">AnnotatedText</span> a1 t1) <span class="fu">&lt;&gt;</span> (<span class="dt">AnnotatedText</span> a2 t2)
     <span class="fu">=</span> <span class="dt">AnnotatedText</span> (a1 <span class="fu">++</span> a2) (t1 <span class="fu">++</span> t2)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">AnnotatedText</span> <span class="kw">where</span>
+  mempty  <span class="fu">=</span> annotFromText <span class="st">&quot;&quot;</span></code></pre></div>
 <p>One particular kind of concatenation we’ll want to do is joining AnnotatedTexts with line breaks between the texts:</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">joinAnnotatedLines ::</span> [<span class="dt">AnnotatedText</span>] <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
 joinAnnotatedLines ats <span class="fu">=</span>
@@ -790,7 +885,7 @@ transformA op (<span class="dt">AnnotatedText</span> a t) <span class="fu">=</sp
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">IsString</span> <span class="dt">AnnotatedText</span> <span class="kw">where</span>
   fromString <span class="fu">=</span> (annotFromText <span class="fu">.</span> pack)</code></pre></div>
 <h1 id="text.mediawiki.wikitext-parse-the-wikitext-format"><code>Text.MediaWiki.WikiText</code>: parse the WikiText format</h1>
-<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings, UnicodeSyntax #-}</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, NoMonomorphismRestriction, OverloadedStrings, UnicodeSyntax, FlexibleContexts #-}</span></code></pre></div>
 <p>This is the core of Wikiparsec: a set of parsing rules for handling the Wikitext format.</p>
 <p>These rules can be used to extract structured information or unstructured text from Wikitext, depending on the task at hand. For example, the <code>anyList</code> parser will parse this Wikitext:</p>
 <pre><code># item 1
@@ -992,21 +1087,25 @@ internalLinkText tproc <span class="fu">=</span> getText <span class="fu">&lt;$&
 <p>There are complicated syntaxes on MediaWiki that look like internal links, particularly the Image: or File: syntax, which can have multiple vertical-bar-separated parts, and assigns properties such as alternate text to an image, as well as a plain-text caption that has no special syntax to introduce it – it seems to be determined by process of elimination.</p>
 <p>Our best guess at which part of the syntax is the caption is the last one without an equals sign. If all parts have an equals sign, perhaps because there’s an innocent equals sign in a link’s text, then we return the last part.</p>
 <p>For example, in this image syntax:</p>
-<pre><code>[[File:Ainola yard.jpg|thumb|left|Ainola, Sibelius&#39;s home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]</code></pre>
+<pre><code>[[File:Ainola yard.jpg|300px|Ainola, Sibelius&#39;s home from 1904 until his death|alt=A white house of north European appearance with an orange tiled roof, surrounded by trees]]</code></pre>
 <p>the text we want to extract is:</p>
 <pre><code>Ainola, Sibelius&#39;s home from 1904 until his death</code></pre>
+<p>On the other hand, images aren’t usually in the flow of text; they’re usually set off to the side using “thumb” as one of the arguments. In that case, we just want to skip them.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractLinkText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
 extractLinkText text <span class="fu">=</span>
-  <span class="co">-- Get the part of a link that&#39;s most likely to be its displayed text.</span>
-  <span class="co">-- If there are many parts to choose from, prefer the ones without</span>
-  <span class="co">-- equals signs (which may be image metadata, for example).</span>
-  <span class="kw">let</span> parts      <span class="fu">=</span> splitOn <span class="st">&quot;|&quot;</span> text
-      noEquals t <span class="fu">=</span> not (isInfixOf <span class="st">&quot;=&quot;</span> t)
-      priority   <span class="fu">=</span> parts ⊕ (filter noEquals parts)
-  <span class="co">-- We use MinLen functions to convince the type system that there will</span>
-  <span class="co">-- be a &quot;last&quot; element. We know there is one because, even if our priority</span>
-  <span class="co">-- order is empty, we stick &quot;&quot; on the front as a last resort.</span>
-  <span class="kw">in</span> last (mlcons <span class="st">&quot;&quot;</span> (toMinLenZero priority))</code></pre></div>
+  <span class="kw">if</span> isPrefixOf <span class="st">&quot;thumb&quot;</span> text
+    <span class="kw">then</span> <span class="st">&quot;&quot;</span>
+    <span class="kw">else</span>
+      <span class="co">-- Get the part of a link that&#39;s most likely to be its displayed text.</span>
+      <span class="co">-- If there are many parts to choose from, prefer the ones without</span>
+      <span class="co">-- equals signs (which may be image metadata, for example).</span>
+      <span class="kw">let</span> parts      <span class="fu">=</span> splitOn <span class="st">&quot;|&quot;</span> text
+          noEquals t <span class="fu">=</span> not (isInfixOf <span class="st">&quot;=&quot;</span> t)
+          priority   <span class="fu">=</span> parts ⊕ (filter noEquals parts)
+      <span class="co">-- We use MinLen functions to convince the type system that there will</span>
+      <span class="co">-- be a &quot;last&quot; element. We know there is one because, even if our priority</span>
+      <span class="co">-- order is empty, we stick &quot;&quot; on the front as a last resort.</span>
+      <span class="kw">in</span> last (ncons <span class="st">&quot;&quot;</span> priority)</code></pre></div>
 <p><code>annotatedWikiText</code> parses text that may or may not contain links or templates, and returns it in an AnnotatedText data structure.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotatedWikiText ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">AnnotatedText</span>
 annotatedWikiText tproc <span class="fu">=</span> concat <span class="fu">&lt;$&gt;</span> many1 (annotatedWikiTextPiece tproc)
@@ -1056,6 +1155,22 @@ extractTopLevelFromList items <span class="fu">=</span> concat (map extractItem 
 <span class="ot">extractItem ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
 extractItem (<span class="dt">Item</span> item) <span class="fu">=</span> [item]
 extractItem _ <span class="fu">=</span> []</code></pre></div>
+<p>If what we expect to see is a list of links to other entries, sometimes we want to be stingier than that, getting just the first link from each item. (So far, we don’t need to apply this across an entire list, just one item at a time.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractFirstLink ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractFirstLink (<span class="dt">Item</span> item) <span class="fu">=</span> [limitAnnotationToFirstLink item]
+extractFirstLink _ <span class="fu">=</span> []
+
+<span class="ot">limitAnnotationToFirstLink ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+limitAnnotationToFirstLink (<span class="dt">AnnotatedText</span> annos text) <span class="fu">=</span>
+  <span class="dt">AnnotatedText</span> (filterForFirstLink annos []) text</code></pre></div>
+<p><code>filterForFirstLink</code> is used in implementing <code>limitAnnotationToFirstLink</code>, scanning the annotation list of an AnnotatedText and keeping only those up to the first that contains a “page” item.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">filterForFirstLink ::</span> [<span class="dt">Annotation</span>] <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>] <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>]
+filterForFirstLink (thisAnnotation<span class="fu">:</span>rest) seen <span class="fu">=</span>
+  <span class="kw">if</span> (member <span class="st">&quot;page&quot;</span> thisAnnotation)
+    <span class="kw">then</span> reverse (thisAnnotation<span class="fu">:</span>seen)
+    <span class="kw">else</span> filterForFirstLink rest (thisAnnotation<span class="fu">:</span>seen)
+
+filterForFirstLink [] seen <span class="fu">=</span> reverse seen</code></pre></div>
 <p>And here are the rules for parsing lists:</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">listItems ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">ListItem</span>]
 listItems tproc marker <span class="fu">=</span> <span class="kw">do</span>
@@ -1179,11 +1294,17 @@ squishBlankLines s <span class="fu">=</span> unlines (filter isMeaningfulLine (l
 <span class="ot">isMeaningfulLine ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
 isMeaningfulLine s <span class="fu">=</span> (length s) <span class="fu">&gt;</span> <span class="dv">0</span> <span class="fu">&amp;&amp;</span> not (isPrefixOf <span class="st">&quot;|&quot;</span> s) <span class="fu">&amp;&amp;</span> not (isPrefixOf <span class="st">&quot;!&quot;</span> s) <span class="fu">&amp;&amp;</span> not (isDirective s)
 isDirective s <span class="fu">=</span> (isPrefixOf <span class="st">&quot;__&quot;</span> s) <span class="fu">&amp;&amp;</span> (isSuffixOf <span class="st">&quot;__&quot;</span> s)</code></pre></div>
+<p>To get links instead of text:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">sectionArticleLinks ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+sectionArticleLinks tproc <span class="fu">=</span> getArticleLinks <span class="fu">&lt;$&gt;</span> sectionAnnotated tproc</code></pre></div>
 <h2 id="entry-points">Entry points</h2>
+<p>Parse all the text of a section.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">parseEntireSection <span class="fu">=</span> parseOnly (sectionText ignoreTemplates <span class="fu">&lt;*</span> endOfInput)
+parseEntireSectionLinks <span class="fu">=</span> parseOnly (sectionArticleLinks ignoreTemplates <span class="fu">&lt;*</span> endOfInput)</code></pre></div>
 <p>Here’s a function to be run at the IO level, which takes in Wikitext, outputs its plain text, and returns nothing.</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">outputPlainText ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
 outputPlainText input <span class="fu">=</span>
-   <span class="kw">case</span> parseOnly (sectionText ignoreTemplates <span class="fu">&lt;*</span> endOfInput) input <span class="kw">of</span>
+   <span class="kw">case</span> parseEntireSection input <span class="kw">of</span>
      <span class="dt">Left</span> err <span class="ot">-&gt;</span> showError input err
      <span class="dt">Right</span> x <span class="ot">-&gt;</span> putStrLn x</code></pre></div>
 <p><code>inspectText</code> shows the parsed plain text as well as its annotations.</p>
@@ -1240,5 +1361,1113 @@ idTemplate <span class="fu">=</span> useArg <span class="st">&quot;0&quot;</span
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">evalTemplate ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
 evalTemplate tproc tdata <span class="fu">=</span>
   <span class="kw">let</span> action <span class="fu">=</span> tproc (get <span class="st">&quot;0&quot;</span> tdata) <span class="kw">in</span> action tdata</code></pre></div>
+<h1 id="text.mediawiki.wiktionary.base-parsing-wiktionary-in-general"><code>Text.MediaWiki.Wiktionary.Base</code>: parsing Wiktionary in general</h1>
+<p>This file defines how to parse Wiktionary entries, as a layer above the basic handling of wiki syntax in <code>Text.MediaWiki.WikiText</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, UnicodeSyntax, FlexibleContexts #-}</span>
+<span class="kw">module</span> <span class="dt">Text.MediaWiki.Wiktionary.Base</span> <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.WikiText</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.ParseTools</span>
+<span class="kw">import </span><span class="dt">Text.SplitUtils</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.AnnotatedText</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.Templates</span>
+<span class="kw">import </span><span class="dt">Data.Attoparsec.Text</span>
+<span class="kw">import </span><span class="dt">Data.Attoparsec.Combinator</span>
+<span class="kw">import </span><span class="dt">Data.Aeson</span> (<span class="dt">ToJSON</span>, toJSON, (.=), encode, object)
+<span class="kw">import </span><span class="dt">Data.LanguageNames</span>
+<span class="kw">import </span><span class="dt">Data.LanguageType</span>
+<span class="kw">import </span><span class="dt">Text.Language.Normalize</span> (normalizeText)
+<span class="kw">import </span><span class="dt">Text.MediaWiki.HTML</span> (extractWikiTextFromHTML)
+<span class="kw">import </span><span class="dt">Text.Show.Unicode</span></code></pre></div>
+<h2 id="the-wiktionaryterm-data-type">The <code>WiktionaryTerm</code> data type</h2>
+<p>A WiktionaryTerm is a piece of text that can be defined on Wiktionary. It is defined by its term text, which is required, along with other fields which may be unknown or missing: the language it’s in, a label for its word sense, its part of speech, and its etymology label (which is like a much broader word sense).</p>
+<p>(Wiktionary entries for etymologically-unrelated homographs separate them into sections named, for example, “Etymology 1” and “Etymology 2”. In these cases, “1” and “2” are the etymology labels. Most words only have a single etymology, and by default their etymology label is “1”.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">WiktionaryTerm</span> <span class="fu">=</span> <span class="dt">WiktionaryTerm</span> {
+<span class="ot">  wtText ::</span> <span class="dt">Text</span>,
+<span class="ot">  wtLanguage ::</span> <span class="dt">Maybe</span> <span class="dt">Language</span>,
+<span class="ot">  wtSense ::</span> <span class="dt">Maybe</span> <span class="dt">Text</span>,
+<span class="ot">  wtPos ::</span> <span class="dt">Maybe</span> <span class="dt">Text</span>,
+<span class="ot">  wtEtym ::</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+} <span class="kw">deriving</span> (<span class="dt">Eq</span>)</code></pre></div>
+<p>We export a term to JSON by constructing an object that associates keys with the record values that are <code>Just val</code>, and leaves out the values that are <code>Nothing</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">ToJSON</span> <span class="dt">WiktionaryTerm</span> <span class="kw">where</span>
+  toJSON term <span class="fu">=</span>
+    <span class="kw">let</span> maybePairs <span class="fu">=</span> [(<span class="st">&quot;text&quot;</span>, <span class="dt">Just</span> (wtText term)),
+                      (<span class="st">&quot;language&quot;</span>, fromLanguage <span class="fu">&lt;$&gt;</span> (wtLanguage term)),
+                      (<span class="st">&quot;pos&quot;</span>, wtPos term),
+                      (<span class="st">&quot;etym&quot;</span>, wtEtym term),
+                      (<span class="st">&quot;sense&quot;</span>, wtSense term)]
+        existingPairs <span class="fu">=</span> mapMaybe moveSecondMaybe maybePairs
+    <span class="kw">in</span> object [key <span class="fu">.=</span> value <span class="fu">|</span> (key, value) <span class="ot">&lt;-</span> existingPairs]</code></pre></div>
+<p><code>mapMaybe</code> is a version of <code>map</code> that throws out <code>Nothing</code> values and unwraps the rest. To use it with our pairs, we need <code>moveSecondMaybe</code>, which is pretty much defined by its type signature.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">moveSecondMaybe ::</span> (a, <span class="dt">Maybe</span> b) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (a, b)
+moveSecondMaybe (first, <span class="dt">Just</span> second) <span class="fu">=</span> <span class="dt">Just</span> (first, second)
+moveSecondMaybe (first, <span class="dt">Nothing</span>)     <span class="fu">=</span> <span class="dt">Nothing</span></code></pre></div>
+<p>Now that we have these JSON representations, we can also use them as the string representation in the REPL. First we convert the term to a JSON value, then <code>encode</code> it to a ByteString.</p>
+<p>To convert this to Unicode that Haskell can be convinced to show with <code>Text.Show.Unicode</code>, we coerce it with <code>cs</code>, the all-purpose string converter. We get <code>cs</code> from <code>Data.String.Conversions</code> in our prelude. It applies the appropriate string conversion depending on the type constraints, and assumes UTF-8 everywhere.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">WiktionaryTerm</span> <span class="kw">where</span>
+  show <span class="fu">=</span> cs <span class="fu">.</span> encode <span class="fu">.</span> toJSON</code></pre></div>
+<p><code>term</code> is a constructor for WiktionaryTerms. Because many of the fields of a WiktionaryTerm are optional, it takes a single argument that is a list of Texts. This list can contain:</p>
+<ul>
+<li>Element 0: the text of the term</li>
+<li>Element 1: the language code</li>
+<li>Element 2: the part of speech</li>
+<li>Element 3: the etymology label</li>
+<li>Element 4: the sense label</li>
+</ul>
+<p>Elements after the end of the list will become <code>Nothing</code>. Elements in the middle can also be set to <code>Nothing</code> by giving the empty string as their value. (This is why we defined <code>nonEmpty</code> as part of our monoid toolkit in the WikiPrelude.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">term ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span>
+term items <span class="fu">=</span>
+  <span class="kw">let</span> language <span class="fu">=</span> toLanguage (fromMaybe <span class="st">&quot;und&quot;</span> (index items <span class="dv">1</span>)) <span class="kw">in</span>
+    <span class="dt">WiktionaryTerm</span> {
+      wtText <span class="fu">=</span> normalizeText language (fromMaybe (error <span class="st">&quot;term is empty&quot;</span>) (index items <span class="dv">0</span>)),
+      wtLanguage <span class="fu">=</span> toLanguage <span class="fu">&lt;$&gt;</span> (index items <span class="dv">1</span>),
+      wtPos <span class="fu">=</span> nonEmpty (index items <span class="dv">2</span>),
+      wtEtym <span class="fu">=</span> nonEmpty (index items <span class="dv">3</span>),
+      wtSense <span class="fu">=</span> nonEmpty (index items <span class="dv">4</span>)
+      }</code></pre></div>
+<p>Two more constructors for straightforward cases. <code>simpleTerm</code> takes in the language code and the text, and produces a WiktionaryTerm.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">simpleTerm ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span>
+simpleTerm language text <span class="fu">=</span> term [text, fromLanguage language]</code></pre></div>
+<p><code>termPos</code> is similar to <code>simpleTerm</code>, but takes the part of speech as a third argument.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">termPos ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span>
+termPos language text pos <span class="fu">=</span> term [text, fromLanguage language, pos]</code></pre></div>
+<h2 id="the-wiktionaryfact-data-type">The <code>WiktionaryFact</code> data type</h2>
+<p>A WiktionaryFact expresses a relationship between terms that we can extract from a page. Much like a ConceptNet edge, it’s defined by a relation <code>rel</code> that points <code>from</code> one term <code>to</code> another term.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">WiktionaryFact</span> <span class="fu">=</span> <span class="dt">WiktionaryFact</span> <span class="dt">Text</span> <span class="dt">WiktionaryTerm</span> <span class="dt">WiktionaryTerm</span> <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>)
+
+<span class="kw">instance</span> <span class="dt">ToJSON</span> <span class="dt">WiktionaryFact</span> <span class="kw">where</span>
+  toJSON (<span class="dt">WiktionaryFact</span> rel from to) <span class="fu">=</span> object [<span class="st">&quot;rel&quot;</span> <span class="fu">.=</span> rel, <span class="st">&quot;from&quot;</span> <span class="fu">.=</span> from, <span class="st">&quot;to&quot;</span> <span class="fu">.=</span> to]</code></pre></div>
+<p><code>makeFact</code> or one of its derived functions should be used to create WiktionaryFacts.</p>
+<p>Sometimes we extract data that goes in the opposite direction form the relation we want: for example, instead of discovering which word <code>from</code> is a form of, we discover a word that is a form of it. In this case, we output a relation that’s prefixed with an asterisk, telling <code>makeFact</code> to strip off the asterisk and switch the arguments.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">makeFact ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span>
+makeFact rel from to <span class="fu">=</span>
+  <span class="kw">case</span> (unPrependChar rel) <span class="kw">of</span>
+    <span class="dt">Just</span> (<span class="ch">&#39;*&#39;</span>, rev) <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span> rev to from
+    _               <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span> rel from to
+
+makeGenericFact <span class="fu">=</span> makeFact <span class="st">&quot;RelatedTo&quot;</span></code></pre></div>
+<p>Sometimes we have to parse things into WiktionaryFacts, but won’t find out the relation until after we’ve parsed them. In those cases, we use <code>&quot;link&quot;</code> as the generic placeholder for the relation. <code>assignRel</code> replaces the relation <code>&quot;link&quot;</code> with the specified <code>rel</code>, while leaving other, more specific relations as is.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">assignRel ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span>
+assignRel rel fact<span class="fu">@</span>(<span class="dt">WiktionaryFact</span> oldRel from to) <span class="fu">=</span>
+  <span class="kw">case</span> oldRel <span class="kw">of</span>
+    <span class="st">&quot;link&quot;</span> <span class="ot">-&gt;</span> makeFact rel from to
+    _      <span class="ot">-&gt;</span> fact</code></pre></div>
+<h2 id="annotations-that-link-to-terms">Annotations that link to terms</h2>
+<p>Recall that an Annotation marks up a span of text with a mapping from keys to optional values.</p>
+<p>We collect various Annotations on our text when parsing a Wiktionary entry. These might indicate specific structured relations, such as “this word is an antonym of ‘down’”, or they might indicate ordinary links that require further context to understand, such as “the definition contains a link to the word ‘direction’”.</p>
+<p>The annotations we get from Wiktionary entries may contain:</p>
+<ul>
+<li><p><code>&quot;page&quot;</code>, the name of the page being linked to.</p></li>
+<li><p><code>&quot;namespace&quot;</code>, the MediaWiki namespace of the link.</p></li>
+<li><p><code>&quot;language&quot;</code>, the language of the dictionary entry being linked to. (As Wiktionary puts multiple languages on the same page, sometimes this is unknown.)</p></li>
+<li><p><code>&quot;rel&quot;</code>, the relationship indicated by the link. A specific template could give us a specific relation such as <code>&quot;antonym&quot;</code>. Plain links have the relation <code>&quot;link&quot;</code>.</p></li>
+</ul>
+<p><code>linkableAnnotation</code> is a filter for annotations that we consider usable as links: their “page” value is present, and their “namespace” is not. A link with a namespace would be a link to something that’s not a dictionary entry, such as an image, an audio file, a category, or a discussion page.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">linkableAnnotation ::</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+linkableAnnotation annot <span class="fu">=</span> (get <span class="st">&quot;page&quot;</span> annot <span class="fu">/=</span> <span class="st">&quot;&quot;</span>) <span class="fu">&amp;&amp;</span> (get <span class="st">&quot;namespace&quot;</span> annot <span class="fu">==</span> <span class="st">&quot;&quot;</span>)
+
+<span class="ot">linkableAnnotations ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>]
+linkableAnnotations atext <span class="fu">=</span> filter linkableAnnotation (getAnnotations atext)</code></pre></div>
+<p><code>plainLinkAnnotation</code> further filters these annotations for those with no specific relation: their “rel” value is “link” or is absent.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">plainLinkAnnotation ::</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+plainLinkAnnotation annot <span class="fu">=</span> linkableAnnotation annot <span class="fu">&amp;&amp;</span> (findWithDefault <span class="st">&quot;link&quot;</span> <span class="st">&quot;rel&quot;</span> annot) <span class="fu">==</span> <span class="st">&quot;link&quot;</span>
+
+<span class="ot">plainLinkAnnotations ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>]
+plainLinkAnnotations atext <span class="fu">=</span> filter plainLinkAnnotation (getAnnotations atext)</code></pre></div>
+<p><code>languageTaggedAnnotation</code> filters linkable annotations for those whose language is known.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">languageTaggedAnnotation ::</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+languageTaggedAnnotation annot <span class="fu">=</span> linkableAnnotation annot <span class="fu">&amp;&amp;</span> (get <span class="st">&quot;language&quot;</span> annot) <span class="fu">/=</span> <span class="st">&quot;&quot;</span>
+
+<span class="ot">languageTaggedAnnotations ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">Annotation</span>]
+languageTaggedAnnotations atext <span class="fu">=</span> filter languageTaggedAnnotation (getAnnotations atext)</code></pre></div>
+<p>You might notice that these Annotations contain most of the information we need for a WiktionaryTerm. Is the target of a linkableAnnotation just a WiktionaryTerm?</p>
+<p>There’s one thing that’s not quite aligned: if we have an annotation with a known “senseID”, it specifies a sense of the word <em>being defined</em>, not the word being linked to. (As far as I know, there’s no mechanism on Wiktionary for relating a specific sense of one word to a specific sense of another word.)</p>
+<p>So really, the Annotation is filling in information about <em>two</em> WiktionaryTerms that are related by a WiktionaryFact. We take this into account with a function that converts an Annotation to a WiktionaryFact, given the current term being defined (<code>thisTerm</code>) and the language of this Wiktionary (<code>thisLang</code>).</p>
+<p>One more subtlety: why don’t we get <code>thisLang</code> from <code>thisTerm</code>? Those are usually different. If the Spanish word <code>amigo</code> is being defined on the English Wiktionary, then <code>thisTerm</code> has a language of Spanish, but <code>thisLang</code> is English.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotationToFact ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span>
+annotationToFact thisLang thisTerm annot <span class="fu">=</span>
+  <span class="kw">let</span> otherTerm <span class="fu">=</span> annotationToTerm thisLang annot
+      <span class="co">-- If we have a senseID, fill it in as the sense of `thisTerm`.</span>
+      termSense <span class="fu">=</span> <span class="kw">case</span> (lookup <span class="st">&quot;senseID&quot;</span> annot) <span class="kw">of</span>
+                    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> thisTerm
+                    <span class="dt">Just</span> sense <span class="ot">-&gt;</span> thisTerm {wtSense<span class="fu">=</span><span class="dt">Just</span> sense}
+      rel       <span class="fu">=</span> findWithDefault <span class="st">&quot;link&quot;</span> <span class="st">&quot;rel&quot;</span> annot
+  <span class="kw">in</span> makeFact rel termSense otherTerm</code></pre></div>
+<p>As a sub-step of this, we do need <code>annotationToTerm</code>, the function that will create the WiktionaryTerm being linked to.</p>
+<p>It may seem intuitive that, if the Annotation doesn’t come with a language, we would default to using <code>thisLang</code>. That would actually introduce errors. If a word is being defined in English, that does not necessarily mean that any word linked in the definition is an English word. It could be the same as the word being defined, instead.</p>
+<p>As an example, on the English Wiktionary, a definition of the Spanish word “tengo” is <code>First-person singular ([[yo]]) present indicative form of [[tener]].</code> Neither “yo” or “tener” here should be considered an English word, despite that they appear in an English definition. If we have no way to determine the language of a link, we should leave it unspecified to be inferred later.</p>
+<p>The reason we take in <code>thisLang</code> is because we might have to look up a language that’s given as a <em>section</em> name, such as [[tener#Spanish]]. “Spanish” is the name of language <code>es</code> in language <code>en</code>. The language code we need to get out of that is <code>es</code>, but we need to know that <code>thisLang</code> is <code>en</code> to extract that language code. (We could be cleverer than this if we had the Python <code>langcodes</code> module. Alas.)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotationToTerm ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span>
+annotationToTerm thisLang annot <span class="fu">=</span>
+  <span class="kw">let</span> maybeLanguage <span class="fu">=</span> (annotationLanguage thisLang annot) <span class="kw">in</span>
+    <span class="dt">WiktionaryTerm</span> {
+      wtText<span class="fu">=</span>(normalizeText (fromMaybe <span class="st">&quot;und&quot;</span> maybeLanguage) (pageName (get <span class="st">&quot;page&quot;</span> annot))),
+      wtLanguage<span class="fu">=</span>maybeLanguage,
+      wtPos<span class="fu">=</span>(lookup <span class="st">&quot;pos&quot;</span> annot),
+      wtEtym<span class="fu">=</span>(lookup <span class="st">&quot;etym&quot;</span> annot),
+      wtSense<span class="fu">=</span>(lookup <span class="st">&quot;sense&quot;</span> annot)
+    }</code></pre></div>
+<p>These helper functions get the language of an Annotation, if possible, either by finding the language code in the “language” value, or deciphering a natural-language name from the “section” value.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotationLanguage ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Language</span>
+annotationLanguage thisLang annot <span class="fu">=</span>
+  <span class="kw">case</span> (lookup <span class="st">&quot;language&quot;</span> annot) <span class="kw">of</span>
+    <span class="dt">Just</span> language <span class="ot">-&gt;</span> <span class="dt">Just</span> (toLanguage (fixLanguageCode language))
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span>
+      <span class="kw">case</span> (lookup <span class="st">&quot;section&quot;</span> annot) <span class="kw">of</span>
+        <span class="dt">Just</span> section <span class="ot">-&gt;</span> sectionLanguage thisLang section
+        <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Nothing</span>
+
+<span class="ot">sectionLanguage ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Language</span>
+sectionLanguage thisLang sectionRef <span class="fu">=</span>
+  <span class="kw">case</span> unPrependChar sectionRef <span class="kw">of</span>
+    <span class="dt">Just</span> (<span class="ch">&#39;#&#39;</span>, language) <span class="ot">-&gt;</span> <span class="dt">Just</span> (lookupLanguage thisLang language)
+    otherwise            <span class="ot">-&gt;</span> <span class="dt">Nothing</span></code></pre></div>
+<p><code>pageName</code> is a helper function for getting the name of an entry being linked to, even if it still has a section attached for some reason. (TODO: can we clean up the processing to make this function unnecessary?)</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pageName ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+pageName name <span class="fu">=</span> fst (splitFirst <span class="st">&quot;#&quot;</span> name)</code></pre></div>
+<p>We might find out the sense ID from a different Annotation than the one containing a link, so we have to handle this at the AnnotatedText level. <code>findSenseID</code> scans through all annotations on a span of text, returning the first sense ID it finds, if any.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">findSenseID ::</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+findSenseID atext <span class="fu">=</span> findSenseIDInList (getAnnotations atext)
+
+<span class="ot">findSenseIDInList ::</span> [<span class="dt">Annotation</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+findSenseIDInList (annot<span class="fu">:</span>rest) <span class="fu">=</span>
+  <span class="kw">case</span> (lookup <span class="st">&quot;senseID&quot;</span> annot) <span class="kw">of</span>
+    <span class="dt">Just</span> x <span class="ot">-&gt;</span> <span class="dt">Just</span> x
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> findSenseIDInList rest
+findSenseIDInList [] <span class="fu">=</span> <span class="dt">Nothing</span></code></pre></div>
+<h2 id="definition-sections">Definition sections</h2>
+<p>Definition sections in many languages of Wiktionary take the form of a numbered list. For example, the English dictionary has sections labeled with a part of speech, such as “Noun”, whose contents are a numbered list of English definitions of the word.</p>
+<p>Here’s an abridged example of the definition section for the word “thing”:</p>
+<pre><code>{{en-noun}}
+
+# That which is considered to [[exist]] as a separate [[entity]], [[object]], [[quality]] or [[concept]].
+# A [[word]], [[symbol]], [[sign]], or other [[referent]] that can be used to refer to any entity.
+# An individual object or distinct entity.
+# {{lb|en|informal}} Something that is normal or generally recognised.
+#: {{ux|en|Bacon pie? Is that a &#39;&#39;&#39;thing&#39;&#39;&#39;?}}
+# {{lb|en|legal}}
+## Whatever can be [[own]]ed.
+## [[corporeal|Corporeal]] [[object]].
+# {{lb|en|somewhat|_|dated}} The [[latest]] [[fad]] or [[fashion]].
+#: {{ux|en|What do you mean you don&#39;t twerk, Stacy? It&#39;s the latest &#39;&#39;&#39;thing&#39;&#39;&#39;!}}</code></pre>
+<p>Here, we parse the Wikitext for the numbered list, then pass its entries on to <code>definitionToFacts</code>. If there’s a parse error, we return nothing for this section.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">parseDefinitions ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+parseDefinitions language tproc thisTerm text <span class="fu">=</span>
+  <span class="kw">let</span> parser <span class="fu">=</span> skipMiscellaneousLines (pNumberedDefinitionList tproc)
+      defs <span class="fu">=</span> parseOrDefault [] parser text
+  <span class="kw">in</span> concat (map (definitionToFacts language thisTerm) defs)</code></pre></div>
+<p>The above function is calling a parse rule that it constructs with <code>skipMiscellaneousLines (pNumberedDefinitionList tproc)</code>.</p>
+<p><code>pNumberedDefinitionList</code> is the main parse rule for definitions. It takes in a TemplateProc so it knows how to handle templates. But we want to modify the parser so that it isn’t thrown off if the definition section starts with something that isn’t a definition, such as an image or a template that introduces the definition. That modification is done by <code>skipMiscellaneousLines</code>.</p>
+<p>To do this, it tries to parse each line with the inner parse rule. If that fails, it parses one line with the generic rule <code>wikiTextLine</code>, throws it out, and recursively runs itself to parse the rest.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">skipMiscellaneousLines ::</span> <span class="dt">Parser</span> α <span class="ot">-&gt;</span> <span class="dt">Parser</span> α
+skipMiscellaneousLines parser <span class="fu">=</span>
+  parser <span class="fu">&lt;|&gt;</span>
+  (newLine <span class="fu">&gt;&gt;</span> skipMiscellaneousLines parser) <span class="fu">&lt;|&gt;</span>
+  (wikiTextLine ignoreTemplates <span class="fu">&gt;&gt;</span> newLine <span class="fu">&gt;&gt;</span> skipMiscellaneousLines parser)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pNumberedDefinitionList ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">LabeledDef</span>]
+pNumberedDefinitionList tproc <span class="fu">=</span> extractNumberedDefs <span class="fu">&lt;$&gt;</span> orderedList tproc <span class="st">&quot;#&quot;</span></code></pre></div>
+<p>Parsing an ordered list as a definition list involves running the <code>orderedList</code> parser (from <code>Text.MediaWiki.WikiText</code>), then passing the result to <code>extractNumberedDefs</code>.</p>
+<p><code>extractNumberedDefs</code> is going to associate each definition with a unique label such as “def.1”. To produce these labels, starting with the text “def”, we add 1-based indices for their location in a possibly nested list:</p>
+<pre><code># def.1
+# def.2
+## def.2.1
+## def.2.2
+# def.3</code></pre>
+<p>The result of <code>extractNumberedDefs</code> is a list of LabeledDefs, which are defined as pairs with one of these labels and the AnnotatedText of the definition.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">LabeledDef</span> <span class="fu">=</span> (<span class="dt">Text</span>, <span class="dt">AnnotatedText</span>)</code></pre></div>
+<p>First we define how to start this iterative process:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractNumberedDefs ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">LabeledDef</span>]
+extractNumberedDefs <span class="fu">=</span> extractNumbered <span class="st">&quot;def&quot;</span>
+
+<span class="ot">extractNumbered ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">LabeledDef</span>]
+extractNumbered prefix (<span class="dt">OrderedList</span> items) <span class="fu">=</span> extractNumberedIter prefix <span class="dv">1</span> items
+extractNumbered prefix _ <span class="fu">=</span> error <span class="st">&quot;Wrong type of list&quot;</span></code></pre></div>
+<p>The first case we handle is an item that introduces a sub-list. The sub-list gets the item’s label as its prefix.</p>
+<p>After that, we handle normal items, sub-lists that aren’t OrderedLists which we ignore, and the base case at the end of the list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractNumberedIter ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [<span class="dt">ListItem</span>] <span class="ot">-&gt;</span> [<span class="dt">LabeledDef</span>]
+extractNumberedIter prefix counter list <span class="fu">=</span>
+  <span class="kw">let</span> newPrefix <span class="fu">=</span> mconcat [prefix, <span class="st">&quot;.&quot;</span>, cs (show counter)]
+  <span class="kw">in</span> <span class="kw">case</span> list <span class="kw">of</span>
+    ((<span class="dt">Item</span> item)<span class="fu">:</span>(<span class="dt">OrderedList</span> items)<span class="fu">:</span>rest) <span class="ot">-&gt;</span> (newPrefix, item)<span class="fu">:</span>(
+                                                (extractNumberedIter newPrefix <span class="dv">1</span> items)
+                                                <span class="fu">++</span> (extractNumberedIter prefix (counter <span class="fu">+</span> <span class="dv">1</span>) rest)
+                                                )
+    ((<span class="dt">Item</span> item)<span class="fu">:</span>rest)                     <span class="ot">-&gt;</span> (newPrefix, item)<span class="fu">:</span>(extractNumberedIter prefix (counter <span class="fu">+</span> <span class="dv">1</span>) rest)
+    _<span class="fu">:</span>rest                                 <span class="ot">-&gt;</span> extractNumberedIter prefix counter rest
+    []                                     <span class="ot">-&gt;</span> []</code></pre></div>
+<p>In German and some other Wiktionaries that have followed its lead, lists have specifically numbered word senses instead of automatic numbering. Instead of starting with <code>#</code>, for example, a definition line starts with <code>:[1]</code>.</p>
+<p>TODO: We don’t bother parsing sub-definitions in this format. If the line after definition 1 starts with, for example, <code>::[a]</code>, we could interpret this as a definition labeled “1a”, but we currently don’t.</p>
+<p><code>pLabeledDefinitionList</code> is a parse rule for these definitions, similar to <code>pNumberedDefinitionList</code> above.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pLabeledDefinitionList ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">LabeledDef</span>]
+pLabeledDefinitionList tproc <span class="fu">=</span> extractLabeledDefs <span class="fu">&lt;$&gt;</span> indentedList tproc <span class="st">&quot;:&quot;</span></code></pre></div>
+<p><code>extractLabeledDefs</code> scans through the items in an IndentedList, and parses them as definitions with optional labels, using the parse rule <code>pLabeledItem</code>.</p>
+<p>A definition can have zero or more labels. If it has zero labels, then it is probably the sole definition of the word, so we make one LabeledDef where we keep the definition and use the empty string as its label.</p>
+<p>If it has one or more labels, we make a LabeledDef coresponding to each label, using <code>adjustLabel</code>, defined below.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">extractLabeledDefs ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">LabeledDef</span>]
+extractLabeledDefs (<span class="dt">IndentedList</span> items) <span class="fu">=</span> mconcat (map extractLabeledDefItem items)
+extractLabeledDefs _ <span class="fu">=</span> error <span class="st">&quot;Wrong type of list&quot;</span>
+
+<span class="ot">extractLabeledDefItem ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">LabeledDef</span>]
+extractLabeledDefItem (<span class="dt">Item</span> item) <span class="fu">=</span>
+  <span class="kw">case</span> parseOnly pLabeledItem (getText item) <span class="kw">of</span>
+    <span class="dt">Left</span> err <span class="ot">-&gt;</span> []
+    <span class="dt">Right</span> (labelList, defn) <span class="ot">-&gt;</span>
+      <span class="kw">case</span> labelList <span class="kw">of</span>
+        []                <span class="ot">-&gt;</span> [(<span class="st">&quot;&quot;</span>, item)]
+        nonEmptyLabelList <span class="ot">-&gt;</span> [adjustLabel label defn item <span class="fu">|</span> label <span class="ot">&lt;-</span> nonEmptyLabelList]
+extractLabeledDefItem _ <span class="fu">=</span> []</code></pre></div>
+<p><code>adjustLabel</code> transforms an AnnotatedText representing a list item for the fact that we’ve parsed a bracketed part at the beginning as a sense label. The existing AnnotatedText has no <code>senseID</code>, and contains the bracketed part as literal text.</p>
+<p>We convert it into a new AnnotatedText whose <code>senseID</code> is named after the label, and whose text is the remaining text, passed in as <code>defn</code>. The other annotations are preserved.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">adjustLabel ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> <span class="dt">LabeledDef</span>
+adjustLabel senseLabel defn atext <span class="fu">=</span>
+  <span class="kw">let</span> senseID     <span class="fu">=</span> <span class="st">&quot;def.&quot;</span> ⊕ senseLabel
+      annotations <span class="fu">=</span> (singletonMap <span class="st">&quot;senseID&quot;</span> senseID)<span class="fu">:</span>(getAnnotations atext)
+      atext&#39;      <span class="fu">=</span> annotate annotations defn
+  <span class="kw">in</span> (senseID, atext&#39;)
+
+<span class="ot">extractLabeledItems ::</span> <span class="dt">ListItem</span> <span class="ot">-&gt;</span> [<span class="dt">AnnotatedText</span>]
+extractLabeledItems items <span class="fu">=</span> map snd (extractLabeledDefs items)</code></pre></div>
+<p>Items in definition lists, and their corresponding entries in sections that describe particular relations, can have complex lists of label numbers. For example, the entry that translates the German word “gehen” into English looks like:</p>
+<pre><code>[1] {{Ü|en|walk}}; [1–3, 7, 13] {{Ü|en|go}}; ...</code></pre>
+<p>Here, sense 1 of “gehen” is translated as “walk”, but all of senses 1, 2, 3, 7, and 13 are translated as “go”.</p>
+<p><code>pLabeledItem</code> parses one of these items as a list of zero or more labels, followed by the remaining plain text of the definition.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pLabeledItem ::</span> <span class="dt">Parser</span> ([<span class="dt">Text</span>], <span class="dt">Text</span>)
+pLabeledItem <span class="fu">=</span> <span class="kw">do</span>
+  labels <span class="ot">&lt;-</span> pOptionalBracketedLabels
+  text <span class="ot">&lt;-</span> takeText
+  return (labels, text)</code></pre></div>
+<p><code>pOptionalBracketedLabels</code> returns a list of labels, as text, if they are present, or an empty list if they are not.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pOptionalBracketedLabels ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pOptionalBracketedLabels <span class="fu">=</span> pBracketedLabels <span class="fu">&lt;|&gt;</span> return []</code></pre></div>
+<p><code>pBracketedLabels</code> parses a list of labels, assuming they’re there. If the labels aren’t there, it fails (in which case it’s the job of <code>pOptionalBracketedLabels</code> to return an empty list).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">pBracketedLabels <span class="fu">=</span> <span class="kw">do</span>
+  string <span class="st">&quot;[&quot;</span>
+  labels <span class="ot">&lt;-</span> pLabels
+  string <span class="st">&quot;]&quot;</span>
+  skipSpace
+  return labels</code></pre></div>
+<p>The interior of a label list is either single labels or ranges, separated by commas and optional whitespace. For example: <code>1, 2a, 4-6</code>. We find these comma-separated groups of labels, and concatenate them into one big list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pLabels ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pLabels <span class="fu">=</span> mconcat <span class="fu">&lt;$&gt;</span> sepBy1 pCommaSeparatedLabel (char <span class="ch">&#39;,&#39;</span> <span class="fu">&gt;&gt;</span> skipSpace)
+
+<span class="ot">pCommaSeparatedLabel ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pCommaSeparatedLabel <span class="fu">=</span> pLabelRange <span class="fu">&lt;|&gt;</span> pSingleLabel</code></pre></div>
+<p>A single label is usually a whole number, but sometimes there are sub-definitions that use letters, such as definition 2 being listed as <code>[2a]</code> and <code>[2b]</code>. If the sub-definitions go beyond letter <code>j</code>, it’s getting a bit ridiculous, though.</p>
+<p>Instead of the <code>do</code> block, this could have been written more concisely and more confusingly as <code>pure &lt;$&gt; textWith &quot;0123456789abcdefghij&quot;</code>. Typical Haskell programmers may wonder why I didn’t do it that way, and others may wonder why you <em>would</em> do it that way.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pSingleLabel ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pSingleLabel <span class="fu">=</span> <span class="kw">do</span>
+  label <span class="ot">&lt;-</span> textWith <span class="st">&quot;0123456789abcdefghij&quot;</span>
+  return [label]</code></pre></div>
+<p>A label range is made of whole-numbered labels (parsed using <code>decimal</code>) separated by some kind of dash. When we parse one, we return it as a list of the numeric values that it spans.</p>
+<p>We don’t deal with ranges involving letters, such as <code>[2a-d]</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">pLabelRange <span class="fu">=</span> <span class="kw">do</span>
+  startNum <span class="ot">&lt;-</span> decimal
+  textWith <span class="st">&quot;-–—&quot;</span>
+  endNum <span class="ot">&lt;-</span> decimal
+  return (map tshow [startNum<span class="fu">..</span>endNum])</code></pre></div>
+<p>When we get a LabeledDef value – that is, an AnnotatedText for a definition, with a text label – the next thing we want to do is convert it into some number of WiktionaryFacts.</p>
+<p>First we find the word sense that the definitions should use. Often this comes from the label. But if a template within the definition has specifically provided a SenseID, we use that first.</p>
+<p><code>mplus</code> is an operator on monads. Here we’re applying it to the Maybe monad, where it returns the first <code>Just</code> value, to prioritize the sources that might provide a sense label.</p>
+<p><code>thisTerm</code> is the term being defined, which we refine by filling in its <code>wtSense</code> with the sense label we found.</p>
+<p>As for the actual text of the definition, we split it into multiple independent definitions by running the <code>pDefinitionText</code> parser on it, defined next.</p>
+<p>The WiktionaryFacts that we output are a fact built with <code>makeDefinitionFact</code> for each piece of the definition text, plus a fact built with <code>annotationToFact</code> for each usable annotation on that text.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">definitionToFacts ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">LabeledDef</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+definitionToFacts language thisTerm defPair <span class="fu">=</span>
+  <span class="kw">let</span> defText <span class="fu">=</span> snd defPair
+      <span class="co">-- get a sense either from the SenseID annotation, or failing that,</span>
+      <span class="co">-- from the label that comes with the definition</span>
+      defSense <span class="fu">=</span> mplus (findSenseID defText) (nonEmpty (<span class="dt">Just</span> (fst defPair)))
+      termSense <span class="fu">=</span> thisTerm {wtSense<span class="fu">=</span>defSense}
+      defPieces <span class="fu">=</span> splitDefinition (stripSpaces (getText defText))
+  <span class="kw">in</span> (map (makeDefinitionFact termSense language) defPieces)
+     ⊕ (map (annotationToFact language termSense) (linkableAnnotations defText))</code></pre></div>
+<p><code>makeDefinitionFact</code> makes a WiktionaryFact out of readable text in a definition. It takes in the term being defined and the language it’s being defined in, and then the text of the definition. It outputs a WiktionaryFact whose <code>rel</code> is “definition”, pointing from the term being defined, to a term made out of the definition text in the appropriate language.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">makeDefinitionFact ::</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryFact</span>
+makeDefinitionFact termSense language definition <span class="fu">=</span>
+  makeFact <span class="st">&quot;definition&quot;</span> termSense (simpleTerm language definition)</code></pre></div>
+<p><code>splitDefinition</code> runs the <code>pDefinitionText</code> parser as a separate parsing stage. This parser should be able to parse whatever it’s given as a definition, so if it fails, it’s not just a situation where the Wiktionary parser should backtrack, it’s a runtime error that should be raised.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">splitDefinition ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>]
+splitDefinition definition <span class="fu">=</span>
+  <span class="kw">if</span> definition <span class="fu">==</span> <span class="st">&quot;&quot;</span> <span class="kw">then</span> []
+  <span class="kw">else</span>
+    <span class="kw">case</span> parseOnly pDefinitionText definition <span class="kw">of</span>
+      <span class="dt">Right</span> results <span class="ot">-&gt;</span> results
+      <span class="dt">Left</span> err <span class="ot">-&gt;</span> error err</code></pre></div>
+<h2 id="parsing-the-language-of-definitions">Parsing the language of definitions</h2>
+<p>Definitions on Wiktionary often define the same thing in multiple ways. These sub-definitions are usually separated by semicolons. For example, the first definition of “vector” is:</p>
+<pre><code>A directed quantity, one with both magnitude and direction; the signed difference between two points.</code></pre>
+<p>When you split at the semicolon, you get two separate ways to describe this word sense.</p>
+<p>Some definitions, especially of words in other languages, are just a list of synonyms separated by commas. The definition of the Russian word “специалист” is:</p>
+<pre><code>specialist, expert</code></pre>
+<p>We also want to parse that form of definition. However, we restrict it to a list of single words, because we don’t want every comma that appears in a definition (such as the one above) to act as a place to split the definition.</p>
+<p>This could probably be done better. When the Japanese word “車” is defined as “a car, an automobile, a carriage, a cart”, we fail to recognize that as four definitions joined by commas, because they contain spaces. Fortunately, each of those words is also a link, which <code>annotationToFact</code> will be able to turn into a WiktionaryFact, so we do get the four separate definitions anyway.</p>
+<p>So to parse a definition, we first look for single words separated by commas. Failing that, we look for sub-definitions separated by semicolons, with an optional period at the end. If neither parser works (perhaps the definition is multiple sentences, so splitting it at semicolons would be likely to be wrong), we just return the entire text as a single definition.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pDefinitionText ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pDefinitionText <span class="fu">=</span> (pDefCommas <span class="fu">&lt;|&gt;</span> pDefSemicolons <span class="fu">&lt;|&gt;</span> pDefAnything)
+
+pCommaItem     <span class="fu">=</span> textWithout <span class="st">&quot; ,;:.&quot;</span>
+pSemicolonItem <span class="fu">=</span> textWithout <span class="st">&quot;;.&quot;</span></code></pre></div>
+<p>To parse the definition as comma-separated, it must be made of items that parse as <code>pCommaItem</code>, separated by <code>&quot;, &quot;</code>. This must encompass the entire definition, so at the end we make sure to parse <code>endOfInput</code> (discarding its meaningless value).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pDefCommas ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pDefCommas <span class="fu">=</span> sepBy1 pCommaItem (string <span class="st">&quot;, &quot;</span>) <span class="fu">&lt;*</span> endOfInput</code></pre></div>
+<p>Parsing the definition as semicolon-separated is similar, but we have the additional thing that there’s an optional period at the end. That makes the rule complicated enough that we break it into steps using a <code>do</code> block.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pDefSemicolons ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pDefSemicolons <span class="fu">=</span> <span class="kw">do</span>
+  items <span class="ot">&lt;-</span> sepBy pSemicolonItem (string <span class="st">&quot;; &quot;</span>)
+  option <span class="ch">&#39;.&#39;</span> (char <span class="ch">&#39;.&#39;</span>)
+  endOfInput
+  return items</code></pre></div>
+<p><code>pDefAnything</code> parses literally anything and wraps it in a list. We can get away with this because it’s running in a sub-parser. It won’t consume the rest of the whole page, just the whole definition.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pDefAnything ::</span> <span class="dt">Parser</span> [<span class="dt">Text</span>]
+pDefAnything <span class="fu">=</span> <span class="kw">do</span>
+  text <span class="ot">&lt;-</span> takeText
+  return [text]</code></pre></div>
+<h2 id="relation-sections">Relation sections</h2>
+<p>Multiple languages of Wiktionary have sections for particular relations, such as “Synonyms”, “Antonyms”, and the generic “Related terms”. Such a section could look like this (for the English word <em>loud</em>):</p>
+<pre><code>====Antonyms====
+* {{sense|sound}} {{l|en|quiet}}, {{l|en|soft}}
+* {{sense|person}} {{l|en|quiet}}</code></pre>
+<p>We want to extract the links from such a bulleted list and turn them into WiktionaryFacts. The general idea of what we want to do is the same across languages, but the details vary. So in this code, we define a structure called <code>RelationSectionInfo</code> that encapsulates the language-specific details of the process, and pass it as an argument to functions that do the work in general.</p>
+<p>The details we need to keep track of are:</p>
+<ul>
+<li>The Language that we’re handling</li>
+<li>The template procedure for handling templates in that language</li>
+<li>A parse rule for parsing one item from the relation section</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">RelationSectionInfo</span> <span class="fu">=</span> <span class="dt">RelationSectionInfo</span> {
+<span class="ot">  rsLanguage ::</span> <span class="dt">Language</span>,                                 <span class="co">-- the language to be parsed</span>
+<span class="ot">  rsTemplateProc ::</span> <span class="dt">TemplateProc</span>,                         <span class="co">-- the template procedure to use</span>
+<span class="ot">  rsItemRule ::</span> (<span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">AnnotatedText</span>])  <span class="co">-- how to parse items</span>
+}</code></pre></div>
+<p><code>parseRelation</code> gets the result of parsing an entire relation section. It takes these arguments:</p>
+<ul>
+<li>The RelationSectionInfo for the language</li>
+<li>The Wikitext to be parsed</li>
+<li>The term being defined</li>
+<li>The relation name that will go in the “rel” field of the WiktionaryFacts</li>
+</ul>
+<p>and it produces a list of WiktionaryFacts, or the empty list if it fails to parse. Its return value is a plain value, not wrapped in a Parser.</p>
+<p>This function passes most of its arguments on to the actual parse rule <code>pRelationSection</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">parseRelation ::</span> <span class="dt">RelationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+parseRelation rsInfo rel thisTerm text <span class="fu">=</span>
+  parseOrDefault [] (pRelationSection rsInfo rel thisTerm) text</code></pre></div>
+<p><code>pRelationSection</code> is the parse rule. It repeatedly applies the <code>rsItemRule</code> (or ignores a line), converts the AnnotatedTexts it returns to WiktionaryFacts using <code>entryToFacts</code> (defined below), and applies the given <code>rel</code> to these facts. It uses <code>mconcat</code> to flatten together multiple lists of results as it goes.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pRelationSection ::</span> <span class="dt">RelationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">WiktionaryFact</span>]
+pRelationSection rsInfo rel thisTerm <span class="fu">=</span>
+  <span class="kw">let</span> tproc <span class="fu">=</span> (rsTemplateProc rsInfo)
+      language <span class="fu">=</span> rsLanguage rsInfo
+      itemRule <span class="fu">=</span> rsItemRule rsInfo
+  <span class="kw">in</span> map (assignRel rel)
+    <span class="fu">&lt;$&gt;</span> mconcat
+    <span class="fu">&lt;$&gt;</span> map (entryToFacts language thisTerm)
+    <span class="fu">&lt;$&gt;</span> mconcat
+    <span class="fu">&lt;$&gt;</span> many ((itemRule tproc) <span class="fu">&lt;|&gt;</span> pRelationIgnored)</code></pre></div>
+<p>pRelationItem is a sensible default function to pass as <code>rsItemRule</code>: it gets the AnnotatedText contents of one list item introduced by the bullet <code>*</code>, limited to a single link.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pRelationItem ::</span> <span class="dt">TemplateProc</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">AnnotatedText</span>]
+pRelationItem tproc <span class="fu">=</span>
+  extractFirstLink <span class="fu">&lt;$&gt;</span> listItem tproc <span class="st">&quot;*&quot;</span></code></pre></div>
+<p>Lines that don’t match the rule for parsing items – such as templates outside of the list, or blank lines – are skipped, producing no results.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pRelationIgnored ::</span> <span class="dt">Parser</span> [<span class="dt">AnnotatedText</span>]
+pRelationIgnored <span class="fu">=</span> wikiTextLine ignoreTemplates <span class="fu">&gt;&gt;</span> newLine <span class="fu">&gt;&gt;</span> return []</code></pre></div>
+<p><code>entryToFacts</code> is a simpler version of <code>definitionToFacts</code> that’s not specialized for definitions. It converts the annotations on an AnnotatedText to some number of WiktionaryFacts, applying a word sense ID if it exists.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">entryToFacts ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+entryToFacts thisLang thisTerm defText <span class="fu">=</span>
+  <span class="kw">let</span> defSense  <span class="fu">=</span> findSenseID defText
+      termSense <span class="fu">=</span> thisTerm {wtSense<span class="fu">=</span>defSense}
+      annots    <span class="fu">=</span> plainLinkAnnotations defText
+  <span class="kw">in</span> map (annotationToFact thisLang termSense) annots</code></pre></div>
+<h2 id="the-translation-section">The translation section</h2>
+<p>Most of the work involved in parsing translation sections is fundamentally the same between different languages. However, details are different between languages, most notably the names of the templates involved.</p>
+<p>If we passed in all these details as arguments to <code>parseTranslations</code>, the type of <code>parseTranslations</code> and its helper functions would be horrifying. Instead, like we did for relation sections, we’ll group them together into a TranslationSectionInfo struct.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">TranslationSectionInfo</span> <span class="fu">=</span> <span class="dt">TranslationSectionInfo</span> {
+<span class="ot">  tsLanguage ::</span> <span class="dt">Language</span>,             <span class="co">-- the language to be parsed</span>
+<span class="ot">  tsTemplateProc ::</span> <span class="dt">TemplateProc</span>,     <span class="co">-- the template procedure to use</span>
+<span class="ot">  tsStartRule ::</span> <span class="dt">Parser</span> (<span class="dt">Maybe</span> <span class="dt">Text</span>), <span class="co">-- a parser for the start of a translation list</span>
+<span class="ot">  tsIgnoreRule ::</span> <span class="dt">Parser</span> (),          <span class="co">-- a parser for lines to ignore</span>
+<span class="ot">  tsEndRule ::</span> <span class="dt">Parser</span> ()              <span class="co">-- a parser for the end of a translation list</span>
+}</code></pre></div>
+<p>As with relation sections above, <code>parseTranslations</code> runs the parse rule we’re about to define and extracts its list of results (if any). Its arguments are:</p>
+<ul>
+<li>The TranslationSectionInfo for the language</li>
+<li>The term being defined</li>
+<li>The Wikitext to be parsed</li>
+</ul>
+<p>It returns (as a plain value, not wrapped in a Parser) the list of facts it extracts, if any.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">parseTranslations ::</span> <span class="dt">TranslationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+parseTranslations tsInfo thisTerm text <span class="fu">=</span>
+  parseOrDefault [] (pTranslationSection tsInfo thisTerm) text</code></pre></div>
+<p><code>pTranslationSection</code> parses one or more translation groups (defined below).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pTranslationSection ::</span> <span class="dt">TranslationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">WiktionaryFact</span>]
+pTranslationSection tsInfo thisTerm <span class="fu">=</span> concat <span class="fu">&lt;$&gt;</span> many1 (pTranslationGroup tsInfo thisTerm)</code></pre></div>
+<p>A translation group is a portion of the “Translations” section that all applies to the same word sense. It’s delimited by a start template and an end template. The start template might return a word sense, or might return Nothing.</p>
+<p>This parser runs <code>tsStartRule</code> and possibly gets a word sense from it, then runs <code>pTranslationGroupBody</code> with that word sense to get the translations it will actually return, and finally runs <code>tsEndRule</code>. It skips blank lines before and after.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pTranslationGroup ::</span> <span class="dt">TranslationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">WiktionaryFact</span>]
+pTranslationGroup tsInfo thisTerm <span class="fu">=</span> <span class="kw">do</span>
+  optionalTextChoices [newLine]
+  maybeSense <span class="ot">&lt;-</span> tsStartRule tsInfo
+  <span class="kw">let</span> senseTerm <span class="fu">=</span> thisTerm {wtSense<span class="fu">=</span>maybeSense}
+  items <span class="ot">&lt;-</span> pTranslationGroupBody tsInfo senseTerm
+  tsEndRule tsInfo
+  optionalTextChoices [newLine]
+  return items</code></pre></div>
+<p>The body of a translation group is a list of translation items, defining translations of a particular sense of a WiktionaryTerm (or an ambiguous WiktionaryTerm whose sense is Nothing).</p>
+<p>We look for one or more lines that are either matches for <code>pTranslationItem</code> or for <code>tsIgnoreRule</code>. We concatenate together the AnnotatedTexts they produce, then run <code>extractTranslations</code> on them to turn them into WiktionaryFacts.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pTranslationGroupBody ::</span> <span class="dt">TranslationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">WiktionaryFact</span>]
+pTranslationGroupBody tsInfo thisTerm <span class="fu">=</span>
+  mconcat <span class="fu">&lt;$&gt;</span>
+    map (extractTranslations (tsLanguage tsInfo) thisTerm) <span class="fu">&lt;$&gt;</span>
+    mconcat <span class="fu">&lt;$&gt;</span>
+    many1 (pTranslationItem tsInfo <span class="fu">&lt;|&gt;</span> (tsIgnoreRule tsInfo <span class="fu">&gt;&gt;</span> return []))
+
+<span class="ot">extractTranslations ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+extractTranslations language thisTerm atext <span class="fu">=</span>
+  <span class="kw">let</span> translationAnnotations <span class="fu">=</span> filter isTranslation (getAnnotations atext) <span class="kw">in</span>
+    map (annotationToFact language thisTerm) translationAnnotations
+
+<span class="ot">isTranslation ::</span> <span class="dt">Annotation</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+isTranslation a <span class="fu">=</span> lookup <span class="st">&quot;rel&quot;</span> a <span class="fu">==</span> <span class="dt">Just</span> <span class="st">&quot;translation&quot;</span></code></pre></div>
+<p>To get translation candidates out of a bunch of bullet points, we need to find the items the bullet-pointed list entry contains.</p>
+<p>There may be multiple of them, because some translation entries are nested lists – multiple kinds of translations for the same language, for example. <code>extractTopLevel</code> turns these items into a flat list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pTranslationItem ::</span> <span class="dt">TranslationSectionInfo</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> [<span class="dt">AnnotatedText</span>]
+pTranslationItem tsInfo <span class="fu">=</span> extractTopLevel <span class="fu">&lt;$&gt;</span> listItem (tsTemplateProc tsInfo) <span class="st">&quot;*&quot;</span></code></pre></div>
+<p>The <code>tsIgnoreRule</code> has to be written for each language, as a parser that takes in lines and returns <code>()</code>. As one simple case, <code>pBlankLine</code> parses a blank line and returns <code>()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pBlankLine ::</span> <span class="dt">Parser</span> ()
+pBlankLine <span class="fu">=</span> newLine <span class="fu">&gt;&gt;</span> return ()</code></pre></div>
+<h2 id="looking-up-sections">Looking up sections</h2>
+<p>To understand what we’re parsing, we need to understand what kind of section it is.</p>
+<p>Sections don’t necessarily come out and <em>tell</em> you what kind of section they are. For example, it would be great if the section that contains definitions were named <strong>Definitions</strong>. However, in the grand Wiktionary tradition of conflating semantics with presentation, the heading on that section is the part of speech, such as <strong>Noun</strong> or <strong>Adverb</strong>.</p>
+<p><code>findHeading</code> handles one case of this problem: given our current stack of headings (the hierarchy of headings leading to a section), we want to find the first one (if any) that matches a known set, such as names of parts of speech.</p>
+<p>Simple example: when <code>findHeading (HashSet [&quot;Noun&quot;, &quot;Verb&quot;, &quot;Adjective&quot;])</code> is run on the list <code>[&quot;English&quot;, &quot;Etymology 1&quot;, &quot;Noun&quot;]</code>, it will return <code>Just &quot;Noun&quot;</code>. When run on <code>[&quot;English&quot;, &quot;Etymology 1&quot;]</code>, it will return <code>Nothing</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">findHeading ::</span> <span class="dt">HashSet</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+findHeading choices headings <span class="fu">=</span>
+  <span class="kw">let</span> filtered <span class="fu">=</span> filter (∈ choices) headings
+  <span class="kw">in</span> headMay filtered</code></pre></div>
+<p><code>findPrefixedHeading</code> finds the first heading in a stack of headings that begins with a particular prefix, such as “Etymology”. If it returns a result, the result is a <code>Just</code> containing the rest of the heading, such as “1”.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">findPrefixedHeading ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+findPrefixedHeading prefix headings <span class="fu">=</span>
+  <span class="kw">let</span> filtered <span class="fu">=</span> filter (isPrefixOf prefix) headings
+      mapped   <span class="fu">=</span> map (drop (length prefix)) filtered
+  <span class="kw">in</span> headMay mapped</code></pre></div>
+<h2 id="transforming-templates">Transforming templates</h2>
+<p>Many of the template functions we define will involve converting a Template value into an AnnotatedText.</p>
+<p>These are similar but not quite the same. A Template indicates what the Wikitext syntax <em>says</em>, but the AnnotatedText output says what it <em>means</em>. Converting one to the other will involve handling specific values based on how it will be used.</p>
+<p>Their types are structured somewhat differently, as well. A Template is an association list from Text parameters to Text values. An AnnotatedText contains visible text, plus any number of Annotations, which are maps from Text keys to Text values.</p>
+<p>But very often, we want to turn Template parameters directly into keys in an Annotation, or into the visible text of the AnnotatedText. Describing these operations repeatedly would be quite verbose. So what we’re defining here is a little language for turning Templates into AnnotatedTexts.</p>
+<p>To get some convenient <code>do</code> syntax for this, we use <code>put</code>, which lets us assemble values using a monad called Writer. The values are accumulated into a sort of state, using their <code>mconcat</code> operation, because the state is in fact a monoid. Yes, we’re using a monad to build a monoid. I promise this will be really useful for templates.</p>
+<p>In particular, here, the monoid we’re building is a map that serves as an Annotation.</p>
+<p>At the end, we can return a separate value that isn’t part of that accumulation. We use this for the text that gets annotated.</p>
+<p>Here’s an example (this code doesn’t actually go here) of how we’ll use <code>put</code> and <code>annotationBuilder</code>:</p>
+<pre><code>handlePOSTemplate t = annotationBuilder $ do
+  put &quot;pos&quot; (partOfSpeechMap (get &quot;1&quot; t))
+  put &quot;language&quot; (getLanguage &quot;2&quot; t)
+  return &quot;POS&quot;</code></pre>
+<p>We get argument “1” from the template, run that through a <code>partOfSpeechMap</code>, and assign the result as the “pos” value of our Annotation. We do something similar with a function called <code>getLanguage</code>, putting the result in the “language” value. As the text that actually gets annotated, we return the placeholder text “POS”.</p>
+<p>So <code>put</code> is our monoid-monad thing that uses <code>writer</code> to assemble a state using do-notation. We also want the values to be a Monoid, so we can check if they’re empty. If a value is empty, we do nothing to the state (we append <code>ø</code>). If the value is present, we append a map that just maps <code>key</code> to <code>value</code>, and the effect of that is to map <code>key</code> to <code>value</code> in the state.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">put ::</span> (<span class="dt">IsMap</span> map, <span class="dt">Monoid</span> (<span class="dt">MapValue</span> map), <span class="dt">Eq</span> (<span class="dt">MapValue</span> map)) <span class="ot">=&gt;</span> <span class="dt">ContainerKey</span> map <span class="ot">-&gt;</span> <span class="dt">MapValue</span> map <span class="ot">-&gt;</span> <span class="dt">Writer</span> map (<span class="dt">MapValue</span> map)
+put key value <span class="fu">=</span>
+  <span class="kw">if</span> (value <span class="fu">==</span> ø)
+    <span class="kw">then</span> writer (value, ø)
+    <span class="kw">else</span> writer (value, singletonMap key value)</code></pre></div>
+<p>If that was obscure, don’t worry about it.</p>
+<p><code>annotationBuilder</code> is how we use that monad to create an AnnotatedText. <code>runWriter</code> runs the monad and gives us a pair of its return value and its accumulated state. The state is our singular Annotation, and the return value is our text.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">annotationBuilder ::</span> <span class="dt">Writer</span> <span class="dt">Annotation</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+annotationBuilder m <span class="fu">=</span>
+  <span class="kw">let</span> (text, anno) <span class="fu">=</span> runWriter m <span class="kw">in</span>
+    annotate [anno] text</code></pre></div>
+<p>Let’s add some shorthand to our little language. Instead of just using <code>put</code> and <code>return</code>, we’re going to write operations that look like this:</p>
+<pre><code>handleDerivationTemplate t = annotationBuilder $ do
+  put &quot;rel&quot; &quot;*derived/etym&quot;
+  adapt &quot;language&quot; arg2 t
+  adapt &quot;page&quot; arg3 t
+  visible arg3 t</code></pre>
+<p>The thing we want to <code>put</code> in the annotation will often be something that we <code>get</code> or <code>getPrioritized</code> from the template, so we combine <code>getPrioritized</code> and <code>put</code> into one operation called <code>adapt</code>. It looks at the keys of the template given by <code>keySources</code>, and puts the first one it finds in the Annotation value with the key <code>keyTarget</code>.</p>
+<p>Sometimes we know exactly which argument to look in and don’t need a priority order, so here are some lists of a single key:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">arg1, arg2,<span class="ot"> arg3 ::</span> [<span class="dt">Text</span>]
+arg1 <span class="fu">=</span> [<span class="st">&quot;1&quot;</span>]
+arg2 <span class="fu">=</span> [<span class="st">&quot;2&quot;</span>]
+arg3 <span class="fu">=</span> [<span class="st">&quot;3&quot;</span>]</code></pre></div>
+<p>So in the <code>handleDerivationTemplate</code> example above, we get arg 2 of the Template and make it the <code>language</code> of the annotation, and get arg 3 of the Template and make it the <code>page</code>, using <code>adapt</code>. Here’s its definition.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">adapt ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">Writer</span> <span class="dt">Annotation</span> <span class="dt">Text</span>
+adapt keyTarget keySources <span class="fu">=</span> (put keyTarget) <span class="fu">.</span> (getPrioritized keySources)</code></pre></div>
+<p><code>visible</code> is a combination of <code>getPrioritized</code> and <code>return</code> – it similarly looks up a list of keys, and makes the first one it finds the text result.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">visible ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">Writer</span> <span class="dt">Annotation</span> <span class="dt">Text</span>
+visible keySources <span class="fu">=</span> return <span class="fu">.</span> (getPrioritized keySources)</code></pre></div>
+<p><code>invisible</code>, then, means that the text of the template is considered to be the empty string – we’re using it only for its Annotations.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">invisible ::</span> <span class="dt">Writer</span> <span class="dt">Annotation</span> <span class="dt">Text</span>
+invisible <span class="fu">=</span> return <span class="st">&quot;&quot;</span></code></pre></div>
+<h2 id="unbounded-numbers-of-arguments">Unbounded numbers of arguments</h2>
+<p>There are now templates that take an unbounded number of arguments and make a table out of them, such as {{der3}} on en.wiktionary.org.</p>
+<p><code>handleUnboundedTemplate</code> builds a template-handler that handles these templates, given the relation to extract and the default language (usually the language the Wiktionary is in).</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleUnboundedTemplate ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleUnboundedTemplate rel defaultLanguage t <span class="fu">=</span>
+  <span class="kw">let</span> language <span class="fu">=</span> findWithDefault defaultLanguage <span class="st">&quot;lang&quot;</span> t
+      keys <span class="fu">=</span> [cs (show n) <span class="fu">|</span> n <span class="ot">&lt;-</span> [<span class="dv">1</span><span class="fu">..</span><span class="dv">200</span>]]
+      entries <span class="fu">=</span> map stripGloss (getAll keys t)
+      annots <span class="fu">=</span> [annotationFromList [(<span class="st">&quot;rel&quot;</span>, rel),
+                                    (<span class="st">&quot;language&quot;</span>, language),
+                                    (<span class="st">&quot;page&quot;</span>, text)] <span class="fu">|</span> text <span class="ot">&lt;-</span> entries]
+  <span class="kw">in</span> annotate annots <span class="st">&quot;&quot;</span>
+
+<span class="ot">stripGloss ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+stripGloss text <span class="fu">=</span> fst (splitFirst <span class="st">&quot;:&quot;</span> text)</code></pre></div>
+<h2 id="an-entry-point-for-parsing-an-entire-page">An entry point for parsing an entire page</h2>
+<p>The <code>handleFileJSON</code> function isn’t actually used anywhere except for experimentation, but it is similar to what the <code>WiktionaryParser</code> command needs to do. I include it here to illustrate what we need to accomplish.</p>
+<p>This function takes in a file containing a Wiktionary page, as Wikitext that possibly includes HTML. It extracts a list of facts from it using a <code>languageParser</code> that’s defined separately for each language of Wiktionary being parsed. (We’ll see those modules later.) The extracted facts are then encoded as JSON structures and sent to standard out.</p>
+<p>The <code>languageParser</code> is a function that takes in a page title (which is important because it tells us what word is being defined) and the non-HTML Wikitext of that page, and outputs a list of WiktionaryFacts.</p>
+<p>The WiktionaryFacts are converted to output by sending them through the JSON <code>encode</code>, then through the all-purpose text type converter <code>cs</code> (I really tried to name something more specific but I failed), and then through <code>println</code>. <code>mapM_</code> applies this chain of functions to each of the results, in order, using the IO monad.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleFileJSON ::</span> (<span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]) <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> FilePath <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+handleFileJSON languageParser title filename <span class="fu">=</span> <span class="kw">do</span>
+  contents <span class="ot">&lt;-</span> (readFile filename)<span class="ot"> ::</span> <span class="dt">IO</span> <span class="dt">ByteString</span>
+  <span class="kw">let</span> fromHTML <span class="fu">=</span> extractWikiTextFromHTML contents
+  mapM_ (println <span class="fu">.</span> cs <span class="fu">.</span> encode) (languageParser title fromHTML)</code></pre></div>
+<h1 id="text.mediawiki.wiktionary.english-parsing-wiktionary-in-english"><code>Text.MediaWiki.Wiktionary.English</code>: parsing Wiktionary in English</h1>
+<p>This file defines specific rules for parsing the English Wiktionary, building on the rules in <code>Text.MediaWiki.Wiktionary.Base</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}</span></code></pre></div>
+<p>Export only the top-level, namespaced functions.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Text.MediaWiki.Wiktionary.English</span>
+  (enParseWiktionary, enTemplates, enParseRelation, enParseEtymology) <span class="kw">where</span>
+<span class="kw">import </span><span class="dt">WikiPrelude</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.Templates</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.AnnotatedText</span>
+<span class="kw">import </span><span class="dt">Text.SplitUtils</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.ParseTools</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.Sections</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.WikiText</span>
+<span class="kw">import </span><span class="dt">Text.MediaWiki.Wiktionary.Base</span>
+<span class="kw">import </span><span class="dt">Data.Attoparsec.Text</span>
+<span class="kw">import </span><span class="dt">Data.LanguageNames</span></code></pre></div>
+<h2 id="parsing-entire-pages">Parsing entire pages</h2>
+<p>This function can be passed as an argument to <code>handleFileJSON</code> in Text.MediaWiki.Wiktionary.Base.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">enParseWiktionary ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+enParseWiktionary title text <span class="fu">=</span>
+  <span class="kw">let</span> sections <span class="fu">=</span> parsePageIntoSections text <span class="kw">in</span>
+    concat (map (enParseSection title) sections)</code></pre></div>
+<h2 id="choosing-an-appropriate-section-parser">Choosing an appropriate section parser</h2>
+<p><code>enParseSection</code> takes in a title and a WikiSection structure (from <code>Text.MediaWiki.Sections</code>), builds a WiktionaryTerm structure for the term we’re defining, and passes it on to a function that will extract WiktionaryFacts.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">enParseSection ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WikiSection</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+enParseSection title (<span class="dt">WikiSection</span> {headings<span class="fu">=</span>headings, content<span class="fu">=</span>content}) <span class="fu">=</span>
+  <span class="co">-- The first two headings are the meaningless level-1 heading and the</span>
+  <span class="co">-- language heading. If those aren&#39;t there, bail out.</span>
+  <span class="kw">case</span> uncons (drop <span class="dv">1</span> headings) <span class="kw">of</span>
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> []
+    <span class="co">-- langHeading will contain the level-2 heading (for the language),</span>
+    <span class="co">-- and subheads will contain levels 3 and later. Now we need to look</span>
+    <span class="co">-- through the subheads for details about the term we&#39;re parsing</span>
+    <span class="co">-- and what kind of section to parse.</span>
+    <span class="dt">Just</span> (langHeading, subheads) <span class="ot">-&gt;</span>
+      <span class="kw">let</span> language    <span class="fu">=</span> lookupLanguage <span class="st">&quot;en&quot;</span> langHeading
+          maybePos    <span class="fu">=</span> findPartOfSpeech subheads
+          etymNumber  <span class="fu">=</span> findEtymologyNumber subheads
+          sectionType <span class="fu">=</span> getSectionType subheads
+          thisTerm    <span class="fu">=</span> <span class="dt">WiktionaryTerm</span> {
+                          wtText<span class="fu">=</span>title,
+                          wtLanguage<span class="fu">=</span><span class="dt">Just</span> language,
+                          wtEtym<span class="fu">=</span><span class="dt">Just</span> etymNumber,
+                          wtPos<span class="fu">=</span>partOfSpeechMap <span class="fu">&lt;$&gt;</span> maybePos,
+                          wtSense<span class="fu">=</span><span class="dt">Nothing</span>
+                          }
+      <span class="kw">in</span> chooseSectionParser sectionType thisTerm content</code></pre></div>
+<p><code>chooseSectionParser</code> selects a particular function for making WiktionaryFacts, based on the type of section we’re parsing.</p>
+<p>When we specify what kind of relation to extract, “hypernym” means that the terms we find will be hypernyms of the word being defined, while “*hypernym&quot; reverses that – the word being defined will be the hypernym of the words we find.</p>
+<p>Later, the <code>makeFact</code> function will see the asterisk and swap the arguments when constructing a WiktionaryFact.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">chooseSectionParser ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+chooseSectionParser <span class="st">&quot;POS&quot;</span> <span class="fu">=</span> enParseDefinitions
+chooseSectionParser <span class="st">&quot;Translations&quot;</span> <span class="fu">=</span> enParseTranslations
+chooseSectionParser <span class="st">&quot;Etymology&quot;</span> <span class="fu">=</span> enParseEtymology
+chooseSectionParser <span class="st">&quot;Synonyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;synonym&quot;</span>
+chooseSectionParser <span class="st">&quot;Antonyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;antonym&quot;</span>
+chooseSectionParser <span class="st">&quot;Hyponyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;*hypernym&quot;</span>
+chooseSectionParser <span class="st">&quot;Hypernyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;hypernym&quot;</span>
+chooseSectionParser <span class="st">&quot;Meronyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;*holonym&quot;</span>
+chooseSectionParser <span class="st">&quot;Holonyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;holonym&quot;</span>
+chooseSectionParser <span class="st">&quot;Troponyms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;troponym&quot;</span>
+chooseSectionParser <span class="st">&quot;Coordinate terms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;coordinate&quot;</span>
+chooseSectionParser <span class="st">&quot;Derived terms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;derived&quot;</span>
+chooseSectionParser <span class="st">&quot;Related terms&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;related&quot;</span>
+chooseSectionParser <span class="st">&quot;See also&quot;</span> <span class="fu">=</span> enParseRelation <span class="st">&quot;related&quot;</span></code></pre></div>
+<p>The default case, for a section type we don’t know how to parse, is a function that ignores two arguments and returns the empty list.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">chooseSectionParser x <span class="fu">=</span> const (const [])</code></pre></div>
+<h2 id="defining-section-parsers">Defining section parsers</h2>
+<p>Defining section parsers by filling in the missing details in more general functions, defined in <code>Text.MediaWiki.Wiktionary.Base</code>:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell">enParseDefinitions <span class="fu">=</span> parseDefinitions <span class="st">&quot;en&quot;</span> enTemplates
+
+enParseRelation <span class="fu">=</span> parseRelation <span class="fu">$</span> <span class="dt">RelationSectionInfo</span> {
+  rsLanguage<span class="fu">=</span><span class="st">&quot;en&quot;</span>,
+  rsTemplateProc<span class="fu">=</span>enTemplates,
+  rsItemRule<span class="fu">=</span>pRelationItem
+}
+
+enParseTranslations <span class="fu">=</span> parseTranslations <span class="fu">$</span> <span class="dt">TranslationSectionInfo</span> {
+  tsLanguage<span class="fu">=</span><span class="st">&quot;en&quot;</span>,
+  tsTemplateProc<span class="fu">=</span>enTemplates,
+  tsStartRule<span class="fu">=</span>(pTransTop <span class="fu">&lt;|&gt;</span> pCheckTransTop),
+  tsIgnoreRule<span class="fu">=</span>(pTransMid <span class="fu">&lt;|&gt;</span> pBlankLine),
+  tsEndRule<span class="fu">=</span>pTransBottom
+}</code></pre></div>
+<p>The <code>pTranslationTopTemplate</code> rule parses the template that starts a translation section, which may or may not be labeled with a word sense. It returns a Maybe Text that contains the word sense if present.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">pTransTop ::</span> <span class="dt">Parser</span> (<span class="dt">Maybe</span> <span class="dt">Text</span>)
+pTransTop <span class="fu">=</span> <span class="kw">do</span>
+  template <span class="ot">&lt;-</span> specificTemplate enTemplates <span class="st">&quot;trans-top&quot;</span>
+  newLine
+  return (lookup <span class="st">&quot;1&quot;</span> template)
+
+<span class="ot">pCheckTransTop ::</span> <span class="dt">Parser</span> (<span class="dt">Maybe</span> <span class="dt">Text</span>)
+pCheckTransTop <span class="fu">=</span> <span class="kw">do</span>
+  specificTemplate enTemplates <span class="st">&quot;checktrans-top&quot;</span>
+  newLine
+  return <span class="dt">Nothing</span>
+
+<span class="ot">pTransMid ::</span> <span class="dt">Parser</span> ()
+pTransMid <span class="fu">=</span> specificTemplate enTemplates <span class="st">&quot;trans-mid&quot;</span> <span class="fu">&gt;&gt;</span> return ()
+
+<span class="ot">pTransBottom ::</span> <span class="dt">Parser</span> ()
+pTransBottom <span class="fu">=</span> specificTemplate enTemplates <span class="st">&quot;trans-bottom&quot;</span> <span class="fu">&gt;&gt;</span> return ()</code></pre></div>
+<p>In an etymology section, we just want to extract all the templates that link to another word. We parse the section using <code>sectionAnnotated</code>, extract the links, and create “related/etym” relations from them.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">enParseEtymology ::</span> <span class="dt">WiktionaryTerm</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> [<span class="dt">WiktionaryFact</span>]
+enParseEtymology thisTerm text <span class="fu">=</span>
+  <span class="kw">let</span> etymParsed <span class="fu">=</span> parseOrDefault mempty (sectionAnnotated enTemplates) text
+      annots <span class="fu">=</span> languageTaggedAnnotations etymParsed
+      facts <span class="fu">=</span> map (annotationToFact <span class="st">&quot;en&quot;</span> thisTerm) annots
+  <span class="kw">in</span> map (assignRel <span class="st">&quot;related/etym&quot;</span>) facts</code></pre></div>
+<h1 id="finding-headings">Finding headings</h1>
+<p>The following list of parts of speech comes from: https://en.wiktionary.org/wiki/Wiktionary:Entry_layout#Part_of_speech</p>
+<p>We skip entries in the sub-lists called ‘Symbols and characters’, ‘Han characters and language-specific varieties’, and ‘Lojban-specific parts of speech’.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">partsOfSpeech ::</span> <span class="dt">HashSet</span> <span class="dt">Text</span>
+partsOfSpeech <span class="fu">=</span> setFromList [
+  <span class="st">&quot;Adjective&quot;</span>, <span class="st">&quot;Adverb&quot;</span>, <span class="st">&quot;Ambiposition&quot;</span>, <span class="st">&quot;Article&quot;</span>, <span class="st">&quot;Circumposition&quot;</span>,
+  <span class="st">&quot;Classifier&quot;</span>, <span class="st">&quot;Conjunction&quot;</span>, <span class="st">&quot;Contraction&quot;</span>, <span class="st">&quot;Counter&quot;</span>, <span class="st">&quot;Determiner&quot;</span>,
+  <span class="st">&quot;Interjection&quot;</span>, <span class="st">&quot;Noun&quot;</span>, <span class="st">&quot;Numeral&quot;</span>, <span class="st">&quot;Participle&quot;</span>, <span class="st">&quot;Particle&quot;</span>,
+  <span class="st">&quot;Postposition&quot;</span>, <span class="st">&quot;Preposition&quot;</span>, <span class="st">&quot;Pronoun&quot;</span>, <span class="st">&quot;Proper noun&quot;</span>, <span class="st">&quot;Verb&quot;</span>,
+  <span class="st">&quot;Circumfix&quot;</span>, <span class="st">&quot;Combining form&quot;</span>, <span class="st">&quot;Infix&quot;</span>, <span class="st">&quot;Interfix&quot;</span>, <span class="st">&quot;Prefix&quot;</span>, <span class="st">&quot;Root&quot;</span>,
+  <span class="st">&quot;Suffix&quot;</span>, <span class="st">&quot;Phrase&quot;</span>, <span class="st">&quot;Proverb&quot;</span>, <span class="st">&quot;Prepositional phrase&quot;</span>, <span class="st">&quot;Acronym&quot;</span>,
+  <span class="st">&quot;Symbol&quot;</span>
+  ]
+
+<span class="ot">partOfSpeechMap ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span>
+partOfSpeechMap <span class="st">&quot;Adjective&quot;</span>   <span class="fu">=</span> <span class="st">&quot;a&quot;</span>
+partOfSpeechMap <span class="st">&quot;Adverb&quot;</span>      <span class="fu">=</span> <span class="st">&quot;r&quot;</span>
+partOfSpeechMap <span class="st">&quot;Noun&quot;</span>        <span class="fu">=</span> <span class="st">&quot;n&quot;</span>
+partOfSpeechMap <span class="st">&quot;Pronoun&quot;</span>     <span class="fu">=</span> <span class="st">&quot;n&quot;</span>
+partOfSpeechMap <span class="st">&quot;Proper noun&quot;</span> <span class="fu">=</span> <span class="st">&quot;n&quot;</span>
+partOfSpeechMap <span class="st">&quot;Verb&quot;</span>        <span class="fu">=</span> <span class="st">&quot;v&quot;</span>
+partOfSpeechMap _             <span class="fu">=</span> <span class="st">&quot;_&quot;</span>
+
+<span class="ot">findPartOfSpeech ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Text</span>
+findPartOfSpeech <span class="fu">=</span> findHeading partsOfSpeech
+
+<span class="ot">findEtymologyNumber ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Text</span>
+findEtymologyNumber headings <span class="fu">=</span>
+  <span class="kw">case</span> findPrefixedHeading <span class="st">&quot;Etymology &quot;</span> headings <span class="kw">of</span>
+    <span class="dt">Just</span> x <span class="ot">-&gt;</span> x
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="st">&quot;1&quot;</span></code></pre></div>
+<p>Generalizing the type of a heading:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">getSectionType ::</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Text</span>
+getSectionType headings <span class="fu">=</span>
+  <span class="kw">case</span> (lastMay headings) <span class="kw">of</span>
+    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="st">&quot;Language&quot;</span>
+    <span class="dt">Just</span> heading <span class="ot">-&gt;</span>
+      <span class="kw">if</span> elem heading partsOfSpeech
+        <span class="kw">then</span> <span class="st">&quot;POS&quot;</span>
+        <span class="kw">else</span> <span class="kw">if</span> isPrefixOf <span class="st">&quot;Etymology &quot;</span> heading
+          <span class="kw">then</span> <span class="st">&quot;Etymology&quot;</span>
+          <span class="kw">else</span> heading</code></pre></div>
+<h1 id="evaluating-templates">Evaluating templates</h1>
+<h2 id="labels">Labels</h2>
+<p>The <code>{{label}}</code> template applies labels to a definition, specifying its grammar, its semantic context, or possibly other things. It involves a lot of Lua code for special cases.</p>
+<p>The following labels are basically just part of the syntax of an entry, and we’d like to skip them. We also include the empty string here, corresponding to template arguments that aren’t there.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">syntacticLabels ::</span> <span class="dt">HashSet</span> <span class="dt">Text</span>
+syntacticLabels <span class="fu">=</span> setFromList [
+  <span class="st">&quot;&quot;</span>, <span class="st">&quot;and&quot;</span>, <span class="st">&quot;&amp;&quot;</span>, <span class="st">&quot;or&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="st">&quot;,&quot;</span>, <span class="st">&quot;now&quot;</span>, <span class="st">&quot;except&quot;</span>, <span class="st">&quot;except in&quot;</span>, <span class="st">&quot;etc.&quot;</span>,
+  <span class="st">&quot;outside&quot;</span>, <span class="st">&quot;especially&quot;</span>, <span class="st">&quot;chiefly&quot;</span>, <span class="st">&quot;mainly&quot;</span>, <span class="st">&quot;mostly&quot;</span>, <span class="st">&quot;particularly&quot;</span>,
+  <span class="st">&quot;primarily&quot;</span>, <span class="st">&quot;excluding&quot;</span>, <span class="st">&quot;extremely&quot;</span>, <span class="st">&quot;frequently&quot;</span>, <span class="st">&quot;including&quot;</span>,
+  <span class="st">&quot;literally&quot;</span>, <span class="st">&quot;literal&quot;</span>, <span class="st">&quot;many&quot;</span>, <span class="st">&quot;markedly&quot;</span>, <span class="st">&quot;mildly&quot;</span>, <span class="st">&quot;now&quot;</span>, <span class="st">&quot;nowadays&quot;</span>,
+  <span class="st">&quot;of&quot;</span>, <span class="st">&quot;of a&quot;</span>, <span class="st">&quot;of an&quot;</span>, <span class="st">&quot;often&quot;</span>, <span class="st">&quot;originally&quot;</span>, <span class="st">&quot;possibly&quot;</span>, <span class="st">&quot;rarely&quot;</span>,
+  <span class="st">&quot;slightly&quot;</span>, <span class="st">&quot;sometimes&quot;</span>, <span class="st">&quot;somewhat&quot;</span>, <span class="st">&quot;strongly&quot;</span>, <span class="st">&quot;typically&quot;</span>, <span class="st">&quot;usually&quot;</span>,
+  <span class="st">&quot;very&quot;</span>, <span class="st">&quot;in&quot;</span>, <span class="st">&quot;of&quot;</span>]</code></pre></div>
+<p>Often we can tell by the prefix of a label that it describes a feature of the word as a word, not of its meaning. This can be called the “use-mention distinction”. We would like to filter out labels that are about mentioning the word and not about using it.</p>
+<p>Some entries contain labels that look like <code>~ par</code>. They come out exactly this way in the entry. I don’t even know what it’s supposed to mean, so let’s leave out these labels, too.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">mentionPrefixes ::</span> [<span class="dt">Text</span>]
+mentionPrefixes <span class="fu">=</span> [
+  <span class="st">&quot;~ &quot;</span>, <span class="st">&quot;with &quot;</span>, <span class="st">&quot;of &quot;</span>, <span class="st">&quot;as &quot;</span>, <span class="st">&quot;especially&quot;</span>, <span class="st">&quot;in &quot;</span>, <span class="st">&quot;+ &quot;</span>, <span class="st">&quot;by &quot;</span>,
+  <span class="st">&quot;followed by &quot;</span>, <span class="st">&quot;no longer&quot;</span>, <span class="st">&quot;often &quot;</span>, <span class="st">&quot;chiefly &quot;</span>, <span class="st">&quot;takes &quot;</span>,
+  <span class="st">&quot;usually &quot;</span>, <span class="st">&quot;on &quot;</span>
+  ]</code></pre></div>
+<p>These labels provide grammatical (not semantic) information. We’ll keep them separate in case we ever want to output them:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">grammarLabels ::</span> <span class="dt">HashSet</span> <span class="dt">Text</span>
+grammarLabels <span class="fu">=</span> setFromList [
+  <span class="st">&quot;abbreviation&quot;</span>, <span class="st">&quot;acronym&quot;</span>, <span class="st">&quot;active&quot;</span>, <span class="st">&quot;active voice&quot;</span>,
+  <span class="st">&quot;in the active&quot;</span>, <span class="st">&quot;ambitransitive&quot;</span>, <span class="st">&quot;archaic-verb-form&quot;</span>, <span class="st">&quot;attributive&quot;</span>,
+  <span class="st">&quot;attributively&quot;</span>, <span class="st">&quot;auxiliary&quot;</span>, <span class="st">&quot;by ellipsis&quot;</span>, <span class="st">&quot;by extension&quot;</span>, <span class="st">&quot;causative&quot;</span>,
+  <span class="st">&quot;collectively&quot;</span>, <span class="st">&quot;comparable&quot;</span>, <span class="st">&quot;copulative&quot;</span>, <span class="st">&quot;copular&quot;</span>, <span class="st">&quot;countable&quot;</span>,
+  <span class="st">&quot;ditransitive&quot;</span>, <span class="st">&quot;emphatic&quot;</span>, <span class="st">&quot;ergative&quot;</span>, <span class="st">&quot;fractional&quot;</span>, <span class="st">&quot;idiomatic&quot;</span>,
+  <span class="st">&quot;idiom&quot;</span>, <span class="st">&quot;impersonal&quot;</span>, <span class="st">&quot;in the singular&quot;</span>, <span class="st">&quot;in singular&quot;</span>, <span class="st">&quot;in the dual&quot;</span>,
+  <span class="st">&quot;in dual&quot;</span>, <span class="st">&quot;in the plural&quot;</span>, <span class="st">&quot;in plural&quot;</span>,
+  <span class="st">&quot;in the mediopassive&quot;</span>, <span class="st">&quot;in mediopassive&quot;</span>, <span class="st">&quot;mediopassive&quot;</span>, <span class="st">&quot;inanimate&quot;</span>,
+  <span class="st">&quot;indefinite&quot;</span>, <span class="st">&quot;indef&quot;</span>, <span class="st">&quot;initialism&quot;</span>, <span class="st">&quot;intransitive&quot;</span>,
+  <span class="st">&quot;mass noun&quot;</span>, <span class="st">&quot;a mass noun&quot;</span>, <span class="st">&quot;not comparable&quot;</span>,
+  <span class="st">&quot;notcomp&quot;</span>, <span class="st">&quot;uncomparable&quot;</span>, <span class="st">&quot;middle&quot;</span>, <span class="st">&quot;middle voice&quot;</span>, <span class="st">&quot;in the middle&quot;</span>,
+  <span class="st">&quot;onomatopoeia&quot;</span>, <span class="st">&quot;ordinal&quot;</span>, <span class="st">&quot;plural&quot;</span>, <span class="st">&quot;passive&quot;</span>, <span class="st">&quot;passive voice&quot;</span>,
+  <span class="st">&quot;in the passive&quot;</span>, <span class="st">&quot;plural only&quot;</span>, <span class="st">&quot;pluralonly&quot;</span>, <span class="st">&quot;plurale tantum&quot;</span>,
+  <span class="st">&quot;possessive&quot;</span>, <span class="st">&quot;possessive pronoun&quot;</span>, <span class="st">&quot;postpositive&quot;</span>, <span class="st">&quot;productive&quot;</span>, <span class="st">&quot;reciprocal&quot;</span>,
+  <span class="st">&quot;reflexive&quot;</span>, <span class="st">&quot;set phrase&quot;</span>, <span class="st">&quot;singular&quot;</span>, <span class="st">&quot;singular only&quot;</span>, <span class="st">&quot;singulare tantum&quot;</span>,
+  <span class="st">&quot;no plural&quot;</span>, <span class="st">&quot;transitive&quot;</span>, <span class="st">&quot;uds.&quot;</span>, <span class="st">&quot;uncountable&quot;</span>, <span class="st">&quot;usually plural&quot;</span>,
+  <span class="st">&quot;usually in the plural&quot;</span>, <span class="st">&quot;usually in plural&quot;</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">usageLabels ::</span> <span class="dt">HashSet</span> <span class="dt">Text</span>
+usageLabels <span class="fu">=</span> setFromList [
+  <span class="st">&quot;obsolete&quot;</span>, <span class="st">&quot;rare&quot;</span>, <span class="st">&quot;dated&quot;</span>, <span class="st">&quot;archaic&quot;</span>, <span class="st">&quot;colloquial&quot;</span>, <span class="st">&quot;informal&quot;</span>,
+  <span class="st">&quot;figuratively&quot;</span>, <span class="st">&quot;figurative&quot;</span>, <span class="st">&quot;poetic&quot;</span>, <span class="st">&quot;uncommon&quot;</span>, <span class="st">&quot;neologism&quot;</span>,
+  <span class="st">&quot;obsolete form&quot;</span>]</code></pre></div>
+<p>Combine these together into a set of all labels we want to ignore.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">ignoredLabels ::</span> <span class="dt">HashSet</span> <span class="dt">Text</span>
+ignoredLabels <span class="fu">=</span> syntacticLabels <span class="fu">&lt;&gt;</span> grammarLabels <span class="fu">&lt;&gt;</span> usageLabels</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">ignoreLabel ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+ignoreLabel label <span class="fu">=</span> (elem label ignoredLabels) <span class="fu">||</span>
+                    (any (\prefix <span class="ot">-&gt;</span> isPrefixOf prefix label) mentionPrefixes)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleLabelTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleLabelTemplate template <span class="fu">=</span>
+  <span class="kw">let</span> entries     <span class="fu">=</span> map (\arg <span class="ot">-&gt;</span> get arg template) [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>]
+      goodEntries <span class="fu">=</span> filter (not <span class="fu">.</span> ignoreLabel) entries
+      annotations <span class="fu">=</span> map labelToAnnotation goodEntries
+  <span class="kw">in</span> annotate annotations (asText <span class="st">&quot;&quot;</span>)
+
+<span class="ot">labelToAnnotation ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Annotation</span>
+labelToAnnotation label <span class="fu">=</span> mapFromList [(<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;context&quot;</span>), (<span class="st">&quot;language&quot;</span>, <span class="st">&quot;en&quot;</span>), (<span class="st">&quot;page&quot;</span>, label)]</code></pre></div>
+<p>Qualifiers are similar to labels, but take just a single argument.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleQualifierTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleQualifierTemplate template <span class="fu">=</span>
+  <span class="kw">let</span> label <span class="fu">=</span> get <span class="st">&quot;1&quot;</span> template <span class="kw">in</span>
+    <span class="kw">if</span> (ignoreLabel label)
+      <span class="kw">then</span> mempty
+      <span class="kw">else</span> annotate [labelToAnnotation label] <span class="st">&quot;&quot;</span></code></pre></div>
+<h2 id="sense-ids">Sense IDs</h2>
+<p>Hooray! Wiktionary is finally starting to mark word senses with stable IDs instead of just numbered lists. But we need to be able to extract that information, mapping the sense number to the sense.</p>
+<p>We’ll make a “senseID” annotation that we pass on to the definition parser in Wiktionary.Base.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleSenseIDTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleSenseIDTemplate template <span class="fu">=</span> singleAnnotation <span class="st">&quot;senseID&quot;</span> (get <span class="st">&quot;2&quot;</span> template)
+
+<span class="ot">handleSenseTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleSenseTemplate template <span class="fu">=</span> singleAnnotation <span class="st">&quot;senseID&quot;</span> (get <span class="st">&quot;1&quot;</span> template)</code></pre></div>
+<h2 id="links-1">Links</h2>
+<p>Starting in this section, we get to make the most of our little <code>annotationBuilder</code> language for expressing how to convert templates into AnnotatedText.</p>
+<p>This little language is defined in the documentation for <code>Text.MediaWiki.Wiktionary.Base</code>, but here’s a summary:</p>
+<ul>
+<li><p><code>put</code> <em>key</em> <em>value</em>: put the actual value <em>value</em> in the annotation named <em>key</em>. This is particularly used for constants.</p></li>
+<li><p><code>adapt</code> <em>key</em> <em>keylist</em> <em>template</em>: try looking up each key in <em>keylist</em> in the <em>template</em>, in order. When we find such a key that exists, its value will become the value of the annotation named <code>key</code>.</p></li>
+<li><p><code>visible</code> <em>keylist</em> <em>template</em>: like <code>adapt</code>, but it sets the text of the AnnotatedText object to the value it finds. In other words, it says which of the template values becomes the text that would be visible to someone reading the article.</p></li>
+<li><p><code>invisible</code>: states that this template has no visible text, so we should just produce the empty string plus annotations.</p></li>
+</ul>
+<p>TODO: describe what these template parsers are for.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleLinkTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleLinkTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  adapt <span class="st">&quot;language&quot;</span> arg1 t
+  adapt <span class="st">&quot;page&quot;</span> arg2 t
+  adapt <span class="st">&quot;gloss&quot;</span> [<span class="st">&quot;4&quot;</span>, <span class="st">&quot;gloss&quot;</span>] t
+  adapt <span class="st">&quot;pos&quot;</span> [<span class="st">&quot;pos&quot;</span>] t
+  visible [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;2&quot;</span>] t
+
+<span class="ot">handleDerivationTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleDerivationTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  put <span class="st">&quot;rel&quot;</span> <span class="st">&quot;*derived/etym&quot;</span>
+  adapt <span class="st">&quot;language&quot;</span> arg2 t
+  adapt <span class="st">&quot;page&quot;</span> arg3 t
+  visible arg3 t
+
+<span class="ot">handleEtylTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleEtylTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  put <span class="st">&quot;rel&quot;</span> <span class="st">&quot;*derived/etym&quot;</span>
+  <span class="co">-- The page name &quot;-&quot; means &quot;figure out what word we&#39;re referring to from</span>
+  <span class="co">-- context&quot;, which is basically always the case for {{etyl}}.</span>
+  put <span class="st">&quot;page&quot;</span> <span class="st">&quot;-&quot;</span>
+  adapt <span class="st">&quot;language&quot;</span> arg1 t
+  invisible</code></pre></div>
+<p>The <code>{{compound}}</code> template can look like this:</p>
+<pre><code>{{compound|en|place|holder}}</code></pre>
+<p>where argument 1 is the language code, and arguments 2 and 3 are the terms being compounded. Or it can look like this:</p>
+<pre><code>{{compound|lang=en|place|holder}}</code></pre>
+<p>Which looks like it’s just being more specific, but now, argument “lang” is the language code, and arguments 1 and 2 are the terms being compounded. Am I just counting positional arguments wrong? Nope, the template can even appear like this:</p>
+<pre><code>{{compound|place|holder|lang=en}}</code></pre>
+<p>Which makes it entirely clear that “place” and “holder” are arguments 1 and 2.</p>
+<p>I don’t know if there is any unified logic to the implementation of this template that makes sense in MediaWiki-land, so we introduce <code>fixLanguageArg</code>, which ensures that the first two non-language arguments are labeled “2” and “3”.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">fixLanguageArg ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">Template</span>
+fixLanguageArg t <span class="fu">=</span>
+  <span class="kw">if</span> (hasKey <span class="st">&quot;lang&quot;</span> t)
+    <span class="kw">then</span> [(<span class="st">&quot;lang&quot;</span>, get <span class="st">&quot;lang&quot;</span> t), (<span class="st">&quot;2&quot;</span>, get <span class="st">&quot;1&quot;</span> t), (<span class="st">&quot;3&quot;</span>, get <span class="st">&quot;2&quot;</span> t)]
+    <span class="kw">else</span> [(<span class="st">&quot;lang&quot;</span>, get <span class="st">&quot;1&quot;</span> t), (<span class="st">&quot;2&quot;</span>, get <span class="st">&quot;2&quot;</span> t), (<span class="st">&quot;3&quot;</span>, get <span class="st">&quot;3&quot;</span> t)]
+
+<span class="ot">handleCompoundTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleCompoundTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> t&#39; <span class="fu">=</span> fixLanguageArg t
+      language <span class="fu">=</span> get <span class="st">&quot;lang&quot;</span> t&#39;
+      term1 <span class="fu">=</span> get <span class="st">&quot;2&quot;</span> t&#39;
+      term2 <span class="fu">=</span> get <span class="st">&quot;3&quot;</span> t&#39;
+      text <span class="fu">=</span> term1 <span class="fu">&lt;&gt;</span> <span class="st">&quot; + &quot;</span> <span class="fu">&lt;&gt;</span> term2
+  <span class="kw">in</span> annotate
+     [mapFromList [(<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;*derived&quot;</span>), (<span class="st">&quot;language&quot;</span>, language), (<span class="st">&quot;page&quot;</span>, term1)],
+      mapFromList [(<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;*derived&quot;</span>), (<span class="st">&quot;language&quot;</span>, language), (<span class="st">&quot;page&quot;</span>, term2)]]
+     text</code></pre></div>
+<p><code>{{prefix}}</code>, <code>{{suffix}}</code>, and <code>{{cognate}}</code> have a language argument that can move in similar ways.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleCognateTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleCognateTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  <span class="kw">let</span> t&#39; <span class="fu">=</span> fixLanguageArg t
+  put <span class="st">&quot;rel&quot;</span> <span class="st">&quot;related/etym&quot;</span>
+  adapt <span class="st">&quot;language&quot;</span> [<span class="st">&quot;lang&quot;</span>] t&#39;
+  adapt <span class="st">&quot;page&quot;</span> arg2 t&#39;
+  visible arg2 t&#39;
+
+<span class="ot">handlePrefixTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handlePrefixTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  <span class="kw">let</span> t&#39; <span class="fu">=</span> fixLanguageArg t
+  put <span class="st">&quot;rel&quot;</span> <span class="st">&quot;*derived&quot;</span>
+  adapt <span class="st">&quot;language&quot;</span> [<span class="st">&quot;lang&quot;</span>] t&#39;
+  adapt <span class="st">&quot;page&quot;</span> arg3 t&#39;
+  visible arg3 t&#39;
+
+<span class="ot">handleSuffixTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleSuffixTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  <span class="kw">let</span> t&#39; <span class="fu">=</span> fixLanguageArg t
+  put <span class="st">&quot;rel&quot;</span> <span class="st">&quot;*derived&quot;</span>
+  adapt <span class="st">&quot;language&quot;</span> [<span class="st">&quot;lang&quot;</span>] t&#39;
+  adapt <span class="st">&quot;page&quot;</span> arg2 t&#39;
+  visible arg2 t&#39;</code></pre></div>
+<p>The <code>{{ja-r}}</code> template is used to create Japanese text with “ruby text” or “furigana” – small hiragana characters above the text to indicate how the kanji are pronounced. In some cases, the <code>%</code> character is used to specify how the hiragana and kanji should be aligned.</p>
+<p>Here, we want to keep just the text as written in kanji, and discard the furigana.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleJapaneseRubyTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleJapaneseRubyTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> text <span class="fu">=</span> getPrioritized [<span class="st">&quot;linkto&quot;</span>, <span class="st">&quot;1&quot;</span>] t
+      term <span class="fu">=</span> replace <span class="st">&quot;%&quot;</span> <span class="st">&quot;&quot;</span> text
+  <span class="kw">in</span> annotate
+     [mapFromList [(<span class="st">&quot;language&quot;</span>, <span class="st">&quot;ja&quot;</span>), (<span class="st">&quot;page&quot;</span>, term)]]
+     term</code></pre></div>
+<h2 id="translations">Translations</h2>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleTranslationTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleTranslationTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  put <span class="st">&quot;rel&quot;</span> <span class="st">&quot;translation&quot;</span>
+  adapt <span class="st">&quot;language&quot;</span> arg1 t
+  adapt <span class="st">&quot;page&quot;</span> arg2 t
+  visible [<span class="st">&quot;alt&quot;</span>, <span class="st">&quot;2&quot;</span>] t</code></pre></div>
+<h2 id="form-of-templates">Form-of templates</h2>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleAbstractFormTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleAbstractFormTemplate t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> (get <span class="st">&quot;1&quot;</span> t))
+  adapt <span class="st">&quot;form&quot;</span> arg1 t
+  adapt <span class="st">&quot;page&quot;</span> arg2 t
+  adapt <span class="st">&quot;language&quot;</span> [<span class="st">&quot;lang&quot;</span>] t
+  invisible
+
+<span class="ot">handleFormTemplate ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleFormTemplate form t <span class="fu">=</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+  put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> form)
+  put <span class="st">&quot;form&quot;</span> form
+  adapt <span class="st">&quot;page&quot;</span> arg1 t
+  adapt <span class="st">&quot;language&quot;</span> [<span class="st">&quot;lang&quot;</span>] t
+  invisible
+
+<span class="ot">handleInflectionTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleInflectionTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> forms <span class="fu">=</span> getAll [<span class="st">&quot;3&quot;</span>,<span class="st">&quot;4&quot;</span>,<span class="st">&quot;5&quot;</span>,<span class="st">&quot;6&quot;</span>,<span class="st">&quot;7&quot;</span>,<span class="st">&quot;8&quot;</span>,<span class="st">&quot;9&quot;</span>] t
+      formStr <span class="fu">=</span> intercalate <span class="st">&quot;+&quot;</span> forms
+  <span class="kw">in</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+      put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> formStr)
+      adapt <span class="st">&quot;language&quot;</span> [<span class="st">&quot;lang&quot;</span>] t
+      adapt <span class="st">&quot;page&quot;</span> arg1 t
+      invisible
+
+<span class="ot">handleSpecificFormsTemplate ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleSpecificFormsTemplate language forms t <span class="fu">=</span>
+  <span class="kw">let</span> annotations <span class="fu">=</span> [annotationFromList
+                      [(<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> form),
+                       (<span class="st">&quot;language&quot;</span>, fromLanguage language),
+                       (<span class="st">&quot;page&quot;</span>, pageName (get <span class="st">&quot;1&quot;</span> t))] <span class="fu">|</span> form <span class="ot">&lt;-</span> forms]
+  <span class="kw">in</span> annotate annotations <span class="st">&quot;&quot;</span></code></pre></div>
+<p><code>handleChineseFormTemplate</code> handles the box that identifies the simplified and traditional forms of a word, possibly including multiple forms of each, appearing at the top of an etymology section.</p>
+<p>The head-word is assumed to be a traditional form, so the “t” parameter is rarely used.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleChineseFormTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleChineseFormTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> simpTexts <span class="fu">=</span> getAll [<span class="st">&quot;s&quot;</span>, <span class="st">&quot;s2&quot;</span>, <span class="st">&quot;s3&quot;</span>] t
+      tradTexts <span class="fu">=</span> getAll [<span class="st">&quot;t&quot;</span>, <span class="st">&quot;t2&quot;</span>, <span class="st">&quot;t3&quot;</span>, <span class="st">&quot;alt&quot;</span>] t
+      simpLinks <span class="fu">=</span> [annotationFromList [(<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;synonym&quot;</span>), (<span class="st">&quot;language&quot;</span>, <span class="st">&quot;zh-Hans&quot;</span>), (<span class="st">&quot;page&quot;</span>, text)]
+                                      <span class="fu">|</span> text <span class="ot">&lt;-</span> simpTexts]
+      tradLinks <span class="fu">=</span> [annotationFromList [(<span class="st">&quot;rel&quot;</span>, <span class="st">&quot;synonym&quot;</span>), (<span class="st">&quot;language&quot;</span>, <span class="st">&quot;zh-Hant&quot;</span>), (<span class="st">&quot;page&quot;</span>, text)]
+                                      <span class="fu">|</span> text <span class="ot">&lt;-</span> tradTexts]
+  <span class="kw">in</span> annotate (simpLinks ⊕ tradLinks) <span class="st">&quot;&quot;</span>
+
+<span class="ot">handleSpanishVerbTemplate ::</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleSpanishVerbTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> forms <span class="fu">=</span> getAll [<span class="st">&quot;pers&quot;</span>, <span class="st">&quot;person&quot;</span>, <span class="st">&quot;num&quot;</span>, <span class="st">&quot;number&quot;</span>, <span class="st">&quot;tense&quot;</span>, <span class="st">&quot;mood&quot;</span>, <span class="st">&quot;gen&quot;</span>, <span class="st">&quot;gender&quot;</span>] t
+      formal <span class="fu">=</span> <span class="kw">case</span> (get <span class="st">&quot;formal&quot;</span> t) <span class="kw">of</span>
+                 <span class="st">&quot;y&quot;</span>   <span class="ot">-&gt;</span> [<span class="st">&quot;formal&quot;</span>]
+                 <span class="st">&quot;yes&quot;</span> <span class="ot">-&gt;</span> [<span class="st">&quot;formal&quot;</span>]
+                 <span class="st">&quot;n&quot;</span>   <span class="ot">-&gt;</span> [<span class="st">&quot;informal&quot;</span>]
+                 <span class="st">&quot;no&quot;</span>  <span class="ot">-&gt;</span> [<span class="st">&quot;informal&quot;</span>]
+                 _     <span class="ot">-&gt;</span> []
+      formStr <span class="fu">=</span> intercalate <span class="st">&quot;+&quot;</span> (formal <span class="fu">&lt;&gt;</span> forms)
+  <span class="kw">in</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+      put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> formStr)
+      put <span class="st">&quot;language&quot;</span> <span class="st">&quot;es&quot;</span>
+      adapt <span class="st">&quot;page&quot;</span> [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;inf&quot;</span>, <span class="st">&quot;verb&quot;</span>, <span class="st">&quot;infinitive&quot;</span>] t
+      invisible
+
+handleSpanishCompoundTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> forms <span class="fu">=</span> getAll [<span class="st">&quot;mood&quot;</span>, <span class="st">&quot;person&quot;</span>] t
+      formStr <span class="fu">=</span> intercalate <span class="st">&quot;+&quot;</span> (<span class="st">&quot;compound&quot;</span><span class="fu">:</span>forms)
+  <span class="kw">in</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+      put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> formStr)
+      put <span class="st">&quot;language&quot;</span> <span class="st">&quot;es&quot;</span>
+      adapt <span class="st">&quot;page&quot;</span> [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;1&quot;</span>] t
+      invisible
+
+handleSwedishFormTemplate t <span class="fu">=</span>
+  <span class="kw">let</span> (formStart, formEnd) <span class="fu">=</span> breakOnEnd <span class="st">&quot;-form-&quot;</span> (get <span class="st">&quot;0&quot;</span> t)
+      formStr <span class="fu">=</span> replace <span class="st">&quot;-&quot;</span> <span class="st">&quot;+&quot;</span> formEnd
+  <span class="kw">in</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+      put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> formStr)
+      put <span class="st">&quot;language&quot;</span> <span class="st">&quot;sv&quot;</span>
+      adapt <span class="st">&quot;page&quot;</span> [<span class="st">&quot;1&quot;</span>] t
+      invisible</code></pre></div>
+<p>There are many templates named “xx-verb form of”, and they tend to work in similar ways: several arguments to the template are symbols for various kinds of inflections, and we just want to join these symbols together. We just need to know which language it is, and which template arguments to look up.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleLanguageFormTemplate ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleLanguageFormTemplate language formKeys t <span class="fu">=</span>
+  <span class="kw">let</span> forms <span class="fu">=</span> getAll formKeys t
+      formStr <span class="fu">=</span> intercalate <span class="st">&quot;+&quot;</span> forms
+  <span class="kw">in</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+    put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> formStr)
+    put <span class="st">&quot;language&quot;</span> (fromLanguage language)
+    adapt <span class="st">&quot;page&quot;</span> arg1 t
+    invisible</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">handleLanguageFormTemplate2 ::</span> <span class="dt">Language</span> <span class="ot">-&gt;</span> [<span class="dt">Text</span>] <span class="ot">-&gt;</span> <span class="dt">Template</span> <span class="ot">-&gt;</span> <span class="dt">AnnotatedText</span>
+handleLanguageFormTemplate2 language formKeys t <span class="fu">=</span>
+  <span class="kw">let</span> forms <span class="fu">=</span> getAll formKeys t
+      formStr <span class="fu">=</span> intercalate <span class="st">&quot;+&quot;</span> forms
+  <span class="kw">in</span> annotationBuilder <span class="fu">$</span> <span class="kw">do</span>
+    put <span class="st">&quot;rel&quot;</span> (<span class="st">&quot;form/&quot;</span> <span class="fu">&lt;&gt;</span> formStr)
+    put <span class="st">&quot;language&quot;</span> (fromLanguage language)
+    adapt <span class="st">&quot;page&quot;</span> arg2 t
+    invisible</code></pre></div>
+<p>Possible templates still to handle:</p>
+<ul>
+<li>[[Category:Form-of_templates]]</li>
+<li>feminine plural past participle of</li>
+<li>feminine singular past participle of</li>
+<li>masculine plural past participle of</li>
+<li>masculine singular past participle of</li>
+<li>neuter singular past participle of</li>
+<li>verbal noun of</li>
+</ul>
+<h2 id="the-big-template-dispatcher">The big template dispatcher</h2>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">enTemplates ::</span> <span class="dt">TemplateProc</span>
+enTemplates <span class="st">&quot;l&quot;</span>         <span class="fu">=</span> handleLinkTemplate
+enTemplates <span class="st">&quot;link&quot;</span>      <span class="fu">=</span> handleLinkTemplate
+enTemplates <span class="st">&quot;m&quot;</span>         <span class="fu">=</span> handleLinkTemplate
+enTemplates <span class="st">&quot;mention&quot;</span>   <span class="fu">=</span> handleLinkTemplate
+enTemplates <span class="st">&quot;inherited&quot;</span> <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;inh&quot;</span>       <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;derived&quot;</span>   <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;der&quot;</span>       <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;borrowed&quot;</span>  <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;borrowing&quot;</span> <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;bor&quot;</span>       <span class="fu">=</span> handleDerivationTemplate
+enTemplates <span class="st">&quot;cognate&quot;</span>   <span class="fu">=</span> handleCognateTemplate
+enTemplates <span class="st">&quot;cog&quot;</span>       <span class="fu">=</span> handleCognateTemplate
+enTemplates <span class="st">&quot;ja-r&quot;</span>      <span class="fu">=</span> handleJapaneseRubyTemplate
+enTemplates <span class="st">&quot;prefix&quot;</span>    <span class="fu">=</span> handlePrefixTemplate
+enTemplates <span class="st">&quot;suffix&quot;</span>    <span class="fu">=</span> handleSuffixTemplate
+enTemplates <span class="st">&quot;compound&quot;</span>  <span class="fu">=</span> handleCompoundTemplate
+enTemplates <span class="st">&quot;blend&quot;</span>     <span class="fu">=</span> handleCompoundTemplate
+enTemplates <span class="st">&quot;etyl&quot;</span>      <span class="fu">=</span> handleEtylTemplate
+enTemplates <span class="st">&quot;label&quot;</span>     <span class="fu">=</span> handleLabelTemplate
+enTemplates <span class="st">&quot;lbl&quot;</span>       <span class="fu">=</span> handleLabelTemplate
+enTemplates <span class="st">&quot;lb&quot;</span>        <span class="fu">=</span> handleLabelTemplate
+enTemplates <span class="st">&quot;qualifier&quot;</span> <span class="fu">=</span> handleQualifierTemplate
+enTemplates <span class="st">&quot;sense&quot;</span>     <span class="fu">=</span> handleSenseTemplate
+enTemplates <span class="st">&quot;senseid&quot;</span>   <span class="fu">=</span> handleSenseIDTemplate
+enTemplates <span class="st">&quot;t&quot;</span>         <span class="fu">=</span> handleTranslationTemplate
+enTemplates <span class="st">&quot;t+&quot;</span>        <span class="fu">=</span> handleTranslationTemplate
+enTemplates <span class="st">&quot;t-&quot;</span>        <span class="fu">=</span> handleTranslationTemplate
+enTemplates <span class="st">&quot;tø&quot;</span>        <span class="fu">=</span> handleTranslationTemplate
+<span class="co">-- ignore the more uncertain translation templates, t-check and t+check</span>
+
+enTemplates <span class="st">&quot;form of&quot;</span>             <span class="fu">=</span> handleAbstractFormTemplate
+enTemplates <span class="st">&quot;alternative form of&quot;</span> <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;alternate form of&quot;</span>   <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;alternative spelling of&quot;</span> <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;misspelling of&quot;</span>      <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;alt form of&quot;</span>         <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;alt form&quot;</span>            <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;altform&quot;</span>             <span class="fu">=</span> handleFormTemplate <span class="st">&quot;alternate&quot;</span>
+enTemplates <span class="st">&quot;inflection of&quot;</span>       <span class="fu">=</span> handleInflectionTemplate
+enTemplates <span class="st">&quot;conjugation of&quot;</span>      <span class="fu">=</span> handleInflectionTemplate
+
+<span class="co">-- templates that take unbounded numbers of arguments</span>
+enTemplates <span class="st">&quot;rel2&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;related&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;rel3&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;related&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;rel4&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;related&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;der2&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;derived&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;der3&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;derived&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;der4&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;derived&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;der5&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;derived&quot;</span> <span class="st">&quot;en&quot;</span>
+enTemplates <span class="st">&quot;zh-der&quot;</span> <span class="fu">=</span> handleUnboundedTemplate <span class="st">&quot;derived&quot;</span> <span class="st">&quot;zh&quot;</span>
+
+<span class="co">-- Should these be handled in more detail than just extracting their text?</span>
+enTemplates <span class="st">&quot;initialism of&quot;</span>       <span class="fu">=</span> useArg <span class="st">&quot;1&quot;</span>
+enTemplates <span class="st">&quot;acronym of&quot;</span>          <span class="fu">=</span> useArg <span class="st">&quot;1&quot;</span>
+enTemplates <span class="st">&quot;synonym of&quot;</span>          <span class="fu">=</span> useArg <span class="st">&quot;1&quot;</span>
+enTemplates <span class="st">&quot;w&quot;</span>                   <span class="fu">=</span> useArg <span class="st">&quot;1&quot;</span>
+
+enTemplates <span class="st">&quot;en-simple past of&quot;</span>                    <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;past&quot;</span>]
+enTemplates <span class="st">&quot;en-past of&quot;</span>                           <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;past&quot;</span>, <span class="st">&quot;past+ptcp&quot;</span>]
+enTemplates <span class="st">&quot;past of&quot;</span>                              <span class="fu">=</span> handleFormTemplate <span class="st">&quot;past&quot;</span>
+enTemplates <span class="st">&quot;past tense of&quot;</span>                        <span class="fu">=</span> handleFormTemplate <span class="st">&quot;past&quot;</span>
+enTemplates <span class="st">&quot;past participle of&quot;</span>                   <span class="fu">=</span> handleFormTemplate <span class="st">&quot;past+ptcp&quot;</span>
+enTemplates <span class="st">&quot;past active participle of&quot;</span>            <span class="fu">=</span> handleFormTemplate <span class="st">&quot;past+actv+ptcp&quot;</span>
+enTemplates <span class="st">&quot;past passive participle of&quot;</span>           <span class="fu">=</span> handleFormTemplate <span class="st">&quot;past+pasv+ptcp&quot;</span>
+enTemplates <span class="st">&quot;present tense of&quot;</span>                     <span class="fu">=</span> handleFormTemplate <span class="st">&quot;pres&quot;</span>
+enTemplates <span class="st">&quot;present participle of&quot;</span>                <span class="fu">=</span> handleFormTemplate <span class="st">&quot;pres+ptcp&quot;</span>
+enTemplates <span class="st">&quot;present active participle of&quot;</span>         <span class="fu">=</span> handleFormTemplate <span class="st">&quot;pres+actv+ptcp&quot;</span>
+enTemplates <span class="st">&quot;present passive participle of&quot;</span>        <span class="fu">=</span> handleFormTemplate <span class="st">&quot;pres+pasv+ptcp&quot;</span>
+enTemplates <span class="st">&quot;future participle of&quot;</span>                 <span class="fu">=</span> handleFormTemplate <span class="st">&quot;fut+ptcp&quot;</span>
+enTemplates <span class="st">&quot;participle of&quot;</span>                        <span class="fu">=</span> handleFormTemplate <span class="st">&quot;ptcp&quot;</span>
+enTemplates <span class="st">&quot;active participle of&quot;</span>                 <span class="fu">=</span> handleFormTemplate <span class="st">&quot;ptcp+actv&quot;</span>
+enTemplates <span class="st">&quot;passive participle of&quot;</span>                <span class="fu">=</span> handleFormTemplate <span class="st">&quot;ptcp+pasv&quot;</span>
+enTemplates <span class="st">&quot;second-person singular past of&quot;</span>       <span class="fu">=</span> handleFormTemplate <span class="st">&quot;archaic+2+s+past&quot;</span>
+enTemplates <span class="st">&quot;plural of&quot;</span>                            <span class="fu">=</span> handleFormTemplate <span class="st">&quot;p&quot;</span>
+enTemplates <span class="st">&quot;gerund of&quot;</span>                            <span class="fu">=</span> handleFormTemplate <span class="st">&quot;ger&quot;</span>
+enTemplates <span class="st">&quot;imperative of&quot;</span>                        <span class="fu">=</span> handleFormTemplate <span class="st">&quot;imp&quot;</span>
+enTemplates <span class="st">&quot;reflexive of&quot;</span>                         <span class="fu">=</span> handleFormTemplate <span class="st">&quot;ref&quot;</span>
+enTemplates <span class="st">&quot;singular definite of&quot;</span>                 <span class="fu">=</span> handleFormTemplate <span class="st">&quot;s+def&quot;</span>
+enTemplates <span class="st">&quot;plural definite of&quot;</span>                   <span class="fu">=</span> handleFormTemplate <span class="st">&quot;p+def&quot;</span>
+enTemplates <span class="st">&quot;singular indefinite of&quot;</span>               <span class="fu">=</span> handleFormTemplate <span class="st">&quot;s+indef&quot;</span>
+enTemplates <span class="st">&quot;plural indefinite of&quot;</span>                 <span class="fu">=</span> handleFormTemplate <span class="st">&quot;p+indef&quot;</span>
+enTemplates <span class="st">&quot;en-third-person singular of&quot;</span>          <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;3+s+pres&quot;</span>]
+enTemplates <span class="st">&quot;en-third person singular of&quot;</span>          <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;3+s+pres&quot;</span>]
+enTemplates <span class="st">&quot;en-archaic second-person singular of&quot;</span> <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;archaic+2+s+pres&quot;</span>]
+enTemplates <span class="st">&quot;en-archaic third-person singular of&quot;</span>  <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;archaic+3+s+pres&quot;</span>]
+
+enTemplates <span class="st">&quot;en-irregular plural of&quot;</span>      <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;p&quot;</span>]
+enTemplates <span class="st">&quot;en-comparative of&quot;</span>           <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;comp&quot;</span>]
+enTemplates <span class="st">&quot;en-superlative of&quot;</span>           <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;en&quot;</span> [<span class="st">&quot;sup&quot;</span>]
+
+enTemplates <span class="st">&quot;de-inflected form of&quot;</span>        <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;de&quot;</span> [<span class="st">&quot;?&quot;</span>]
+enTemplates <span class="st">&quot;de-zu-infinitive of&quot;</span>         <span class="fu">=</span> handleSpecificFormsTemplate <span class="st">&quot;de&quot;</span> [<span class="st">&quot;zu&quot;</span>]
+enTemplates <span class="st">&quot;de-verb form of&quot;</span>             <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;de&quot;</span> [<span class="st">&quot;2&quot;</span>,<span class="st">&quot;3&quot;</span>,<span class="st">&quot;4&quot;</span>,<span class="st">&quot;5&quot;</span>]
+enTemplates <span class="st">&quot;nl-noun form of&quot;</span>             <span class="fu">=</span> handleLanguageFormTemplate2 <span class="st">&quot;nl&quot;</span> [<span class="st">&quot;1&quot;</span>]
+enTemplates <span class="st">&quot;nl-adj form of&quot;</span>              <span class="fu">=</span> handleLanguageFormTemplate2 <span class="st">&quot;nl&quot;</span> [<span class="st">&quot;1&quot;</span>]
+enTemplates <span class="st">&quot;nl-verb form of&quot;</span>             <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;nl&quot;</span> [<span class="st">&quot;p&quot;</span>,<span class="st">&quot;n&quot;</span>,<span class="st">&quot;t&quot;</span>,<span class="st">&quot;m&quot;</span>]
+
+enTemplates <span class="st">&quot;es-verb form of&quot;</span>      <span class="fu">=</span> handleSpanishVerbTemplate
+enTemplates <span class="st">&quot;es-compound of&quot;</span>       <span class="fu">=</span> handleSpanishCompoundTemplate
+
+enTemplates <span class="st">&quot;pt-noun form of&quot;</span> <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;pt&quot;</span> [<span class="st">&quot;2&quot;</span>,<span class="st">&quot;3&quot;</span>,<span class="st">&quot;4&quot;</span>]
+enTemplates <span class="st">&quot;pt-adj form of&quot;</span>  <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;pt&quot;</span> [<span class="st">&quot;2&quot;</span>,<span class="st">&quot;3&quot;</span>,<span class="st">&quot;4&quot;</span>]
+enTemplates <span class="st">&quot;pt-verb form of&quot;</span> <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;pt&quot;</span> [<span class="st">&quot;3&quot;</span>,<span class="st">&quot;4&quot;</span>,<span class="st">&quot;5&quot;</span>,<span class="st">&quot;6&quot;</span>]
+
+enTemplates <span class="st">&quot;fi-form of&quot;</span>       <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;fi&quot;</span> [<span class="st">&quot;case&quot;</span>,<span class="st">&quot;pr&quot;</span>,<span class="st">&quot;pl&quot;</span>,<span class="st">&quot;mood&quot;</span>,<span class="st">&quot;tense&quot;</span>,<span class="st">&quot;suffix&quot;</span>]
+enTemplates <span class="st">&quot;ru-participle of&quot;</span> <span class="fu">=</span> handleLanguageFormTemplate <span class="st">&quot;ru&quot;</span> [<span class="st">&quot;2&quot;</span>,<span class="st">&quot;3&quot;</span>,<span class="st">&quot;4&quot;</span>,<span class="st">&quot;5&quot;</span>]
+
+enTemplates x
+  <span class="fu">|</span> isPrefixOf <span class="st">&quot;sv-noun-form&quot;</span> x <span class="fu">=</span> handleSwedishFormTemplate
+  <span class="fu">|</span> isPrefixOf <span class="st">&quot;sv-adj-form&quot;</span>  x <span class="fu">=</span> handleSwedishFormTemplate
+  <span class="fu">|</span> isPrefixOf <span class="st">&quot;sv-verb-form&quot;</span> x <span class="fu">=</span> handleSwedishFormTemplate
+  <span class="fu">|</span> otherwise                   <span class="fu">=</span> skipTemplate</code></pre></div>
 </body>
 </html>
