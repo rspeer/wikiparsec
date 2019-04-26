@@ -213,10 +213,14 @@ se; instead, they're functions that you apply to a `TemplateProc` to get a
 parser combinator. `wikiTextLine ignoreTemplates` is a parser combinator.
 
 > wikiTextLine :: TemplateProc -> Parser Text
-> wikiTextLine tproc        = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]       <?> "line of wikitext"
-> wikiTextInLink tproc      = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                <?> "wikitext inside link"
-> wikiTextAtEndOfLink tproc = textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]<?> "wikitext at end of link"
-> wikiTextInTemplate tproc  = textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInTemplate]            <?> "wikitext inside template"
+> wikiTextLine tproc        =
+>   textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]         <?> "line of wikitext"
+> wikiTextInLink tproc      =
+>   textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                  <?> "wikitext inside link"
+> wikiTextAtEndOfLink tproc =
+>   textChoices [wikiTable, nestedLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]    <?> "wikitext at end of link"
+> wikiTextInTemplate tproc  =
+>   textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInTemplate]              <?> "wikitext inside template"
 
 Wiki syntax for links
 ---------------------
@@ -333,6 +337,36 @@ the parse result with `getText`.
 
 > internalLinkText :: TemplateProc -> Parser Text
 > internalLinkText tproc = getText <$> internalLink tproc
+
+nestedLinkText is for when you're already parsing a link, and you just
+found another link inside it, and you need to make sure this madness ends at
+some point (this will be discussed in a moment when we talk about image
+syntax). It's similar to internalLinkText but it's not allowed to parse any
+more links.
+
+> nestedLinkText :: TemplateProc -> Parser Text
+> nestedLinkText tproc = getText <$> nestedLink tproc
+>
+> nestedLink :: TemplateProc -> Parser AnnotatedText
+> nestedLink tproc = do
+>   string "[["
+>   target <- plainTextInLink
+>   maybeText <- optionMaybe (nestedAlternateText tproc)
+>   let {
+>     link      = parseLink target;
+>     annotated = case maybeText of
+>                   Just text -> annotate [link] text
+>                   Nothing   -> annotate [link] (get "page" link)
+>   } in do
+>        string "]]"
+>        return annotated
+>
+> nestedAlternateText :: TemplateProc -> Parser Text
+> nestedAlternateText tproc = do
+>   char '|'
+>   text <- messyTextAtEndOfLink
+>   return (extractLinkText text)
+>
 
 There are complicated syntaxes on MediaWiki that look like internal links,
 particularly the Image: or File: syntax, which can have multiple

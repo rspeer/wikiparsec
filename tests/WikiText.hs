@@ -86,11 +86,16 @@ articleSectionWikitext = extractWikiTextFromHTML $ encodeUtf8 $ unlines [
     "| This shouldn't be a table but we still don't want it"
     ]
 
-
 articleSectionText :: Text
 articleSectionText = unlines [
     "Jean Sibelius was born in 1865 in Finland, since 1809 an autonomous grand duchy within the Russian Empire having earlier been under Swedish control for many centuries. The country remained divided between a culturally dominant Swedish-speaking minority, to which the Sibelius family belonged, and a more nationalistically-minded Finnish-speaking, or \"Fennoman\" majority. In about 1889 Sibelius met his future wife, Aino Järnefelt, who came from a staunch Fennoman family. Sibelius's association with the Järnefelts helped to awaken and develop his own nationalism; in 1892, the year of his marriage to Aino, he completed his first overtly nationalistic work, the symphonic suite Kullervo. Through the 1890s, as Russian control over the duchy grew increasingly oppressive, Sibelius produced a series of works reflecting Finnish resistance to foreign rule, culminating in the tone poem Finlandia."
     ]
+
+badLinkFragments :: [Text]
+badLinkFragments = (replicate 100 "[[a|")
+
+badLinkWikitext :: Text
+badLinkWikitext = extractWikiTextFromHTML $ encodeUtf8 $ concat badLinkFragments
 
 
 sectionTests = [
@@ -103,6 +108,10 @@ tableTests = [
    testParser (sectionText ignoreTemplates) "\n|incomplete table\n|}" ""
    ]
 
+recursionTests = [
+    testParser (sectionText ignoreTemplates) badLinkWikitext (badLinkWikitext ++ "\n")
+    ]
+
 miscTests = [
     testParser looseBracket "}" "}",
     testParser (sectionText ignoreTemplates) "[[Image:Levellers declaration and standard.gif|thumb|200px|Woodcut from a [[Diggers]] document by [[William Everard (Digger)|William Everard]]]]" "",
@@ -111,7 +120,7 @@ miscTests = [
     ]
 
 
-tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests ++ tableTests ++ miscTests)
+tests = test (linkTests ++ templateTests ++ listTests ++ sectionTests ++ tableTests ++ recursionTests ++ miscTests)
 
 main :: IO ()
 main = void (runTestTT tests)
