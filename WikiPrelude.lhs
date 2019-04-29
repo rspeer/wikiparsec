@@ -48,18 +48,19 @@ hat. I don't know many Haskell programmers, though. This documentation is for
 other people who come across this code and are just familiar with functional
 programming in general.
 
-Monoids are things you can concatenate
---------------------------------------
+Monoids are things you can join together
+----------------------------------------
 
-A **monoid** is a type of thing that can be empty and can be concatenated.
+A **monoid** is a type of thing that can be joined in a way that's like
+concatenation. The type of thing also needs to have an empty value, `ø`, which
+when you join it with something just gives you back that thing.
+
 Some monoids you'll encounter in this code are Unicode text, ByteStrings, and
-lists. Sets also work, if you think about the "union" operation as being like
-concatenation.
+lists. Sets also work, joined using the "union" operation.
 
 (A mathematician might say I'm overlooking some monoids that are a big deal,
 like addition of numbers. But you wouldn't realistically *use* a monoid to add
-numbers. You'd use `+` to add numbers. Monoids are for things you need to
-concatenate.)
+numbers. You'd use `+` to add numbers.)
 
 When I'm willing to call all these sequencey things Monoids, then instead of
 having to use awkwardly-namespaced functions for dealing with all these types
@@ -70,6 +71,9 @@ can use `mappend` to append whatever monoidy things I have, and `mempty` or
 By the way, Haskell programmers show their apprecation for functions they find
 really important by giving them infix operators. So `mappend list1 list2` is
 also spelled `list1 <> list2`, or in fancy Unicode, `list1 ⊕ list2`.
+
+In short, "Monoid" should have been named "Joinable". But I can't change
+that name very easily.
 
 Monads are stateful things you can do
 -------------------------------------
@@ -96,6 +100,7 @@ type system. A function of type `IO Text` is a function that does some IO and
 then returns some Text. A function of type `Parser Text` is a function that
 parses some input and then returns some Text.
 
+In short, "Monad" should have been named "Sequenceable".
 
 Here's where the actual code starts
 -----------------------------------
@@ -195,10 +200,11 @@ Unicode shenanigans
 We can use Unicode operators to work with monoids, and we might as well do so
 because we'll be working with a lot of monoids.
 
-One thing I want to do is define the empty monoid as the letter ø. I know it's
-supposed to be the math symbol ∅. You have to put that one in parentheses
-because it's a symbol and Haskell's parser thinks it's supposed to be an infix
-operator. But ø is a name, and that's exactly what we need.
+One thing I want to do is define the empty monoid (the value that, when you
+join it with value X, you get back X) as the letter ø. I know it's supposed to
+be the math symbol ∅. You have to put that one in parentheses because it's a
+symbol and Haskell's parser thinks it's supposed to be an infix operator. But ø
+is a name, and that's exactly what we need.
 
 > ø :: Monoid α => α
 > ø = (∅)

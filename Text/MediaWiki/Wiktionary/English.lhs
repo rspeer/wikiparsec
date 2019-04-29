@@ -343,15 +343,34 @@ This little language is defined in the documentation for
   someone reading the article.
 
 - `invisible`: states that this template has no visible text, so we should just
-  produce the empty string plus annotations.
+  produce the empty string with annotations.
 
-TODO: describe what these template parsers are for.
+The first template we'll implement this way is the `{{link}}` template, which
+is used like this:
+
+    {{link|en|go|went}}
+
+or
+
+    {{link|la|similis|t=like}}
+
+The first argument is always the language code, which we assign to `"language"`
+in the annotation. The second argument is the page being linked to.
+
+The visible text of the link is usually the second argument, but there can be a
+third argument that overrides it, perhaps with a word form, as in
+`{{link|en|go|went}}` which links to "go" with the visible text of "went".
+Thus, the priority order for which fields to extract the visible text from is
+`["3", "2"]`.
+
+Some additional fields can specify the part of speech of the entry being linked
+("pos") or a short definition ("gloss").
 
 > handleLinkTemplate :: Template -> AnnotatedText
 > handleLinkTemplate t = annotationBuilder $ do
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
->   adapt "gloss" ["4", "gloss"] t
+>   adapt "gloss" ["4", "t", "gloss"] t
 >   adapt "pos" ["pos"] t
 >   visible ["3", "2"] t
 >
@@ -597,6 +616,9 @@ The big template dispatcher
 > enTemplates "link"      = handleLinkTemplate
 > enTemplates "m"         = handleLinkTemplate
 > enTemplates "mention"   = handleLinkTemplate
+
+TODO: implement `ja-l` and `ko-l`
+
 > enTemplates "inherited" = handleDerivationTemplate
 > enTemplates "inh"       = handleDerivationTemplate
 > enTemplates "derived"   = handleDerivationTemplate
