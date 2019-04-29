@@ -212,15 +212,19 @@ So `wikiTextLine` and its siblings are not Attoparsec parser combinators, per
 se; instead, they're functions that you apply to a `TemplateProc` to get a
 parser combinator. `wikiTextLine ignoreTemplates` is a parser combinator.
 
+When we give `internalLinkText` as an option, we need to provide an extra
+boolean argument for whether it's allowed to recurse and match
+`internalLinkText` again within. (See `internalLink`, below.)
+
 > wikiTextLine :: TemplateProc -> Parser Text
 > wikiTextLine tproc        =
->   textChoices [wikiTable, internalLinkText tproc, externalLinkText, templateText tproc, messyTextLine]         <?> "line of wikitext"
+>   textChoices [wikiTable, internalLinkText True tproc, externalLinkText, templateText tproc, messyTextLine]          <?> "line of wikitext"
 > wikiTextInLink tproc      =
->   textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInLink]                  <?> "wikitext inside link"
+>   textChoices [internalLinkText True tproc, externalLinkText, templateText tproc, messyTextInLink]                   <?> "wikitext inside link"
 > wikiTextAtEndOfLink tproc =
->   textChoices [wikiTable, nestedLinkText tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]    <?> "wikitext at end of link"
+>   textChoices [wikiTable, internalLinkText False tproc, externalLinkText, templateText tproc, messyTextAtEndOfLink]  <?> "wikitext at end of link"
 > wikiTextInTemplate tproc  =
->   textChoices [internalLinkText tproc, externalLinkText, templateText tproc, messyTextInTemplate]              <?> "wikitext inside template"
+>   textChoices [internalLinkText True tproc, externalLinkText, templateText tproc, messyTextInTemplate]               <?> "wikitext inside template"
 
 Wiki syntax for links
 ---------------------
@@ -300,11 +304,24 @@ the text and the other properties are annotations. Some examples:
      In:    [[Category:English nouns]]
      Out:   AnnotatedText [mapFromList [("namespace", "Category"), ("page", "English nouns")]] "English nouns"
 
-> internalLink :: TemplateProc -> Parser AnnotatedText
-> internalLink tproc = do
+It is possible, in link syntax, for the text of the link to contain another
+link. In fact, this is a common occurrence in image captions, because images
+are a kind of link.
+
+However, there's never a reason for this to recurse more than twice. If there
+are more than two levels of nested links, something is wrong. And these cases
+where something is wrong could require exponential time to parse, because the
+error case for links requires backtracking.
+
+So the first argument to `internalLink` is a boolean for whether it is allowed
+to recurse and match `internalLink` again internally. We pass this boolean on
+to the `alternateText` rule.
+
+> internalLink :: Bool -> TemplateProc -> Parser AnnotatedText
+> internalLink recurse tproc = do
 >   string "[["
 >   target <- plainTextInLink
->   maybeText <- optionMaybe (alternateText tproc)
+>   maybeText <- optionMaybe (alternateText recurse tproc)
 >   let {
 >     link      = parseLink target;
 >     annotated = case maybeText of
@@ -321,52 +338,27 @@ the text and the other properties are annotations. Some examples:
 >     (namespace, local) = splitLast ":" target
 >     (page, section) = splitFirst "#" local
 
-The label of a link can be made of Wikitext and can even include templates.
-When we encounter a label that's different from the link target, we need
-to parse it as Wikitext, including handling templates with a `TemplateProc`.
+The label of a link can be made of Wikitext and can even include templates or,
+in the case of image captions, other links.  When we encounter a label that's
+different from the link target, we need to parse it as Wikitext, including
+handling templates with a `TemplateProc`.
 
-> alternateText :: TemplateProc -> Parser Text
-> alternateText tproc = do
+The `recurse` flag determines whether this rule is allowed to match links.
+
+> alternateText :: Bool -> TemplateProc -> Parser Text
+> alternateText recurse tproc = do
 >   char '|'
->   text <- wikiTextAtEndOfLink tproc
+>   text <- if recurse
+>             then wikiTextAtEndOfLink tproc
+>             else messyTextAtEndOfLink
 >   return (extractLinkText text)
 >
 
 In some cases, we only want the text of the link, in which case we operate on
 the parse result with `getText`.
 
-> internalLinkText :: TemplateProc -> Parser Text
-> internalLinkText tproc = getText <$> internalLink tproc
-
-nestedLinkText is for when you're already parsing a link, and you just
-found another link inside it, and you need to make sure this madness ends at
-some point (this will be discussed in a moment when we talk about image
-syntax). It's similar to internalLinkText but it's not allowed to parse any
-more links.
-
-> nestedLinkText :: TemplateProc -> Parser Text
-> nestedLinkText tproc = getText <$> nestedLink tproc
->
-> nestedLink :: TemplateProc -> Parser AnnotatedText
-> nestedLink tproc = do
->   string "[["
->   target <- plainTextInLink
->   maybeText <- optionMaybe (nestedAlternateText tproc)
->   let {
->     link      = parseLink target;
->     annotated = case maybeText of
->                   Just text -> annotate [link] text
->                   Nothing   -> annotate [link] (get "page" link)
->   } in do
->        string "]]"
->        return annotated
->
-> nestedAlternateText :: TemplateProc -> Parser Text
-> nestedAlternateText tproc = do
->   char '|'
->   text <- messyTextAtEndOfLink
->   return (extractLinkText text)
->
+> internalLinkText :: Bool -> TemplateProc -> Parser Text
+> internalLinkText recurse tproc = getText <$> internalLink recurse tproc
 
 There are complicated syntaxes on MediaWiki that look like internal links,
 particularly the Image: or File: syntax, which can have multiple
@@ -411,7 +403,7 @@ and returns it in an AnnotatedText data structure.
 
 > annotatedWikiText :: TemplateProc -> Parser AnnotatedText
 > annotatedWikiText tproc = concat <$> many1 (annotatedWikiTextPiece tproc)
-> annotatedWikiTextPiece tproc = internalLink tproc <|> templateValue tproc <|> simpleWikiTextPiece
+> annotatedWikiTextPiece tproc = internalLink True tproc <|> templateValue tproc <|> simpleWikiTextPiece
 > simpleWikiTextPiece = annotFromText <$> choice [wikiTable, externalLinkText, messyTextLine]
 
 Sometimes there's extra syntax going on, so we need to exclude specific
@@ -424,7 +416,7 @@ belongs in `exclude`.
 > annotatedWikiTextWithout :: [Char] -> TemplateProc -> Parser AnnotatedText
 > annotatedWikiTextWithout exclude tproc =
 >   mconcat <$> many' (
->     internalLink tproc
+>     internalLink True tproc
 >     <|> templateValue tproc
 >     <|> annotFromText <$> (textWithout (exclude ⊕ "\n[]{}"))
 >     )
