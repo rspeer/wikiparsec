@@ -910,12 +910,12 @@ little language for turning Templates into AnnotatedTexts.
 
 To get some convenient `do` syntax for this, we use `put`, which lets us
 assemble values using a monad called Writer. The values are accumulated into a
-sort of state, using their `mconcat` operation, because the state is in fact
-a monoid. Yes, we're using a monad to build a monoid. I promise this will be
-really useful for templates.
+sort of state, a key-value map that we are building up incrementally, which
+will become the Annotation of the AnnotatedText.
 
-In particular, here, the monoid we're building is a map that serves as an
-Annotation.
+(It turns out that's a monoid, so we can do this building up using `mconcat`.)
+Yes, we're using a monad to build a monoid. I promise this will be really
+useful.)
 
 At the end, we can return a separate value that isn't part of that accumulation.
 We use this for the text that gets annotated.
@@ -934,19 +934,18 @@ similar with a function called `getLanguage`, putting the result in the
 "language" value. As the text that actually gets annotated, we return the
 placeholder text "POS".
 
-So `put` is our monoid-monad thing that uses `writer` to assemble a state using
-do-notation. We also want the values to be a Monoid, so we can check if they're
-empty. If a value is empty, we do nothing to the state (we append `ø`). If the
-value is present, we append a map that just maps `key` to `value`, and the
-effect of that is to map `key` to `value` in the state.
+So now let's implement this using the tools Haskell gives us.  `put` is our
+monoid-monad thing that uses `writer` to assemble a state using do-notation. We
+also want the values to be a Monoid, so we can check if they're empty. If a
+value is empty, we do nothing to the state (we append `ø`). If the value is
+present, we append a map that just maps `key` to `value`, and the effect of
+that is to map `key` to `value` in the state.
 
 > put :: (IsMap map, Monoid (MapValue map), Eq (MapValue map)) => ContainerKey map -> MapValue map -> Writer map (MapValue map)
 > put key value =
 >   if (value == ø)
 >     then writer (value, ø)
 >     else writer (value, singletonMap key value)
-
-If that was obscure, don't worry about it.
 
 `annotationBuilder` is how we use that monad to create an AnnotatedText.
 `runWriter` runs the monad and gives us a pair of its return value and its
@@ -990,6 +989,8 @@ make it the `page`, using `adapt`. Here's its definition.
 
 `visible` is a combination of `getPrioritized` and `return` -- it similarly
 looks up a list of keys, and makes the first one it finds the text result.
+It's named this because it specifies which field is the one that's "visible"
+on the page to someone reading the Wiktionary entry.
 
 > visible :: [Text] -> Template -> Writer Annotation Text
 > visible keySources = return . (getPrioritized keySources)

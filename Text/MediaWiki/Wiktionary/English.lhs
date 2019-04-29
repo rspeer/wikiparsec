@@ -323,11 +323,54 @@ Wiktionary.Base.
 Links
 -----
 
+Starting in this section, we get to make the most of our little
+`annotationBuilder` language for expressing how to convert templates into
+AnnotatedText.
+
+This little language is defined in the documentation for
+`Text.MediaWiki.Wiktionary.Base`, but here's a summary:
+
+- `put` _key_ _value_: put the actual value _value_ in the annotation named
+  _key_. This is particularly used for constants.
+
+- `adapt` _key_ _keylist_ _template_: try looking up each key in _keylist_ in
+  the _template_, in order. When we find such a key that exists, its value will
+  become the value of the annotation named `key`.
+
+- `visible` _keylist_ _template_: like `adapt`, but it sets the text of the
+  AnnotatedText object to the value it finds. In other words, it says
+  which of the template values becomes the text that would be visible to
+  someone reading the article.
+
+- `invisible`: states that this template has no visible text, so we should just
+  produce the empty string with annotations.
+
+The first template we'll implement this way is the `{{link}}` template, which
+is used like this:
+
+    {{link|en|go|went}}
+
+or
+
+    {{link|la|similis|t=like}}
+
+The first argument is always the language code, which we assign to `"language"`
+in the annotation. The second argument is the page being linked to.
+
+The visible text of the link is usually the second argument, but there can be a
+third argument that overrides it, perhaps with a word form, as in
+`{{link|en|go|went}}` which links to "go" with the visible text of "went".
+Thus, the priority order for which fields to extract the visible text from is
+`["3", "2"]`.
+
+Some additional fields can specify the part of speech of the entry being linked
+("pos") or a short definition ("gloss").
+
 > handleLinkTemplate :: Template -> AnnotatedText
 > handleLinkTemplate t = annotationBuilder $ do
 >   adapt "language" arg1 t
 >   adapt "page" arg2 t
->   adapt "gloss" ["4", "gloss"] t
+>   adapt "gloss" ["4", "t", "gloss"] t
 >   adapt "pos" ["pos"] t
 >   visible ["3", "2"] t
 >
@@ -370,7 +413,7 @@ template that makes sense in MediaWiki-land, so we introduce `fixLanguageArg`,
 which ensures that the first two non-language arguments are labeled "2" and "3".
 
 > fixLanguageArg :: Template -> Template
-> fixLanguageArg t = 
+> fixLanguageArg t =
 >   if (hasKey "lang" t)
 >     then [("lang", get "lang" t), ("2", get "1" t), ("3", get "2" t)]
 >     else [("lang", get "1" t), ("2", get "2" t), ("3", get "3" t)]
@@ -387,7 +430,7 @@ which ensures that the first two non-language arguments are labeled "2" and "3".
 >       mapFromList [("rel", "*derived"), ("language", language), ("page", term2)]]
 >      text
 
-{{prefix}}, {{suffix}}, and {{cognate}} have a language argument that can move
+`{{prefix}}`, `{{suffix}}`, and `{{cognate}}` have a language argument that can move
 in similar ways.
 
 > handleCognateTemplate :: Template -> AnnotatedText
@@ -414,7 +457,7 @@ in similar ways.
 >   adapt "page" arg2 t'
 >   visible arg2 t'
 
-The {{ja-r}} template is used to create Japanese text with "ruby text" or
+The `{{ja-r}}` template is used to create Japanese text with "ruby text" or
 "furigana" -- small hiragana characters above the text to indicate how the
 kanji are pronounced. In some cases, the `%` character is used to specify how
 the hiragana and kanji should be aligned.
@@ -573,6 +616,9 @@ The big template dispatcher
 > enTemplates "link"      = handleLinkTemplate
 > enTemplates "m"         = handleLinkTemplate
 > enTemplates "mention"   = handleLinkTemplate
+
+TODO: implement `ja-l` and `ko-l`
+
 > enTemplates "inherited" = handleDerivationTemplate
 > enTemplates "inh"       = handleDerivationTemplate
 > enTemplates "derived"   = handleDerivationTemplate
