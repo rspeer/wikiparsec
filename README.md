@@ -49,11 +49,11 @@ extracts paragraphs of plain text from a MediaWiki dump in XML format
 (ideally Wikipedia). It can be run with:
 
 ```sh
-bunzip2 -c wikipedia.xml.bz2 | stack exec wiki2text
+bunzip2 -c wikipedia.xml.bz2 | stack exec wiki2text > wikipedia.txt
 ```
 
-`wiktionary-parser` parses the structure of some
-languages' Wiktionaries to extract a stream of lexical facts in JSON format.
+`wiktionary-parser` parses the structure of some languages' Wiktionaries to
+extract a stream of lexical facts in [JSON lines](http://jsonlines.org/) format.
 It takes one argument, the language code of the Wiktionary it will be parsing.
 Each language has its own structure of Wiktionary entries, and so far we
 can parse:
@@ -65,7 +65,7 @@ can parse:
 To run it in English, for example:
 
 ```sh
-bunzip2 -c enwiktionary.xml.bz2 | stack exec wiktionary-parser en
+bunzip2 -c enwiktionary.xml.bz2 | stack exec wiktionary-parser en > enwiktionary.jsonl
 ```
 
 
