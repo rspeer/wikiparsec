@@ -313,6 +313,20 @@ first sense ID it finds, if any.
 >     Nothing -> findSenseIDInList rest
 > findSenseIDInList [] = Nothing
 
+As of version 3, we can parse "warnings" that a particular definition is not one
+that we should use -- such as if it's archaic or offensive.
+
+> findWarning :: AnnotatedText -> Maybe Text
+> findWarning atext = findWarningInList (getAnnotations atext)
+>
+> findWarningInList :: [Annotation] -> Maybe Text
+> findWarningInList (annot:rest) =
+>   case (lookup "warning" annot) of
+>     Just x -> Just x
+>     Nothing -> findWarningInList rest
+> findWarningInList [] = Nothing
+
+
 Definition sections
 -------------------
 
@@ -569,6 +583,11 @@ The WiktionaryFacts that we output are a fact built with `makeDefinitionFact` fo
 each piece of the definition text, plus a fact built with `annotationToFact`
 for each usable annotation on that text.
 
+If the definition contains a "warning" (see `findWarning`), then the only fact
+will be one where the relation is "warning" and the target is the reason for the
+warning, such as the word "rare" or "offensive". These 'warning' outputs are meant
+for diagnostic purposes, and are discarded when building ConceptNet.
+
 > definitionToFacts :: Language -> WiktionaryTerm -> LabeledDef -> [WiktionaryFact]
 > definitionToFacts language thisTerm defPair =
 >   let defText = snd defPair
@@ -577,8 +596,12 @@ for each usable annotation on that text.
 >       defSense = mplus (findSenseID defText) (nonEmpty (Just (fst defPair)))
 >       termSense = thisTerm {wtSense=defSense}
 >       defPieces = splitDefinition (stripSpaces (getText defText))
->   in (map (makeDefinitionFact termSense language) defPieces)
->      ⊕ (map (annotationToFact language termSense) (linkableAnnotations defText))
+>   in
+>     case findWarning defText of
+>       Just warning -> [makeFact "warning" termSense (simpleTerm language warning)]
+>       Nothing ->
+>         (map (makeDefinitionFact termSense language) defPieces)
+>           ⊕ (map (annotationToFact language termSense) (linkableAnnotations defText))
 
 `makeDefinitionFact` makes a WiktionaryFact out of readable text in a
 definition.  It takes in the term being defined and the language it's being

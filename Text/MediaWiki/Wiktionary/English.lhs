@@ -229,7 +229,7 @@ to template arguments that aren't there.
 >   "literally", "literal", "many", "markedly", "mildly", "now", "nowadays",
 >   "of", "of a", "of an", "often", "originally", "possibly", "rarely",
 >   "slightly", "sometimes", "somewhat", "strongly", "typically", "usually",
->   "very", "in", "of"]
+>   "very", "in", "of", "likely"]
 
 Often we can tell by the prefix of a label that it describes a feature of the
 word as a word, not of its meaning. This can be called the "use-mention
@@ -272,9 +272,12 @@ separate in case we ever want to output them:
 
 > usageLabels :: HashSet Text
 > usageLabels = setFromList [
->   "obsolete", "rare", "dated", "archaic", "colloquial", "informal",
->   "figuratively", "figurative", "poetic", "uncommon", "neologism",
->   "obsolete form"]
+>   "colloquial", "informal", "figuratively", "figurative", "poetic",
+>   "neologism", "dated"]
+>
+> usageWarningLabels :: HashSet Text
+> usageWarningLabels = setFromList [
+>   "obsolete", "rare", "archaic", "obsolete form", "offensive", "ethnic slur"]
 
 Combine these together into a set of all labels we want to ignore.
 
@@ -285,15 +288,26 @@ Combine these together into a set of all labels we want to ignore.
 > ignoreLabel label = (elem label ignoredLabels) ||
 >                     (any (\prefix -> isPrefixOf prefix label) mentionPrefixes)
 
+"Warning" labels are not ignored, but become additional annotations, created with
+`labelToWarning`. These will prevent facts from the entry from being output in
+`Text.MediaWiki.Wiktionary.Base`.
+
+> warnLabel :: Text -> Bool
+> warnLabel label = elem label usageWarningLabels
+>
 > handleLabelTemplate :: Template -> AnnotatedText
 > handleLabelTemplate template =
 >   let entries     = map (\arg -> get arg template) ["2", "3", "4", "5"]
 >       goodEntries = filter (not . ignoreLabel) entries
->       annotations = map labelToAnnotation goodEntries
+>       badEntries  = filter warnLabel entries
+>       annotations = (map labelToAnnotation goodEntries) <> (map labelToWarning badEntries)
 >   in annotate annotations (asText "")
 >
 > labelToAnnotation :: Text -> Annotation
 > labelToAnnotation label = mapFromList [("rel", "context"), ("language", "en"), ("page", label)]
+>
+> labelToWarning :: Text -> Annotation
+> labelToWarning label = mapFromList [("warning", label)]
 
 Qualifiers are similar to labels, but take just a single argument.
 
