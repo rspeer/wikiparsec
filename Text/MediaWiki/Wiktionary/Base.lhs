@@ -301,30 +301,15 @@ clean up the processing to make this function unnecessary?)
 We might find out the sense ID from a different Annotation than the one
 containing a link, so we have to handle this at the AnnotatedText level.
 `findSenseID` scans through all annotations on a span of text, returning the
-first sense ID it finds, if any.
+first sense ID it finds, if any. This is built on the `findAnnotationValue`
+operation from `Text.MediaWiki.AnnotatedText`.
 
-> findSenseID :: AnnotatedText -> Maybe Text
-> findSenseID atext = findSenseIDInList (getAnnotations atext)
->
-> findSenseIDInList :: [Annotation] -> Maybe Text
-> findSenseIDInList (annot:rest) =
->   case (lookup "senseID" annot) of
->     Just x -> Just x
->     Nothing -> findSenseIDInList rest
-> findSenseIDInList [] = Nothing
+> findSenseID = findAnnotationValue "senseID"
 
 As of version 3, we can parse "warnings" that a particular definition is not one
 that we should use -- such as if it's archaic or offensive.
 
-> findWarning :: AnnotatedText -> Maybe Text
-> findWarning atext = findWarningInList (getAnnotations atext)
->
-> findWarningInList :: [Annotation] -> Maybe Text
-> findWarningInList (annot:rest) =
->   case (lookup "warning" annot) of
->     Just x -> Just x
->     Nothing -> findWarningInList rest
-> findWarningInList [] = Nothing
+> findWarning = findAnnotationValue "warning"
 
 
 Definition sections

@@ -274,10 +274,6 @@ separate in case we ever want to output them:
 > usageLabels = setFromList [
 >   "colloquial", "informal", "figuratively", "figurative", "poetic",
 >   "neologism", "dated"]
->
-> usageWarningLabels :: HashSet Text
-> usageWarningLabels = setFromList [
->   "obsolete", "rare", "archaic", "obsolete form", "offensive", "ethnic slur"]
 
 Combine these together into a set of all labels we want to ignore.
 
@@ -292,6 +288,10 @@ Combine these together into a set of all labels we want to ignore.
 `labelToWarning`. These will prevent facts from the entry from being output in
 `Text.MediaWiki.Wiktionary.Base`.
 
+> usageWarningLabels :: HashSet Text
+> usageWarningLabels = setFromList [
+>   "obsolete", "rare", "archaic", "obsolete form", "offensive", "ethnic slur"]
+>
 > warnLabel :: Text -> Bool
 > warnLabel label = elem label usageWarningLabels
 >

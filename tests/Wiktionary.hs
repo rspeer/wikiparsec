@@ -10,10 +10,11 @@ import Data.Aeson (encode, decode, Value)
 linkTest = makeLink "" "test" ""
 linkExample = makeLink "" "example" "#English"
 linkOffWiki = makeLink "w" "example" ""
-senseID = mapFromList [("senseID", "challenge, trial")]
+senseID = annotationFromList [("senseID", "challenge, trial")]
+warning = annotationFromList [("warning", "offensive")]
 senseName = "challenge, trial" :: Text
 at1 = annotate [linkTest, senseID] "test"
-at2 = annotate [linkExample] "example"
+at2 = annotate [warning] "test"
 
 english = toLanguage "en"
 german = toLanguage "de"
@@ -45,7 +46,10 @@ tests = test [
     "show term" ~: (show termRussian) ~?= "{\"text\":\"остынуть\",\"language\":\"ru\"}",
     "JSON decodes properly" ~: assert (isJust redecoded),
     "JSON fact matches" ~: decode (encode fact1) ~?= factJSONValue,
-    "find sense ID" ~: findSenseIDInList (getAnnotations at1) ~?= (Just senseName),
+    "find sense ID" ~: findSenseID at1 ~?= (Just senseName),
+    "find no sense ID" ~: findSenseID at2 ~?= Nothing,
+    "find warning" ~: findWarning at2 ~?= (Just "offensive"),
+    "find no warning" ~: findWarning at1 ~?= Nothing,
 
     "annotation is linkable" ~: assert (linkableAnnotation linkTest),
     "off-wiki annotation is not linkable" ~: assert (not (linkableAnnotation linkOffWiki)),
