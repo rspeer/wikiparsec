@@ -290,7 +290,7 @@ Combine these together into a set of all labels we want to ignore.
 
 > usageWarningLabels :: HashSet Text
 > usageWarningLabels = setFromList [
->   "obsolete", "rare", "archaic", "obsolete form", "offensive", "ethnic slur"]
+>   "obsolete", "rare", "obsolete form", "offensive", "ethnic slur"]
 >
 > warnLabel :: Text -> Bool
 > warnLabel label = elem label usageWarningLabels
@@ -314,9 +314,11 @@ Qualifiers are similar to labels, but take just a single argument.
 > handleQualifierTemplate :: Template -> AnnotatedText
 > handleQualifierTemplate template =
 >   let label = get "1" template in
->     if (ignoreLabel label)
->       then mempty
->       else annotate [labelToAnnotation label] ""
+>     if (warnLabel label)
+>       then annotate [labelToWarning label] ""
+>       else if (ignoreLabel label)
+>         then mempty
+>         else annotate [labelToAnnotation label] ""
 
 Sense IDs
 ---------
