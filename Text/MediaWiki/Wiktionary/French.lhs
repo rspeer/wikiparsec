@@ -808,6 +808,10 @@ Other relevant labels from https://fr.wiktionary.org/wiki/Catégorie:Modèles_de
 >   "vulgaire"]
 >
 > contextLabels = domainLabels <> regionLabels <> otherLabels
+>
+> usageWarningLabels :: HashSet Text
+> usageWarningLabels = setFromList [
+>   "désuet", "rare", "injurieux"]
 
 
 > handleContextTemplate :: Template -> AnnotatedText
@@ -817,7 +821,10 @@ Other relevant labels from https://fr.wiktionary.org/wiki/Catégorie:Modèles_de
 > handleMiscContextTemplate :: Template -> AnnotatedText
 > handleMiscContextTemplate template =
 >   annotate [mapFromList [("rel", "context"), ("language", "fr"), ("page", get "1" template)]] ""
-
+>
+> handleWarningTemplate :: Template -> AnnotatedText
+> handleWarningTemplate template =
+>   annotate [mapFromList [("warning", get "0" template)]] ""
 
 Evaluating templates
 ====================
@@ -889,5 +896,6 @@ matches:
 >   -- as a context label
 >   | member x contextLabels     = handleContextTemplate
 >   | isPrefixOf "argot" x       = handleContextTemplate
+>   | member x usageWarningLabels = handleWarningTemplate
 >   | otherwise                  = skipTemplate
 

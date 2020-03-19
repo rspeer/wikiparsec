@@ -104,6 +104,19 @@ cloudberryFacts = [
     WiktionaryFact "translation" (term ["plaquebière","fr","n","1","La plante et le fruit (sauf mention contraire)"]) (term ["Rubus chamaemorus","mul"])
     ]
 
+-- a hypothetical entry that should be blocked by the "warning" rule
+blockedEntry = unlines [
+    "== {{langue|en}} ==",
+    "=== {{S|étymologie}} ===",
+    "=== {{S|adj|en}} ===",
+    "{{en-nom-rég|blakt}}",
+    "'''blocked''' {{pron|blakt|en}}",
+    "# {{injurieux|en}} [[do not|Don't]] [[link]] these words."
+    ]
+
+blockedFacts :: [WiktionaryFact]
+blockedFacts = [WiktionaryFact "warning" (term ["blocked","en","a","1","def.1"]) (term ["injurieux","fr"])]
+
 compareLists :: (Eq a, Show a) => String -> [a] -> [a] -> [Test]
 compareLists name input output =
   -- This deliberately runs off the end of the list. If the lists are the
@@ -111,9 +124,13 @@ compareLists name input output =
   -- confirm this by successfully comparing Nothing to Nothing.
   [(name <> ": item " <> (show i)) ~: (index input i) ~?= (index output i) | i <- [0..(length input)]]
 
+entryTests :: [Test]
 entryTests = compareLists "Example entry for 'plaquebière'" (frParseWiktionary "plaquebière" cloudberryEntry) cloudberryFacts
 
-tests = test entryTests
+blockTests :: [Test]
+blockTests = compareLists "Example blocked entry" (frParseWiktionary "blocked" blockedEntry) blockedFacts
+
+tests = test (entryTests ++ blockTests)
 
 main :: IO ()
 main = void (runTestTT tests)
