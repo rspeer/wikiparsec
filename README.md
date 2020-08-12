@@ -28,7 +28,7 @@ This code is meant to be built with [Haskell Stack][stack]. Install Stack and
 dependencies:
 
 ```
-sudo apt install stack libicu-dev
+sudo apt install haskell-stack libicu-dev
 stack upgrade
 ```
 
