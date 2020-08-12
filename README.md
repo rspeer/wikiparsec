@@ -32,9 +32,12 @@ First you need to install Stack using the Haskell Toolchain's recommended instru
 curl -sSL https://get.haskellstack.org/ | sh
 ```
 
-If you get the Ubuntu version, you will likely get strange errors, because Haskell Stack
-breaks compatibility faster than Ubuntu updates. I'm sorry. If you already have the Ubuntu
-`haskell-stack` package, uninstall it first.
+Yes, you need to run the dodgy command above, even on Ubuntu. The Ubuntu version of
+Haskell Stack [has stopped working](https://bugs.launchpad.net/ubuntu/+source/haskell-stack/+bug/1786197).
+If you have the Ubuntu `haskell-stack` package, uninstall it first, and close your shell so that it
+doesn't remain in your path cache.
+
+If you already have a version of Haskell Stack, you may need to upgrade it with `stack upgrade`.
 
 Then build this code with:
 
