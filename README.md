@@ -24,16 +24,17 @@ Wikiparsec is used to provide dictionary definitions to
 Compiling and running the code
 ------------------------------
 
-This code is meant to be built with [Haskell Stack][stack]. Install Stack and
-dependencies:
+This code is meant to be built with [Haskell Stack][stack].
 
-```
-sudo apt install haskell-stack libicu-dev
-stack upgrade
+First you need to install Stack using the Haskell Toolchain's recommended instructions:
+
+```sh
+curl -sSL https://get.haskellstack.org/ | sh
 ```
 
-If Stack upgraded itself, you need to start a new shell, or else the old path
-to Stack will be cached.
+If you get the Ubuntu version, you will likely get strange errors, because Haskell Stack
+breaks compatibility faster than Ubuntu updates. I'm sorry. If you already have the Ubuntu
+`haskell-stack` package, uninstall it first.
 
 Then build this code with:
 
