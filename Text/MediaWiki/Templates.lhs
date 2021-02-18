@@ -6,6 +6,8 @@
 > module Text.MediaWiki.Templates where
 > import WikiPrelude
 > import Text.MediaWiki.AnnotatedText
+> import Text.MediaWiki.MultiTemplate
+> import qualified Data.Text as T
 
 Parsing templates the same way they're parsed on Wikipedia or Wiktionary would
 be an insanely complicated and time-consuming process, as their actions are
@@ -70,3 +72,13 @@ that function to the `Template` structure.
 > evalTemplate :: TemplateProc -> Template -> AnnotatedText
 > evalTemplate tproc tdata =
 >   let action = tproc (get "0" tdata) in action tdata
+
+
+This is a TemplateProc that isn't used anywhere by default but you can replace 
+ignoreTemplates with it in WikiText.lhs to parse some things that would otherwise be ignored
+
+> multiTemplates :: TemplateProc
+> multiTemplates = const multiTemplate
+> multiTemplate :: TemplateAction
+> multiTemplate = annotFromText . multiSwitch
+

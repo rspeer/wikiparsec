@@ -27,7 +27,7 @@ Library
                        Text.SplitUtils, Text.MediaWiki.AnnotatedText,
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML,
-                       Data.LanguageType, Data.LanguageNames
+                       Data.LanguageType, Data.LanguageNames, Text.MediaWiki.MultiTemplate
   build-depends:       HUnit,
                        base,
                        base-unicode-symbols,
@@ -57,7 +57,7 @@ Executable wiki2text
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML, Text.MediaWiki.XML,
                        Data.LanguageType, Data.LanguageNames,
-                       Text.MediaWiki.WikiText,
+                       Text.MediaWiki.WikiText, Text.MediaWiki.MultiTemplate,
                        WikiPrelude
   build-depends:       base,
                        base-unicode-symbols,
@@ -87,7 +87,7 @@ Executable wp-summary
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML, Text.MediaWiki.XML,
                        Data.LanguageType, Data.LanguageNames,
-                       Text.MediaWiki.WikiText,
+                       Text.MediaWiki.WikiText, Text.MediaWiki.MultiTemplate,
                        WikiPrelude
   build-depends:       base,
                        base-unicode-symbols,
@@ -117,7 +117,7 @@ Executable wp-links
                        Text.MediaWiki.Templates, Text.MediaWiki.Sections,
                        Text.MediaWiki.HTML, Text.MediaWiki.XML,
                        Data.LanguageType, Data.LanguageNames,
-                       Text.MediaWiki.WikiText,
+                       Text.MediaWiki.WikiText, Text.MediaWiki.MultiTemplate,
                        WikiPrelude
   build-depends:       base,
                        base-unicode-symbols,
@@ -152,7 +152,7 @@ Executable wiktionary-parser
                        Text.MediaWiki.Wiktionary.English,
                        Text.MediaWiki.Wiktionary.French,
                        Text.MediaWiki.Wiktionary.German,
-                       Text.Language.Normalize,
+                       Text.Language.Normalize, Text.MediaWiki.MultiTemplate,
                        WikiPrelude
   build-depends:       base,
                        base-unicode-symbols,
