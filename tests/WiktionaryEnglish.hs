@@ -272,12 +272,15 @@ compareLists name input output =
   [(name <> ": item " <> (show i)) ~: (index input i) ~?= (index output i) | i <- [0..(length input)]]
 
 defnTests = [
-    -- Parse a definition list with word senses
+    -- Parse a definition list with word senses and a warning
     testExtract (parseDefinitions "en" enTemplates (termPos "en" "test" "Noun"))
-                "# {{senseid|en|first}} definition 1\n# {{senseid|en|second}} definition 2\n# definition 3"
+                "# {{senseid|en|first}} definition 1\n# {{senseid|en|second}} definition 2\n# definition 3\n# {{label|en|offensive}} don't use this definition\n# {{label|en|obsolete}} {{senseid|en|last}} don't use this either"
                 [WiktionaryFact "definition" (term ["test", "en", "Noun", "", "first"]) (simpleTerm "en" "definition 1"),
                  WiktionaryFact "definition" (term ["test", "en", "Noun", "", "second"]) (simpleTerm "en" "definition 2"),
-                 WiktionaryFact "definition" (term ["test", "en", "Noun", "", "def.3"]) (simpleTerm "en" "definition 3")],
+                 WiktionaryFact "definition" (term ["test", "en", "Noun", "", "def.3"]) (simpleTerm "en" "definition 3"),
+                 WiktionaryFact "warning" (term ["test", "en", "Noun", "", "def.4"]) (simpleTerm "en" "offensive"),
+                 WiktionaryFact "warning" (term ["test", "en", "Noun", "", "last"]) (simpleTerm "en" "obsolete")
+                 ],
 
     -- Parse a "related terms" list, where the first entry has an additional link we ignore
     testExtract (enParseWiktionary "example")

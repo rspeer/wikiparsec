@@ -288,7 +288,26 @@ compareLists name input output =
 
 entryTests = compareLists "Example entry for 'Katze'" (deParseWiktionary "Katze" catEntry) catFacts
 
-tests = test entryTests
+tribusEntry = unlines [
+    "== Tribus ({{Sprache|Deutsch}}) ==",
+    "=== {{Wortart|Substantiv|Deutsch}}, {{f}} ===",
+    "",
+    "==== {{Übersetzungen}} ====",
+    "{{Ü-Tabelle|Ü-links=",
+    "*{{en}}: [1, 2] {{Ü|en|tribe}}",
+    "|Ü-rechts=",
+    "*{{fr}}: [1] {{Ü|fr|}}",
+    "}}",
+    ""]
+
+tribusFacts = [
+    WiktionaryFact "translation" (term ["Tribus","de","n","","def.1"]) (term ["tribe","en"]),
+    WiktionaryFact "translation" (term ["Tribus","de","n","","def.2"]) (term ["tribe","en"])
+    ]
+
+translationTests = compareLists "translations of 'Tribus'" (deParseWiktionary "Tribus" tribusEntry) tribusFacts
+
+tests = test (entryTests ++ translationTests)
 
 main :: IO ()
 main = void (runTestTT tests)

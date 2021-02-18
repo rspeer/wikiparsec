@@ -71,7 +71,7 @@ a function that will extract WiktionaryFacts.
 >   case headings of
 >     (_:_:pos:trans:[]) ->
 >       let term = getHeadingTerm title (evalHeading pos) in
->         if trans == "Übersetzungen"
+>         if trans == "Übersetzungen" || trans == "{{Übersetzungen}}"
 >           then (deParseTranslations term content)
 >           else []
 >     (_:_:pos:[]) ->

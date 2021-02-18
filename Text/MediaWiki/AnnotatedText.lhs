@@ -42,11 +42,26 @@ Some simple functions to extract values from AnnotatedText:
 > getText :: AnnotatedText -> Text
 > getText (AnnotatedText annos t) = t
 
+`findAnnotationValue` is an operation we turn out to need multiple times.
+It searches through the Annotations on an AnnotatedText to find the first
+one with the given key, and then returns `Just` the value of that key.
+If none of the annotations have that key, it returns `Nothing`.
+
+> findAnnotationValue :: Text -> AnnotatedText -> Maybe Text
+> findAnnotationValue key atext = findAnnotationValueInList key (getAnnotations atext)
+>
+> findAnnotationValueInList :: Text -> [Annotation] -> Maybe Text
+> findAnnotationValueInList key (annot:rest) =
+>   case (lookup key annot) of
+>     Just x -> Just x
+>     Nothing -> findAnnotationValueInList key rest
+> findAnnotationValueInList key [] = Nothing
+
+
 Links
 -----
 
-`makeLink` is a constant that can be used as a template for making Annotations
-for internal links.
+`makeLink` can be used as a template for making Annotations for internal links.
 
 > makeLink :: Text -> Text -> Text -> Annotation
 > makeLink namespace page section = annotationFromList [
