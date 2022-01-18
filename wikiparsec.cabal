@@ -45,7 +45,9 @@ Library
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
-                       aeson
+                       aeson,
+		       text-regex-replace
+
 
 Executable wiki2text
   ghc-options:
@@ -75,7 +77,8 @@ Executable wiki2text
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
-                       aeson
+                       aeson,
+		       text-regex-replace
 
 Executable wp-summary
   ghc-options:
@@ -105,7 +108,8 @@ Executable wp-summary
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
-                       aeson
+                       aeson,
+		       text-regex-replace
 
 Executable wp-links
   ghc-options:
@@ -135,7 +139,9 @@ Executable wp-links
                        tagsoup,
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
-                       aeson
+                       aeson,
+		       text-regex-replace
+
 
 Executable wiktionary-parser
   ghc-options:
@@ -171,4 +177,6 @@ Executable wiktionary-parser
                        fast-tagsoup-utf8-only,
                        hexpat ==0.20.*,
                        aeson,
-                       aeson-pretty
+                       aeson-pretty,
+		       text-regex-replace
+
