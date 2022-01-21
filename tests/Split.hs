@@ -4,7 +4,7 @@ import Test.HUnit
 import Text.SplitUtils
 import Control.Monad
 
-splitTests = test [
+splitTests = [
     -- Test the case where the delimiter doesn't appear
     splitFirst ":" "test" ~?= ("test", ""),
     splitLast ":" "test" ~?= ("", "test"),
@@ -28,5 +28,16 @@ splitTests = test [
     splitFirst "☃" "tëst☃øne☃tẃo" ~?= ("tëst", "☃øne☃tẃo"),
     splitLast "☃" "tëst☃øne☃tẃo" ~?= ("tëst☃øne☃", "tẃo")]
 
-tests = splitTests
+balanceTests = [
+    removeParentheticals "text" ~?= "text",
+    removeParentheticals "text (clarification)" ~?= "text",
+    removeParentheticals "text (clarification (too much)) and more" ~?= "text and more",
+    removeParentheticals "ASCII ()" ~?= "ASCII"
+    removeParentheticals "(212) 555-1212" ~?= " 555-1212",
+    removeParentheticals "((what" ~?= "",
+    removeParentheticals "))what" ~?= "what",
+    removeParentheticals ")(" ~?= "",
+    removeParentheticals "(())" ~?= ""]
+
+tests = test (splitTests ++ balanceTests)
 main = void (runTestTT tests)

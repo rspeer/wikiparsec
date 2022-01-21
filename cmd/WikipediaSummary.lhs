@@ -5,6 +5,7 @@
 > import Text.MediaWiki.WikiText (outputPlainText, parseEntireSection, showError)
 > import Text.MediaWiki.Sections (parsePageIntoSections, WikiSection, headings, content)
 > import Data.Text.ICU.Replace (replaceAll)
+> import Text.SplitUtils (removeParentheticals)
 
 Top level
 =========
@@ -16,15 +17,24 @@ After that, it removes extra spaces, including before punctuation.
 
 > cleanup :: Text -> Text
 > cleanup =
->   (replaceAll " ([!.,?;:])" "$1") .
 >   (replaceAll "\\s+" " ") .
->   (replaceAll "[(][^)]*[)]" "")
+>   removeParentheticals
+
+We throw out summaries that end in a colon (as they're probably unhelpful
+disambiguation lines), and empty summaries.
+
+> okayText :: Text -> Bool
+> okayText text = (
+>   (length text) > 0    
+>   && not (isSuffixOf ":" (stripSpaces text))
+>   )
 >
 > showArticle :: Text -> Text -> IO ()
-> showArticle title text = do
->   putStr title
->   putStr "\t"
->   putStrLn (cleanup text)
+> showArticle title text = let ctext = (cleanup text) in do
+>   when (okayText ctext) $ do
+>     putStr title
+>     putStr "\t"
+>     putStrLn ctext
 >
 > outputPlainTextFirstSection :: Text -> Text -> IO ()
 > outputPlainTextFirstSection title text =
