@@ -666,7 +666,7 @@ the plain text that they contain.
 
 To get links instead of text:
 
-> sectionArticleLinks :: TemplateProc -> Parser [Text]
+> sectionArticleLinks :: TemplateProc -> Parser [Annotation]
 > sectionArticleLinks tproc = getArticleLinks <$> sectionAnnotated tproc
 
 

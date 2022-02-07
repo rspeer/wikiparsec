@@ -4,18 +4,21 @@
 >                            pageNamespace, pageTitle, pageText, pageRedirect)
 > import Text.MediaWiki.WikiText (parseEntireSectionLinks, showError)
 > import Text.MediaWiki.Sections (parsePageIntoSections, WikiSection, headings, content)
+> import Text.MediaWiki.AnnotatedText (Annotation)
 
 Top level
 =========
 
-> showLinks :: Text -> [Text] -> IO ()
+> showLinks :: Text -> [Annotation] -> IO ()
 > showLinks title = mapM_ (showLink title)
 >
-> showLink :: Text -> Text -> IO ()
+> showLink :: Text -> Annotation -> IO ()
 > showLink title link = do
 >   putStr title
 >   putStr "\t"
->   putStrLn link
+>   putStr (get "page" link)
+>   putStr "\t"
+>   putStrLn (get "text" link)
 >
 > showSectionLinks title section =
 >   case parseEntireSectionLinks (content section) of

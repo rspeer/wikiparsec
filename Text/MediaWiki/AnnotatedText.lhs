@@ -69,8 +69,8 @@ If links in particular are what we're interested in, we can use `getLinks` or
 > getLinks :: AnnotatedText -> [Annotation]
 > getLinks atext = filter filterLink (getAnnotations atext)
 >
-> getArticleLinks :: AnnotatedText -> [Text]
-> getArticleLinks atext = map (get "page") (filter filterArticleLink (getAnnotations atext))
+> getArticleLinks :: AnnotatedText -> [Annotation]
+> getArticleLinks atext = (filter filterArticleLink (getAnnotations atext))
 
 Operations on AnnotatedTexts
 ----------------------------
