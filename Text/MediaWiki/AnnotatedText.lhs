@@ -45,15 +45,15 @@ Some simple functions to extract values from AnnotatedText:
 Links
 -----
 
-`makeLink` is a constant that can be used as a template for making Annotations
-for internal links.
+`makeLink` can be used for making Annotations for internal links.
 
-> makeLink :: Text -> Text -> Text -> Annotation
-> makeLink namespace page section = annotationFromList [
+> makeLink :: Text -> Text -> Text -> Text -> Annotation
+> makeLink namespace page section text = annotationFromList [
 >   ("rel", "link"),
 >   ("namespace", namespace),
 >   ("page", page),
->   ("section", section)]
+>   ("section", section),
+>   ("text", text)]
 
 `filterLink` tests whether an annotation is a link.
 

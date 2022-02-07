@@ -5,8 +5,8 @@ import Text.MediaWiki.AnnotatedText
 import WikiPrelude
 import Control.Monad
 
-linkTest = makeLink "" "test" ""
-linkExample = makeLink "en" "example" "#English"
+linkTest = makeLink "" "test" "" "test"
+linkExample = makeLink "en" "example" "#English" "example"
 at1 = annotate [linkTest] "test"
 at2 = annotate [linkExample] "example"
 

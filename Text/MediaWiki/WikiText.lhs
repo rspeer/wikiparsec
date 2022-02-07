@@ -321,22 +321,18 @@ to the `alternateText` rule.
 > internalLink recurse tproc = do
 >   string "[["
 >   target <- plainTextInLink
->   maybeText <- optionMaybe (alternateText recurse tproc)
 >   let {
->     link      = parseLink target;
->     annotated = case maybeText of
->                   Just text -> annotate [link] text
->                   Nothing   -> annotate [link] (get "page" link)
+>     (namespace, local) = splitLast ":" target ;
+>     (page, section) = splitFirst "#" local
 >   } in do
+>     maybeText <- optionMaybe (alternateText recurse tproc)
+>     let {
+>       text = fromMaybe page maybeText ;
+>       link = makeLink namespace page section text ;
+>       annotated = annotate [link] text
+>     } in do
 >        string "]]"
 >        return annotated
->
-> parseLink :: Text -> Annotation
-> parseLink target =
->   makeLink namespace page section
->   where
->     (namespace, local) = splitLast ":" target
->     (page, section) = splitFirst "#" local
 
 The label of a link can be made of Wikitext and can even include templates or,
 in the case of image captions, other links.  When we encounter a label that's

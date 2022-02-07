@@ -36,11 +36,11 @@ linkTests = [
     testParser (sectionText ignoreTemplates) "[[Category:English nouns]]" "English nouns\n",
     testParser (sectionText ignoreTemplates) "uphold[ing] the wages system" "uphold[ing] the wages system\n",
 
-    testAnnotations (sectionAnnotated ignoreTemplates) "this [[word]]" [makeLink "" "word" ""],
-    testAnnotations (sectionAnnotated ignoreTemplates) "[[word|''this'' word]]" [makeLink "" "word" ""],
-    testAnnotations (sectionAnnotated ignoreTemplates) "this [[word#English]]" [makeLink "" "word" "#English"],
-    testAnnotations (sectionAnnotated ignoreTemplates) "this [[w:en:word]]" [makeLink "w:en:" "word" ""],
-    testAnnotations (sectionAnnotated ignoreTemplates) "[[Category:English nouns]]" [makeLink "Category:" "English nouns" ""]
+    testAnnotations (sectionAnnotated ignoreTemplates) "this [[word]]" [makeLink "" "word" "" "word"],
+    testAnnotations (sectionAnnotated ignoreTemplates) "[[word|''this'' word]]" [makeLink "" "word" "" "this word"],
+    testAnnotations (sectionAnnotated ignoreTemplates) "this [[word#English]]" [makeLink "" "word" "#English" "word"],
+    testAnnotations (sectionAnnotated ignoreTemplates) "this [[w:en:word]]" [makeLink "w:en:" "word" "" "word"],
+    testAnnotations (sectionAnnotated ignoreTemplates) "[[Category:English nouns]]" [makeLink "Category:" "English nouns" "" "English nouns"]
     ]
 
 templateTests = [

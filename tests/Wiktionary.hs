@@ -7,9 +7,9 @@ import Text.MediaWiki.WikiText
 import Text.MediaWiki.Wiktionary.Base
 import Data.Aeson (encode, decode, Value)
 
-linkTest = makeLink "" "test" ""
-linkExample = makeLink "" "example" "#English"
-linkOffWiki = makeLink "w" "example" ""
+linkTest = makeLink "" "test" "" "test"
+linkExample = makeLink "" "example" "#English" "example"
+linkOffWiki = makeLink "w" "example" "" "example"
 senseID = mapFromList [("senseID", "challenge, trial")]
 senseName = "challenge, trial" :: Text
 at1 = annotate [linkTest, senseID] "test"
