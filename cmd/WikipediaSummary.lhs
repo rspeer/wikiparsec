@@ -28,28 +28,65 @@ disambiguation lines), and empty summaries.
 >   (length text) > 0    
 >   && not (isSuffixOf ":" (stripSpaces text))
 >   )
->
-> showArticle :: Text -> Text -> IO ()
-> showArticle title text = let ctext = (cleanup text) in do
+
+Okay, now all the imperative code that gets text onto standard out, in various
+formats. Haskell devs will hate this code and I kinda do too.
+
+> showArticleTabular :: Text -> Text -> IO ()
+> showArticleTabular title text = let ctext = (cleanup text) in do
 >   when (okayText ctext) $ do
 >     putStr title
 >     putStr "\t"
 >     putStrLn ctext
 >
-> outputPlainTextFirstSection :: Text -> Text -> IO ()
-> outputPlainTextFirstSection title text =
+> outputTabularFirstSection :: Text -> Text -> IO ()
+> outputTabularFirstSection title text =
 >   let sections = (parsePageIntoSections text)
 >       Just firstSection = headMay sections
 >   in case parseEntireSection (content firstSection) of
 >     Left err -> return ()
->     Right parsed -> showArticle title parsed
+>     Right parsed -> showArticleTabular title parsed
 >
-> handlePage :: WikiPage -> IO ()
-> handlePage page = do
+> outputPlainTextArticle :: Text -> Text -> IO ()
+> outputPlainTextArticle title text = do
+>   putStr "\n\n<article> "
+>   putStrLn title
+>   putStr "\n"
+>   let sections = impureNonNull (parsePageIntoSections text)
+>       firstSection = head sections
+>       restSections = tail sections
+>     in do
+>       outputPlainFirstSection firstSection
+>       mapM_ outputPlainTextSection restSections
+>
+> outputPlainFirstSection :: WikiSection -> IO ()
+> outputPlainFirstSection section = do
+>   case parseEntireSection (content section) of
+>     Left err -> return ()
+>     Right parsed -> putStrLn (removeParentheticals parsed)
+>
+> outputPlainTextSection :: WikiSection -> IO ()
+> outputPlainTextSection section = do
+>   let headingLvl = length (headings section)
+>   let heading = last (impureNonNull (headings section))
+>   putStr "\n"
+>   putStr (replicate headingLvl '#')
+>   putStr " "
+>   putStrLn heading
+>   putStr "\n"
+>   case parseEntireSection (content section) of
+>     Left err -> return ()
+>     Right parsed -> putStrLn parsed
+>
+> handlePage :: Bool -> WikiPage -> IO ()
+> handlePage fullArticles page = do
 >   when (pageNamespace page == "0" && pageRedirect page == Nothing) $ do
->     outputPlainTextFirstSection (pageTitle page) (pageText page)
+>     if fullArticles
+>       then (outputPlainTextArticle (pageTitle page) (pageText page))
+>       else (outputTabularFirstSection (pageTitle page) (pageText page))
 >
 > main :: IO ()
 > main = do
->   processMediaWikiStdin handlePage
-
+>   args <- getArgs
+>   processMediaWikiStdin (handlePage ("--articles" ∈ args))
+>   
