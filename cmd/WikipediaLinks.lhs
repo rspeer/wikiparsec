@@ -43,6 +43,7 @@ links in tabular form.
 > showLink title link = do
 >   putStr title
 >   putStr "\t"
+>   when ((get "namespace" link) /= "") (putStr (get "namespace" link))
 >   putStr (replaceAll "\\n" " " (get "text" link))
 >   putStr "\t"
 >   putStrLn (get "page" link)

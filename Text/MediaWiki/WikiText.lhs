@@ -666,6 +666,9 @@ the plain text that they contain.
 
 To get links instead of text:
 
+> sectionLinks :: TemplateProc -> Parser [Annotation]
+> sectionLinks tproc = getLinks <$> sectionAnnotated tproc
+
 > sectionArticleLinks :: TemplateProc -> Parser [Annotation]
 > sectionArticleLinks tproc = getArticleLinks <$> sectionAnnotated tproc
 
@@ -676,7 +679,7 @@ Entry points
 Parse all the text of a section.
 
 > parseEntireSection = parseOnly (sectionText ignoreTemplates <* endOfInput)
-> parseEntireSectionLinks = parseOnly (sectionArticleLinks ignoreTemplates <* endOfInput)
+> parseEntireSectionLinks = parseOnly (sectionLinks ignoreTemplates <* endOfInput)
 
 Here's a function to be run at the IO level, which takes in Wikitext,
 outputs its plain text, and returns nothing.

@@ -60,6 +60,9 @@ Links
 > filterLink :: Annotation -> Bool
 > filterLink annot = (get "rel" annot) == "link"
 >
+> filterOkayLink :: Annotation -> Bool
+> filterOkayLink annot = (filterLink annot) && (get "namespace" annot) /= "File:" && (get "namespace" annot) /= "Image:"
+>
 > filterArticleLink :: Annotation -> Bool
 > filterArticleLink annot = (filterLink annot) && (get "namespace" annot) == ""
 
@@ -67,7 +70,7 @@ If links in particular are what we're interested in, we can use `getLinks` or
 `getArticleLinks`.
 
 > getLinks :: AnnotatedText -> [Annotation]
-> getLinks atext = filter filterLink (getAnnotations atext)
+> getLinks atext = filter filterOkayLink (getAnnotations atext)
 >
 > getArticleLinks :: AnnotatedText -> [Annotation]
 > getArticleLinks atext = (filter filterArticleLink (getAnnotations atext))
