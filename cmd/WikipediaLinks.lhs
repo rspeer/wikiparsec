@@ -43,9 +43,9 @@ links in tabular form.
 > showLink title link = do
 >   putStr title
 >   putStr "\t"
->   when ((get "namespace" link) /= "") (putStr (get "namespace" link))
->   putStr (replaceAll "\\n" " " (get "text" link))
+>   putStr (replaceAll "\n" " " (get "text" link))
 >   putStr "\t"
+>   when ((get "namespace" link) /= "") (putStr (get "namespace" link))
 >   putStrLn (get "page" link)
 
 Similar to showLinks, but for the special case of redirect links.
@@ -55,11 +55,22 @@ Similar to showLinks, but for the special case of redirect links.
 >
 > showRedirectLink :: Text -> Annotation -> IO ()
 > showRedirectLink title link = do
+>   putStr title
+>   putStr "\t"
 >   putStr "#REDIRECT"
+>   putStr "\t"
+>   putStrLn (get "page" link)
+
+I've found it's helpful downstream for every page to conceptually include
+a link to itself, under its own title.
+
+> showSelfLink :: Text -> IO ()
+> showSelfLink title = do
+>   putStr title
 >   putStr "\t"
 >   putStr title
 >   putStr "\t"
->   putStrLn (get "page" link)
+>   putStr title
 
 Extracting links from pages
 ===========================
@@ -100,6 +111,7 @@ handleRedirectPage as appropriate.
 >
 > handleArticlePage page = do
 >   when (pageNamespace page == "0") $ do
+>     showSelfLink (pageTitle page)
 >     showPageLinks (pageTitle page) (pageText page)
 
 Top level

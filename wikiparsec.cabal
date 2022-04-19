@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                wikiparsec
-version:             2.0.0
+version:             2.1.0
 synopsis:            An LL parser for extracting information from Wiki text, particularly Wiktionary.
 -- description:
 homepage:            http://github.com/LuminosoInsight/wikiparsec

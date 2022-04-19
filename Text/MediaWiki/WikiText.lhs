@@ -322,13 +322,13 @@ to the `alternateText` rule.
 >   string "[["
 >   target <- plainTextInLink
 >   let {
->     (namespace, local) = splitLast ":" target ;
->     (page, section) = splitFirst "#" local
+>     (page, section) = splitFirst "#" target ;
+>     (namespace, local) = splitLast ":" page
 >   } in do
 >     maybeText <- optionMaybe (alternateText recurse tproc)
 >     let {
->       text = fromMaybe page maybeText ;
->       link = makeLink namespace page section text ;
+>       text = fromMaybe local maybeText ;
+>       link = makeLink namespace local section text ;
 >       annotated = annotate [link] text
 >     } in do
 >        string "]]"

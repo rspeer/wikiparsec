@@ -40,7 +40,9 @@ linkTests = [
     testAnnotations (sectionAnnotated ignoreTemplates) "[[word|''this'' word]]" [makeLink "" "word" "" "this word"],
     testAnnotations (sectionAnnotated ignoreTemplates) "this [[word#English]]" [makeLink "" "word" "#English" "word"],
     testAnnotations (sectionAnnotated ignoreTemplates) "this [[w:en:word]]" [makeLink "w:en:" "word" "" "word"],
-    testAnnotations (sectionAnnotated ignoreTemplates) "[[Category:English nouns]]" [makeLink "Category:" "English nouns" "" "English nouns"]
+    testAnnotations (sectionAnnotated ignoreTemplates) "[[Category:English nouns]]" [makeLink "Category:" "English nouns" "" "English nouns"],
+    testAnnotations (sectionAnnotated ignoreTemplates) "[[Allosaurus: a Walking with Dinosaurs' Special|The Ballad of Big Al]]" [makeLink "Allosaurus:" " a Walking with Dinosaurs' Special" "" "The Ballad of Big Al"],
+    testAnnotations (sectionAnnotated ignoreTemplates) "[[Top Shot#Episode 5: .22The Good.2C the Rat and the Ugly.22|fifth episode]]" [makeLink "" "Top Shot" "#Episode 5: .22The Good.2C the Rat and the Ugly.22" "fifth episode"]
     ]
 
 templateTests = [
