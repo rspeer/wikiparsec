@@ -70,7 +70,7 @@ a link to itself, under its own title.
 >   putStr "\t"
 >   putStr title
 >   putStr "\t"
->   putStr title
+>   putStrLn title
 
 Extracting links from pages
 ===========================
