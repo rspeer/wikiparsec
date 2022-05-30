@@ -146,6 +146,7 @@ catEntry = unlines [
 
 catFacts :: [WiktionaryFact]
 catFacts = [
+    WiktionaryFact "form/genus" (term ["f","de"]) (term ["Katze","de","n"]),
     WiktionaryFact "form/nominativ_singular" (term ["Katze","de"]) (term ["Katze","de","n"]),
     WiktionaryFact "form/nominativ_plural" (term ["Katzen","de"]) (term ["Katze","de","n"]),
     WiktionaryFact "form/genitiv_singular" (term ["Katze","de"]) (term ["Katze","de","n"]),
