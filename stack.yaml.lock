@@ -7,20 +7,27 @@ packages:
 - completed:
     hackage: fast-tagsoup-utf8-only-1.0.5@sha256:9292c8ff275c08b88b6013ccc410182552f180904214a07ad4db932ab462aaa1,1651
     pantry-tree:
-      size: 242
       sha256: e11a37330ae114279efd501f718e8a570c3d0763c890183531a1d81610262d11
+      size: 242
   original:
     hackage: fast-tagsoup-utf8-only-1.0.5
 - completed:
     hackage: text-regex-replace-0.1.1.4@sha256:58d96b4e5caec8bf9dd2ca6eaa206fe5bce0fd162759c5e102a92c05f6bd5ebc,1547
     pantry-tree:
-      size: 360
       sha256: d7005331a160dffc75bc790a52abb1b68bbdb9dde99c8d4f95ce2edaf70b6385
+      size: 360
   original:
     hackage: text-regex-replace-0.1.1.4
+- completed:
+    hackage: text-icu-0.7.1.0@sha256:6cd1b5a22f7271dc67bab3904dd5f631c93b0c6f2aacbfb07bd139810c4d1668,3646
+    pantry-tree:
+      sha256: 60034a5492ff1778c1953f3621a00341acda6d5db3677d9829c3d8c1cd45db9e
+      size: 2307
+  original:
+    hackage: text-icu-0.7.1.0
 snapshots:
 - completed:
+    sha256: fbce9f11b2f1c637855eb29fe952f3ac16c35d46836df0dee0cc54a85e1e33d6
     size: 502349
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/12/6.yaml
-    sha256: fbce9f11b2f1c637855eb29fe952f3ac16c35d46836df0dee0cc54a85e1e33d6
   original: lts-12.6
